@@ -1,0 +1,1127 @@
+{
+  "version": "1.0.0",
+  "componentsMap": [
+    {
+      "package": "@tenx-ui/materials",
+      "version": "1.5.9",
+      "exportName": "Page",
+      "destructuring": true,
+      "subName": "",
+      "componentName": "Page"
+    },
+    {
+      "package": "@tenx-ui/materials",
+      "version": "1.5.9",
+      "exportName": "Table",
+      "destructuring": true,
+      "subName": "",
+      "componentName": "Table"
+    },
+    {
+      "devMode": "lowCode",
+      "componentName": "LccComponentUiqky"
+    }
+  ],
+  "componentsTree": [
+    {
+      "componentName": "Page",
+      "id": "page-zgb2o",
+      "props": {},
+      "css": "body {\n  font-size: 12px;\n}\n",
+      "meta": {
+        "title": "测试",
+        "router": "/test",
+        "appConfig": {
+          "antd": {
+            "configProvider": {
+              "locale": {
+                "locale": "zh-cn",
+                "Pagination": {
+                  "items_per_page": "条/页",
+                  "jump_to": "跳至",
+                  "jump_to_confirm": "确定",
+                  "page": "页",
+                  "prev_page": "上一页",
+                  "next_page": "下一页",
+                  "prev_5": "向前 5 页",
+                  "next_5": "向后 5 页",
+                  "prev_3": "向前 3 页",
+                  "next_3": "向后 3 页",
+                  "page_size": "页码"
+                },
+                "DatePicker": {
+                  "lang": {
+                    "placeholder": "请选择日期",
+                    "yearPlaceholder": "请选择年份",
+                    "quarterPlaceholder": "请选择季度",
+                    "monthPlaceholder": "请选择月份",
+                    "weekPlaceholder": "请选择周",
+                    "rangePlaceholder": ["开始日期", "结束日期"],
+                    "rangeYearPlaceholder": ["开始年份", "结束年份"],
+                    "rangeMonthPlaceholder": ["开始月份", "结束月份"],
+                    "rangeQuarterPlaceholder": ["开始季度", "结束季度"],
+                    "rangeWeekPlaceholder": ["开始周", "结束周"],
+                    "locale": "zh_CN",
+                    "today": "今天",
+                    "now": "此刻",
+                    "backToToday": "返回今天",
+                    "ok": "确定",
+                    "timeSelect": "选择时间",
+                    "dateSelect": "选择日期",
+                    "weekSelect": "选择周",
+                    "clear": "清除",
+                    "month": "月",
+                    "year": "年",
+                    "previousMonth": "上个月 (翻页上键)",
+                    "nextMonth": "下个月 (翻页下键)",
+                    "monthSelect": "选择月份",
+                    "yearSelect": "选择年份",
+                    "decadeSelect": "选择年代",
+                    "yearFormat": "YYYY年",
+                    "dayFormat": "D日",
+                    "dateFormat": "YYYY年M月D日",
+                    "dateTimeFormat": "YYYY年M月D日 HH时mm分ss秒",
+                    "previousYear": "上一年 (Control键加左方向键)",
+                    "nextYear": "下一年 (Control键加右方向键)",
+                    "previousDecade": "上一年代",
+                    "nextDecade": "下一年代",
+                    "previousCentury": "上一世纪",
+                    "nextCentury": "下一世纪"
+                  },
+                  "timePickerLocale": {
+                    "placeholder": "请选择时间",
+                    "rangePlaceholder": ["开始时间", "结束时间"]
+                  }
+                },
+                "TimePicker": {
+                  "placeholder": "请选择时间",
+                  "rangePlaceholder": ["开始时间", "结束时间"]
+                },
+                "Calendar": {
+                  "lang": {
+                    "placeholder": "请选择日期",
+                    "yearPlaceholder": "请选择年份",
+                    "quarterPlaceholder": "请选择季度",
+                    "monthPlaceholder": "请选择月份",
+                    "weekPlaceholder": "请选择周",
+                    "rangePlaceholder": ["开始日期", "结束日期"],
+                    "rangeYearPlaceholder": ["开始年份", "结束年份"],
+                    "rangeMonthPlaceholder": ["开始月份", "结束月份"],
+                    "rangeQuarterPlaceholder": ["开始季度", "结束季度"],
+                    "rangeWeekPlaceholder": ["开始周", "结束周"],
+                    "locale": "zh_CN",
+                    "today": "今天",
+                    "now": "此刻",
+                    "backToToday": "返回今天",
+                    "ok": "确定",
+                    "timeSelect": "选择时间",
+                    "dateSelect": "选择日期",
+                    "weekSelect": "选择周",
+                    "clear": "清除",
+                    "month": "月",
+                    "year": "年",
+                    "previousMonth": "上个月 (翻页上键)",
+                    "nextMonth": "下个月 (翻页下键)",
+                    "monthSelect": "选择月份",
+                    "yearSelect": "选择年份",
+                    "decadeSelect": "选择年代",
+                    "yearFormat": "YYYY年",
+                    "dayFormat": "D日",
+                    "dateFormat": "YYYY年M月D日",
+                    "dateTimeFormat": "YYYY年M月D日 HH时mm分ss秒",
+                    "previousYear": "上一年 (Control键加左方向键)",
+                    "nextYear": "下一年 (Control键加右方向键)",
+                    "previousDecade": "上一年代",
+                    "nextDecade": "下一年代",
+                    "previousCentury": "上一世纪",
+                    "nextCentury": "下一世纪"
+                  },
+                  "timePickerLocale": {
+                    "placeholder": "请选择时间",
+                    "rangePlaceholder": ["开始时间", "结束时间"]
+                  }
+                },
+                "global": {
+                  "placeholder": "请选择"
+                },
+                "Table": {
+                  "filterTitle": "筛选",
+                  "filterConfirm": "确定",
+                  "filterReset": "重置",
+                  "filterEmptyText": "无筛选项",
+                  "filterCheckall": "全选",
+                  "filterSearchPlaceholder": "在筛选项中搜索",
+                  "selectAll": "全选当页",
+                  "selectInvert": "反选当页",
+                  "selectNone": "清空所有",
+                  "selectionAll": "全选所有",
+                  "sortTitle": "排序",
+                  "expand": "展开行",
+                  "collapse": "关闭行",
+                  "triggerDesc": "点击降序",
+                  "triggerAsc": "点击升序",
+                  "cancelSort": "取消排序"
+                },
+                "Modal": {
+                  "okText": "确定",
+                  "cancelText": "取消",
+                  "justOkText": "知道了"
+                },
+                "Tour": {
+                  "Next": "下一步",
+                  "Previous": "上一步",
+                  "Finish": "结束导览"
+                },
+                "Popconfirm": {
+                  "cancelText": "取消",
+                  "okText": "确定"
+                },
+                "Transfer": {
+                  "titles": ["", ""],
+                  "searchPlaceholder": "请输入搜索内容",
+                  "itemUnit": "项",
+                  "itemsUnit": "项",
+                  "remove": "删除",
+                  "selectCurrent": "全选当页",
+                  "removeCurrent": "删除当页",
+                  "selectAll": "全选所有",
+                  "removeAll": "删除全部",
+                  "selectInvert": "反选当页"
+                },
+                "Upload": {
+                  "uploading": "文件上传中",
+                  "removeFile": "删除文件",
+                  "uploadError": "上传错误",
+                  "previewFile": "预览文件",
+                  "downloadFile": "下载文件"
+                },
+                "Empty": {
+                  "description": "暂无数据"
+                },
+                "Icon": {
+                  "icon": "图标"
+                },
+                "Text": {
+                  "edit": "编辑",
+                  "copy": "复制",
+                  "copied": "复制成功",
+                  "expand": "展开"
+                },
+                "PageHeader": {
+                  "back": "返回"
+                },
+                "Form": {
+                  "optional": "（可选）",
+                  "defaultValidateMessages": {
+                    "default": "字段验证错误${label}",
+                    "required": "请输入${label}",
+                    "enum": "${label}必须是其中一个[${enum}]",
+                    "whitespace": "${label}不能为空字符",
+                    "date": {
+                      "format": "${label}日期格式无效",
+                      "parse": "${label}不能转换为日期",
+                      "invalid": "${label}是一个无效日期"
+                    },
+                    "types": {
+                      "string": "${label}不是一个有效的${type}",
+                      "method": "${label}不是一个有效的${type}",
+                      "array": "${label}不是一个有效的${type}",
+                      "object": "${label}不是一个有效的${type}",
+                      "number": "${label}不是一个有效的${type}",
+                      "date": "${label}不是一个有效的${type}",
+                      "boolean": "${label}不是一个有效的${type}",
+                      "integer": "${label}不是一个有效的${type}",
+                      "float": "${label}不是一个有效的${type}",
+                      "regexp": "${label}不是一个有效的${type}",
+                      "email": "${label}不是一个有效的${type}",
+                      "url": "${label}不是一个有效的${type}",
+                      "hex": "${label}不是一个有效的${type}"
+                    },
+                    "string": {
+                      "len": "${label}须为${len}个字符",
+                      "min": "${label}最少${min}个字符",
+                      "max": "${label}最多${max}个字符",
+                      "range": "${label}须在${min}-${max}字符之间"
+                    },
+                    "number": {
+                      "len": "${label}必须等于${len}",
+                      "min": "${label}最小值为${min}",
+                      "max": "${label}最大值为${max}",
+                      "range": "${label}须在${min}-${max}之间"
+                    },
+                    "array": {
+                      "len": "须为${len}个${label}",
+                      "min": "最少${min}个${label}",
+                      "max": "最多${max}个${label}",
+                      "range": "${label}数量须在${min}-${max}之间"
+                    },
+                    "pattern": {
+                      "mismatch": "${label}与模式不匹配${pattern}"
+                    }
+                  }
+                },
+                "Image": {
+                  "preview": "预览"
+                },
+                "QRCode": {
+                  "expired": "二维码过期",
+                  "refresh": "点击刷新"
+                },
+                "ColorPicker": {
+                  "presetEmpty": "暂无"
+                }
+              },
+              "antd": {
+                "configProvider": {
+                  "space": {
+                    "size": 12
+                  },
+                  "theme": {
+                    "token": {
+                      "fontSize": 12,
+                      "colorLink": "#00b96b",
+                      "colorError": "#f85a5a",
+                      "borderRadius": 2,
+                      "colorPrimary": "#00b96b",
+                      "colorSuccess": "#5cb85c",
+                      "colorWarning": "#ffbf00",
+                      "colorLinkHover": "#6f8bf7"
+                    },
+                    "components": {
+                      "Row": {
+                        "rowVerticalGutter": 20,
+                        "rowHorizontalGutter": 20
+                      },
+                      "Page": {
+                        "pagePadding": 20,
+                        "pagePaddingTop": 20,
+                        "pagePaddingBottom": 32
+                      }
+                    }
+                  },
+                  "componentSize": "middle"
+                }
+              },
+              "theme": {
+                "token": {
+                  "fontSize": 12,
+                  "colorLink": "#00b96b",
+                  "colorError": "#f85a5a",
+                  "borderRadius": 2,
+                  "colorPrimary": "#00b96b",
+                  "colorSuccess": "#5cb85c",
+                  "colorWarning": "#ffbf00",
+                  "colorLinkHover": "#6f8bf7"
+                },
+                "components": {
+                  "Row": {
+                    "rowVerticalGutter": 20,
+                    "rowHorizontalGutter": 20
+                  },
+                  "Page": {
+                    "pagePadding": 20,
+                    "pagePaddingTop": 20,
+                    "pagePaddingBottom": 32
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "state": {},
+      "title": "",
+      "hidden": false,
+      "methods": {},
+      "fileName": "Test",
+      "isLocked": false,
+      "condition": true,
+      "lifeCycles": {
+        "componentDidMount": {
+          "type": "JSFunction",
+          "value": "function componentDidMount() {\n  console.log('did mount');\n}",
+          "source": "function componentDidMount() {\n  console.log('did mount');\n}"
+        },
+        "componentWillUnmount": {
+          "type": "JSFunction",
+          "value": "function componentWillUnmount() {\n  console.log('will unmount');\n}",
+          "source": "function componentWillUnmount() {\n  console.log('will unmount');\n}"
+        }
+      },
+      "conditionGroup": "",
+      "children": [
+        {
+          "componentName": "Table",
+          "id": "node_oclnyc6xz81",
+          "props": {
+            "__component_name": "Table",
+            "rowKey": "id",
+            "dataSource": [
+              {
+                "id": "1",
+                "name": "胡彦斌",
+                "age": 32,
+                "address": "西湖区湖底公园1号"
+              },
+              {
+                "id": "2",
+                "name": "王一博",
+                "age": 28,
+                "address": "滨江区网商路699号"
+              }
+            ],
+            "columns": [
+              {
+                "title": "姓名",
+                "dataIndex": "name",
+                "key": "name"
+              },
+              {
+                "title": "年龄",
+                "dataIndex": "age",
+                "key": "age"
+              }
+            ],
+            "pagination": {
+              "pageSize": 10,
+              "total": 15,
+              "current": 1,
+              "showSizeChanger": false,
+              "showQuickJumper": false,
+              "simple": false,
+              "size": "default"
+            },
+            "showHeader": true,
+            "size": "default",
+            "scroll": {
+              "scrollToFirstRowOnChange": true
+            }
+          },
+          "hidden": false,
+          "title": "",
+          "isLocked": false,
+          "condition": true,
+          "conditionGroup": ""
+        },
+        {
+          "componentName": "LccComponentUiqky",
+          "id": "node_oclnyc6xz82",
+          "props": {
+            "__component_name": "LccComponentUiqky",
+            "title": "应用 1"
+          },
+          "hidden": false,
+          "title": "",
+          "isLocked": false,
+          "condition": true,
+          "conditionGroup": ""
+        }
+      ]
+    }
+  ],
+  "i18n": {},
+  "meta": {
+    "name": "KubeAGI 前端 portal",
+    "version": "0.1.0",
+    "basename": "/kubeagi-portal",
+    "namespace": "kubeagi-portal",
+    "description": "KubeAGI 的前端 portal",
+    "lowCode": {
+      "packages": [
+        {
+          "id": "component-nx9n5",
+          "name": "TEST",
+          "type": "lowCode",
+          "version": "0.0.7",
+          "schema": {
+            "i18n": {
+              "en-US": {
+                "i18n-9kasn3gj": "link",
+                "i18n-dnz1z2ki": "too",
+                "i18n-iaikfrv9": "test",
+                "i18n-ma2afpod": "aaa",
+                "i18n-r3ziw6g5": "d",
+                "i18n-svnvngfx": "test"
+              },
+              "zh-CN": {
+                "i18n-9kasn3gj": "链接",
+                "i18n-dnz1z2ki": "te",
+                "i18n-iaikfrv9": "test",
+                "i18n-ma2afpod": "aaa",
+                "i18n-r3ziw6g5": "tex",
+                "i18n-svnvngfx": "test"
+              }
+            },
+            "meta": {
+              "name": "TEST",
+              "version": "0.0.7",
+              "namespace": "TEST",
+              "description": "TEST"
+            },
+            "utils": [
+              {
+                "name": "message",
+                "type": "npm",
+                "content": {
+                  "package": "antd",
+                  "subName": "",
+                  "exportName": "message",
+                  "componentName": "message",
+                  "destructuring": true
+                },
+                "description": "全局提示"
+              },
+              {
+                "name": "notification",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/materials",
+                  "subName": "",
+                  "exportName": "notification",
+                  "componentName": "notification",
+                  "destructuring": true
+                },
+                "description": "通知提醒框"
+              },
+              {
+                "name": "getAuthData",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/auth-utils",
+                  "subName": "",
+                  "version": "0.0.1",
+                  "exportName": "getAuthData",
+                  "componentName": "getAuthData",
+                  "destructuring": true
+                },
+                "description": "获取认证数据"
+              },
+              {
+                "name": "setAuthData",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/auth-utils",
+                  "version": "0.0.1",
+                  "exportName": "setAuthData",
+                  "componentName": "setAuthData",
+                  "destructuring": true
+                },
+                "description": "设置认证数据"
+              },
+              {
+                "name": "removeAuthData",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/auth-utils",
+                  "version": "0.0.1",
+                  "exportName": "removeAuthData",
+                  "componentName": "removeAuthData",
+                  "destructuring": true
+                },
+                "description": "移除认证数据"
+              },
+              {
+                "name": "isTokenExpired",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/auth-utils",
+                  "version": "0.0.1",
+                  "exportName": "isTokenExpired",
+                  "componentName": "isTokenExpired",
+                  "destructuring": true
+                },
+                "description": "判断 token 是否有效"
+              },
+              {
+                "name": "getAuthorization",
+                "type": "function",
+                "content": {
+                  "value": "() => {\r\n  const authData = this.getAuthData();\r\n  const { token_type, id_token } = authData.token || {};\r\n  const Authorization = token_type && id_token && `${token_type} ${id_token}`;\r\n  return Authorization;\r\n}"
+                },
+                "description": "获取 Authorization header"
+              },
+              {
+                "name": "getAxiosHanlderConfig",
+                "type": "function",
+                "description": "获取 axios 默认配置，也可在配置中指定拦截器，用于数据源初始化 axios handler"
+              }
+            ],
+            "config": {
+              "space": {
+                "size": 12
+              },
+              "theme": {},
+              "select": {
+                "showSearch": true
+              },
+              "authData": {},
+              "componentSize": "middle"
+            },
+            "version": "1.0.0",
+            "constants": {
+              "IS_PROD": {
+                "mock": "false",
+                "type": "JSExpression",
+                "value": "process.env.NODE_ENV === 'production'",
+                "description": "是否为生产环境"
+              }
+            },
+            "componentsMap": [
+              {
+                "package": "@tenx-ui/materials",
+                "subName": "",
+                "version": "1.5.5-beta",
+                "exportName": "UnifiedLink",
+                "componentName": "UnifiedLink",
+                "destructuring": true
+              },
+              {
+                "package": "@tenx-ui/materials",
+                "subName": "",
+                "version": "1.5.5-beta",
+                "exportName": "Component",
+                "componentName": "Component",
+                "destructuring": true
+              }
+            ],
+            "componentsTree": [
+              {
+                "id": "component-nx9n5",
+                "css": "body {\n  font-size: 12px;\n}",
+                "meta": {},
+                "props": {
+                  "category": "11111"
+                },
+                "state": {},
+                "title": "",
+                "hidden": false,
+                "methods": {},
+                "children": [
+                  {
+                    "id": "node_ocll4tp7z71",
+                    "props": {
+                      "to": "",
+                      "target": "_blank",
+                      "children": "链接",
+                      "__component_name": "UnifiedLink"
+                    },
+                    "title": "",
+                    "hidden": false,
+                    "isLocked": false,
+                    "condition": true,
+                    "componentName": "UnifiedLink",
+                    "conditionGroup": ""
+                  }
+                ],
+                "fileName": "TEST",
+                "isLocked": false,
+                "condition": true,
+                "propTypes": [
+                  {
+                    "name": "propName",
+                    "type": "string",
+                    "title": "属性标题",
+                    "setter": "DateSetter"
+                  },
+                  {
+                    "name": "propName222",
+                    "title": "属性标题"
+                  }
+                ],
+                "lifeCycles": {},
+                "originCode": "class Page extends Component {\n  state = {}\n  componentDidMount() {\n    console.log(this.props, 'ppppppppppppppppppppppppppppppp')\n    console.log('did mount');\n  }\n  componentWillUnmount() {\n    console.log('will unmount');\n  }\n  \n  // 你可以在这里编写函数，并且与组件的事件进行绑定，支持JSX语法\n  testFunc() {\n    console.log('test aliLowcode func');\n    return (\n      <div className=\"test-aliLowcode-func\">\n        {this.state.test}\n      </div>\n    );\n  }\n  \n}",
+                "componentName": "Component",
+                "conditionGroup": ""
+              }
+            ]
+          }
+        },
+        {
+          "id": "component-uiqky",
+          "name": "应用卡片",
+          "type": "lowCode",
+          "version": "0.3.0",
+          "schema": {
+            "i18n": {},
+            "meta": {
+              "name": "应用卡片",
+              "version": "0.3.0",
+              "namespace": "app-card",
+              "description": "用来以卡片形式展示应用的组件"
+            },
+            "utils": [
+              {
+                "name": "message",
+                "type": "npm",
+                "content": {
+                  "package": "antd",
+                  "subName": "",
+                  "exportName": "message",
+                  "componentName": "message",
+                  "destructuring": true
+                },
+                "description": "全局提示"
+              },
+              {
+                "name": "notification",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/materials",
+                  "subName": "",
+                  "exportName": "notification",
+                  "componentName": "notification",
+                  "destructuring": true
+                },
+                "description": "通知提醒框"
+              },
+              {
+                "name": "getAuthData",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/auth-utils",
+                  "subName": "",
+                  "version": "0.0.1",
+                  "exportName": "getAuthData",
+                  "componentName": "getAuthData",
+                  "destructuring": true
+                },
+                "description": "获取认证数据"
+              },
+              {
+                "name": "setAuthData",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/auth-utils",
+                  "version": "0.0.1",
+                  "exportName": "setAuthData",
+                  "componentName": "setAuthData",
+                  "destructuring": true
+                },
+                "description": "设置认证数据"
+              },
+              {
+                "name": "removeAuthData",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/auth-utils",
+                  "version": "0.0.1",
+                  "exportName": "removeAuthData",
+                  "componentName": "removeAuthData",
+                  "destructuring": true
+                },
+                "description": "移除认证数据"
+              },
+              {
+                "name": "isTokenExpired",
+                "type": "npm",
+                "content": {
+                  "package": "@tenx-ui/auth-utils",
+                  "version": "0.0.1",
+                  "exportName": "isTokenExpired",
+                  "componentName": "isTokenExpired",
+                  "destructuring": true
+                },
+                "description": "判断 token 是否有效"
+              },
+              {
+                "name": "getAuthorization",
+                "type": "function",
+                "content": {
+                  "value": "() => {\r\n  const authData = this.getAuthData();\r\n  const { token_type, id_token } = authData.token || {};\r\n  const Authorization = token_type && id_token && `${token_type} ${id_token}`;\r\n  return Authorization;\r\n}"
+                },
+                "description": "获取 Authorization header"
+              },
+              {
+                "name": "getAxiosHanlderConfig",
+                "type": "function",
+                "description": "获取 axios 默认配置，也可在配置中指定拦截器，用于数据源初始化 axios handler"
+              }
+            ],
+            "config": {
+              "space": {
+                "size": 12
+              },
+              "theme": {},
+              "select": {
+                "showSearch": true
+              },
+              "authData": {},
+              "componentSize": "middle"
+            },
+            "version": "1.0.0",
+            "constants": {
+              "IS_PROD": {
+                "mock": "false",
+                "type": "JSExpression",
+                "value": "process.env.NODE_ENV === 'production'",
+                "description": "是否为生产环境"
+              }
+            },
+            "componentsMap": [
+              {
+                "package": "@tenx-ui/materials",
+                "subName": "Item",
+                "version": "1.5.8",
+                "exportName": "Descriptions",
+                "componentName": "Descriptions.Item",
+                "destructuring": true
+              },
+              {
+                "package": "@tenx-ui/materials",
+                "subName": "",
+                "version": "1.5.8",
+                "exportName": "Descriptions",
+                "componentName": "Descriptions",
+                "destructuring": true
+              },
+              {
+                "devMode": "lowCode",
+                "componentName": "LccComponentNx9n5"
+              },
+              {
+                "package": "@tenx-ui/materials",
+                "subName": "",
+                "version": "1.5.8",
+                "exportName": "Card",
+                "componentName": "Card",
+                "destructuring": true
+              },
+              {
+                "package": "@tenx-ui/materials",
+                "subName": "",
+                "version": "1.5.8",
+                "exportName": "Component",
+                "componentName": "Component",
+                "destructuring": true
+              }
+            ],
+            "componentsTree": [
+              {
+                "id": "component-uiqky",
+                "css": "body {\n  font-size: 12px;\n}\n",
+                "meta": {},
+                "props": {},
+                "state": {},
+                "title": "",
+                "hidden": false,
+                "methods": {},
+                "children": [
+                  {
+                    "id": "node_oclkum3dda1",
+                    "props": {
+                      "size": "default",
+                      "type": "default",
+                      "actions": [],
+                      "loading": false,
+                      "bordered": false,
+                      "hoverable": false,
+                      "__component_name": "Card"
+                    },
+                    "title": "",
+                    "hidden": false,
+                    "children": [
+                      {
+                        "id": "node_oclkum3dda2",
+                        "props": {
+                          "id": "",
+                          "size": "default",
+                          "colon": true,
+                          "items": [
+                            {
+                              "key": "w5g22zp76uq",
+                              "span": 1,
+                              "label": "属性1",
+                              "children": "test"
+                            },
+                            {
+                              "key": "i4dso2902x",
+                              "span": 1,
+                              "label": "属性2",
+                              "children": "test"
+                            },
+                            {
+                              "key": "pmprbnkm4u",
+                              "span": 1,
+                              "label": "属性3",
+                              "children": "test3"
+                            }
+                          ],
+                          "title": {
+                            "type": "JSExpression",
+                            "value": "this.props.title || '应用标题'"
+                          },
+                          "column": 3,
+                          "layout": "horizontal",
+                          "bordered": false,
+                          "labelStyle": {
+                            "width": 100
+                          },
+                          "borderedBottom": false,
+                          "__component_name": "Descriptions",
+                          "borderedBottomDashed": false,
+                          "_unsafe_MixedSetter_title_select": "VariableSetter"
+                        },
+                        "title": "",
+                        "hidden": false,
+                        "children": [
+                          {
+                            "id": "node_oclkum3dda4",
+                            "props": {
+                              "key": "w5g22zp76uq",
+                              "span": 1,
+                              "label": "属性1",
+                              "children": "test"
+                            },
+                            "title": "",
+                            "hidden": false,
+                            "isLocked": false,
+                            "condition": true,
+                            "componentName": "Descriptions.Item",
+                            "conditionGroup": ""
+                          },
+                          {
+                            "id": "node_oclkum3dda7",
+                            "props": {
+                              "key": "i4dso2902x",
+                              "span": 1,
+                              "label": "属性2",
+                              "children": "test"
+                            },
+                            "title": "",
+                            "hidden": false,
+                            "isLocked": false,
+                            "condition": true,
+                            "componentName": "Descriptions.Item",
+                            "conditionGroup": ""
+                          },
+                          {
+                            "id": "node_oclkum3ddac",
+                            "props": {
+                              "key": "pmprbnkm4u",
+                              "span": 1,
+                              "label": "属性3",
+                              "children": "test3"
+                            },
+                            "title": "",
+                            "hidden": false,
+                            "isLocked": false,
+                            "condition": true,
+                            "componentName": "Descriptions.Item",
+                            "conditionGroup": ""
+                          }
+                        ],
+                        "isLocked": false,
+                        "condition": true,
+                        "componentName": "Descriptions",
+                        "conditionGroup": ""
+                      },
+                      {
+                        "id": "node_oclm4necbl1",
+                        "props": {
+                          "rq": "2023-08-23T00:00:00+08:00",
+                          "yue": {
+                            "type": "JSExpression",
+                            "value": "{\n  \"_isAMomentObject\": true,\n  \"_isUTC\": false,\n  \"_pf\": {\n    \"empty\": false,\n    \"unusedTokens\": [],\n    \"unusedInput\": [],\n    \"overflow\": -2,\n    \"charsLeftOver\": 0,\n    \"nullInput\": false,\n    \"invalidMonth\": null,\n    \"invalidFormat\": false,\n    \"userInvalidated\": false,\n    \"iso\": false,\n    \"parsedDateParts\": [],\n    \"meridiem\": null,\n    \"rfc2822\": false,\n    \"weekdayMismatch\": false\n  },\n  \"_locale\": {\n    \"_calendar\": {\n      \"sameDay\": \"[Today at] LT\",\n      \"nextDay\": \"[Tomorrow at] LT\",\n      \"nextWeek\": \"dddd [at] LT\",\n      \"lastDay\": \"[Yesterday at] LT\",\n      \"lastWeek\": \"[Last] dddd [at] LT\",\n      \"sameElse\": \"L\"\n    },\n    \"_longDateFormat\": {\n      \"LTS\": \"h:mm:ss A\",\n      \"LT\": \"h:mm A\",\n      \"L\": \"MM/DD/YYYY\",\n      \"LL\": \"MMMM D, YYYY\",\n      \"LLL\": \"MMMM D, YYYY h:mm A\",\n      \"LLLL\": \"dddd, MMMM D, YYYY h:mm A\"\n    },\n    \"_invalidDate\": \"Invalid date\",\n    \"ordinal\": function(e){var t=e%10;return e+(1===D(e%100/10)?\"th\":1===t?\"st\":2===t?\"nd\":3===t?\"rd\":\"th\")},\n    \"_dayOfMonthOrdinalParse\": /\\d{1,2}(th|st|nd|rd)/,\n    \"_relativeTime\": {\n      \"future\": \"in %s\",\n      \"past\": \"%s ago\",\n      \"s\": \"a few seconds\",\n      \"ss\": \"%d seconds\",\n      \"m\": \"a minute\",\n      \"mm\": \"%d minutes\",\n      \"h\": \"an hour\",\n      \"hh\": \"%d hours\",\n      \"d\": \"a day\",\n      \"dd\": \"%d days\",\n      \"M\": \"a month\",\n      \"MM\": \"%d months\",\n      \"y\": \"a year\",\n      \"yy\": \"%d years\"\n    },\n    \"_months\": [\n      \"January\",\n      \"February\",\n      \"March\",\n      \"April\",\n      \"May\",\n      \"June\",\n      \"July\",\n      \"August\",\n      \"September\",\n      \"October\",\n      \"November\",\n      \"December\"\n    ],\n    \"_monthsShort\": [\n      \"Jan\",\n      \"Feb\",\n      \"Mar\",\n      \"Apr\",\n      \"May\",\n      \"Jun\",\n      \"Jul\",\n      \"Aug\",\n      \"Sep\",\n      \"Oct\",\n      \"Nov\",\n      \"Dec\"\n    ],\n    \"_week\": {\n      \"dow\": 0,\n      \"doy\": 6\n    },\n    \"_weekdays\": [\n      \"Sunday\",\n      \"Monday\",\n      \"Tuesday\",\n      \"Wednesday\",\n      \"Thursday\",\n      \"Friday\",\n      \"Saturday\"\n    ],\n    \"_weekdaysMin\": [\n      \"Su\",\n      \"Mo\",\n      \"Tu\",\n      \"We\",\n      \"Th\",\n      \"Fr\",\n      \"Sa\"\n    ],\n    \"_weekdaysShort\": [\n      \"Sun\",\n      \"Mon\",\n      \"Tue\",\n      \"Wed\",\n      \"Thu\",\n      \"Fri\",\n      \"Sat\"\n    ],\n    \"_meridiemParse\": /[ap]\\.?m?\\.?/i,\n    \"_abbr\": \"en\",\n    \"_config\": {\n      \"calendar\": {\n        \"sameDay\": \"[Today at] LT\",\n        \"nextDay\": \"[Tomorrow at] LT\",\n        \"nextWeek\": \"dddd [at] LT\",\n        \"lastDay\": \"[Yesterday at] LT\",\n        \"lastWeek\": \"[Last] dddd [at] LT\",\n        \"sameElse\": \"L\"\n      },\n      \"longDateFormat\": {\n        \"LTS\": \"h:mm:ss A\",\n        \"LT\": \"h:mm A\",\n        \"L\": \"MM/DD/YYYY\",\n        \"LL\": \"MMMM D, YYYY\",\n        \"LLL\": \"MMMM D, YYYY h:mm A\",\n        \"LLLL\": \"dddd, MMMM D, YYYY h:mm A\"\n      },\n      \"invalidDate\": \"Invalid date\",\n      \"ordinal\": function(e){var t=e%10;return e+(1===D(e%100/10)?\"th\":1===t?\"st\":2===t?\"nd\":3===t?\"rd\":\"th\")},\n      \"dayOfMonthOrdinalParse\": /\\d{1,2}(th|st|nd|rd)/,\n      \"relativeTime\": {\n        \"future\": \"in %s\",\n        \"past\": \"%s ago\",\n        \"s\": \"a few seconds\",\n        \"ss\": \"%d seconds\",\n        \"m\": \"a minute\",\n        \"mm\": \"%d minutes\",\n        \"h\": \"an hour\",\n        \"hh\": \"%d hours\",\n        \"d\": \"a day\",\n        \"dd\": \"%d days\",\n        \"M\": \"a month\",\n        \"MM\": \"%d months\",\n        \"y\": \"a year\",\n        \"yy\": \"%d years\"\n      },\n      \"months\": [\n        \"January\",\n        \"February\",\n        \"March\",\n        \"April\",\n        \"May\",\n        \"June\",\n        \"July\",\n        \"August\",\n        \"September\",\n        \"October\",\n        \"November\",\n        \"December\"\n      ],\n      \"monthsShort\": [\n        \"Jan\",\n        \"Feb\",\n        \"Mar\",\n        \"Apr\",\n        \"May\",\n        \"Jun\",\n        \"Jul\",\n        \"Aug\",\n        \"Sep\",\n        \"Oct\",\n        \"Nov\",\n        \"Dec\"\n      ],\n      \"week\": {\n        \"dow\": 0,\n        \"doy\": 6\n      },\n      \"weekdays\": [\n        \"Sunday\",\n        \"Monday\",\n        \"Tuesday\",\n        \"Wednesday\",\n        \"Thursday\",\n        \"Friday\",\n        \"Saturday\"\n      ],\n      \"weekdaysMin\": [\n        \"Su\",\n        \"Mo\",\n        \"Tu\",\n        \"We\",\n        \"Th\",\n        \"Fr\",\n        \"Sa\"\n      ],\n      \"weekdaysShort\": [\n        \"Sun\",\n        \"Mon\",\n        \"Tue\",\n        \"Wed\",\n        \"Thu\",\n        \"Fri\",\n        \"Sat\"\n      ],\n      \"meridiemParse\": /[ap]\\.?m?\\.?/i,\n      \"abbr\": \"en\"\n    },\n    \"_dayOfMonthOrdinalParseLenient\": /\\d{1,2}(th|st|nd|rd)|\\d{1,2}/\n  },\n  \"_d\": new Date(\"2023-01-31T16:00:00.974Z\"),\n  \"_isValid\": true\n}"
+                          },
+                          "nian": {
+                            "mock": "2019-12-31T16:00:00.136Z",
+                            "type": "JSExpression",
+                            "value": "{\n  \"_isAMomentObject\": true,\n  \"_isUTC\": false,\n  \"_pf\": {\n    \"empty\": false,\n    \"unusedTokens\": [],\n    \"unusedInput\": [],\n    \"overflow\": -2,\n    \"charsLeftOver\": 0,\n    \"nullInput\": false,\n    \"invalidMonth\": null,\n    \"invalidFormat\": false,\n    \"userInvalidated\": false,\n    \"iso\": false,\n    \"parsedDateParts\": [],\n    \"meridiem\": null,\n    \"rfc2822\": false,\n    \"weekdayMismatch\": false\n  },\n  \"_locale\": {\n    \"_calendar\": {\n      \"sameDay\": \"[Today at] LT\",\n      \"nextDay\": \"[Tomorrow at] LT\",\n      \"nextWeek\": \"dddd [at] LT\",\n      \"lastDay\": \"[Yesterday at] LT\",\n      \"lastWeek\": \"[Last] dddd [at] LT\",\n      \"sameElse\": \"L\"\n    },\n    \"_longDateFormat\": {\n      \"LTS\": \"h:mm:ss A\",\n      \"LT\": \"h:mm A\",\n      \"L\": \"MM/DD/YYYY\",\n      \"LL\": \"MMMM D, YYYY\",\n      \"LLL\": \"MMMM D, YYYY h:mm A\",\n      \"LLLL\": \"dddd, MMMM D, YYYY h:mm A\"\n    },\n    \"_invalidDate\": \"Invalid date\",\n    \"ordinal\": function(e){var t=e%10;return e+(1===D(e%100/10)?\"th\":1===t?\"st\":2===t?\"nd\":3===t?\"rd\":\"th\")},\n    \"_dayOfMonthOrdinalParse\": /\\d{1,2}(th|st|nd|rd)/,\n    \"_relativeTime\": {\n      \"future\": \"in %s\",\n      \"past\": \"%s ago\",\n      \"s\": \"a few seconds\",\n      \"ss\": \"%d seconds\",\n      \"m\": \"a minute\",\n      \"mm\": \"%d minutes\",\n      \"h\": \"an hour\",\n      \"hh\": \"%d hours\",\n      \"d\": \"a day\",\n      \"dd\": \"%d days\",\n      \"M\": \"a month\",\n      \"MM\": \"%d months\",\n      \"y\": \"a year\",\n      \"yy\": \"%d years\"\n    },\n    \"_months\": [\n      \"January\",\n      \"February\",\n      \"March\",\n      \"April\",\n      \"May\",\n      \"June\",\n      \"July\",\n      \"August\",\n      \"September\",\n      \"October\",\n      \"November\",\n      \"December\"\n    ],\n    \"_monthsShort\": [\n      \"Jan\",\n      \"Feb\",\n      \"Mar\",\n      \"Apr\",\n      \"May\",\n      \"Jun\",\n      \"Jul\",\n      \"Aug\",\n      \"Sep\",\n      \"Oct\",\n      \"Nov\",\n      \"Dec\"\n    ],\n    \"_week\": {\n      \"dow\": 0,\n      \"doy\": 6\n    },\n    \"_weekdays\": [\n      \"Sunday\",\n      \"Monday\",\n      \"Tuesday\",\n      \"Wednesday\",\n      \"Thursday\",\n      \"Friday\",\n      \"Saturday\"\n    ],\n    \"_weekdaysMin\": [\n      \"Su\",\n      \"Mo\",\n      \"Tu\",\n      \"We\",\n      \"Th\",\n      \"Fr\",\n      \"Sa\"\n    ],\n    \"_weekdaysShort\": [\n      \"Sun\",\n      \"Mon\",\n      \"Tue\",\n      \"Wed\",\n      \"Thu\",\n      \"Fri\",\n      \"Sat\"\n    ],\n    \"_meridiemParse\": /[ap]\\.?m?\\.?/i,\n    \"_abbr\": \"en\",\n    \"_config\": {\n      \"calendar\": {\n        \"sameDay\": \"[Today at] LT\",\n        \"nextDay\": \"[Tomorrow at] LT\",\n        \"nextWeek\": \"dddd [at] LT\",\n        \"lastDay\": \"[Yesterday at] LT\",\n        \"lastWeek\": \"[Last] dddd [at] LT\",\n        \"sameElse\": \"L\"\n      },\n      \"longDateFormat\": {\n        \"LTS\": \"h:mm:ss A\",\n        \"LT\": \"h:mm A\",\n        \"L\": \"MM/DD/YYYY\",\n        \"LL\": \"MMMM D, YYYY\",\n        \"LLL\": \"MMMM D, YYYY h:mm A\",\n        \"LLLL\": \"dddd, MMMM D, YYYY h:mm A\"\n      },\n      \"invalidDate\": \"Invalid date\",\n      \"ordinal\": function(e){var t=e%10;return e+(1===D(e%100/10)?\"th\":1===t?\"st\":2===t?\"nd\":3===t?\"rd\":\"th\")},\n      \"dayOfMonthOrdinalParse\": /\\d{1,2}(th|st|nd|rd)/,\n      \"relativeTime\": {\n        \"future\": \"in %s\",\n        \"past\": \"%s ago\",\n        \"s\": \"a few seconds\",\n        \"ss\": \"%d seconds\",\n        \"m\": \"a minute\",\n        \"mm\": \"%d minutes\",\n        \"h\": \"an hour\",\n        \"hh\": \"%d hours\",\n        \"d\": \"a day\",\n        \"dd\": \"%d days\",\n        \"M\": \"a month\",\n        \"MM\": \"%d months\",\n        \"y\": \"a year\",\n        \"yy\": \"%d years\"\n      },\n      \"months\": [\n        \"January\",\n        \"February\",\n        \"March\",\n        \"April\",\n        \"May\",\n        \"June\",\n        \"July\",\n        \"August\",\n        \"September\",\n        \"October\",\n        \"November\",\n        \"December\"\n      ],\n      \"monthsShort\": [\n        \"Jan\",\n        \"Feb\",\n        \"Mar\",\n        \"Apr\",\n        \"May\",\n        \"Jun\",\n        \"Jul\",\n        \"Aug\",\n        \"Sep\",\n        \"Oct\",\n        \"Nov\",\n        \"Dec\"\n      ],\n      \"week\": {\n        \"dow\": 0,\n        \"doy\": 6\n      },\n      \"weekdays\": [\n        \"Sunday\",\n        \"Monday\",\n        \"Tuesday\",\n        \"Wednesday\",\n        \"Thursday\",\n        \"Friday\",\n        \"Saturday\"\n      ],\n      \"weekdaysMin\": [\n        \"Su\",\n        \"Mo\",\n        \"Tu\",\n        \"We\",\n        \"Th\",\n        \"Fr\",\n        \"Sa\"\n      ],\n      \"weekdaysShort\": [\n        \"Sun\",\n        \"Mon\",\n        \"Tue\",\n        \"Wed\",\n        \"Thu\",\n        \"Fri\",\n        \"Sat\"\n      ],\n      \"meridiemParse\": /[ap]\\.?m?\\.?/i,\n      \"abbr\": \"en\"\n    },\n    \"_dayOfMonthOrdinalParseLenient\": /\\d{1,2}(th|st|nd|rd)|\\d{1,2}/\n  },\n  \"_d\": new Date(\"2023-12-31T16:00:00.685Z\"),\n  \"_isValid\": true\n}"
+                          },
+                          "riqi": [
+                            "",
+                            {
+                              "type": "JSExpression",
+                              "value": "{\n  \"_isAMomentObject\": true,\n  \"_isUTC\": false,\n  \"_pf\": {\n    \"empty\": false,\n    \"unusedTokens\": [],\n    \"unusedInput\": [],\n    \"overflow\": -2,\n    \"charsLeftOver\": 0,\n    \"nullInput\": false,\n    \"invalidMonth\": null,\n    \"invalidFormat\": false,\n    \"userInvalidated\": false,\n    \"iso\": false,\n    \"parsedDateParts\": [],\n    \"meridiem\": null,\n    \"rfc2822\": false,\n    \"weekdayMismatch\": false\n  },\n  \"_locale\": {\n    \"_calendar\": {\n      \"sameDay\": \"[Today at] LT\",\n      \"nextDay\": \"[Tomorrow at] LT\",\n      \"nextWeek\": \"dddd [at] LT\",\n      \"lastDay\": \"[Yesterday at] LT\",\n      \"lastWeek\": \"[Last] dddd [at] LT\",\n      \"sameElse\": \"L\"\n    },\n    \"_longDateFormat\": {\n      \"LTS\": \"h:mm:ss A\",\n      \"LT\": \"h:mm A\",\n      \"L\": \"MM/DD/YYYY\",\n      \"LL\": \"MMMM D, YYYY\",\n      \"LLL\": \"MMMM D, YYYY h:mm A\",\n      \"LLLL\": \"dddd, MMMM D, YYYY h:mm A\"\n    },\n    \"_invalidDate\": \"Invalid date\",\n    \"ordinal\": function(e){var t=e%10;return e+(1===D(e%100/10)?\"th\":1===t?\"st\":2===t?\"nd\":3===t?\"rd\":\"th\")},\n    \"_dayOfMonthOrdinalParse\": /\\d{1,2}(th|st|nd|rd)/,\n    \"_relativeTime\": {\n      \"future\": \"in %s\",\n      \"past\": \"%s ago\",\n      \"s\": \"a few seconds\",\n      \"ss\": \"%d seconds\",\n      \"m\": \"a minute\",\n      \"mm\": \"%d minutes\",\n      \"h\": \"an hour\",\n      \"hh\": \"%d hours\",\n      \"d\": \"a day\",\n      \"dd\": \"%d days\",\n      \"M\": \"a month\",\n      \"MM\": \"%d months\",\n      \"y\": \"a year\",\n      \"yy\": \"%d years\"\n    },\n    \"_months\": [\n      \"January\",\n      \"February\",\n      \"March\",\n      \"April\",\n      \"May\",\n      \"June\",\n      \"July\",\n      \"August\",\n      \"September\",\n      \"October\",\n      \"November\",\n      \"December\"\n    ],\n    \"_monthsShort\": [\n      \"Jan\",\n      \"Feb\",\n      \"Mar\",\n      \"Apr\",\n      \"May\",\n      \"Jun\",\n      \"Jul\",\n      \"Aug\",\n      \"Sep\",\n      \"Oct\",\n      \"Nov\",\n      \"Dec\"\n    ],\n    \"_week\": {\n      \"dow\": 0,\n      \"doy\": 6\n    },\n    \"_weekdays\": [\n      \"Sunday\",\n      \"Monday\",\n      \"Tuesday\",\n      \"Wednesday\",\n      \"Thursday\",\n      \"Friday\",\n      \"Saturday\"\n    ],\n    \"_weekdaysMin\": [\n      \"Su\",\n      \"Mo\",\n      \"Tu\",\n      \"We\",\n      \"Th\",\n      \"Fr\",\n      \"Sa\"\n    ],\n    \"_weekdaysShort\": [\n      \"Sun\",\n      \"Mon\",\n      \"Tue\",\n      \"Wed\",\n      \"Thu\",\n      \"Fri\",\n      \"Sat\"\n    ],\n    \"_meridiemParse\": /[ap]\\.?m?\\.?/i,\n    \"_abbr\": \"en\",\n    \"_config\": {\n      \"calendar\": {\n        \"sameDay\": \"[Today at] LT\",\n        \"nextDay\": \"[Tomorrow at] LT\",\n        \"nextWeek\": \"dddd [at] LT\",\n        \"lastDay\": \"[Yesterday at] LT\",\n        \"lastWeek\": \"[Last] dddd [at] LT\",\n        \"sameElse\": \"L\"\n      },\n      \"longDateFormat\": {\n        \"LTS\": \"h:mm:ss A\",\n        \"LT\": \"h:mm A\",\n        \"L\": \"MM/DD/YYYY\",\n        \"LL\": \"MMMM D, YYYY\",\n        \"LLL\": \"MMMM D, YYYY h:mm A\",\n        \"LLLL\": \"dddd, MMMM D, YYYY h:mm A\"\n      },\n      \"invalidDate\": \"Invalid date\",\n      \"ordinal\": function(e){var t=e%10;return e+(1===D(e%100/10)?\"th\":1===t?\"st\":2===t?\"nd\":3===t?\"rd\":\"th\")},\n      \"dayOfMonthOrdinalParse\": /\\d{1,2}(th|st|nd|rd)/,\n      \"relativeTime\": {\n        \"future\": \"in %s\",\n        \"past\": \"%s ago\",\n        \"s\": \"a few seconds\",\n        \"ss\": \"%d seconds\",\n        \"m\": \"a minute\",\n        \"mm\": \"%d minutes\",\n        \"h\": \"an hour\",\n        \"hh\": \"%d hours\",\n        \"d\": \"a day\",\n        \"dd\": \"%d days\",\n        \"M\": \"a month\",\n        \"MM\": \"%d months\",\n        \"y\": \"a year\",\n        \"yy\": \"%d years\"\n      },\n      \"months\": [\n        \"January\",\n        \"February\",\n        \"March\",\n        \"April\",\n        \"May\",\n        \"June\",\n        \"July\",\n        \"August\",\n        \"September\",\n        \"October\",\n        \"November\",\n        \"December\"\n      ],\n      \"monthsShort\": [\n        \"Jan\",\n        \"Feb\",\n        \"Mar\",\n        \"Apr\",\n        \"May\",\n        \"Jun\",\n        \"Jul\",\n        \"Aug\",\n        \"Sep\",\n        \"Oct\",\n        \"Nov\",\n        \"Dec\"\n      ],\n      \"week\": {\n        \"dow\": 0,\n        \"doy\": 6\n      },\n      \"weekdays\": [\n        \"Sunday\",\n        \"Monday\",\n        \"Tuesday\",\n        \"Wednesday\",\n        \"Thursday\",\n        \"Friday\",\n        \"Saturday\"\n      ],\n      \"weekdaysMin\": [\n        \"Su\",\n        \"Mo\",\n        \"Tu\",\n        \"We\",\n        \"Th\",\n        \"Fr\",\n        \"Sa\"\n      ],\n      \"weekdaysShort\": [\n        \"Sun\",\n        \"Mon\",\n        \"Tue\",\n        \"Wed\",\n        \"Thu\",\n        \"Fri\",\n        \"Sat\"\n      ],\n      \"meridiemParse\": /[ap]\\.?m?\\.?/i,\n      \"abbr\": \"en\"\n    },\n    \"_dayOfMonthOrdinalParseLenient\": /\\d{1,2}(th|st|nd|rd)|\\d{1,2}/\n  },\n  \"_d\": new Date(\"2024-09-17T16:00:00.000Z\"),\n  \"_isValid\": true\n}"
+                            }
+                          ],
+                          "text": "text",
+                          "mtext": {
+                            "key": "i18n-ma2afpod",
+                            "type": "i18n"
+                          }
+                        },
+                        "title": "",
+                        "hidden": false,
+                        "isLocked": false,
+                        "condition": true,
+                        "componentName": "LccComponentNx9n5",
+                        "conditionGroup": ""
+                      }
+                    ],
+                    "isLocked": false,
+                    "condition": true,
+                    "componentName": "Card",
+                    "conditionGroup": ""
+                  }
+                ],
+                "fileName": "AppCard",
+                "isLocked": false,
+                "condition": true,
+                "propTypes": [],
+                "lifeCycles": {},
+                "componentName": "Component",
+                "conditionGroup": ""
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "utils": [
+    {
+      "name": "message",
+      "type": "npm",
+      "builtin": true,
+      "content": {
+        "package": "antd",
+        "subName": "",
+        "exportName": "message",
+        "componentName": "message",
+        "destructuring": true
+      },
+      "description": "全局提示"
+    },
+    {
+      "name": "notification",
+      "type": "npm",
+      "builtin": true,
+      "content": {
+        "package": "@tenx-ui/materials",
+        "subName": "",
+        "exportName": "notification",
+        "componentName": "notification",
+        "destructuring": true
+      },
+      "description": "通知提醒框"
+    },
+    {
+      "name": "getAuthData",
+      "type": "npm",
+      "builtin": true,
+      "content": {
+        "package": "@tenx-ui/auth-utils",
+        "subName": "",
+        "version": "0.0.1",
+        "exportName": "getAuthData",
+        "componentName": "getAuthData",
+        "destructuring": true
+      },
+      "description": "获取认证数据"
+    },
+    {
+      "name": "setAuthData",
+      "type": "npm",
+      "builtin": true,
+      "content": {
+        "package": "@tenx-ui/auth-utils",
+        "version": "0.0.1",
+        "exportName": "setAuthData",
+        "componentName": "setAuthData",
+        "destructuring": true
+      },
+      "description": "设置认证数据"
+    },
+    {
+      "name": "removeAuthData",
+      "type": "npm",
+      "builtin": true,
+      "content": {
+        "package": "@tenx-ui/auth-utils",
+        "version": "0.0.1",
+        "exportName": "removeAuthData",
+        "componentName": "removeAuthData",
+        "destructuring": true
+      },
+      "description": "移除认证数据"
+    },
+    {
+      "name": "isTokenExpired",
+      "type": "npm",
+      "builtin": true,
+      "content": {
+        "package": "@tenx-ui/auth-utils",
+        "version": "0.0.1",
+        "exportName": "isTokenExpired",
+        "componentName": "isTokenExpired",
+        "destructuring": true
+      },
+      "description": "判断 token 是否有效"
+    },
+    {
+      "name": "getAuthorization",
+      "type": "function",
+      "builtin": true,
+      "content": {
+        "value": "() => {\r\n  const authData = this.getAuthData();\r\n  const { token_type, id_token } = authData.token || {};\r\n  const Authorization = token_type && id_token && `${token_type} ${id_token}`;\r\n  return Authorization;\r\n}"
+      },
+      "description": "获取 Authorization header"
+    },
+    {
+      "name": "getAxiosHanlderConfig",
+      "type": "function",
+      "builtin": true,
+      "content": {
+        "type": "JSFunction",
+        "value": "() => ({\r\n  // 详细配置见：http://dev-npm.tenxcloud.net/-/web/detail/@yunti/lowcode-datasource-axios-handler\r\n  interceptors: {\r\n    request: [\r\n      {\r\n        onFulfilled: (config) => {\r\n          if (!config.headers.get('Authorization')) {\r\n            config.headers.set('Authorization', this.getAuthorization());\r\n          }\r\n          return config;\r\n        }\r\n      }\r\n    ],\r\n  }\r\n})"
+      },
+      "description": "获取 axios 默认配置，也可在配置中指定拦截器，用于数据源初始化 axios handler"
+    }
+  ],
+  "config": {
+    "antd": {
+      "configProvider": {
+        "space": {
+          "size": 12
+        },
+        "theme": {
+          "token": {
+            "fontSize": 12,
+            "colorLink": "#00b96b",
+            "colorError": "#f85a5a",
+            "borderRadius": 2,
+            "colorPrimary": "#00b96b",
+            "colorSuccess": "#5cb85c",
+            "colorWarning": "#ffbf00",
+            "colorLinkHover": "#6f8bf7"
+          },
+          "components": {
+            "Row": {
+              "rowVerticalGutter": 20,
+              "rowHorizontalGutter": 20
+            },
+            "Page": {
+              "pagePadding": 20,
+              "pagePaddingTop": 20,
+              "pagePaddingBottom": 32
+            }
+          }
+        },
+        "componentSize": "middle"
+      }
+    }
+  },
+  "constants": {
+    "IS_PROD": {
+      "mock": "false",
+      "type": "JSExpression",
+      "value": "process.env.NODE_ENV === 'production'",
+      "builtin": true,
+      "description": "是否为生产环境"
+    },
+    "basename": {
+      "type": "JSExpression",
+      "value": "'/kubeagi-portal'",
+      "builtin": true,
+      "description": "应用路由前缀"
+    },
+    "IS_QIAN_KUN": {
+      "mock": "true",
+      "type": "JSExpression",
+      "value": "window.__POWERED_BY_QIANKUN__",
+      "builtin": true,
+      "description": "是否为乾坤微前端环境"
+    }
+  }
+}

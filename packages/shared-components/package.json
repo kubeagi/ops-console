@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "shared-components",
+  "version": "0.1.0",
+  "keywords": [],
+  "module": "src/index.ts",
+  "dependencies": {
+    "query-string": "^8.1.0"
+  }
+}

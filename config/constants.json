@@ -1,0 +1,4 @@
+{
+  "__basename-desc__": "正式环境时的路由前缀，用于构建，需要与页面的路由前缀保持一致",
+  "basename": "/kubeagi-portal"
+}
