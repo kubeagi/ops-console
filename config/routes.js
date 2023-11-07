@@ -9,6 +9,11 @@ const routes = [
         path: '/test',
         component: '@/pages/Test',
       },
+      {
+        name: '数据处理',
+        path: '/data-handle',
+        component: '@/pages/DataHandleList',
+      },
     ],
   },
 ];
