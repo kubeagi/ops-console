@@ -14,6 +14,10 @@ const routes = [
         path: '/data-handle',
         component: '@/pages/DataHandleList',
       },
+      {
+        path: '/data-handle/create',
+        component: '@/pages/CreateDataHandle',
+      },
     ],
   },
 ];
