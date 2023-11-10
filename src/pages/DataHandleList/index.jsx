@@ -69,6 +69,16 @@ class DataHandleList$$Page extends React.Component {
     console.log('will unmount');
   }
 
+  testFunc() {
+    console.log('test aliLowcode func');
+    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  }
+
+  onLinkCreate() {
+    // 点击按钮时的回调
+    this.history.push('/data-handle/create');
+  }
+
   componentDidMount() {
     console.log('did mount');
   }
@@ -122,6 +132,12 @@ class DataHandleList$$Page extends React.Component {
                           target="_self"
                           disabled={false}
                           __component_name="Button"
+                          onClick={function () {
+                            return this.onLinkCreate.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                         >
                           创建处理任务
                         </Button>
@@ -159,11 +175,11 @@ class DataHandleList$$Page extends React.Component {
                     <Col __component_name="Col">
                       <Space align="center" direction="horizontal">
                         <Pagination
-                          __component_name="Pagination"
-                          pageSize={10}
                           total={50}
-                          current={1}
                           simple={false}
+                          current={1}
+                          pageSize={10}
+                          __component_name="Pagination"
                         />
                       </Space>
                     </Col>
@@ -172,37 +188,39 @@ class DataHandleList$$Page extends React.Component {
                     <Col span={24} __component_name="Col">
                       <Table
                         size="default"
+                        style={{ marginTop: '24px' }}
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true }}
                         columns={[
                           {
                             key: 'name',
+                            title: '任务名称',
                             ellipsis: { showTitle: true },
                             dataIndex: 'name',
-                            title: '任务名称',
                           },
                           {
                             key: 'status',
-                            filters: __$$eval(() => this.utils.getComponentWarehouseTypes(this)),
-                            dataIndex: 'status',
                             title: '状态',
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Status
-                                  __component_name="Status"
                                   id="disabled"
-                                  types={[{ id: 'disabled', children: '未知', type: 'disabled' }]}
+                                  types={[{ id: 'disabled', type: 'disabled', children: '未知' }]}
+                                  __component_name="Status"
                                 />
                               ))(__$$createChildContext(__$$context, { text, record, index })),
+                            filters: __$$eval(() => this.utils.getComponentWarehouseTypes(this)),
+                            dataIndex: 'status',
                           },
                           {
-                            dataIndex: 'dataset_pre',
                             key: 'dataset_pre',
                             title: '处理前数据集',
                             ellipsis: { showTitle: true },
+                            dataIndex: 'dataset_pre',
                           },
                           {
                             key: 'dataset_after',
+                            title: '处理后数据集',
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Status
