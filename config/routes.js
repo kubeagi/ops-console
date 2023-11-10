@@ -17,7 +17,7 @@ const routes = [
       {
         path: '/data-handle/create',
         component: '@/pages/CreateDataHandle',
-      },
+      }
     ],
   },
 ];
