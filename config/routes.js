@@ -14,6 +14,11 @@ const routes = [
         path: '/data-handle',
         component: '@/pages/DataHandleList',
       },
+      {
+        name: '数据源详情',
+        path: '/data-source/detail',
+        component: '@/pages/DatasourceDetail',
+      },
     ],
   },
 ];
