@@ -11,6 +11,8 @@ import {
   Row,
   Col,
   Typography,
+  FormilyInput,
+  FormilyTextArea,
   Container,
   Button,
   Space,
@@ -26,6 +28,7 @@ import {
   TenxIconStorageConnect,
   AntdIconPlusOutlined,
   AntdIconReloadOutlined,
+  AntdIconWarningFilled,
 } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -70,7 +73,16 @@ class DatasourceDetail$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { uploadFileVisible: false };
+    this.state = {
+      uploadFileVisible: false,
+      editVisible: false,
+      deleteVisible: false,
+      dataSourceDetail: {},
+      tableData: [],
+      loading: false,
+      currentPage: 1,
+      total: 3,
+    };
   }
 
   $ = refName => {
@@ -85,49 +97,159 @@ class DatasourceDetail$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  goBack() {
-    this.props.self?.history.back();
+  loadData() {
+    console.log('match', this.match);
+    console.log('id', this.match.params.id);
+    this.setState({
+      loading: true,
+    });
+    this.setState(
+      {
+        dataSourceDetail: {
+          name: '数据源1',
+          description: '数据源1的描述信息',
+          createTime: '2023.10.11 00:00:10',
+        },
+        tableData: [
+          {
+            id: 1,
+            fileName: '文件1',
+            status: 'success',
+            fileSize: 10240,
+            importTime: '2023.11.11 10:10:10',
+          },
+          {
+            id: 2,
+            fileName: '文件2',
+            status: 'failed',
+            fileSize: 1024,
+            importTime: '2023.11.12 11:10:10',
+          },
+          {
+            id: 3,
+            fileName: '文件3',
+            status: 'importing',
+            fileSize: 20480,
+            importTime: '2023.11.14 12:10:10',
+          },
+        ],
+      },
+      () => {
+        this.setState({
+          loading: false,
+        });
+      }
+    );
   }
 
-  search(event) {
-    console.log(event.target.value);
+  goBack() {
+    this.history.back();
   }
 
   refresh() {
     this.loadData();
   }
 
-  loadData() {
+  search(event) {
+    console.log(event.target.value);
+    const newData = this.state.tableData.filter(
+      item => item.fileName.indexOf(event.target.value) > -1
+    );
     this.setState({
-      dataSourceDetail: {
-        name: '数据源1',
-        createTime: '2023.10.11 00:00:10',
-      },
+      tableData: newData,
+    });
+  }
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
+
+  clickUploadFileBtn() {
+    this.setState({
+      uploadFileVisible: true,
     });
   }
 
   cancelUploadFile() {
-    console.log('取消上传');
-    this.setState(
-      {
-        uploadFileVisible: false,
-      },
-      () => {
-        console.log(this.state.uploadFileVisible);
-      }
-    );
+    this.setState({
+      uploadFileVisible: false,
+    });
   }
 
-  clickUploadFileBtn() {
-    console.log('点击上传');
-    this.setState(
-      {
-        uploadFileVisible: true,
-      },
-      () => {
-        console.log(this.state.uploadFileVisible);
-      }
-    );
+  uploadFile() {}
+
+  clickEditBtn() {
+    this.setState({
+      editVisible: true,
+    });
+  }
+
+  cancelEdit() {
+    this.setState({
+      editVisible: false,
+    });
+  }
+
+  editDatasource() {
+    const form = this.$('edit_form_ref')?.formRef?.current?.form;
+    form.validate().then(res => {
+      this.setState({
+        loading: true,
+      });
+      const { name, description } = form.values;
+      this.setState(
+        {
+          dataSourceDetail: {
+            ...this.state.dataSourceDetail,
+            name,
+            description,
+          },
+        },
+        () => {
+          this.setState({
+            loading: false,
+            editVisible: false,
+          });
+        }
+      );
+    });
+  }
+
+  clickDeleteBtn() {
+    this.setState({
+      deleteVisible: true,
+    });
+  }
+
+  cancelDelete() {
+    this.setState({
+      deleteVisible: false,
+    });
+  }
+
+  deleteDatasource() {
+    this.setState({
+      loading: true,
+    });
+  }
+
+  tablePageChange(value) {
+    this.setState({
+      currentPage: value,
+    });
+  }
+
+  downloadFile(record) {
+    console.log('下载文件');
+  }
+
+  deleteFile(record) {
+    console.log(record);
+    const newData = this.state.tableData.filter(item => item.id !== record.id);
+    console.log(newData);
+    this.setState({
+      tableData: newData,
+    });
   }
 
   componentDidMount() {
@@ -142,6 +264,9 @@ class DatasourceDetail$$Page extends React.Component {
       <Page style={{ backgroundColor: '#f0f0f0' }}>
         <Modal
           mask={true}
+          onOk={function () {
+            return this.uploadFile.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
           open={__$$eval(() => this.state.uploadFileVisible)}
           title="上传数据"
           okType="primary"
@@ -183,8 +308,10 @@ class DatasourceDetail$$Page extends React.Component {
               }}
               componentProps={{
                 'x-component-props': {
+                  accept: '.txt,.doc,.docx,.pdf,.md',
                   disabled: false,
                   listType: 'text',
+                  maxCount: 20,
                   multiple: false,
                   directory: false,
                   showUploadList: true,
@@ -192,7 +319,12 @@ class DatasourceDetail$$Page extends React.Component {
                 },
               }}
               decoratorProps={{
-                'x-decorator-props': { colon: true, asterisk: true, bordered: false },
+                'x-decorator-props': {
+                  colon: true,
+                  asterisk: true,
+                  bordered: false,
+                  labelEllipsis: true,
+                },
               }}
               __component_name="FormilyUpload"
             >
@@ -204,7 +336,6 @@ class DatasourceDetail$$Page extends React.Component {
                   'x-component': 'FormilyFormItem',
                   'x-validator': [],
                 }}
-                componentProps={{ 'x-component-props': {} }}
                 decoratorProps={{
                   'x-decorator-props': {
                     inset: false,
@@ -212,6 +343,7 @@ class DatasourceDetail$$Page extends React.Component {
                     bordered: false,
                     fullness: false,
                     wrapperWidth: '',
+                    labelEllipsis: true,
                     feedbackLayout: 'loose',
                   },
                 }}
@@ -364,6 +496,87 @@ class DatasourceDetail$$Page extends React.Component {
                 </Row>
               </FormilyFormItem>
             </FormilyUpload>
+          </FormilyForm>
+        </Modal>
+        <Modal
+          mask={true}
+          onOk={function () {
+            return this.editDatasource.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.editVisible)}
+          title="编辑"
+          centered={false}
+          keyboard={true}
+          onCancel={function () {
+            return this.cancelEdit.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          forceRender={false}
+          maskClosable={false}
+          confirmLoading={__$$eval(() => this.state.loading)}
+          destroyOnClose={true}
+          __component_name="Modal"
+        >
+          <FormilyForm
+            ref={this._refsManager.linkRef('edit_form_ref')}
+            formHelper={{ autoFocus: true }}
+            componentProps={{
+              colon: false,
+              layout: 'horizontal',
+              labelCol: 4,
+              labelAlign: 'left',
+              wrapperCol: 20,
+            }}
+            createFormProps={{ values: __$$eval(() => this.state.dataSourceDetail) }}
+            __component_name="FormilyForm"
+          >
+            <FormilyInput
+              fieldProps={{
+                name: 'name',
+                title: '数据源名称',
+                required: true,
+                'x-validator': [
+                  {
+                    id: 'disabled',
+                    type: 'disabled',
+                    message: '请输入数据源名称',
+                    children: '未知',
+                    required: true,
+                    whitespace: false,
+                    triggerType: 'onBlur',
+                  },
+                ],
+              }}
+              componentProps={{
+                'x-component-props': {
+                  bordered: true,
+                  allowClear: true,
+                  placeholder: '请输入数据源名称',
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelWidth: '', labelEllipsis: false } }}
+              __component_name="FormilyInput"
+            />
+            <FormilyTextArea
+              fieldProps={{
+                name: 'description',
+                title: '描述',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+              componentProps={{
+                'x-component-props': {
+                  rows: 3,
+                  autoSize: false,
+                  showCount: false,
+                  placeholder: '请输入描述',
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              __component_name="FormilyTextArea"
+            />
           </FormilyForm>
         </Modal>
         <Container __component_name="Container">
@@ -533,6 +746,12 @@ class DatasourceDetail$$Page extends React.Component {
                   ghost={false}
                   shape="default"
                   danger={false}
+                  onClick={function () {
+                    return this.clickEditBtn.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
                   disabled={false}
                   __component_name="Button"
                 >
@@ -543,6 +762,12 @@ class DatasourceDetail$$Page extends React.Component {
                   ghost={false}
                   shape="default"
                   danger={false}
+                  onClick={function () {
+                    return this.clickDeleteBtn.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
                   disabled={false}
                   __component_name="Button"
                 >
@@ -589,7 +814,7 @@ class DatasourceDetail$$Page extends React.Component {
                             ellipsis={true}
                             __component_name="Typography.Text"
                           >
-                            text
+                            {null}
                           </Typography.Text>
                         ),
                       },
@@ -845,6 +1070,12 @@ class DatasourceDetail$$Page extends React.Component {
                                   ghost={false}
                                   shape="default"
                                   danger={false}
+                                  onClick={function () {
+                                    return this.downloadFile.apply(
+                                      this,
+                                      Array.prototype.slice.call(arguments).concat([])
+                                    );
+                                  }.bind(__$$context)}
                                   disabled={false}
                                   __component_name="Button"
                                 >
@@ -856,6 +1087,12 @@ class DatasourceDetail$$Page extends React.Component {
                                   ghost={false}
                                   shape="default"
                                   danger={false}
+                                  onClick={function () {
+                                    return this.deleteFile.apply(
+                                      this,
+                                      Array.prototype.slice.call(arguments).concat([])
+                                    );
+                                  }.bind(__$$context)}
                                   disabled={false}
                                   __component_name="Button"
                                 >
@@ -866,18 +1103,22 @@ class DatasourceDetail$$Page extends React.Component {
                           dataIndex: 'opertion',
                         },
                       ]}
+                      loading={__$$eval(() => this.state.loading)}
                       bordered={false}
                       showCard={false}
-                      dataSource={[
-                        { id: '1', age: 32, name: '胡彦斌', address: '西湖区湖底公园1号' },
-                        { id: '2', age: 28, name: '王一博', address: '滨江区网商路699号' },
-                      ]}
+                      dataSource={__$$eval(() => this.state.tableData)}
                       pagination={{
                         size: 'small',
-                        total: 14,
+                        total: __$$eval(() => this.state.total),
                         simple: false,
-                        current: 1,
-                        pageSize: 10,
+                        current: __$$eval(() => this.state.currentPage),
+                        onChange: function () {
+                          return this.tablePageChange.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
+                        }.bind(this),
+                        pageSize: 2,
                         position: ['topRight'],
                         showQuickJumper: false,
                         showSizeChanger: false,
@@ -958,6 +1199,91 @@ class DatasourceDetail$$Page extends React.Component {
             destroyInactiveTabPane="true"
           />
         </Container>
+        <Modal
+          mask={true}
+          onOk={function () {
+            return this.deleteDatasource.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.deleteVisible)}
+          title="删除"
+          centered={false}
+          keyboard={true}
+          onCancel={function () {
+            return this.cancelDelete.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          forceRender={false}
+          maskClosable={false}
+          confirmLoading={__$$eval(() => this.state.loading)}
+          destroyOnClose={true}
+          __component_name="Modal"
+        >
+          <Container
+            style={{
+              display: 'flex',
+              padding: '10px',
+              alignItems: 'center',
+              borderColor: '#fedc9f',
+              borderStyle: 'solid',
+              borderWidth: '1px',
+              backgroundColor: '#fffbf5',
+            }}
+            defaultStyle={{
+              borderColor: '#f5a623',
+              borderStyle: 'solid',
+              borderWidth: '1px',
+              borderRadius: '4px',
+            }}
+            __component_name="Container"
+          >
+            <AntdIconWarningFilled
+              style={{ color: '#ff7f23', fontSize: '16px', marginRight: '10px' }}
+              __component_name="AntdIconWarningFilled"
+            />
+            <Typography.Paragraph
+              code={false}
+              mark={false}
+              style={{ fontSize: '' }}
+              delete={false}
+              strong={false}
+              disabled={false}
+              editable={false}
+              ellipsis={true}
+              underline={false}
+            >
+              确定删除{' '}
+            </Typography.Paragraph>
+            <Typography.Paragraph
+              code={false}
+              mark={false}
+              style={{ padding: '0 4px', fontSize: '' }}
+              delete={false}
+              strong={false}
+              disabled={false}
+              editable={false}
+              ellipsis={true}
+              underline={false}
+            >
+              {__$$eval(() => this.state.dataSourceDetail.name)}
+            </Typography.Paragraph>
+            <Typography.Paragraph
+              code={false}
+              mark={false}
+              style={{ fontSize: '' }}
+              delete={false}
+              strong={false}
+              disabled={false}
+              editable={false}
+              ellipsis={true}
+              underline={false}
+            >
+              {' '}
+              吗？
+            </Typography.Paragraph>
+          </Container>
+        </Modal>
       </Page>
     );
   }
@@ -966,7 +1292,7 @@ class DatasourceDetail$$Page extends React.Component {
 const PageWrapper = () => {
   const location = useLocation();
   const history = getUnifiedHistory();
-  const match = matchPath({ path: '/data-source/detail' }, location.pathname);
+  const match = matchPath({ path: '/data-source/detail/:id' }, location.pathname);
   history.match = match;
   history.query = qs.parse(location.search);
   const appHelper = {

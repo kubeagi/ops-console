@@ -16,7 +16,7 @@ const routes = [
       },
       {
         name: '数据源详情',
-        path: '/data-source/detail',
+        path: '/data-source/detail/:id',
         component: '@/pages/DatasourceDetail',
       },
     ],
