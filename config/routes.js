@@ -20,6 +20,10 @@ const routes = [
         hideInMenu: true,
         component: '@/pages/DataHandleDetail',
       },
+      {
+        path: '/data-handle/create',
+        component: '@/pages/CreateDataHandle',
+      },
     ],
   },
 ];
