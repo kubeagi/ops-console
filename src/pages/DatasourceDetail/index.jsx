@@ -100,11 +100,9 @@ class DatasourceDetail$$Page extends React.Component {
   loadData() {
     console.log('match', this.match);
     console.log('id', this.match.params.id);
-    this.setState({
-      loading: true,
-    });
     this.setState(
       {
+        loading: true,
         dataSourceDetail: {
           name: '数据源1',
           description: '数据源1的描述信息',
@@ -133,6 +131,7 @@ class DatasourceDetail$$Page extends React.Component {
             importTime: '2023.11.14 12:10:10',
           },
         ],
+        total: 3,
       },
       () => {
         this.setState({
@@ -158,10 +157,6 @@ class DatasourceDetail$$Page extends React.Component {
     this.setState({
       tableData: newData,
     });
-  }
-
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
   clickUploadFileBtn() {
@@ -239,17 +234,47 @@ class DatasourceDetail$$Page extends React.Component {
     });
   }
 
-  downloadFile(record) {
-    console.log('下载文件');
+  downloadFile(event, record) {
+    console.log(record);
+    try {
+      let file = `file content`;
+      const blob = new Blob([file], {
+        type: 'text/html;charset=utf-8',
+      }); // 创建 Blob 对象
+      const url = URL.createObjectURL(blob); // 创建 URL
+      const a = document.createElement('a');
+      a.href = url; // 设置链接地址
+      a.download = record.fileName; // 设置文件名
+      a.click(); // 模拟点击链接进行下载
+      URL.revokeObjectURL(url); // 释放 URL
+    } catch (error) {
+      // console.log(error)
+    }
   }
 
-  deleteFile(record) {
+  deleteFile(event, record) {
     console.log(record);
     const newData = this.state.tableData.filter(item => item.id !== record.id);
     console.log(newData);
-    this.setState({
-      tableData: newData,
+    this.setState(state => {
+      return {
+        tableData: newData,
+        total: state.total - 1,
+      };
     });
+  }
+
+  selectFileChange(event) {
+    console.log(event);
+    const maxFileSize = 2 * 1024 * 1024 * 1024;
+    if (event.file.size > maxFileSize) {
+      event.fileList = event.fileList.filter(item => {
+        return item.uid !== event.file.uid;
+      });
+      this.utils.notification.warnings({
+        message: '文件：' + event.file.name + '内容过大',
+      });
+    }
   }
 
   componentDidMount() {
@@ -298,6 +323,7 @@ class DatasourceDetail$$Page extends React.Component {
           >
             <FormilyUpload
               fieldProps={{
+                enum: [],
                 name: 'Upload',
                 title: '',
                 required: true,
@@ -312,10 +338,16 @@ class DatasourceDetail$$Page extends React.Component {
                   disabled: false,
                   listType: 'text',
                   maxCount: 20,
-                  multiple: false,
+                  multiple: true,
                   directory: false,
                   showUploadList: true,
                   openFileDialogOnClick: true,
+                  onChange: function () {
+                    return this.selectFileChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                 },
               }}
               decoratorProps={{
@@ -1039,7 +1071,25 @@ class DatasourceDetail$$Page extends React.Component {
                           ellipsis={true}
                           __component_name="Typography.Text"
                         >
-                          共计5条
+                          共计
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontSize: '', padding: '0 5px' }}
+                          strong={false}
+                          disabled={false}
+                          ellipsis={true}
+                          __component_name="Typography.Text"
+                        >
+                          {__$$eval(() => this.state.total)}
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontSize: '' }}
+                          strong={false}
+                          disabled={false}
+                          ellipsis={true}
+                          __component_name="Typography.Text"
+                        >
+                          条
                         </Typography.Text>
                       </Col>
                     </Row>
@@ -1073,7 +1123,7 @@ class DatasourceDetail$$Page extends React.Component {
                                   onClick={function () {
                                     return this.downloadFile.apply(
                                       this,
-                                      Array.prototype.slice.call(arguments).concat([])
+                                      Array.prototype.slice.call(arguments).concat([record])
                                     );
                                   }.bind(__$$context)}
                                   disabled={false}
@@ -1090,7 +1140,7 @@ class DatasourceDetail$$Page extends React.Component {
                                   onClick={function () {
                                     return this.deleteFile.apply(
                                       this,
-                                      Array.prototype.slice.call(arguments).concat([])
+                                      Array.prototype.slice.call(arguments).concat([record])
                                     );
                                   }.bind(__$$context)}
                                   disabled={false}
