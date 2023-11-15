@@ -14,6 +14,12 @@ const routes = [
         path: '/data-handle',
         component: '@/pages/DataHandleList',
       },
+      {
+        name: '数据处理详情',
+        path: '/data-handle/detail/:id',
+        hideInMenu: true,
+        component: '@/pages/DataHandleDetail',
+      },
     ],
   },
 ];
