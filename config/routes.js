@@ -24,6 +24,11 @@ const routes = [
         hideInMenu: true,
         component: '@/pages/DataHandleDetail',
       },
+      {
+        name: '数据源详情',
+        path: '/data-source/detail/:id',
+        component: '@/pages/DatasourceDetail',
+      },
     ],
   },
 ];
