@@ -7,16 +7,21 @@ import {
   Row,
   Col,
   Typography,
+  Alert,
   Card,
   Space,
   Button,
   Input,
   Pagination,
+  Modal,
   Table,
+  UnifiedLink,
   Status,
 } from '@tenx-ui/materials';
 
 import { AntdIconPlusOutlined, AntdIconReloadOutlined } from '@tenx-ui/icon-materials';
+
+import { default as Logs } from '@tenx-ui/logs';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -58,7 +63,7 @@ class DataHandleList$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = {};
+    this.state = { delModalvisible: false, logModalVisible: false, currentRecord: null };
   }
 
   $ = () => null;
@@ -69,9 +74,32 @@ class DataHandleList$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  onOpenDelModal(record) {
+    this.setState({
+      delModalvisible: true,
+      currentRecord: record,
+    });
+  }
+
+  onCloseDelModal(isNeedReload) {
+    this.setState({
+      delModalvisible: false,
+      currentRecord: null,
+    });
+  }
+
+  onOpenLogModal(record) {
+    this.setState({
+      logModalVisible: true,
+      currentRecord: record,
+    });
+  }
+
+  onCloseLogModal(isNeedReload) {
+    this.setState({
+      logModalVisible: false,
+      currentRecord: null,
+    });
   }
 
   onLinkCreate() {
@@ -88,10 +116,10 @@ class DataHandleList$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page
+        style={{ marginBottom: '0px', paddingBottom: '24px' }}
         pagePadding={24}
         pagePaddingTop={24}
         pagePaddingBottom={24}
-        style={{ marginBottom: '0px', paddingBottom: '24px' }}
       >
         <Row wrap={true} __component_name="Row">
           <Col span={24} __component_name="Col">
@@ -104,6 +132,9 @@ class DataHandleList$$Page extends React.Component {
             >
               数据处理
             </Typography.Title>
+          </Col>
+          <Col span={24} __component_name="Col">
+            <Alert type="info" message="数据处理描述" showIcon={true} __component_name="Alert" />
           </Col>
           <Col span={24} style={{}} __component_name="Col">
             <Row wrap={true} __component_name="Row">
@@ -130,14 +161,14 @@ class DataHandleList$$Page extends React.Component {
                           shape="default"
                           danger={false}
                           target="_self"
-                          disabled={false}
-                          __component_name="Button"
                           onClick={function () {
                             return this.onLinkCreate.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
+                          disabled={false}
+                          __component_name="Button"
                         >
                           创建处理任务
                         </Button>
@@ -186,89 +217,169 @@ class DataHandleList$$Page extends React.Component {
                   </Row>
                   <Row wrap={true} gutter={[0, 0]} __component_name="Row">
                     <Col span={24} __component_name="Col">
+                      {!!__$$eval(() => this.state.delModalvisible) && (
+                        <Modal
+                          mask={true}
+                          onOk={function () {
+                            return this.onCloseDelModal.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          open={true}
+                          title="删除任务"
+                          centered={false}
+                          keyboard={true}
+                          onCancel={function () {
+                            return this.onCloseDelModal.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          forceRender={false}
+                          maskClosable={false}
+                          confirmLoading={false}
+                          destroyOnClose={true}
+                          __component_name="Modal"
+                        >
+                          <Alert
+                            type="warning"
+                            message="确认删除任务？"
+                            showIcon={true}
+                            __component_name="Alert"
+                          />
+                        </Modal>
+                      )}
                       <Table
                         size="default"
                         style={{ marginTop: '24px' }}
-                        rowKey="id"
+                        rowKey="task_name"
                         scroll={{ scrollToFirstRowOnChange: true }}
                         columns={[
                           {
-                            key: 'name',
+                            key: 'task_name',
                             title: '任务名称',
+                            render: (text, record, index) =>
+                              (__$$context => (
+                                <UnifiedLink
+                                  to={__$$eval(() => '/data-handle/detail/' + record.id)}
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                >
+                                  {__$$eval(() => text)}
+                                </UnifiedLink>
+                              ))(__$$createChildContext(__$$context, { text, record, index })),
                             ellipsis: { showTitle: true },
-                            dataIndex: 'name',
+                            dataIndex: 'task_name',
                           },
                           {
-                            key: 'status',
+                            key: 'task_status',
                             title: '状态',
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Status
                                   id="disabled"
-                                  types={[{ id: 'disabled', type: 'disabled', children: '未知' }]}
+                                  types={[
+                                    { id: 'success', type: 'disabled', children: '未知' },
+                                    { id: 'error', type: 'disabled', children: '未知' },
+                                    { id: 'doing', type: 'disabled', children: '未知' },
+                                  ]}
                                   __component_name="Status"
                                 />
                               ))(__$$createChildContext(__$$context, { text, record, index })),
-                            filters: __$$eval(() => this.utils.getComponentWarehouseTypes(this)),
-                            dataIndex: 'status',
+                            filters: [{ text: '处理成功', value: 'success' }],
+                            dataIndex: 'task_status',
                           },
                           {
-                            key: 'dataset_pre',
-                            title: '处理前数据集',
-                            ellipsis: { showTitle: true },
-                            dataIndex: 'dataset_pre',
+                            key: 'dataset_name',
+                            title: '处理数据集',
+                            render: (text, record, index) =>
+                              (__$$context => [
+                                <UnifiedLink
+                                  to=""
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                  key="node_ocloz29z4l3"
+                                >
+                                  {__$$eval(() => text)}
+                                </UnifiedLink>,
+                                <Typography.Text
+                                  style={{ fontSize: '' }}
+                                  strong={false}
+                                  disabled={false}
+                                  ellipsis={true}
+                                  __component_name="Typography.Text"
+                                  key="node_ocloz29z4l5"
+                                >
+                                  ----
+                                </Typography.Text>,
+                                <UnifiedLink
+                                  to="https://alibaba.com"
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                  key="node_ocloz29z4l4"
+                                >
+                                  {__$$eval(() => `V ${record.dataset_version}`)}
+                                </UnifiedLink>,
+                              ])(__$$createChildContext(__$$context, { text, record, index })),
+                            dataIndex: 'dataset_name',
                           },
+                          { key: 'start_time', title: '开始时间', dataIndex: 'start_time' },
                           {
-                            key: 'dataset_after',
-                            title: '处理后数据集',
+                            key: 'op',
+                            title: '操作',
                             render: (text, record, index) =>
                               (__$$context => (
-                                <Status
-                                  id="health"
-                                  types={__$$eval(() =>
-                                    __$$context.utils.getComponentWarehouseStatus(__$$context, true)
-                                  )}
-                                  __component_name="Status"
-                                />
-                              ))(__$$createChildContext(__$$context, { text, record, index })),
-                            filters: __$$eval(() => this.utils.getComponentWarehouseStatus(this)),
-                            dataIndex: 'dataset_after',
-                            title: '处理后数据集',
-                          },
-                          {
-                            key: 'time',
-                            render: (text, record, index) =>
-                              (__$$context => (
-                                <Typography.Time
-                                  time=""
-                                  format=""
-                                  relativeTime={false}
-                                  __component_name="Typography.Time"
-                                />
-                              ))(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'time',
-                            title: '开始时间',
-                            sorter: true,
-                          },
-                          {
-                            render: (text, record, index) =>
-                              (__$$context => (
-                                <Space size={12} align="center" direction="horizontal">
+                                <Space
+                                  align="center"
+                                  direction="horizontal"
+                                  __component_name="Space"
+                                >
                                   <Button
-                                    __component_name="Button"
-                                    danger={false}
-                                    ghost={false}
                                     size="small"
-                                    shape="default"
                                     block={false}
+                                    ghost={false}
+                                    shape="default"
+                                    danger={false}
+                                    onClick={function () {
+                                      return this.onOpenLogModal.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([
+                                          {
+                                            record: record,
+                                          },
+                                        ])
+                                      );
+                                    }.bind(__$$context)}
                                     disabled={false}
+                                    __component_name="Button"
+                                  >
+                                    查看日志
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    block={false}
+                                    ghost={false}
+                                    shape="default"
+                                    danger={false}
+                                    onClick={function () {
+                                      return this.onOpenDelModal.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([
+                                          {
+                                            record: record,
+                                          },
+                                        ])
+                                      );
+                                    }.bind(__$$context)}
+                                    disabled={false}
+                                    __component_name="Button"
                                   >
                                     删除
                                   </Button>
                                 </Space>
                               ))(__$$createChildContext(__$$context, { text, record, index })),
                             dataIndex: 'op',
-                            title: '操作',
                           },
                         ]}
                         onChange={function () {
@@ -278,8 +389,30 @@ class DataHandleList$$Page extends React.Component {
                           );
                         }.bind(this)}
                         dataSource={[
-                          { id: '1', age: 32, name: '胡彦斌', address: '西湖区湖底公园1号' },
-                          { id: '2', age: 28, name: '王一博', address: '滨江区网商路699号' },
+                          {
+                            id: '1101',
+                            task_name: '任务一',
+                            start_time: '2021-10-10 12:00:00',
+                            task_status: 'success',
+                            dataset_name: '数据集一',
+                            dataset_version: '1.0',
+                          },
+                          {
+                            id: '1102',
+                            task_name: '任务二',
+                            start_time: '2021-10-12 12:00:00',
+                            task_status: 'success',
+                            dataset_name: '数据集二',
+                            dataset_version: '2.0',
+                          },
+                          {
+                            id: '1102',
+                            task_name: '任务三',
+                            start_time: '2021-10-13 12:00:00',
+                            task_status: 'success',
+                            dataset_name: '数据集三',
+                            dataset_version: '3.0',
+                          },
                         ]}
                         pagination={{
                           size: 'default',
@@ -290,7 +423,6 @@ class DataHandleList$$Page extends React.Component {
                         }}
                         showHeader={true}
                         __component_name="Table"
-                        style={{ marginTop: '24px' }}
                       />
                     </Col>
                   </Row>
@@ -299,6 +431,70 @@ class DataHandleList$$Page extends React.Component {
             </Row>
           </Col>
         </Row>
+        {!!__$$eval(() => this.state.logModalVisible) && (
+          <Modal
+            mask={true}
+            open={true}
+            title="日志"
+            footer=""
+            centered={false}
+            keyboard={true}
+            onCancel={function () {
+              return this.onCloseLogModal.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            forceRender={false}
+            maskClosable={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            __component_name="Modal"
+          >
+            <Logs
+              logs="123"
+              getComponentRef={function e(t) {
+                return t;
+              }}
+              __component_name="Logs"
+            />
+          </Modal>
+        )}
+        {!!__$$eval(() => this.state.delModalvisible) && (
+          <Modal
+            mask={true}
+            onOk={function () {
+              return this.onCloseDelModal.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            open={true}
+            title="删除"
+            centered={false}
+            keyboard={true}
+            onCancel={function () {
+              return this.onCloseDelModal.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            forceRender={false}
+            maskClosable={false}
+            okButtonProps={{ disabled: false }}
+            confirmLoading={false}
+            destroyOnClose={true}
+            __component_name="Modal"
+            cancelButtonProps={{ disabled: false }}
+          >
+            <Alert
+              type="warning"
+              message="确认删除此任务？"
+              showIcon={true}
+              __component_name="Alert"
+            />
+          </Modal>
+        )}
       </Page>
     );
   }
