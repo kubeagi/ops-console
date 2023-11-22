@@ -56,6 +56,7 @@
     "@tenx-ui/form-helper": "^0.0.2",
     "@tenx-ui/icon": "^2.4.17",
     "@tenx-ui/icon-materials": "^0.1.5",
+    "@tenx-ui/logs": "^3.0.5",
     "@tenx-ui/materials": "latest",
     "@tenx-ui/request": "^1.0.0-beta.6",
     "@tenx-ui/utils": "^2.3.1",
