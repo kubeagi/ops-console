@@ -54,6 +54,167 @@ utils.getAxiosHanlderConfig = function __getAxiosHanlderConfig() {
 }.apply(utils);
 export const getAxiosHanlderConfig = utils.getAxiosHanlderConfig;
 
+/** 数据源状态 */
+utils.getDataSourceStatus = function __getDataSourceStatus() {
+  return (pageThis, isStatus, isTag) => {
+    return [
+      // 导入中
+      {
+        type: 'primary',
+        [isStatus ? 'id' : 'value']: 'process',
+        [isStatus || isTag ? 'children' : 'text']: pageThis.i18n('i18n-9plmyzo5'),
+      },
+      // 连接成功
+      {
+        type: 'success',
+        [isStatus ? 'id' : 'value']: 'success',
+        [isStatus || isTag ? 'children' : 'text']: pageThis.i18n('i18n-qahl1me8'),
+      },
+      {
+        // 连接异常
+        type: 'error',
+        [isStatus ? 'id' : 'value']: 'error',
+        [isStatus || isTag ? 'children' : 'text']: pageThis.i18n('i18n-8f4bzjjd'),
+      },
+    ];
+  };
+}.apply(utils);
+export const getDataSourceStatus = utils.getDataSourceStatus;
+
+/** 数据源类型 */
+utils.getDataSourceTypes = function __getDataSourceTypes() {
+  return (pageThis, isTag) => {
+    const valueKey = 'value';
+    const labelKey = isTag ? 'children' : 'text';
+    return [
+      {
+        [valueKey]: 'localUpload',
+        [labelKey]: pageThis.i18n(''),
+        forms: ['upload'],
+      },
+      {
+        [valueKey]: 'fileStorage',
+        [labelKey]: pageThis.i18n(''),
+        forms: ['serverAddress', 'path'],
+      },
+      {
+        [valueKey]: 'objectStorage',
+        [labelKey]: pageThis.i18n(''),
+        forms: ['Bucket', 'Object'],
+      },
+      {
+        [valueKey]: 'mysql',
+        [labelKey]: pageThis.i18n(''),
+        forms: ['serverAddress', 'username', 'password'],
+      },
+      {
+        [valueKey]: 'mongodb',
+        [labelKey]: pageThis.i18n(''),
+        forms: ['serverAddress', 'username', 'password'],
+      },
+      {
+        [valueKey]: 'api',
+        [labelKey]: pageThis.i18n(''),
+        forms: ['apiAddress', 'token'],
+      },
+    ];
+  };
+}.apply(utils);
+export const getDataSourceTypes = utils.getDataSourceTypes;
+
+/** 数据集类型 */
+utils.getDataSetTypes = function __getDataSetTypes() {
+  return (pageThis, isTag) => {
+    const valueKey = 'value';
+    const labelKey = isTag ? 'children' : 'label';
+    return [
+      {
+        // 文本
+        [valueKey]: 'text',
+        [labelKey]: pageThis.i18n('i18n-3kxctf9p'),
+      },
+      {
+        // 图片
+        [valueKey]: 'image',
+        [labelKey]: pageThis.i18n('i18n-4sbaoiyr'),
+      },
+      {
+        // 视频
+        [valueKey]: 'video',
+        [labelKey]: pageThis.i18n('i18n-516o6p6k'),
+      },
+    ];
+  };
+}.apply(utils);
+export const getDataSetTypes = utils.getDataSetTypes;
+
+/** 数据源应用场景 */
+utils.getDataSetApplicationScenario = function __getDataSetApplicationScenario() {
+  return (pageThis, isTag) => {
+    const valueKey = 'value';
+    const labelKey = isTag ? 'children' : 'label';
+    return [
+      {
+        // 科技
+        [valueKey]: 'science',
+        [labelKey]: pageThis.i18n('i18n-zpw49ds4'),
+      },
+      {
+        // 金融
+        [valueKey]: 'finance',
+        [labelKey]: pageThis.i18n('i18n-3avsorb4'),
+      },
+      {
+        // 教育
+        [valueKey]: 'education',
+        [labelKey]: pageThis.i18n('i18n-hrtg7fkn'),
+      },
+      {
+        // 医疗
+        [valueKey]: 'medical',
+        [labelKey]: pageThis.i18n('i18n-yrc22hwt'),
+      },
+      {
+        // 能源
+        [valueKey]: 'energy',
+        [labelKey]: pageThis.i18n('i18n-mazlme9u'),
+      },
+      {
+        // 法律
+        [valueKey]: 'law',
+        [labelKey]: pageThis.i18n('i18n-82tsjj5m'),
+      },
+      {
+        // 其他
+        [valueKey]: 'others',
+        [labelKey]: pageThis.i18n('i18n-k56nh13q'),
+      },
+    ];
+  };
+}.apply(utils);
+export const getDataSetApplicationScenario = utils.getDataSetApplicationScenario;
+
+/** 获取数据源文件类型 */
+utils.getDataSetFileTypes = function __getDataSetFileTypes() {
+  return (pageThis, isTag) => {
+    const valueKey = 'value';
+    const labelKey = isTag ? 'children' : 'label';
+    return [
+      {
+        // 普通文本
+        [valueKey]: 'text',
+        [labelKey]: pageThis.i18n('i18n-uwszai5e'),
+      },
+      {
+        // QA 文本
+        [valueKey]: 'pic',
+        [labelKey]: pageThis.i18n('i18n-l6bbbjcm'),
+      },
+    ];
+  };
+}.apply(utils);
+export const getDataSetFileTypes = utils.getDataSetFileTypes;
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -115,4 +276,14 @@ export default {
   getAuthorization,
 
   getAxiosHanlderConfig,
+
+  getDataSourceStatus,
+
+  getDataSourceTypes,
+
+  getDataSetTypes,
+
+  getDataSetApplicationScenario,
+
+  getDataSetFileTypes,
 };

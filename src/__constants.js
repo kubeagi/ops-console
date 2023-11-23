@@ -31,5 +31,15 @@ constants.DATASET_DATA = function applyThis() {
   };
 }.apply(constants);
 export const DATASET_DATA = constants.DATASET_DATA;
+/** 不允许输入空格 */
+constants.NO_BLANK_SPACE_REG = function applyThis() {
+  return '^[^s]*$';
+}.apply(constants);
+export const NO_BLANK_SPACE_REG = constants.NO_BLANK_SPACE_REG;
 
+/** 描述长度 */
+constants.DESCRIPTION_LENGTH_REG = function applyThis() {
+  return '^.{0,200}$';
+}.apply(constants);
+export const DESCRIPTION_LENGTH_REG = constants.DESCRIPTION_LENGTH_REG;
 export default constants;

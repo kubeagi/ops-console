@@ -4,9 +4,15 @@ import React from 'react';
 
 import {
   Page,
+  Modal,
+  FormilyForm,
+  FormilyFormItem,
+  Typography,
+  FormilyTextArea,
+  FormilySwitch,
+  FormilySelect,
   Row,
   Col,
-  Typography,
   Alert,
   Card,
   Space,
@@ -34,7 +40,7 @@ import { DataProvider } from 'shared-components';
 import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
-import utils from '../../utils/__utils';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
@@ -67,25 +73,83 @@ class Dataset$$Page extends React.Component {
 
     this.utils = utils;
 
+    this._refsManager = new RefsManager();
+
     __$$i18n._inject2(this);
 
     this.state = {
-      search: undefined,
+      data: [],
+      page: 1,
       type: undefined,
       field: undefined,
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      data: [],
+      search: undefined,
+      pageSize: 5,
+      addVersion: {
+        visible: false,
+        data: {
+          name: 'def',
+          namespace: 'abc',
+          creator: '',
+          displayName: 'def',
+          updateTimestamp: null,
+          contentType: 'text',
+          field: '',
+          versionCount: 0,
+          versions: {
+            nodes: [
+              {
+                name: 'def-v1',
+                namespace: 'abc',
+                displayName: '版本1',
+                files: {
+                  nodes: [],
+                },
+              },
+              {
+                name: 'def-v2',
+                namespace: 'abc',
+                displayName: '版本1',
+                files: {
+                  nodes: [],
+                },
+              },
+            ],
+          },
+        },
+      },
+      totalCount: 0,
     };
   }
 
-  $ = () => null;
+  $ = refName => {
+    return this._refsManager.get(refName);
+  };
 
-  $$ = () => [];
+  $$ = refName => {
+    return this._refsManager.getAll(refName);
+  };
 
   componentWillUnmount() {
     console.log('will unmount');
+  }
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
+
+  onClick(event) {
+    // 点击按钮时的回调
+    console.log('onClick', event);
+  }
+
+  refresh(event) {
+    event.stopPropagation();
+    this.fetchData();
+  }
+
+  testFunc() {
+    console.log('test aliLowcode func');
+    return <div className="test-aliLowcode-func">{this.state.test}</div>;
   }
 
   async fetchData() {
@@ -96,58 +160,49 @@ class Dataset$$Page extends React.Component {
           fieldSelector: this.state.field,
           keyword: this.state.search,
           namespace: this.appHelper.utils.getAuthData().project,
+          pageSize: this.state.pageSize,
+          page: this.state.page,
         },
         versionsInput: {
           namespace: this.appHelper.utils.getAuthData().project,
         },
+        filesInput: {
+          keyword: '',
+          pageSize: 10,
+          page: 1,
+        },
       })
-      .catch(e => {
-        console.log(
-          'eee',
-          {
-            ...e,
-          },
-          e?.response?.data?.Dataset?.listDatasets?.nodes
-        );
-        this.setState({
-          data: e?.response?.data?.Dataset?.listDatasets?.nodes,
-        });
-      });
+      .catch(e => {});
     console.log('res', res);
-  }
-
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
-  }
-
-  addText(event) {
-    event.stopPropagation();
-    // 点击按钮时的回调
-    console.log('addText', event);
-  }
-
-  refresh(event) {
-    event.stopPropagation();
-    // 点击按钮时的回调
-    console.log('refresh', event);
-  }
-
-  onClick(event) {
-    // 点击按钮时的回调
-    console.log('onClick', event);
+    this.setState({
+      data: res?.Dataset?.listDatasets?.nodes,
+      totalCount: res?.Dataset?.listDatasets?.totalCount,
+    });
   }
 
   linkClick(event) {
     event.stopPropagation();
   }
 
-  onSearchChange(event) {
-    // 输入框内容变化时的回调
-    console.log('onChange', event);
+  addVersion(event, params) {
+    event.stopPropagation();
     this.setState({
-      search: event.target.value,
+      addVersion: {
+        visible: true,
+        data: params.data,
+      },
     });
+  }
+
+  onPageChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState(
+      {
+        page,
+        pageSize,
+      },
+      this.fetchData
+    );
   }
 
   onTypeChange(event) {
@@ -171,8 +226,41 @@ class Dataset$$Page extends React.Component {
     );
   }
 
-  onPageChange(page, pageSize) {
-    // 页码或 pageSize 改变的回调
+  async onAddVersionOK() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    console.log('onAddVersionOK');
+    const res = await this.form()
+      .validate()
+      .then(values => {
+        console.log('then', values);
+      })
+      .catch(e => {
+        console.log('eeerror', e);
+      });
+    console.log('res', res);
+  }
+
+  onSearchChange(event) {
+    // 输入框内容变化时的回调
+    console.log('onChange', event);
+    this.setState({
+      search: event.target.value,
+    });
+  }
+
+  getVersionsNumMax(versions) {
+    return Math.max(...versions.map(v => parseInt(v?.name?.match(/\d+/)?.[0] || '0')));
+  }
+
+  onAddVersionCancel() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    console.log('onCancel');
+    this.setState({
+      addVersion: {
+        visible: false,
+        data: {},
+      },
+    });
   }
 
   componentDidMount() {
@@ -185,6 +273,124 @@ class Dataset$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        <Modal
+          mask={true}
+          onOk={function () {
+            return this.onAddVersionOK.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.addVersion.visible)}
+          title={this.i18n('i18n-wgpt60zj') /* 新增版本 */}
+          centered={false}
+          keyboard={true}
+          onCancel={function () {
+            return this.onAddVersionCancel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          forceRender={false}
+          maskClosable={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          __component_name="Modal"
+        >
+          <FormilyForm
+            ref={this._refsManager.linkRef('formily_create')}
+            formHelper={{ autoFocus: true }}
+            componentProps={{
+              colon: false,
+              layout: 'horizontal',
+              labelCol: 5,
+              labelAlign: 'left',
+              wrapperCol: 19,
+            }}
+            createFormProps={{
+              initialValues: __$$eval(() => ({
+                inheritedFromSwitch: !!this.state.addVersion.data?.versions.nodes.length,
+              })),
+            }}
+            __component_name="FormilyForm"
+          >
+            <FormilyFormItem
+              fieldProps={{
+                name: 'FormilyFormItem',
+                title: '数据集版本',
+                'x-component': 'FormilyFormItem',
+                'x-validator': [],
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              __component_name="FormilyFormItem"
+            >
+              <Typography.Text
+                style={{ fontSize: '' }}
+                strong={false}
+                disabled={false}
+                ellipsis={true}
+                __component_name="Typography.Text"
+              >
+                {__$$eval(
+                  () =>
+                    'v' + (this.getVersionsNumMax(this.state.addVersion.data?.versions.nodes) + 1)
+                )}
+              </Typography.Text>
+            </FormilyFormItem>
+            <FormilyTextArea
+              fieldProps={{
+                name: 'description',
+                title: '版本描述',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+              componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              __component_name="FormilyTextArea"
+            />
+            <FormilySwitch
+              fieldProps={{ name: 'inheritedFromSwitch', title: '继承历史版本', 'x-validator': [] }}
+              componentProps={{ 'x-component-props': { loading: false, disabled: false } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              __component_name="FormilySwitch"
+            />
+            {!!__$$eval(() =>
+              (() => {
+                const v = this.form();
+                console.log('fff', v);
+                return this.form().values.inheritedFromSwitch;
+              })()
+            ) && (
+              <FormilySelect
+                fieldProps={{
+                  enum: __$$eval(() =>
+                    this.state.addVersion.data?.versions.nodes.map(v => ({
+                      label: v.name,
+                      value: v.name,
+                    }))
+                  ),
+                  name: 'inheritedFrom',
+                  title: this.i18n('i18n-ygp6an7a') /* 历史版本 */,
+                  required: true,
+                  'x-display': "{{ $form.values?.inheritedFromSwitch ? 'visible' : 'hidden' }}",
+                  'x-validator': [],
+                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                }}
+                componentProps={{
+                  'x-component-props': {
+                    disabled: false,
+                    allowClear: false,
+                    placeholder: this.i18n('i18n-84e86ujo') /* 请选择历史版本 */,
+                    _sdkSwrGetFunc: {},
+                    _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                  },
+                }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                __component_name="FormilySelect"
+              />
+            )}
+          </FormilyForm>
+        </Modal>
         <Row wrap={true} __component_name="Row">
           <Col span={24} __component_name="Col">
             <Typography.Title
@@ -238,6 +444,12 @@ class Dataset$$Page extends React.Component {
                   ghost={false}
                   shape="default"
                   danger={false}
+                  onClick={function () {
+                    return this.refresh.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
                   disabled={false}
                   __component_name="Button"
                 >
@@ -326,7 +538,7 @@ class Dataset$$Page extends React.Component {
             itemLayout="vertical"
             pagination={{
               size: 'default',
-              total: __$$eval(() => this.state.total),
+              total: __$$eval(() => this.state.totalCount),
               simple: false,
               current: __$$eval(() => this.state.page),
               onChange: function () {
@@ -353,17 +565,20 @@ class Dataset$$Page extends React.Component {
                           {
                             key: '1',
                             label: (
-                              <Row wrap={true} __component_name="Row">
+                              <Row
+                                wrap={true}
+                                style={{ display: 'flex', justifyContent: 'space-between' }}
+                                __component_name="Row"
+                              >
                                 <Col
-                                  span={6}
+                                  span=""
                                   style={{ display: 'flex', alignItems: 'center' }}
                                   __component_name="Col"
                                 >
                                   <Image
                                     src={__$$eval(
                                       () =>
-                                        __$$context.props.appHelper.constants.DATASET_DATA
-                                          ?.typeIcons?.[item.contentType]
+                                        __$$context.constants.DATASET_DATA?.typeIcons?.[item.contentType]
                                     )}
                                     width={32}
                                     height={32}
@@ -389,11 +604,11 @@ class Dataset$$Page extends React.Component {
                                   }}
                                   __component_name="Col"
                                 >
-                                  <Tag color="processing" closable={false} __component_name="Tag">
-                                    tag
+                                  <Tag color="warning" closable={false} __component_name="Tag">
+                                    {__$$eval(() => item.contentType)}
                                   </Tag>
                                   <Tag color="processing" closable={false} __component_name="Tag">
-                                    tag
+                                    {__$$eval(() => item.field || '未知')}
                                   </Tag>
                                 </Col>
                                 <Col
@@ -412,7 +627,7 @@ class Dataset$$Page extends React.Component {
                                     ellipsis={true}
                                     __component_name="Typography.Text"
                                   >
-                                    版本数 5
+                                    {__$$eval(() => `版本数：${item.versions.totalCount}`)}
                                   </Typography.Text>
                                 </Col>
                                 <Col
@@ -434,15 +649,20 @@ class Dataset$$Page extends React.Component {
                                     shape="default"
                                     danger={false}
                                     onClick={function () {
-                                      return this.addText.apply(
+                                      return this.addVersion.apply(
                                         this,
-                                        Array.prototype.slice.call(arguments).concat([])
+                                        Array.prototype.slice.call(arguments).concat([
+                                          {
+                                            testKey: 123,
+                                            data: item,
+                                          },
+                                        ])
                                       );
                                     }.bind(__$$context)}
                                     disabled={false}
                                     __component_name="Button"
                                   >
-                                    新增文本
+                                    {this.i18n('i18n-wgpt60zj') /* 新增版本 */}
                                   </Button>
                                   <Divider
                                     mode="default"
@@ -487,25 +707,42 @@ class Dataset$$Page extends React.Component {
                                     dataIndex: 'version',
                                   },
                                   {
-                                    key: 'importStatus',
+                                    key: 'syncStatus',
                                     title: '导入状态',
-                                    dataIndex: 'importStatus',
+                                    render: (text, record) =>
+                                      ({
+                                        FileSyncing: '同步中',
+                                        FileSyncFailed: '同步失败',
+                                        FileSyncSuccess: '同步成功',
+                                      }[text] || '未知'),
+                                    dataIndex: 'syncStatus',
                                   },
                                   {
-                                    key: 'releaseStatus',
+                                    key: 'released',
                                     title: '发布状态',
-                                    dataIndex: 'releaseStatus',
+                                    render: (text, record) =>
+                                      ({
+                                        0: '未发布',
+                                        1: '已发布',
+                                      }[text] || '未知'),
+                                    dataIndex: 'released',
                                   },
                                   {
-                                    key: 'dataField',
+                                    key: 'dataProcessStatus',
                                     title: '数据处理状态',
-                                    dataIndex: 'dataField',
+                                    render: (text, record) => text || '未开始',
+                                    dataIndex: 'dataProcessStatus',
                                   },
-                                  { key: 'dataMount', title: '数据量', dataIndex: 'dataMount' },
                                   {
-                                    key: 'updateTime',
+                                    key: 'files',
+                                    title: '数据量',
+                                    render: (text, record) => text.totalCount,
+                                    dataIndex: 'files',
+                                  },
+                                  {
+                                    key: 'updateTimestamp',
                                     title: '最后更新时间',
-                                    dataIndex: 'updateTime',
+                                    dataIndex: 'updateTimestamp',
                                   },
                                   {
                                     key: 'action',
@@ -552,20 +789,7 @@ class Dataset$$Page extends React.Component {
                                     dataIndex: 'action',
                                   },
                                 ]}
-                                dataSource={[
-                                  {
-                                    id: '1',
-                                    age: 32,
-                                    name: '胡彦斌',
-                                    address: '西湖区湖底公园1号',
-                                  },
-                                  {
-                                    id: '2',
-                                    age: 28,
-                                    name: '王一博',
-                                    address: '滨江区网商路699号',
-                                  },
-                                ]}
+                                dataSource={__$$eval(() => item.versions?.nodes || [])}
                                 pagination={false}
                                 showHeader={true}
                                 __component_name="Table"
@@ -596,7 +820,7 @@ class Dataset$$Page extends React.Component {
   }
 }
 
-const PageWrapper = () => {
+const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/dataset' }, location.pathname);
@@ -627,7 +851,9 @@ const PageWrapper = () => {
           enableLocationSearch: undefined,
         },
       ]}
-      render={dataProps => <Dataset$$Page {...dataProps} self={self} appHelper={appHelper} />}
+      render={dataProps => (
+        <Dataset$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+      )}
     />
   );
 };

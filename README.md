@@ -55,7 +55,7 @@ chmod +x ./build.sh ./update_base_image.sh
 docker run -d -p 8000:80 172.22.50.223/dev-branch/kubeagi-portal:main
 ```
 
-然后浏览器中打开 http://localhost:8000/KubeAGI/test 即可访问 portal。
+然后浏览器中打开 http://localhost:8000/kubeagi-portal/test 即可访问 portal。
 
 ### 代码风格检查
 

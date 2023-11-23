@@ -1,0 +1,10 @@
+body {
+  font-size: 12px;
+
+  .ant-upload,
+  .ant-upload-select,
+  .tenx-ui-materials-upload,
+  .tenx-ui-materials-upload-select {
+    width: 100%;
+  }
+}

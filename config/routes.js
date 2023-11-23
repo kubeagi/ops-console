@@ -25,7 +25,15 @@ const routes = [
         component: '@/pages/DataHandleDetail',
       },
       {
-        name: '数据源详情',
+        name: '数据源管理',
+        path: '/data-source',
+        component: '@/pages/DataSource',
+      },
+      {
+        path: '/data-source/create',
+        component: '@/pages/DataSourceCreate',
+      },
+      {
         path: '/data-source/detail/:id',
         component: '@/pages/DatasourceDetail',
       },
@@ -33,6 +41,10 @@ const routes = [
         name: '数据集管理 - 列表',
         path: '/dataset',
         component: '@/pages/Dataset',
+      },
+      {
+        path: '/dataset/create',
+        component: '@/pages/DataSetCreate',
       },
       {
         name: '知识库管理',
