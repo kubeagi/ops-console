@@ -36,6 +36,7 @@ http://${site}`;
 export const alias = {
   'app-card': join(__dirname, '../packages/app-card/src'),
   TEST: join(__dirname, '../packages/TEST/src'),
+  KubeAGIUpload: join(__dirname, '../packages/KubeAGIUpload/src'),
 };
 
 export default defineConfig({

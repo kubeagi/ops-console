@@ -35,6 +35,10 @@ const routes = [
         component: '@/pages/Dataset',
       },
       {
+        path: '/dataset/create',
+        component: '@/pages/DataSetCreate',
+      },
+      {
         name: '知识库管理',
         path: '/knowledge',
         component: '@/pages/Knowledge',
