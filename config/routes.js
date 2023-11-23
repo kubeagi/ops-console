@@ -34,6 +34,11 @@ const routes = [
         path: '/knowledge',
         component: '@/pages/Knowledge',
       },
+      {
+        name: '数据集管理 - 列表',
+        path: '/dataset',
+        component: '@/pages/Dataset',
+      },
     ],
   },
 ];

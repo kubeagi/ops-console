@@ -5,7 +5,7 @@ import { notification } from '@tenx-ui/materials';
 import { getAuthData, setAuthData, removeAuthData, isTokenExpired } from '@tenx-ui/auth-utils';
 
 import { createRef } from 'react';
-import { sdk as bff } from '../../bff-sdk';
+import { sdk as bff } from '@tenx-ui/arcadia-bff-sdk';
 
 const utils = {};
 
