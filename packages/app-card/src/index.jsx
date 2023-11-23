@@ -748,7 +748,7 @@ class AppCard$$Component extends React.Component {
   }
 }
 
-const ComponentWrapper = () => {
+const ComponentWrapper = (props = {}) => {
   const history = getUnifiedHistory();
   const appHelper = {
     utils,
@@ -768,6 +768,7 @@ const ComponentWrapper = () => {
       }}
       sdkSwrFuncs={[]}
       render={dataProps => <AppCard$$Component {...dataProps} self={self} appHelper={appHelper} />}
+      {...props}
     />
   );
 };
