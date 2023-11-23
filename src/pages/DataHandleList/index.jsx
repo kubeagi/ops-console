@@ -4,7 +4,6 @@ import React from 'react';
 
 import {
   Page,
-  UnifiedLink,
   Row,
   Col,
   Typography,
@@ -16,6 +15,7 @@ import {
   Pagination,
   Modal,
   Table,
+  UnifiedLink,
   Status,
 } from '@tenx-ui/materials';
 
@@ -64,11 +64,14 @@ class DataHandleList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      keyword: undefined,
-      currentPage: 1,
-      currentRecord: null,
       delModalvisible: false,
       logModalVisible: false,
+      currentRecord: null,
+      currentPage: 0,
+      pageSize: 10,
+      totalCount: 0,
+      keyword: '',
+      dataHandleList: [],
     };
   }
 
@@ -80,21 +83,29 @@ class DataHandleList$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  onLinkCreate() {
-    // 点击按钮时的回调
-    this.history.push('/data-handle/create');
+  async getDataList() {
+    try {
+      const res = await this.utils.bff.allDataProcessListByPage({
+        input: {
+          pageIndex: this.state.currentPage,
+          pageSize: this.state.pageSize,
+          keyword: this.state.keyword,
+        },
+      });
+      console.log(res);
+      const { data, status } = res?.dataProcess?.allDataProcessListByPage;
+      if (status === 200) {
+        this.setState({
+          dataHandleList: data || [],
+          totalCount: data.length,
+        });
+      }
+    } catch (error) {}
   }
 
   onOpenDelModal(record) {
     this.setState({
       delModalvisible: true,
-      currentRecord: record,
-    });
-  }
-
-  onOpenLogModal(record) {
-    this.setState({
-      logModalVisible: true,
       currentRecord: record,
     });
   }
@@ -106,6 +117,13 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
+  onOpenLogModal(record) {
+    this.setState({
+      logModalVisible: true,
+      currentRecord: record,
+    });
+  }
+
   onCloseLogModal(isNeedReload) {
     this.setState({
       logModalVisible: false,
@@ -113,11 +131,9 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onKeyWordChange(event) {
-    // 输入框内容变化时的回调
-    this.setState({
-      keyword: event.target.value,
-    });
+  onLinkCreate() {
+    // 点击按钮时的回调
+    this.history.push('/data-handle/create');
   }
 
   onCurrentPageChange(page, pageSize) {
@@ -127,8 +143,22 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
+  onKeyWordChange(event) {
+    // 输入框内容变化时的回调
+    this.setState({
+      keyword: event.target.value,
+    });
+    this.getDataList();
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
   componentDidMount() {
-    console.log('did mount');
+    console.log('did mount', this.utils.bff);
+    this.getDataList();
   }
 
   render() {
@@ -141,9 +171,6 @@ class DataHandleList$$Page extends React.Component {
         pagePaddingTop={24}
         pagePaddingBottom={24}
       >
-        <UnifiedLink to="https://alibaba.com" target="_blank" __component_name="UnifiedLink">
-          链接
-        </UnifiedLink>
         <Row wrap={true} __component_name="Row">
           <Col span={24} __component_name="Col">
             <Typography.Title
@@ -229,7 +256,7 @@ class DataHandleList$$Page extends React.Component {
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          placeholder="请输入"
+                          placeholder="请输入任务名称搜索"
                           __component_name="Input.Search"
                         />
                       </Space>
@@ -237,16 +264,11 @@ class DataHandleList$$Page extends React.Component {
                     <Col __component_name="Col">
                       <Space align="center" direction="horizontal">
                         <Pagination
-                          total={50}
-                          simple={false}
-                          current={__$$eval(() => this.state.currentPage)}
-                          onChange={function () {
-                            return this.onCurrentPageChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          pageSize={10}
+                          total={__$$eval(() => this.state.totalCount)}
+                          simple={true}
+                          current={__$$eval(() => this.state.currentPage + 1)}
+                          pageSize={__$$eval(() => this.state.pageSize)}
+                          showTotal={__$$eval(() => this.state.totalCount)}
                           __component_name="Pagination"
                         />
                       </Space>
@@ -300,7 +322,7 @@ class DataHandleList$$Page extends React.Component {
                               (__$$context => (
                                 <UnifiedLink
                                   to={__$$eval(() => '/data-handle/detail/' + record.id)}
-                                  target="_blank"
+                                  target="_self"
                                   __component_name="UnifiedLink"
                                 >
                                   {__$$eval(() => text)}
@@ -315,11 +337,15 @@ class DataHandleList$$Page extends React.Component {
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Status
-                                  id="disabled"
+                                  id={__$$eval(() => record.status)}
                                   types={[
-                                    { id: 'success', type: 'disabled', children: '未知' },
-                                    { id: 'error', type: 'disabled', children: '未知' },
-                                    { id: 'doing', type: 'disabled', children: '未知' },
+                                    { id: 'processing', type: 'info', children: '处理中' },
+                                    {
+                                      id: 'process_complete',
+                                      type: 'success',
+                                      children: '处理完成',
+                                    },
+                                    { id: 'process_fail', type: 'error', children: '处理失败' },
                                   ]}
                                   __component_name="Status"
                                 />
@@ -328,71 +354,43 @@ class DataHandleList$$Page extends React.Component {
                             dataIndex: 'status',
                           },
                           {
-                            key: 'preDataSetName',
-                            title: '处理后数据集',
+                            key: 'pre_data_set_name',
+                            title: '处理前数据集',
                             render: (text, record, index) =>
-                              (__$$context => [
-                                <UnifiedLink
-                                  to=""
-                                  target="_blank"
-                                  __component_name="UnifiedLink"
-                                  key="node_ocloz29z4l3"
-                                >
-                                  {__$$eval(() => text)}
-                                </UnifiedLink>,
+                              (__$$context => (
                                 <Typography.Text
                                   style={{ fontSize: '' }}
                                   strong={false}
                                   disabled={false}
                                   ellipsis={true}
                                   __component_name="Typography.Text"
-                                  key="node_ocloz29z4l5"
                                 >
-                                  ----
-                                </Typography.Text>,
-                                <UnifiedLink
-                                  to="https://alibaba.com"
-                                  target="_blank"
-                                  __component_name="UnifiedLink"
-                                  key="node_ocloz29z4l4"
-                                >
-                                  {__$$eval(() => `V ${record.dataset_version}`)}
-                                </UnifiedLink>,
-                              ])(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'dataset_info.preDataSetName',
+                                  {__$$eval(
+                                    () =>
+                                      `${record.pre_data_set_name}/${record.pre_data_set_version}`
+                                  )}
+                                </Typography.Text>
+                              ))(__$$createChildContext(__$$context, { text, record, index })),
+                            dataIndex: 'pre_data_set_name',
                           },
                           {
                             key: 'postDataSetName',
                             title: '处理后数据集',
                             render: (text, record, index) =>
-                              (__$$context => [
-                                <UnifiedLink
-                                  to="https://alibaba.com"
-                                  target="_blank"
-                                  __component_name="UnifiedLink"
-                                  key="node_oclp7zl1ey6"
-                                >
-                                  数据集名称
-                                </UnifiedLink>,
+                              (__$$context => (
                                 <Typography.Text
                                   style={{ fontSize: '' }}
                                   strong={false}
                                   disabled={false}
                                   ellipsis={true}
                                   __component_name="Typography.Text"
-                                  key="node_oclp7zl1ey9"
                                 >
-                                  ---
-                                </Typography.Text>,
-                                <UnifiedLink
-                                  to="https://alibaba.com"
-                                  target="_blank"
-                                  __component_name="UnifiedLink"
-                                  key="node_oclp7zl1eyb"
-                                >
-                                  1.2.0
-                                </UnifiedLink>,
-                              ])(__$$createChildContext(__$$context, { text, record, index })),
+                                  {__$$eval(
+                                    () =>
+                                      `${record.post_data_set_name}/${record.post_data_set_version}`
+                                  )}
+                                </Typography.Text>
+                              ))(__$$createChildContext(__$$context, { text, record, index })),
                             dataIndex: 'dataset_info.postDataSetName',
                           },
                           { key: 'start_datetime', title: '开始时间', dataIndex: 'start_datetime' },
@@ -407,7 +405,7 @@ class DataHandleList$$Page extends React.Component {
                                   __component_name="Space"
                                 >
                                   <Button
-                                    size="small"
+                                    size="middle"
                                     block={false}
                                     ghost={false}
                                     shape="default"
@@ -428,7 +426,7 @@ class DataHandleList$$Page extends React.Component {
                                     查看日志
                                   </Button>
                                   <Button
-                                    size="small"
+                                    size="middle"
                                     block={false}
                                     ghost={false}
                                     shape="default"
@@ -459,32 +457,7 @@ class DataHandleList$$Page extends React.Component {
                             Array.prototype.slice.call(arguments).concat([])
                           );
                         }.bind(this)}
-                        dataSource={[
-                          {
-                            id: '1101',
-                            name: '任务一',
-                            start_time: '2021-10-10 12:00:00',
-                            task_status: 'success',
-                            dataset_name: '数据集一',
-                            dataset_version: '1.0',
-                          },
-                          {
-                            id: '1102',
-                            name: '任务二',
-                            start_time: '2021-10-12 12:00:00',
-                            task_status: 'success',
-                            dataset_name: '数据集二',
-                            dataset_version: '2.0',
-                          },
-                          {
-                            id: '1102',
-                            name: '任务三',
-                            start_time: '2021-10-13 12:00:00',
-                            task_status: 'success',
-                            dataset_name: '数据集三',
-                            dataset_version: '3.0',
-                          },
-                        ]}
+                        dataSource={__$$eval(() => this.state.dataHandleList)}
                         pagination={{
                           size: 'default',
                           simple: false,
@@ -494,6 +467,7 @@ class DataHandleList$$Page extends React.Component {
                         }}
                         showHeader={true}
                         __component_name="Table"
+                        loading={__$$eval(() => this.props.allDataProcessListByPage?.loading)}
                       />
                     </Col>
                   </Row>
@@ -571,7 +545,7 @@ class DataHandleList$$Page extends React.Component {
   }
 }
 
-const PageWrapper = () => {
+const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/data-handle' }, location.pathname);
@@ -595,9 +569,17 @@ const PageWrapper = () => {
         func: 'undefined',
         params: undefined,
       }}
-      sdkSwrFuncs={[]}
+      sdkSwrFuncs={[
+        {
+          func: 'useAllDataProcessListByPage',
+          params: undefined,
+          enableLocationSearch: function applyThis() {
+            return true;
+          }.apply(self),
+        },
+      ]}
       render={dataProps => (
-        <DataHandleList$$Page {...dataProps} self={self} appHelper={appHelper} />
+        <DataHandleList$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
       )}
     />
   );
