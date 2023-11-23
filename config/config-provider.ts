@@ -3,17 +3,22 @@ const config = {
   theme: {
     token: {
       fontSize: 12,
-      colorLink: '#00b96b',
+      colorLink: '#4461eb',
       colorError: '#f85a5a',
-      borderRadius: 2,
-      colorPrimary: '#00b96b',
+      borderRadius: 4,
+      colorPrimary: '#4461eb',
       colorSuccess: '#5cb85c',
       colorWarning: '#ffbf00',
       colorLinkHover: '#6f8bf7',
     },
     components: {
-      Row: { rowVerticalGutter: 20, rowHorizontalGutter: 20 },
-      Page: { pagePadding: 20, pagePaddingTop: 20, pagePaddingBottom: 32 },
+      Row: { rowVerticalGutter: 16, rowHorizontalGutter: 16 },
+      Page: {
+        pagePadding: 20,
+        pageBackground: 'transparent',
+        pagePaddingTop: 20,
+        pagePaddingBottom: 32,
+      },
     },
   },
   componentSize: 'middle',
