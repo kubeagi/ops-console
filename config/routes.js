@@ -29,6 +29,11 @@ const routes = [
         path: '/data-source/detail/:id',
         component: '@/pages/DatasourceDetail',
       },
+      {
+        name: '知识库管理',
+        path: '/knowledge',
+        component: '@/pages/Knowledge',
+      },
     ],
   },
 ];
