@@ -4,6 +4,7 @@ import React from 'react';
 
 import {
   Page,
+  UnifiedLink,
   Row,
   Col,
   Typography,
@@ -15,7 +16,6 @@ import {
   Pagination,
   Modal,
   Table,
-  UnifiedLink,
   Status,
 } from '@tenx-ui/materials';
 
@@ -63,7 +63,13 @@ class DataHandleList$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { delModalvisible: false, logModalVisible: false, currentRecord: null };
+    this.state = {
+      keyword: undefined,
+      currentPage: 1,
+      currentRecord: null,
+      delModalvisible: false,
+      logModalVisible: false,
+    };
   }
 
   $ = () => null;
@@ -74,9 +80,21 @@ class DataHandleList$$Page extends React.Component {
     console.log('will unmount');
   }
 
+  onLinkCreate() {
+    // 点击按钮时的回调
+    this.history.push('/data-handle/create');
+  }
+
   onOpenDelModal(record) {
     this.setState({
       delModalvisible: true,
+      currentRecord: record,
+    });
+  }
+
+  onOpenLogModal(record) {
+    this.setState({
+      logModalVisible: true,
       currentRecord: record,
     });
   }
@@ -88,13 +106,6 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onOpenLogModal(record) {
-    this.setState({
-      logModalVisible: true,
-      currentRecord: record,
-    });
-  }
-
   onCloseLogModal(isNeedReload) {
     this.setState({
       logModalVisible: false,
@@ -102,9 +113,18 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onLinkCreate() {
-    // 点击按钮时的回调
-    this.history.push('/data-handle/create');
+  onKeyWordChange(event) {
+    // 输入框内容变化时的回调
+    this.setState({
+      keyword: event.target.value,
+    });
+  }
+
+  onCurrentPageChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState({
+      currentPage: page,
+    });
   }
 
   componentDidMount() {
@@ -121,6 +141,9 @@ class DataHandleList$$Page extends React.Component {
         pagePaddingTop={24}
         pagePaddingBottom={24}
       >
+        <UnifiedLink to="https://alibaba.com" target="_blank" __component_name="UnifiedLink">
+          链接
+        </UnifiedLink>
         <Row wrap={true} __component_name="Row">
           <Col span={24} __component_name="Col">
             <Typography.Title
@@ -193,12 +216,20 @@ class DataHandleList$$Page extends React.Component {
                         </Button>
                         <Input.Search
                           style={{ width: '240px' }}
+                          value={__$$eval(() => this.state.keyword)}
+                          onChange={function () {
+                            return this.onKeyWordChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                           onSearch={function () {
                             return this.handleSearchValueChange.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
+                          placeholder="请输入"
                           __component_name="Input.Search"
                         />
                       </Space>
@@ -208,7 +239,13 @@ class DataHandleList$$Page extends React.Component {
                         <Pagination
                           total={50}
                           simple={false}
-                          current={1}
+                          current={__$$eval(() => this.state.currentPage)}
+                          onChange={function () {
+                            return this.onCurrentPageChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                           pageSize={10}
                           __component_name="Pagination"
                         />
@@ -253,11 +290,11 @@ class DataHandleList$$Page extends React.Component {
                       <Table
                         size="default"
                         style={{ marginTop: '24px' }}
-                        rowKey="task_name"
+                        rowKey=""
                         scroll={{ scrollToFirstRowOnChange: true }}
                         columns={[
                           {
-                            key: 'task_name',
+                            key: 'name',
                             title: '任务名称',
                             render: (text, record, index) =>
                               (__$$context => (
@@ -270,10 +307,10 @@ class DataHandleList$$Page extends React.Component {
                                 </UnifiedLink>
                               ))(__$$createChildContext(__$$context, { text, record, index })),
                             ellipsis: { showTitle: true },
-                            dataIndex: 'task_name',
+                            dataIndex: 'name',
                           },
                           {
-                            key: 'task_status',
+                            key: 'status',
                             title: '状态',
                             render: (text, record, index) =>
                               (__$$context => (
@@ -288,11 +325,11 @@ class DataHandleList$$Page extends React.Component {
                                 />
                               ))(__$$createChildContext(__$$context, { text, record, index })),
                             filters: [{ text: '处理成功', value: 'success' }],
-                            dataIndex: 'task_status',
+                            dataIndex: 'status',
                           },
                           {
-                            key: 'dataset_name',
-                            title: '处理数据集',
+                            key: 'preDataSetName',
+                            title: '处理后数据集',
                             render: (text, record, index) =>
                               (__$$context => [
                                 <UnifiedLink
@@ -322,9 +359,43 @@ class DataHandleList$$Page extends React.Component {
                                   {__$$eval(() => `V ${record.dataset_version}`)}
                                 </UnifiedLink>,
                               ])(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'dataset_name',
+                            dataIndex: 'dataset_info.preDataSetName',
                           },
-                          { key: 'start_time', title: '开始时间', dataIndex: 'start_time' },
+                          {
+                            key: 'postDataSetName',
+                            title: '处理后数据集',
+                            render: (text, record, index) =>
+                              (__$$context => [
+                                <UnifiedLink
+                                  to="https://alibaba.com"
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                  key="node_oclp7zl1ey6"
+                                >
+                                  数据集名称
+                                </UnifiedLink>,
+                                <Typography.Text
+                                  style={{ fontSize: '' }}
+                                  strong={false}
+                                  disabled={false}
+                                  ellipsis={true}
+                                  __component_name="Typography.Text"
+                                  key="node_oclp7zl1ey9"
+                                >
+                                  ---
+                                </Typography.Text>,
+                                <UnifiedLink
+                                  to="https://alibaba.com"
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                  key="node_oclp7zl1eyb"
+                                >
+                                  1.2.0
+                                </UnifiedLink>,
+                              ])(__$$createChildContext(__$$context, { text, record, index })),
+                            dataIndex: 'dataset_info.postDataSetName',
+                          },
+                          { key: 'start_datetime', title: '开始时间', dataIndex: 'start_datetime' },
                           {
                             key: 'op',
                             title: '操作',
@@ -391,7 +462,7 @@ class DataHandleList$$Page extends React.Component {
                         dataSource={[
                           {
                             id: '1101',
-                            task_name: '任务一',
+                            name: '任务一',
                             start_time: '2021-10-10 12:00:00',
                             task_status: 'success',
                             dataset_name: '数据集一',
@@ -399,7 +470,7 @@ class DataHandleList$$Page extends React.Component {
                           },
                           {
                             id: '1102',
-                            task_name: '任务二',
+                            name: '任务二',
                             start_time: '2021-10-12 12:00:00',
                             task_status: 'success',
                             dataset_name: '数据集二',
@@ -407,7 +478,7 @@ class DataHandleList$$Page extends React.Component {
                           },
                           {
                             id: '1102',
-                            task_name: '任务三',
+                            name: '任务三',
                             start_time: '2021-10-13 12:00:00',
                             task_status: 'success',
                             dataset_name: '数据集三',
