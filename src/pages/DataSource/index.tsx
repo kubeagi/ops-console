@@ -407,7 +407,6 @@ class DataSource$$Page extends React.Component {
           __component_name="Drawer"
         >
           <LccComponentRu83f
-            ref={this._refsManager.linkRef('')}
             data={__$$eval(() => this.state?.record || {})}
             setThis={function () {
               return this.setEditThis.apply(this, Array.prototype.slice.call(arguments).concat([]));

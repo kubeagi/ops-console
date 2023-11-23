@@ -229,7 +229,7 @@ class KubeAgiUpload$$Component extends React.Component {
   }
 }
 
-const ComponentWrapper = () => {
+const ComponentWrapper = (props = {}) => {
   const history = getUnifiedHistory();
   const appHelper = {
     utils,
@@ -251,6 +251,7 @@ const ComponentWrapper = () => {
       render={dataProps => (
         <KubeAgiUpload$$Component {...dataProps} self={self} appHelper={appHelper} />
       )}
+      {...props}
     />
   );
 };
