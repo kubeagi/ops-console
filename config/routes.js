@@ -29,6 +29,11 @@ const routes = [
         path: '/data-source/detail/:id',
         component: '@/pages/DatasourceDetail',
       },
+      {
+        name: '数据集管理 - 列表',
+        path: '/dataset',
+        component: '@/pages/Dataset',
+      },
     ],
   },
 ];
