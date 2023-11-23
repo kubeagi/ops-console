@@ -25,7 +25,15 @@ const routes = [
         component: '@/pages/DataHandleDetail',
       },
       {
-        name: '数据源详情',
+        name: '数据源管理',
+        path: '/data-source',
+        component: '@/pages/DataSource',
+      },
+      {
+        path: '/data-source/create',
+        component: '@/pages/DataSourceCreate',
+      },
+      {
         path: '/data-source/detail/:id',
         component: '@/pages/DatasourceDetail',
       },

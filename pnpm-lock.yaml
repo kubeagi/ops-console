@@ -190,6 +190,52 @@ importers:
         specifier: ^4.1.2
         version: 4.9.5
 
+  packages/CreateDataSource:
+    dependencies:
+      '@alilc/lowcode-datasource-engine':
+        specifier: ^1.0.0
+        version: 1.1.4
+      '@formily/antd':
+        specifier: ^2.1.4
+        version: 2.2.30(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.2)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@formily/core':
+        specifier: ^2.1.4
+        version: 2.2.30
+      '@formily/react':
+        specifier: ^2.1.4
+        version: 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@tenx-ui/form-helper':
+        specifier: ^0.0.2
+        version: 0.0.2(react@18.2.0)
+      '@tenx-ui/icon':
+        specifier: ^2.4.17
+        version: 2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
+      '@tenx-ui/icon-materials':
+        specifier: 0.1.1
+        version: 0.1.1(react-dom@17.0.2)(react@18.2.0)
+      '@tenx-ui/materials':
+        specifier: 1.5.16
+        version: 1.5.16(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.2)(dayjs@1.11.10)(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+      '@tenx-ui/utils':
+        specifier: ^2.3.1
+        version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
+      SelectCard:
+        specifier: workspace:*
+        version: link:../SelectCard
+      babel-runtime:
+        specifier: ^6.26.0
+        version: 6.26.0
+      react-sortable-hoc:
+        specifier: ^2.0.0
+        version: 2.0.0(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
+      shared-components:
+        specifier: workspace:*
+        version: link:../shared-components
+    devDependencies:
+      react:
+        specifier: ^18.0.0
+        version: 18.2.0
+
   packages/KubeAGIUpload:
     dependencies:
       '@alilc/lowcode-datasource-engine':
@@ -219,6 +265,46 @@ importers:
       '@tenx-ui/materials':
         specifier: 1.5.21
         version: 1.5.21(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.2)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+      '@tenx-ui/utils':
+        specifier: ^2.3.1
+        version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
+      babel-runtime:
+        specifier: ^6.26.0
+        version: 6.26.0
+      react-sortable-hoc:
+        specifier: ^2.0.0
+        version: 2.0.0(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
+      shared-components:
+        specifier: workspace:*
+        version: link:../shared-components
+    devDependencies:
+      react:
+        specifier: ^18.0.0
+        version: 18.2.0
+
+  packages/SelectCard:
+    dependencies:
+      '@alilc/lowcode-datasource-engine':
+        specifier: ^1.0.0
+        version: 1.1.4
+      '@formily/antd':
+        specifier: ^2.1.4
+        version: 2.2.30(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.2)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@formily/core':
+        specifier: ^2.1.4
+        version: 2.2.30
+      '@formily/react':
+        specifier: ^2.1.4
+        version: 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@tenx-ui/form-helper':
+        specifier: ^0.0.2
+        version: 0.0.2(react@18.2.0)
+      '@tenx-ui/icon':
+        specifier: ^2.4.17
+        version: 2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
+      '@tenx-ui/materials':
+        specifier: 1.5.16
+        version: 1.5.16(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.2)(dayjs@1.11.10)(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
       '@tenx-ui/utils':
         specifier: ^2.3.1
         version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
@@ -4894,6 +4980,44 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
       react-monaco-editor: 0.33.0(monaco-editor@0.19.3)(react@18.2.0)
       react-virtualized: 9.22.5(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
+  /@tenx-ui/materials@1.5.16(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.2)(dayjs@1.11.10)(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5):
+    resolution: {integrity: sha512-dfETTkaJFw0H8+3rijbmCU8BZg91Pw6EzuIyMUW7YilRxhj3fH0j+e3zV9h991ONZsZfR0kbTrwG4XV8bro5zg==}
+    peerDependencies:
+      '@ant-design/icons': ^4.7.0
+      antd: ^5.8.6
+      dayjs: ^1.9.8
+      lodash: ^4.17.21
+    dependencies:
+      '@ant-design/icons': 4.8.1(react-dom@17.0.2)(react@18.2.0)
+      '@babel/runtime': 7.23.2
+      '@formily/antd': 2.2.30(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.2)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@formily/core': 2.2.30
+      '@formily/json-schema': 2.2.30(typescript@4.9.5)
+      '@formily/react': 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@formily/reactive': 2.2.30
+      '@formily/shared': 2.2.30
+      '@tenx-ui/form-helper': 0.0.2(react@18.2.0)
+      '@tenx-ui/utils': 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
+      antd: 5.11.2(react-dom@18.2.0)(react@18.2.0)
+      classnames: 2.3.2
+      dayjs: 1.11.10
+      lodash: 4.17.21
+      rc-cascader: 3.20.0(react-dom@17.0.2)(react@18.2.0)
+      rc-select: 14.10.0(react-dom@17.0.2)(react@18.2.0)
+      rc-tabs: 12.13.1(react-dom@17.0.2)(react@18.2.0)
+      react-sortable-hoc: 2.0.0(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - moment
+      - prop-types
+      - react
+      - react-dom
+      - react-is
+      - react-router-dom
+      - typescript
     dev: false
 
   /@tenx-ui/materials@1.5.21(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.2)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5):
