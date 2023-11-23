@@ -66,7 +66,17 @@ class Corpus$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { corpusList: [], searchName: '', loading: false };
+    this.state = {
+      corpusList: [],
+      searchName: '',
+      loading: false,
+      pages: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+      },
+      pageRange: [],
+    };
   }
 
   $ = () => null;
@@ -124,6 +134,10 @@ class Corpus$$Page extends React.Component {
     this.setState(
       {
         searchName: name,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
       },
       () => {
         this.getData(name);
@@ -136,12 +150,16 @@ class Corpus$$Page extends React.Component {
       loading: true,
     });
     const project = JSON.parse(localStorage.getItem('authData')).project;
+    const { currentPage, pageSize } = this.state.pages;
+    const params = {
+      namespace: project,
+      name: this.state.searchName,
+      page: currentPage,
+      pageSize,
+    };
     this.utils.bff
       .listKnowledgeBases({
-        input: {
-          namespace: project,
-          name: this.state.searchName,
-        },
+        input: params,
       })
       .then(res => {
         const { KnowledgeBase } = res;
@@ -150,6 +168,10 @@ class Corpus$$Page extends React.Component {
         this.setState({
           corpusList: nodes || [],
           loading: false,
+          pages: {
+            ...this.state.pages,
+            total: totalCount,
+          },
         });
       })
       .catch(error => {
@@ -225,6 +247,46 @@ query listkb {
       });
   }
 
+  handlePageSizeChange(size) {
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  onShowSizeChange(current, size) {
+    // pageSize 变化的回调
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
+  onChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState(
+      {
+        pages: {
+          ...this.state.pages,
+          currentPage: page,
+          pageSize,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
   componentDidMount() {
     console.log('did mount', this.utils.bff);
     this.getData();
@@ -292,14 +354,14 @@ query listkb {
                       {this.i18n('i18n-jskgqh8o') /* 刷新 */}
                     </Button>
                     <Input.Search
-                      placeholder={this.i18n('i18n-caihsq7h') /* 请输入知识库名称搜索 */}
-                      __component_name="Input.Search"
                       onSearch={function () {
                         return this.onSearch.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
+                      placeholder={this.i18n('i18n-caihsq7h') /* 请输入知识库名称搜索 */}
+                      __component_name="Input.Search"
                     />
                   </Space>
                 </Col>
@@ -311,11 +373,11 @@ query listkb {
                     footer=""
                     header=""
                     rowKey="id"
+                    loading={__$$eval(() => this.state.loading)}
                     bordered={false}
                     dataSource={__$$eval(() => this.state.corpusList)}
                     gridEnable={true}
                     itemLayout="horizontal"
-                    pagination={false}
                     renderItem={
                       /* 插槽容器*/ item =>
                         (__$$context => (
@@ -506,7 +568,6 @@ query listkb {
                         ))(__$$createChildContext(__$$context, { item }))
                     }
                     __component_name="List"
-                    loading={__$$eval(() => this.state.loading)}
                   />
                 </Col>
                 <Col
@@ -516,11 +577,25 @@ query listkb {
                 >
                   <Pagination
                     style={{ display: 'flex', marginTop: '8px' }}
-                    total={50}
+                    total={__$$eval(() => this.state.pages.total)}
                     simple={false}
-                    current={1}
-                    pageSize={10}
+                    current={__$$eval(() => this.state.pages.currentPage)}
+                    pageSize={__$$eval(() => this.state.pages.pageSize)}
                     __component_name="Pagination"
+                    pageSizeOptions={null}
+                    showTotal={null}
+                    onShowSizeChange={function () {
+                      return this.onShowSizeChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    onChange={function () {
+                      return this.onChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
                   />
                 </Col>
               </Row>
