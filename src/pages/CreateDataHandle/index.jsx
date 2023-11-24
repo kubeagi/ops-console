@@ -339,9 +339,11 @@ class $$Page extends React.Component {
   }
 
   getVersionName(dataset, version) {
+    console.log(dataset, this.state.dataSetDataList);
     if (dataset && version) {
-      const datasetObj = this.state.dataSetDataList.find(i => (i.value = dataset));
-      const versionObj = datasetObj.versions.find(i => (i.value = version));
+      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
+      console.log(datasetObj);
+      const versionObj = datasetObj.versions.find(i => i.value === version);
       return versionObj.name;
     }
     return;
@@ -2626,12 +2628,7 @@ class $$Page extends React.Component {
                   { title: '处理后', dataIndex: 'after' },
                 ]}
                 dataSource={__$$eval(() => this.state.afterTreatmentData)}
-                pagination={{
-                  size: 'default',
-                  simple: false,
-                  showQuickJumper: false,
-                  showSizeChanger: false,
-                }}
+                pagination={false}
                 showHeader={true}
                 __component_name="Table"
               />
@@ -2929,13 +2926,13 @@ class $$Page extends React.Component {
                     </Row>
                     <Table
                       size="default"
-                      style={{ width: '500px' }}
+                      style={{ width: '800px' }}
                       rowKey="path"
                       scroll={{ scrollToFirstRowOnChange: true }}
                       columns={[
                         { key: 'name', title: '文件名称', dataIndex: 'path' },
-                        { title: '标签', dataIndex: 'label' },
-                        { key: 'age', title: '文件大小', dataIndex: 'count' },
+                        { title: '标签', dataIndex: 'label', width: 120 },
+                        { key: 'count', title: '文件大小', dataIndex: 'count', width: 100 },
                       ]}
                       bordered={false}
                       dataSource={__$$eval(() => this.state.dataSetFileList)}
