@@ -398,14 +398,19 @@ class DataSetCreate$$Page extends React.Component {
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   __component_name="FormilySelect"
                 />
-                <LccComponentQlsmm
-                  accept=".txt,.doc,.docx,.pdf,.md"
-                  bucket="xxyy"
-                  bucket_path={__$$eval(() => this.getBucketPath())}
-                  Authorization={__$$eval(() => this.utils.getAuthorization())}
-                  __component_name="LccComponentQlsmm"
-                />
               </FormilyForm>
+              <LccComponentQlsmm
+                accept=".txt,.doc,.docx,.pdf,.md"
+                bucket="xxyy"
+                Authorization={__$$eval(() => this.utils.getAuthorization())}
+                __component_name="LccComponentQlsmm"
+                getBucketPath={function () {
+                  return this.getBucketPath.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+              />
               <Divider
                 mode="line"
                 style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
