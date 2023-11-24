@@ -96,11 +96,16 @@ class DataHandleList$$Page extends React.Component {
           keyword: this.state.keyword,
         },
       });
+      const counts = await this.utils.bff.allDataProcessListByCount({
+        input: {
+          keyword: this.state.keyword,
+        },
+      });
       const { data, status } = res?.dataProcess?.allDataProcessListByPage;
       if (status === 200) {
         this.setState({
           dataHandleList: data || [],
-          totalCount: data.length,
+          totalCount: counts?.dataProcess?.allDataProcessListByCount?.data,
           listLoading: false,
         });
       }
@@ -161,9 +166,14 @@ class DataHandleList$$Page extends React.Component {
 
   onCurrentPageChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
-    this.setState({
-      currentPage: page,
-    });
+    this.setState(
+      {
+        currentPage: page - 1,
+      },
+      () => {
+        this.getDataList();
+      }
+    );
   }
 
   handleSearchValueChange(event) {
@@ -185,8 +195,14 @@ class DataHandleList$$Page extends React.Component {
 
   onRefresh(event) {
     // 点击按钮时的回调
-    console.log('onClick', event);
-    this.getDataList();
+    this.setState(
+      {
+        currentPage: 0,
+      },
+      () => {
+        this.getDataList();
+      }
+    );
   }
 
   onhandleChange(event) {
@@ -285,6 +301,12 @@ class DataHandleList$$Page extends React.Component {
                         <Input.Search
                           style={{ width: '240px' }}
                           value={__$$eval(() => this.state.keyword)}
+                          onChange={function () {
+                            return this.onhandleChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                           onSearch={function () {
                             return this.handleSearchValueChange.apply(
                               this,
@@ -293,12 +315,6 @@ class DataHandleList$$Page extends React.Component {
                           }.bind(this)}
                           placeholder="请输入任务名称搜索"
                           __component_name="Input.Search"
-                          onChange={function () {
-                            return this.onhandleChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
                         />
                       </Space>
                     </Col>
@@ -308,6 +324,12 @@ class DataHandleList$$Page extends React.Component {
                           total={__$$eval(() => this.state.totalCount)}
                           simple={true}
                           current={__$$eval(() => this.state.currentPage + 1)}
+                          onChange={function () {
+                            return this.onCurrentPageChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                           pageSize={__$$eval(() => this.state.pageSize)}
                           showTotal={function () {
                             return this.showTotal.apply(
@@ -402,55 +424,84 @@ class DataHandleList$$Page extends React.Component {
                             key: 'pre_data_set_name',
                             title: '处理前数据集',
                             render: (text, record, index) =>
-                              (__$$context => (
+                              (__$$context => [
+                                <UnifiedLink
+                                  to="https://alibaba.com"
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                  key="node_oclpc8ipq71"
+                                >
+                                  {__$$eval(() => record.pre_data_set_name)}
+                                </UnifiedLink>,
                                 <Typography.Text
                                   style={{ fontSize: '' }}
                                   strong={false}
                                   disabled={false}
                                   ellipsis={true}
                                   __component_name="Typography.Text"
+                                  key="node_oclpb5hlmy7"
                                 >
-                                  {__$$eval(
-                                    () =>
-                                      `${record.pre_data_set_name}/${record.pre_data_set_version}`
-                                  )}
-                                </Typography.Text>
-                              ))(__$$createChildContext(__$$context, { text, record, index })),
+                                  {' '}
+                                  /{' '}
+                                </Typography.Text>,
+                                <UnifiedLink
+                                  to="https://alibaba.com"
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                  key="node_oclpc8ipq77"
+                                >
+                                  {__$$eval(() => record.pre_data_set_version)}
+                                </UnifiedLink>,
+                              ])(__$$createChildContext(__$$context, { text, record, index })),
                             dataIndex: 'pre_data_set_name',
                           },
                           {
                             key: 'postDataSetName',
                             title: '处理后数据集',
                             render: (text, record, index) =>
-                              (__$$context => (
+                              (__$$context => [
+                                <UnifiedLink
+                                  to="https://alibaba.com"
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                  key="node_oclpc8ipq78"
+                                >
+                                  {__$$eval(() => record.post_data_set_name)}
+                                </UnifiedLink>,
                                 <Typography.Text
                                   style={{ fontSize: '' }}
                                   strong={false}
                                   disabled={false}
                                   ellipsis={true}
                                   __component_name="Typography.Text"
+                                  key="node_oclpb2s62x4"
                                 >
-                                  {__$$eval(
-                                    () =>
-                                      `${record.post_data_set_name}/${record.post_data_set_version}`
-                                  )}
-                                </Typography.Text>
-                              ))(__$$createChildContext(__$$context, { text, record, index })),
+                                  /
+                                </Typography.Text>,
+                                <UnifiedLink
+                                  to="https://alibaba.com"
+                                  target="_blank"
+                                  __component_name="UnifiedLink"
+                                  key="node_oclpc8ipq79"
+                                >
+                                  {__$$eval(() => record.post_data_set_version)}
+                                </UnifiedLink>,
+                              ])(__$$createChildContext(__$$context, { text, record, index })),
                             dataIndex: 'dataset_info.postDataSetName',
                           },
                           {
                             key: 'start_datetime',
                             title: '开始时间',
-                            dataIndex: 'start_datetime',
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Typography.Time
-                                  __component_name="Typography.Time"
                                   time={__$$eval(() => record.start_datetime)}
                                   format=""
                                   relativeTime={false}
+                                  __component_name="Typography.Time"
                                 />
                               ))(__$$createChildContext(__$$context, { text, record, index })),
+                            dataIndex: 'start_datetime',
                           },
                           {
                             key: 'op',
