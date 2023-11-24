@@ -125,7 +125,7 @@ class Create$$Page extends React.Component {
     form.setFieldState('embedder', state => {
       state.dataSource = embedderList;
     });
-    this.setDataSetAndDataSetVersionsSource(dataset);
+    dataset && this.setDataSetAndDataSetVersionsSource(dataset);
   }
 
   testFunc() {
@@ -304,7 +304,7 @@ class Create$$Page extends React.Component {
   setDataSetAndDataSetVersionsSource(v) {
     const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
     const obj = this.state.dataSetDataList.find(item => item.value === v);
-    const genOptionList = obj.versions;
+    const genOptionList = obj?.versions || [];
     // form.setFieldState('version', { dataSource: genOptionList })
     form.setFieldState('dataSetContain.version', state => {
       state.dataSource = genOptionList;
