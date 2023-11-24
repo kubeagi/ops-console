@@ -101,31 +101,37 @@ class Create$$Page extends React.Component {
     console.log('will unmount');
   }
 
+  getFormInstence() {
+    return this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
+  }
+
   initFormValue() {
-    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    const { displayName, dataSetContain, description, embedder } = this.state.form;
-    const { dataset, version } = dataSetContain;
-    form.setValues(
-      {
-        displayName,
-        dataSetContain: {
-          dataset,
-          version,
+    try {
+      const form = this.getFormInstence();
+      const { displayName, dataSetContain, description, embedder } = this.state.form;
+      const { dataset, version } = dataSetContain;
+      form.setValues(
+        {
+          displayName,
+          dataSetContain: {
+            dataset,
+            version,
+          },
+          description,
+          embedder,
         },
-        description,
-        embedder,
-      },
-      'deepMerge'
-    );
-    // dataSetDataList: datasetlist
-    const { dataSetDataList, embedderList } = this.state;
-    form.setFieldState('dataSetContain.dataset', state => {
-      state.dataSource = dataSetDataList;
-    });
-    form.setFieldState('embedder', state => {
-      state.dataSource = embedderList;
-    });
-    dataset && this.setDataSetAndDataSetVersionsSource(dataset);
+        'deepMerge'
+      );
+      // dataSetDataList: datasetlist
+      const { dataSetDataList, embedderList } = this.state;
+      form.setFieldState('dataSetContain.dataset', state => {
+        state.dataSource = dataSetDataList;
+      });
+      form.setFieldState('embedder', state => {
+        state.dataSource = embedderList;
+      });
+      this.setDataSetAndDataSetVersionsSource(dataset);
+    } catch (error) { }
   }
 
   testFunc() {
@@ -168,203 +174,217 @@ class Create$$Page extends React.Component {
   }
 
   checkFileds() {
-    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    form.submit(async values => {
-      // const {  formValue } = this.state;
-      const { displayName, dataSetContain, description, embedder } = values;
-      const { dataset, version } = dataSetContain;
-      this.setState({
-        currentStep: this.state.currentStep + 1,
-        formValue: values,
-        form: {
-          displayName,
-          dataSetContain,
-          description,
-          embedder,
-        },
+    try {
+      const form = this.getFormInstence();
+      form.submit(async values => {
+        // const {  formValue } = this.state;
+        const { displayName, dataSetContain, description, embedder } = values;
+        const { dataset, version } = dataSetContain;
+        this.setState({
+          currentStep: this.state.currentStep + 1,
+          formValue: values,
+          form: {
+            displayName,
+            dataSetContain,
+            description,
+            embedder,
+          },
+        });
       });
-    });
+    } catch (error) { }
   }
 
   handleSubmit() {
-    this.setState(
-      {
-        submited: true,
-      },
-      () => {
-        // form.submit(async values => {
-        // console.log(form, this.$('step_form'), values)
-        const { embedderList, selectFiles, dataSetFileList, formValue } = this.state;
-        const { displayName, dataSetContain, description, embedder } = formValue;
-        const { dataset, version } = dataSetContain;
-        const embedderItem = embedderList.find(item => item.value === embedder);
-        const fileGroups = [
-          {
-            source: {
-              kind: 'VersionedDataset',
-              Name: version,
-              Namespace: this.utils.getAuthData().project,
+    try {
+      this.setState(
+        {
+          submited: true,
+        },
+        () => {
+          const { embedderList, selectFiles, dataSetFileList, formValue } = this.state;
+          const { displayName, dataSetContain, description, embedder } = formValue;
+          const { dataset, version } = dataSetContain;
+          const embedderItem = embedderList.find(item => item.value === embedder);
+          const fileGroups = [
+            {
+              source: {
+                kind: 'VersionedDataset',
+                Name: version,
+                Namespace: this.utils.getAuthData().project,
+              },
+              path: selectFiles,
             },
-            path: selectFiles,
-          },
-        ];
-        this.utils.bff.createKnowledgeBase({
-          input: {
-            displayName,
-            name: displayName,
-            description,
-            embedder: embedderItem,
-            fileGroups,
-            namespace: this.utils.getAuthData().project,
-          },
-        });
-      }
-    );
-    // })
+          ];
+          this.utils.bff.createKnowledgeBase({
+            input: {
+              displayName,
+              name: displayName,
+              description,
+              embedder: embedderItem,
+              fileGroups,
+              namespace: this.utils.getAuthData().project,
+            },
+          });
+        }
+      );
+    } catch (error) { }
   }
 
   async getDataSet() {
-    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    const res = await this.utils.bff.listDatasets({
-      input: {
-        namespace: this.utils.getAuthData().project, //'abc'
-      },
+    try {
+      const form = this.getFormInstence();
+      const res = await this.utils.bff.listDatasets({
+        input: {
+          namespace: this.utils.getAuthData().project, //'abc'
+        },
 
-      versionsInput: {
-        namespace: this.utils.getAuthData().project, //'abc'
-      },
+        versionsInput: {
+          namespace: this.utils.getAuthData().project, //'abc'
+        },
 
-      filesInput: {
-        keyword: '',
-        pageSize: 1,
-        page: 999999,
-      },
-    });
-    const datasetlist = res.Dataset.listDatasets.nodes.map(item => {
-      const versions = item.versions.nodes.map(i => ({
-        label: i.displayName,
-        value: i.name,
-        files: i.files.nodes,
-      }));
-      return {
-        label: item.name,
-        value: item.name,
-        contentType: item.contentType,
-        versions: versions,
-      };
-    });
-    this.setState(
-      {
-        dataSetDataList: datasetlist,
-      },
-      () => {
-        // const values = this.form('createDataHandleStep2')?.values;
-        // this.getTableList(values?.pre_data_set_name, values?.pre_data_set_version)
-      }
-    );
-    form.setFieldState('dataSetContain.dataset', state => {
-      state.dataSource = datasetlist;
-    });
+        filesInput: {
+          keyword: '',
+          pageSize: 1,
+          page: 999999,
+        },
+      });
+      const datasetlist = res.Dataset.listDatasets.nodes.map(item => {
+        const versions = item.versions.nodes.map(i => ({
+          label: i.displayName,
+          value: i.name,
+          files: i.files.nodes,
+        }));
+        return {
+          label: item.name,
+          value: item.name,
+          contentType: item.contentType,
+          versions: versions,
+        };
+      });
+      this.setState(
+        {
+          dataSetDataList: datasetlist,
+        },
+        () => {
+          // const values = this.form('createDataHandleStep2')?.values;
+          // this.getTableList(values?.pre_data_set_name, values?.pre_data_set_version)
+        }
+      );
+      form.setFieldState('dataSetContain.dataset', state => {
+        state.dataSource = datasetlist;
+      });
+    } catch (error) { }
   }
 
   async getTableList(pre_data_set_name, pre_data_set_version) {
-    //'abc'
-    const res = await this.utils.bff.getVersionedDataset({
-      name: pre_data_set_version,
-      namespace: this.utils.getAuthData().project,
-    });
-    const { getVersionedDataset } = res.VersionedDataset || {};
-    const { files } = getVersionedDataset;
-    this.setState(
-      {
-        dataSetFileList: files.nodes || [],
-      },
-      () => {
-        // console.log(files,  this.state)
-      }
-    );
+    try {
+      const res = await this.utils.bff.getVersionedDataset({
+        name: pre_data_set_version,
+        namespace: this.utils.getAuthData().project,
+      });
+      const { getVersionedDataset } = res.VersionedDataset || {};
+      const { files } = getVersionedDataset;
+      this.setState(
+        {
+          dataSetFileList: files.nodes || [],
+        },
+        () => {
+          // console.log(files,  this.state)
+        }
+      );
+    } catch (error) { }
   }
 
   onDataSetChange(v) {
     // console.log(form.setValues, 'form.setValues')
-    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    this.setState({
-      dataSet: v,
-      dataSetFileList: [], // 清空表格
-    });
+    try {
+      const form = this.getFormInstence();
+      this.setState({
+        dataSet: v,
+        dataSetFileList: [], // 清空表格
+      });
 
-    form.setValues({
-      dataSetContain: {
-        version: null,
-      },
-    });
-    this.setDataSetAndDataSetVersionsSource(v);
+      form.setValues({
+        dataSetContain: {
+          version: null,
+        },
+      });
+      this.setDataSetAndDataSetVersionsSource(v);
+    } catch (error) { }
   }
 
   setDataSetAndDataSetVersionsSource(v) {
-    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    const obj = this.state.dataSetDataList.find(item => item.value === v);
-    const genOptionList = obj?.versions || [];
-    // form.setFieldState('version', { dataSource: genOptionList })
-    form.setFieldState('dataSetContain.version', state => {
-      state.dataSource = genOptionList;
-    });
-    this.setState({
-      contentType: obj.contentType,
-    });
+    try {
+      const form = this.getFormInstence();
+      const obj = this.state.dataSetDataList.find(item => item.value === v);
+      const genOptionList = obj.versions;
+      // form.setFieldState('version', { dataSource: genOptionList })
+      form.setFieldState('dataSetContain.version', state => {
+        state.dataSource = genOptionList;
+      });
+      this.setState({
+        contentType: obj.contentType,
+      });
+    } catch (error) { }
   }
 
   onVersionChange(v) {
-    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    // form.setFieldState('version', { dataSource: [{label: 'v2', value: 'v2'}] })
-    this.setState({
-      version: v,
-    });
-    this.getTableList(this.state.dataSet, v);
+    try {
+      const form = this.getFormInstence();
+      // form.setFieldState('version', { dataSource: [{label: 'v2', value: 'v2'}] })
+      this.setState({
+        version: v,
+      });
+      this.getTableList(this.state.dataSet, v);
+    } catch (error) { }
   }
 
   async getEmbedder() {
-    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    const project = JSON.parse(localStorage.getItem('authData')).project;
-    const params = {
-      input: {
-        namespace: project,
-        page: 1,
-        pageSize: 99999,
-      },
-    };
-    const { Embedder } = await this.utils.bff.listEmbedders(params);
-    const { nodes } = Embedder?.listEmbedders || {};
-    this.setState({
-      embedderList: nodes.map(item => {
-        return {
-          ...item,
-          label: item.displayName,
-          value: item.name,
-        };
-      }),
-    });
-    form.setFieldState('embedder', state => {
-      state.dataSource = nodes.map(item => {
-        return {
-          label: item.displayName,
-          value: item.name,
-        };
+    try {
+      const form = this.getFormInstence();
+      const project = JSON.parse(localStorage.getItem('authData')).project;
+      const params = {
+        input: {
+          namespace: project,
+          page: 1,
+          pageSize: 99999,
+        },
+      };
+      const { Embedder } = await this.utils.bff.listEmbedders(params);
+      const { nodes } = Embedder?.listEmbedders || {};
+      this.setState({
+        embedderList: nodes.map(item => {
+          return {
+            ...item,
+            label: item.displayName,
+            value: item.name,
+          };
+        }),
       });
-    });
+      form.setFieldState('embedder', state => {
+        state.dataSource = nodes.map(item => {
+          return {
+            label: item.displayName,
+            value: item.name,
+          };
+        });
+      });
+    } catch (error) { }
   }
 
   getCheckBox(rows) {
-    const { version } = this.state;
-    this.setState({
-      selectFiles: rows,
-      nextFileList: rows.map(item => {
-        return {
-          ...this.state.dataSetFileList.find(_item => _item.path === item),
-          version,
-        };
-      }),
-    });
+    try {
+      const { version } = this.state;
+      this.setState({
+        selectFiles: rows,
+        nextFileList: rows.map(item => {
+          return {
+            ...this.state.dataSetFileList.find(_item => _item.path === item),
+            version,
+          };
+        }),
+      });
+    } catch (error) { }
   }
 
   getFileNameFromPath(path) {
@@ -375,12 +395,14 @@ class Create$$Page extends React.Component {
   }
 
   getType() {
-    const contentTypeObj = {
-      text: '文本',
-      image: '图片',
-      video: '视频',
-    };
-    return contentTypeObj[this.state.contentType];
+    try {
+      const contentTypeObj = {
+        text: '文本',
+        image: '图片',
+        video: '视频',
+      };
+      return contentTypeObj[this.state.contentType];
+    } catch (error) { }
   }
 
   componentDidMount() {
