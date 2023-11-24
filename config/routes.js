@@ -51,6 +51,11 @@ const routes = [
         path: '/knowledge',
         component: '@/pages/Knowledge',
       },
+      {
+        name: '知识库管理',
+        path: '/knowledge/create',
+        component: '@/pages/KnowledgeCreate',
+      }
     ],
   },
 ];

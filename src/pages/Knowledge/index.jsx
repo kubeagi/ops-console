@@ -67,15 +67,15 @@ class Corpus$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      corpusList: [],
-      searchName: '',
-      loading: false,
       pages: {
         currentPage: 1,
         pageSize: 10,
         total: 0,
       },
+      loading: false,
       pageRange: [],
+      corpusList: [],
+      searchName: '',
     };
   }
 
@@ -85,64 +85,6 @@ class Corpus$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
-  }
-
-  returnTxt(item) {
-    console.log(item, 'eeeee');
-    return item;
-  }
-
-  getStatusType(item) {
-    if (item.status === 'True') {
-      return 'success';
-    } else if (item.status === 'False') {
-      return 'error';
-    } else {
-      return 'unknow';
-    }
-  }
-
-  getDataStatus(isStatus, isTag) {
-    return [
-      // 导入中
-      {
-        type: 'primary',
-        [isStatus ? 'id' : 'value']: 'process',
-        [isStatus || isTag ? 'children' : 'text']: '数据处理中',
-      },
-      // 连接成功
-      {
-        type: 'success',
-        [isStatus ? 'id' : 'value']: 'success',
-        [isStatus || isTag ? 'children' : 'text']: '数据处理完成',
-      },
-      {
-        // 连接异常
-        type: 'error',
-        [isStatus ? 'id' : 'value']: 'error',
-        [isStatus || isTag ? 'children' : 'text']: '数据处理失败',
-      },
-    ];
-  }
-
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
-  }
-
-  onSearch(name) {
-    this.setState(
-      {
-        searchName: name,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData(name);
-      }
-    );
   }
 
   getData() {
@@ -247,30 +189,6 @@ query listkb {
       });
   }
 
-  handlePageSizeChange(size) {
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
-  }
-
-  onShowSizeChange(current, size) {
-    // pageSize 变化的回调
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
   onChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -285,6 +203,88 @@ query listkb {
         this.getData();
       }
     );
+  }
+
+  onSearch(name) {
+    this.setState(
+      {
+        searchName: name,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData(name);
+      }
+    );
+  }
+
+  testFunc() {
+    console.log('test aliLowcode func');
+    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  }
+
+  returnTxt(item) {
+    console.log(item, 'eeeee');
+    return item;
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  getDataStatus(isStatus, isTag) {
+    return [
+      // 导入中
+      {
+        type: 'primary',
+        [isStatus ? 'id' : 'value']: 'process',
+        [isStatus || isTag ? 'children' : 'text']: '数据处理中',
+      },
+      // 连接成功
+      {
+        type: 'success',
+        [isStatus ? 'id' : 'value']: 'success',
+        [isStatus || isTag ? 'children' : 'text']: '数据处理完成',
+      },
+      {
+        // 连接异常
+        type: 'error',
+        [isStatus ? 'id' : 'value']: 'error',
+        [isStatus || isTag ? 'children' : 'text']: '数据处理失败',
+      },
+    ];
+  }
+
+  getStatusType(item) {
+    if (item.status === 'True') {
+      return 'success';
+    } else if (item.status === 'False') {
+      return 'error';
+    } else {
+      return 'unknow';
+    }
+  }
+
+  onShowSizeChange(current, size) {
+    // pageSize 变化的回调
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
+  handlePageSizeChange(size) {
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
   }
 
   componentDidMount() {
@@ -324,7 +324,7 @@ query listkb {
                 <Col span={24} __component_name="Col">
                   <Space align="center" direction="horizontal" __component_name="Space">
                     <Button
-                      href="/add/corpus"
+                      href="/knowledge/create"
                       icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
                       type="primary"
                       block={false}
@@ -334,7 +334,7 @@ query listkb {
                       disabled={false}
                       __component_name="Button"
                     >
-                      {this.i18n('i18n-ueslu0a9') /* 新增知识库 */}
+                      新增知识库
                     </Button>
                     <Button
                       icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
@@ -360,7 +360,7 @@ query listkb {
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      placeholder={this.i18n('i18n-caihsq7h') /* 请输入知识库名称搜索 */}
+                      placeholder="请输入知识库名称搜索"
                       __component_name="Input.Search"
                     />
                   </Space>
@@ -524,7 +524,7 @@ query listkb {
                                       {
                                         key: 'ssfd772g2sk',
                                         span: 1,
-                                        label: this.i18n('i18n-gjzse85o') /* 状态 */,
+                                        label: '状态',
                                         children: (
                                           <Status
                                             id={__$$eval(() => __$$context.getStatusType(item))}
@@ -539,7 +539,7 @@ query listkb {
                                       {
                                         key: '3nv8b79bh9d',
                                         span: 1,
-                                        label: this.i18n('i18n-uag94ndq') /* 更新时间 */,
+                                        label: '更新时间',
                                         children: (
                                           <Typography.Time
                                             time={__$$eval(() => item.updateTimestamp)}
@@ -580,18 +580,18 @@ query listkb {
                     total={__$$eval(() => this.state.pages.total)}
                     simple={false}
                     current={__$$eval(() => this.state.pages.currentPage)}
-                    pageSize={__$$eval(() => this.state.pages.pageSize)}
-                    __component_name="Pagination"
-                    pageSizeOptions={null}
-                    showTotal={null}
-                    onShowSizeChange={function () {
-                      return this.onShowSizeChange.apply(
+                    onChange={function () {
+                      return this.onChange.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    onChange={function () {
-                      return this.onChange.apply(
+                    pageSize={__$$eval(() => this.state.pages.pageSize)}
+                    showTotal={null}
+                    pageSizeOptions={null}
+                    __component_name="Pagination"
+                    onShowSizeChange={function () {
+                      return this.onShowSizeChange.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
@@ -607,7 +607,7 @@ query listkb {
   }
 }
 
-const PageWrapper = () => {
+const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/corpus' }, location.pathname);
@@ -638,7 +638,9 @@ const PageWrapper = () => {
           enableLocationSearch: undefined,
         },
       ]}
-      render={dataProps => <Corpus$$Page {...dataProps} self={self} appHelper={appHelper} />}
+      render={dataProps => (
+        <Corpus$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+      )}
     />
   );
 };
@@ -647,7 +649,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) { }
+  } catch (error) {}
 }
 
 function __$$evalArray(expr) {
