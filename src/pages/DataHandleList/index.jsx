@@ -114,6 +114,13 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
+  onCancelDelModal(e) {
+    this.setState({
+      delModalvisible: false,
+      currentRecord: null,
+    });
+  }
+
   async onCloseDelModal() {
     try {
       const res = await this.utils.bff.deleteDataProcessTask({
@@ -570,7 +577,7 @@ class DataHandleList$$Page extends React.Component {
             centered={false}
             keyboard={true}
             onCancel={function () {
-              return this.onCloseDelModal.apply(
+              return this.onCancelDelModal.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
