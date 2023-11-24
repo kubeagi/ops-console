@@ -72,6 +72,7 @@ class DataHandleList$$Page extends React.Component {
       totalCount: 0,
       keyword: '',
       dataHandleList: [],
+      listLoading: false,
     };
   }
 
@@ -85,6 +86,9 @@ class DataHandleList$$Page extends React.Component {
 
   async getDataList() {
     try {
+      this.setState({
+        listLoading: true,
+      });
       const res = await this.utils.bff.allDataProcessListByPage({
         input: {
           pageIndex: this.state.currentPage,
@@ -92,32 +96,51 @@ class DataHandleList$$Page extends React.Component {
           keyword: this.state.keyword,
         },
       });
-      console.log(res);
       const { data, status } = res?.dataProcess?.allDataProcessListByPage;
       if (status === 200) {
         this.setState({
           dataHandleList: data || [],
           totalCount: data.length,
+          listLoading: false,
         });
       }
     } catch (error) {}
   }
 
-  onOpenDelModal(record) {
+  onOpenDelModal(e, { record }) {
     this.setState({
       delModalvisible: true,
       currentRecord: record,
     });
   }
 
-  onCloseDelModal(isNeedReload) {
+  onCancelDelModal(e) {
     this.setState({
       delModalvisible: false,
       currentRecord: null,
     });
   }
 
-  onOpenLogModal(record) {
+  async onCloseDelModal() {
+    try {
+      const res = await this.utils.bff.deleteDataProcessTask({
+        input: {
+          id: this.state.currentRecord?.id,
+        },
+      });
+      this.setState(
+        {
+          delModalvisible: false,
+          currentRecord: null,
+        },
+        () => {
+          this.getDataList();
+        }
+      );
+    } catch (error) {}
+  }
+
+  onOpenLogModal(e, record) {
     this.setState({
       logModalVisible: true,
       currentRecord: record,
@@ -143,12 +166,16 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onKeyWordChange(event) {
+  handleSearchValueChange(event) {
     // 输入框内容变化时的回调
-    this.setState({
-      keyword: event.target.value,
-    });
-    this.getDataList();
+    this.setState(
+      {
+        currentPage: 0,
+      },
+      () => {
+        this.getDataList();
+      }
+    );
   }
 
   showTotal(total, range) {
@@ -156,8 +183,22 @@ class DataHandleList$$Page extends React.Component {
     return `共 ${total} 条`;
   }
 
+  onRefresh(event) {
+    // 点击按钮时的回调
+    console.log('onClick', event);
+    this.getDataList();
+  }
+
+  onhandleChange(event) {
+    // 输入框内容变化时的回调
+    console.log('onChange', event);
+    this.setState({
+      keyword: event.target.value,
+    });
+  }
+
   componentDidMount() {
-    console.log('did mount', this.utils.bff);
+    console.log('did mount', this.utils);
     this.getDataList();
   }
 
@@ -231,7 +272,7 @@ class DataHandleList$$Page extends React.Component {
                           shape="default"
                           danger={false}
                           onClick={function () {
-                            return this.handleRefresh.apply(
+                            return this.onRefresh.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
@@ -244,12 +285,6 @@ class DataHandleList$$Page extends React.Component {
                         <Input.Search
                           style={{ width: '240px' }}
                           value={__$$eval(() => this.state.keyword)}
-                          onChange={function () {
-                            return this.onKeyWordChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
                           onSearch={function () {
                             return this.handleSearchValueChange.apply(
                               this,
@@ -258,6 +293,12 @@ class DataHandleList$$Page extends React.Component {
                           }.bind(this)}
                           placeholder="请输入任务名称搜索"
                           __component_name="Input.Search"
+                          onChange={function () {
+                            return this.onhandleChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                         />
                       </Space>
                     </Col>
@@ -268,7 +309,12 @@ class DataHandleList$$Page extends React.Component {
                           simple={true}
                           current={__$$eval(() => this.state.currentPage + 1)}
                           pageSize={__$$eval(() => this.state.pageSize)}
-                          showTotal={__$$eval(() => this.state.totalCount)}
+                          showTotal={function () {
+                            return this.showTotal.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                           __component_name="Pagination"
                         />
                       </Space>
@@ -350,7 +396,6 @@ class DataHandleList$$Page extends React.Component {
                                   __component_name="Status"
                                 />
                               ))(__$$createChildContext(__$$context, { text, record, index })),
-                            filters: [{ text: '处理成功', value: 'success' }],
                             dataIndex: 'status',
                           },
                           {
@@ -393,7 +438,20 @@ class DataHandleList$$Page extends React.Component {
                               ))(__$$createChildContext(__$$context, { text, record, index })),
                             dataIndex: 'dataset_info.postDataSetName',
                           },
-                          { key: 'start_datetime', title: '开始时间', dataIndex: 'start_datetime' },
+                          {
+                            key: 'start_datetime',
+                            title: '开始时间',
+                            dataIndex: 'start_datetime',
+                            render: (text, record, index) =>
+                              (__$$context => (
+                                <Typography.Time
+                                  __component_name="Typography.Time"
+                                  time={__$$eval(() => record.start_datetime)}
+                                  format=""
+                                  relativeTime={false}
+                                />
+                              ))(__$$createChildContext(__$$context, { text, record, index })),
+                          },
                           {
                             key: 'op',
                             title: '操作',
@@ -451,6 +509,7 @@ class DataHandleList$$Page extends React.Component {
                             dataIndex: 'op',
                           },
                         ]}
+                        loading={__$$eval(() => this.state.listLoading)}
                         onChange={function () {
                           return this.handleTableChange.apply(
                             this,
@@ -467,7 +526,6 @@ class DataHandleList$$Page extends React.Component {
                         }}
                         showHeader={true}
                         __component_name="Table"
-                        loading={__$$eval(() => this.props.allDataProcessListByPage?.loading)}
                       />
                     </Col>
                   </Row>
@@ -519,7 +577,7 @@ class DataHandleList$$Page extends React.Component {
             centered={false}
             keyboard={true}
             onCancel={function () {
-              return this.onCloseDelModal.apply(
+              return this.onCancelDelModal.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
@@ -569,15 +627,7 @@ const PageWrapper = (props = {}) => {
         func: 'undefined',
         params: undefined,
       }}
-      sdkSwrFuncs={[
-        {
-          func: 'useAllDataProcessListByPage',
-          params: undefined,
-          enableLocationSearch: function applyThis() {
-            return true;
-          }.apply(self),
-        },
-      ]}
+      sdkSwrFuncs={[]}
       render={dataProps => (
         <DataHandleList$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
       )}
