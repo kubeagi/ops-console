@@ -131,6 +131,10 @@ class DataSetCreate$$Page extends React.Component {
     this.history?.go(-1);
   }
 
+  getBucketPath() {
+    return `dataset/${this.form()?.values?.name}/v1`;
+  }
+
   handleConfirm() {
     this.form()?.submit(async v => {
       this.setState({
@@ -396,7 +400,9 @@ class DataSetCreate$$Page extends React.Component {
                 />
                 <LccComponentQlsmm
                   accept=".txt,.doc,.docx,.pdf,.md"
-                  dataSourceMap={__$$eval(() => this.dataSourceMap)}
+                  bucket="xxyy"
+                  bucket_path={__$$eval(() => this.getBucketPath())}
+                  Authorization={__$$eval(() => this.utils.getAuthorization())}
                   __component_name="LccComponentQlsmm"
                 />
               </FormilyForm>
@@ -455,7 +461,7 @@ class DataSetCreate$$Page extends React.Component {
   }
 }
 
-const PageWrapper = () => {
+const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/dataset/create' }, location.pathname);
@@ -480,7 +486,9 @@ const PageWrapper = () => {
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      render={dataProps => <DataSetCreate$$Page {...dataProps} self={self} appHelper={appHelper} />}
+      render={dataProps => (
+        <DataSetCreate$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+      )}
     />
   );
 };

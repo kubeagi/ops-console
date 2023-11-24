@@ -244,9 +244,6 @@ importers:
       '@alilc/lowcode-datasource-engine':
         specifier: ^1.0.0
         version: 1.1.4
-      '@alilc/lowcode-datasource-fetch-handler':
-        specifier: ^1.0.0
-        version: 1.1.4(rax@1.2.3)
       '@formily/antd':
         specifier: ^2.1.4
         version: 2.2.30(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
@@ -271,15 +268,27 @@ importers:
       '@tenx-ui/utils':
         specifier: ^2.3.1
         version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
+      '@yunti/lowcode-datasource-axios-handler':
+        specifier: ^1.0.0
+        version: 1.0.1
+      axios:
+        specifier: 1.6.2
+        version: 1.6.2
       babel-runtime:
         specifier: ^6.26.0
         version: 6.26.0
+      qs:
+        specifier: 6.11.2
+        version: 6.11.2
       react-sortable-hoc:
         specifier: ^2.0.0
         version: 2.0.0(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
       shared-components:
         specifier: workspace:*
         version: link:../shared-components
+      spark-md5:
+        specifier: 3.0.2
+        version: 3.0.2
     devDependencies:
       react:
         specifier: ^18.0.0
@@ -15254,6 +15263,10 @@ packages:
   /source-map@0.7.4:
     resolution: {integrity: sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==}
     engines: {node: '>= 8'}
+
+  /spark-md5@3.0.2:
+    resolution: {integrity: sha512-wcFzz9cDfbuqe0FZzfi2or1sgyIrsDwmPwfZC4hiNidPdPINjeUwNfv5kldczoEAcjl9Y1L3SM7Uz2PUEQzxQw==}
+    dev: false
 
   /spawn-command@0.0.2-1:
     resolution: {integrity: sha512-n98l9E2RMSJ9ON1AKisHzz7V42VDiBQGY6PB1BwRglz99wpVsSuGzQ+jOi6lFXBGVTCrRpltvjm+/XA+tpeJrg==}
