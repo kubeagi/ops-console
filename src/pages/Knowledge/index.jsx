@@ -306,7 +306,7 @@ query listkb {
               ellipsis={true}
               __component_name="Typography.Title"
             >
-              {this.i18n('i18n-38tkeb1r') /* 知识库管理 */}
+              知识库
             </Typography.Title>
           </Col>
           <Col span={24} __component_name="Col">
@@ -649,7 +649,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch (error) { }
 }
 
 function __$$evalArray(expr) {
