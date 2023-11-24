@@ -66,7 +66,7 @@ class KubeAgiUpload$$Component extends React.Component {
       status: {
         // 文件处理状态： '初始状态'
       },
-      urlPrex: 'https://portal.172.22.96.136.nip.io/kubeagi-apis/minio',
+      urlPrex: 'http://172.22.96.17/kubeagi-apis/minio',
       Authorization:
         'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImI1MmViYzk1NWRiYjYyNzBiN2YyZDZiNzQ5YWQ0M2RlNmExNTg0MjYifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwODEwNDY0LCJpYXQiOjE3MDA3MjQwNjQsImF0X2hhc2giOiJNWFpoRGhrVGVNOGg2OVYyT193Vl93IiwiY19oYXNoIjoiWHFfQXFKSllsN3VrQ1ZRWVFqak5IZyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.p5r2XN0Jl19FsHv85meDrFExu-TneS7i5_ENsWMMa5ziAxJjC_mLjgeN-4CzdM9flN3U931mSO29H-b2lifLdf7bYwtSOuIMiwoBkklOEa2MQVGDybkgH4QTlaClYYNSVYL4o4ZLmt5CFL7t0cf8UTapeUZTynL1ZPPgLMepPoqvteuNx4rsXXPjmywMK_o8jMRVxPLSdpxAV0e75lEW6wjq-0kqg8j2BFXbIeiftKzlRwAUa6NYAQZxsQGhS7_C3zIymyndoqzK5rAflwiHOZRX_CgQS0MIym1uNkauuH7MekRB2y5h0PMwGZ6tVwvF_h8by8RgjS7lVOb8rxMDcg',
       bucket: 'xxyy',
@@ -94,7 +94,7 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.state.urlPrex}/get_chunks`,
+              uri: `${this.getUrlPrex()}/get_chunks`,
               isCors: true,
               method: 'GET',
               params: {},
@@ -113,7 +113,7 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.state.urlPrex}/new_multipart`,
+              uri: `${this.getUrlPrex()}/new_multipart`,
               isCors: true,
               method: 'GET',
               params: {},
@@ -132,7 +132,7 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.state.urlPrex}/get_multipart_url`,
+              uri: `${this.getUrlPrex()}/get_multipart_url`,
               isCors: true,
               method: 'GET',
               params: {},
@@ -151,7 +151,7 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.state.urlPrex}/update_chunk`,
+              uri: `${this.getUrlPrex()}/update_chunk`,
               isCors: true,
               method: 'POST',
               params: {},
@@ -170,7 +170,7 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.state.urlPrex}/complete_multipart`,
+              uri: `${this.getUrlPrex()}/complete_multipart`,
               isCors: true,
               method: 'POST',
               params: {},
@@ -189,9 +189,13 @@ class KubeAgiUpload$$Component extends React.Component {
     return this.dataSourceMap;
   }
 
+  getUrlPrex() {
+    return `${window.location.origin}/kubeagi-apis/minio`;
+  }
+
   getBucketPath() {
     // bucket_path就是 dataset/<dataset-name>/ < version
-    return this.props.bucket_path || this.state.bucket_path;
+    return this.props.getBucketPath() || this.state.bucket_path;
   }
 
   getBucket() {
@@ -265,13 +269,14 @@ class KubeAgiUpload$$Component extends React.Component {
   }
 
   getSuccessChunks(file) {
-    const pageThis = this
+    const pageThis = this;
     return new Promise((resolve, reject) => {
-      pageThis.getDataSourceMap()
+      pageThis
+        .getDataSourceMap()
         .get_chunks.load({
           md5: file.uniqueIdentifier,
-          bucket: this.getBucket(),
-          bucket_path: this.getBucketPath(),
+          bucket: pageThis.getBucket(),
+          bucket_path: pageThis.getBucketPath(),
         })
         .then(function (response) {
           file.uploadID = response?.uploadID;
@@ -288,16 +293,17 @@ class KubeAgiUpload$$Component extends React.Component {
   }
 
   newMultiUpload(file) {
-    const pageThis = this
+    const pageThis = this;
     return new Promise((resolve, reject) => {
-      pageThis.getDataSourceMap()
+      pageThis
+        .getDataSourceMap()
         .new_multipart.load({
           totalChunkCounts: file.totalChunkCounts,
           md5: file.uniqueIdentifier,
           size: file.size,
           fileName: file.name,
-          bucket: this.getBucket(),
-          bucket_path: this.getBucketPath(),
+          bucket: pageThis.getBucket(),
+          bucket_path: pageThis.getBucketPath(),
         })
         .then(function (response) {
           console.log('newMultiUpload then', response);
@@ -313,6 +319,7 @@ class KubeAgiUpload$$Component extends React.Component {
   }
 
   multipartUpload(file) {
+    const pageThis = this;
     let blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
       chunkSize = 1024 * 1024 * 64,
       chunks = Math.ceil(file.size / chunkSize),
@@ -331,10 +338,10 @@ class KubeAgiUpload$$Component extends React.Component {
       }
       return true;
     }
-    const pageThis = this
     function getUploadChunkUrl(currentChunk, partSize) {
       return new Promise((resolve, reject) => {
-        pageThis.getDataSourceMap()
+        pageThis
+          .getDataSourceMap()
           .get_multipart_url.load({
             md5: file.uniqueIdentifier,
             uuid: file.uuid,
@@ -369,20 +376,20 @@ class KubeAgiUpload$$Component extends React.Component {
       });
     }
     function updateChunk(currentChunk) {
-      const pageThis = this
       return new Promise((resolve, reject) => {
         // axios.post(file.urlPrex + '/update_chunk', qs.stringify({
         //   uuid: file.uuid,
         //   chunkNumber: currentChunk + 1,
         //   etag: etags[currentChunk]
         // }))
-        pageThis.getDataSourceMap()
+        pageThis
+          .getDataSourceMap()
           .update_chunk.load({
             uuid: file.uuid,
             chunkNumber: currentChunk + 1,
             etag: etags[currentChunk],
-            bucket: this.getBucket(),
-            bucket_path: this.getBucketPath(),
+            bucket: pageThis.getBucket(),
+            bucket_path: pageThis.getBucketPath(),
             md5: file.uniqueIdentifier,
           })
           .then(function (response) {
@@ -423,7 +430,8 @@ class KubeAgiUpload$$Component extends React.Component {
         //   file_name: file.name,
         //   size: file.size,
         // }))
-        pageThis.getDataSourceMap()
+        pageThis
+          .getDataSourceMap()
           .complete_multipart.load({
             uuid: file.uuid,
             uploadID: file.uploadID,
@@ -541,8 +549,7 @@ class KubeAgiUpload$$Component extends React.Component {
     this._dataSourceEngine.reloadDataSource();
 
     console.log(
-      this.utils,
-      this.constants,
+      this,
       'componentDidMountcomponentDidMountcomponentDidMountcomponentDidMountcomponentDidMountaaaaaaaaaaaaa'
     );
   }
@@ -574,12 +581,6 @@ class KubeAgiUpload$$Component extends React.Component {
             }}
             componentProps={{
               'x-component-props': {
-                beforeUpload: function () {
-                  return this.onFileAdded.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this),
                 disabled: false,
                 fileList: __$$eval(() => [
                   {
@@ -590,6 +591,12 @@ class KubeAgiUpload$$Component extends React.Component {
                     url: '',
                   },
                 ]),
+                beforeUpload: function () {
+                  return this.onFileAdded.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this),
               },
             }}
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -646,7 +653,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 </Typography.Text>
                 <Typography.Text
                   type="colorTextSecondary"
-                  style={{ paddingLeft: '6px' }}
+                  style={{ paddingLeft: '6px', fontSize: '' }}
                   strong={false}
                   disabled={false}
                   ellipsis={true}
@@ -676,7 +683,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 </Typography.Text>
                 <Typography.Text
                   type="warning"
-                  style={{ paddingLeft: '6px', fontSize: '' }}
+                  style={{ fontSize: '', paddingLeft: '6px' }}
                   strong={false}
                   disabled={false}
                   ellipsis={true}
