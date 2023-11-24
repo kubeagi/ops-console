@@ -66,17 +66,19 @@ class Create$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      currentStep: 0,
+      submited: false,
+      embedderList: [],
+      dataSetDataList: [],
+      dataSetFileList: [],
       form: {
         version: '',
         dataSet: '',
         name: '',
       },
+      formValue: [],
       dataSet: '',
       version: '',
-      submited: false,
-      formValue: [],
-      currentStep: 0,
-      selectFiles: [],
       versionList: {
         genOptionList: [
           {
@@ -93,10 +95,8 @@ class Create$$Page extends React.Component {
           },
         ],
       },
-      embedderList: [],
+      selectFiles: [],
       nextFileList: [],
-      dataSetDataList: [],
-      dataSetFileList: [],
     };
   }
 
@@ -117,6 +117,10 @@ class Create$$Page extends React.Component {
     return <div className="test-aliLowcode-func">{this.state.test}</div>;
   }
 
+  handleSave(v) {
+    console.log(v, 'aaaaaaaaaaaaaaaaaaaa');
+  }
+
   getStatus() {
     return {
       type: 'success',
@@ -125,55 +129,14 @@ class Create$$Page extends React.Component {
     };
   }
 
-  async getDataSet() {
-    const res = await this.utils.bff.listDatasets({
-      input: {
-        namespace: 'abc', //this.utils.getAuthData().project,
-      },
-
-      versionsInput: {
-        namespace: 'abc', // this.utils.getAuthData().project,
-      },
-
-      filesInput: {
-        keyword: '',
-        pageSize: 1,
-        page: 999999,
-      },
+  onStepChange(value) {
+    this.setState({
+      currentStep: value,
     });
-    const datasetlist = res.Dataset.listDatasets.nodes.map(item => {
-      const versions = item.versions.nodes.map(i => ({
-        label: i.displayName,
-        value: i.name,
-        files: i.files.nodes,
-      }));
-      return {
-        label: item.name,
-        value: item.name,
-        versions: versions,
-      };
-    });
-    this.setState(
-      {
-        dataSetDataList: datasetlist,
-      },
-      () => {
-        // const values = this.form('createDataHandleStep2')?.values;
-        // this.getTableList(values?.pre_data_set_name, values?.pre_data_set_version)
-      }
-    );
-    console.log(datasetlist, 'datasetlist');
-    return {
-      datasetlist,
-    };
-  }
-
-  handleSave(v) {
-    console.log(v, 'aaaaaaaaaaaaaaaaaaaa');
   }
 
   handleStep(event, { action }) {
-    console.log(this.state.currentStep, action);
+    // console.log(this.state.currentStep, action)
     if (action === 'next') {
       this.checkFileds();
     } else {
@@ -185,71 +148,13 @@ class Create$$Page extends React.Component {
 
   checkFileds() {
     const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    console.log(form.value);
+    // console.log(form.value)
     form.submit(async values => {
       this.setState({
         currentStep: this.state.currentStep + 1,
         formValue: values,
       });
     });
-  }
-
-  getCheckBox(rows) {
-    this.setState({
-      selectFiles: rows,
-      nextFileList: rows.map(item => {
-        return this.state.dataSetFileList.find(_item => _item.path === item);
-      }),
-    });
-  }
-
-  async getEmbedder() {
-    const project = JSON.parse(localStorage.getItem('authData')).project;
-    const params = {
-      input: {
-        namespace: project,
-        page: 1,
-        pageSize: 99999,
-      },
-    };
-    const { Embedder } = await this.utils.bff.listEmbedders(params);
-    const { nodes } = Embedder?.listEmbedders || {};
-    this.setState(
-      {
-        embedderList: nodes,
-      },
-      () => {
-        console.log(nodes, 'data', this.state.embedderList);
-      }
-    );
-    return {
-      nodes,
-    };
-  }
-
-  async getTableList(pre_data_set_name, pre_data_set_version) {
-    // let files = this.state.dataSetFileList;
-    // if (pre_data_set_name && pre_data_set_version) {
-    //   const datasetObj = this.state.dataSetDataList.find(i => i.value = pre_data_set_name)
-    //   const filesObj = datasetObj.versions.find(i => i.value = pre_data_set_version)
-    //   files = filesObj.files;
-    // }
-
-    const res = await this.utils.bff.getVersionedDataset({
-      name: 'def-v1',
-      namespace: 'abc',
-    });
-    console.log(res, 'res');
-    const { getVersionedDataset } = res.VersionedDataset || {};
-    const { files } = getVersionedDataset;
-    this.setState(
-      {
-        dataSetFileList: files.nodes || [],
-      },
-      () => {
-        console.log(files, this.state);
-      }
-    );
   }
 
   handleSubmit() {
@@ -289,42 +194,131 @@ class Create$$Page extends React.Component {
     // })
   }
 
-  onStepChange(value) {
-    this.setState({
-      currentStep: value,
+  async getDataSet() {
+    const res = await this.utils.bff.listDatasets({
+      input: {
+        namespace: this.utils.getAuthData().project, //'abc'
+      },
+
+      versionsInput: {
+        namespace: this.utils.getAuthData().project, //'abc'
+      },
+
+      filesInput: {
+        keyword: '',
+        pageSize: 1,
+        page: 999999,
+      },
     });
+    const datasetlist = res.Dataset.listDatasets.nodes.map(item => {
+      const versions = item.versions.nodes.map(i => ({
+        label: i.displayName,
+        value: i.name,
+        files: i.files.nodes,
+      }));
+      return {
+        label: item.name,
+        value: item.name,
+        versions: versions,
+      };
+    });
+    this.setState(
+      {
+        dataSetDataList: datasetlist,
+      },
+      () => {
+        // const values = this.form('createDataHandleStep2')?.values;
+        // this.getTableList(values?.pre_data_set_name, values?.pre_data_set_version)
+      }
+    );
+    return {
+      datasetlist,
+    };
+  }
+
+  async getTableList(pre_data_set_name, pre_data_set_version) {
+    //'abc'
+    const res = await this.utils.bff.getVersionedDataset({
+      name: pre_data_set_version,
+      namespace: this.utils.getAuthData().project,
+    });
+    const { getVersionedDataset } = res.VersionedDataset || {};
+    const { files } = getVersionedDataset;
+    this.setState(
+      {
+        dataSetFileList: files.nodes || [],
+      },
+      () => {
+        // console.log(files,  this.state)
+      }
+    );
   }
 
   onDataSetChange(v) {
     // console.log(form.setValues, 'form.setValues')
     const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
     this.setState({
+      dataSet: v,
       dataSetFileList: [], // 清空表格
     });
 
-    // form.setValues({ "set": {
-    //   "version": ''
-    // } })
-    // this.setDataSetAndDataSetVersionsSource(v)
+    form.setValues({
+      dataSetContain: {
+        version: null,
+      },
+    });
+    this.setDataSetAndDataSetVersionsSource(v);
+  }
+
+  setDataSetAndDataSetVersionsSource(v) {
+    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
+    const obj = this.state.dataSetDataList.find(item => item.value === v);
+    const genOptionList = obj.versions;
+    // form.setFieldState('version', { dataSource: genOptionList })
+    form.setFieldState('dataSetContain.version', state => {
+      state.dataSource = genOptionList;
+    });
   }
 
   onVersionChange(v) {
     const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
     // form.setFieldState('version', { dataSource: [{label: 'v2', value: 'v2'}] })
-    // console.log(values, 'values')
     this.setState({
       version: v,
     });
     this.getTableList(this.state.dataSet, v);
   }
 
-  setDataSetAndDataSetVersionsSource(v) {
-    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    const obj = this.state.dataSetDataList.find(item => item.value === v);
-    // const genOptionList = obj.versions;
-    // form.setFieldState('version', { dataSource: genOptionList })
+  async getEmbedder() {
+    const project = JSON.parse(localStorage.getItem('authData')).project;
+    const params = {
+      input: {
+        namespace: project,
+        page: 1,
+        pageSize: 99999,
+      },
+    };
+    const { Embedder } = await this.utils.bff.listEmbedders(params);
+    const { nodes } = Embedder?.listEmbedders || {};
+    this.setState(
+      {
+        embedderList: nodes,
+      },
+      () => {
+        //  console.log(nodes, 'data', this.state.embedderList)
+      }
+    );
+    return {
+      nodes,
+    };
+  }
+
+  getCheckBox(rows) {
     this.setState({
-      dataSet: v,
+      selectFiles: rows,
+      nextFileList: rows.map(item => {
+        return this.state.dataSetFileList.find(_item => _item.path === item);
+      }),
     });
   }
 
@@ -345,10 +339,10 @@ class Create$$Page extends React.Component {
             <Space align="center" direction="horizontal" __component_name="Space">
               <Button.Back
                 name="返回"
+                path="/knowledge"
                 type="primary"
                 title="新增知识库"
                 __component_name="Button.Back"
-                path="/knowledge"
               />
             </Space>
           </Col>
@@ -525,14 +519,7 @@ class Create$$Page extends React.Component {
                                     allowClear: false,
                                     showSearch: false,
                                     placeholder: '请选择版本',
-                                    _sdkSwrGetFunc: {
-                                      func: () => {
-                                        return this.state.versionList;
-                                      },
-                                      label: 'label',
-                                      value: 'value',
-                                      resKey: __$$eval(() => ['genOptionList']),
-                                    },
+                                    _sdkSwrGetFunc: { label: 'label', value: 'value' },
                                     _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
                                   },
                                 }}
@@ -549,7 +536,7 @@ class Create$$Page extends React.Component {
               </FormilyForm>
               {!!__$$eval(() => this.state.currentStep === 0 && !this.state.submited) && (
                 <Row wrap={false} __component_name="Row">
-                  <Col flex="120px" __component_name="Col">
+                  <Col flex="130px" __component_name="Col">
                     <Typography.Text
                       style={{ fontSize: '' }}
                       strong={false}
@@ -876,8 +863,9 @@ class Create$$Page extends React.Component {
                   danger={false}
                   disabled={false}
                   __component_name="Button"
+                  href="/knowledge"
                 >
-                  取消
+                  {__$$eval(() => `${this.state.submited ? '返回' : '取消'}`)}
                 </Button>
                 {!!__$$eval(() => this.state.currentStep > 0 && !this.state.submited) && (
                   <Button
@@ -942,7 +930,7 @@ class Create$$Page extends React.Component {
                     disabled={false}
                     __component_name="Button"
                   >
-                    完成
+                    确认
                   </Button>
                 )}
               </Flex>
