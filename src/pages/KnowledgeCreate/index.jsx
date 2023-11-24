@@ -70,21 +70,22 @@ class Create$$Page extends React.Component {
       submited: false,
       embedderList: [],
       dataSetDataList: [],
-      dataSetFileList: [
-        {
-          path: '/path/to/file.txt',
-        },
-      ],
+      dataSetFileList: [],
       form: {
-        version: '',
-        dataSet: '',
-        name: '',
+        displayName: '',
+        dataSetContain: {
+          version: null,
+          dataset: null,
+        },
+        embedder: '',
+        description: '',
       },
       formValue: [],
       dataSet: '',
       version: '',
       selectFiles: [],
       nextFileList: [],
+      contentType: '',
     };
   }
 
@@ -98,6 +99,33 @@ class Create$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
+  }
+
+  initFormValue() {
+    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
+    const { displayName, dataSetContain, description, embedder } = this.state.form;
+    const { dataset, version } = dataSetContain;
+    form.setValues(
+      {
+        displayName,
+        dataSetContain: {
+          dataset,
+          version,
+        },
+        description,
+        embedder,
+      },
+      'deepMerge'
+    );
+    // dataSetDataList: datasetlist
+    const { dataSetDataList, embedderList } = this.state;
+    form.setFieldState('dataSetContain.dataset', state => {
+      state.dataSource = dataSetDataList;
+    });
+    form.setFieldState('embedder', state => {
+      state.dataSource = embedderList;
+    });
+    this.setDataSetAndDataSetVersionsSource(dataset);
   }
 
   testFunc() {
@@ -128,19 +156,32 @@ class Create$$Page extends React.Component {
     if (action === 'next') {
       this.checkFileds();
     } else {
-      this.setState({
-        currentStep: this.state.currentStep - 1,
-      });
+      this.setState(
+        {
+          currentStep: this.state.currentStep - 1,
+        },
+        () => {
+          this.initFormValue();
+        }
+      );
     }
   }
 
   checkFileds() {
     const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-    // console.log(form.value)
     form.submit(async values => {
+      // const {  formValue } = this.state;
+      const { displayName, dataSetContain, description, embedder } = values;
+      const { dataset, version } = dataSetContain;
       this.setState({
         currentStep: this.state.currentStep + 1,
         formValue: values,
+        form: {
+          displayName,
+          dataSetContain,
+          description,
+          embedder,
+        },
       });
     });
   }
@@ -155,7 +196,7 @@ class Create$$Page extends React.Component {
         // console.log(form, this.$('step_form'), values)
         const { embedderList, selectFiles, dataSetFileList, formValue } = this.state;
         const { displayName, dataSetContain, description, embedder } = formValue;
-        const { dataSet, version } = dataSetContain;
+        const { dataset, version } = dataSetContain;
         const embedderItem = embedderList.find(item => item.value === embedder);
         const fileGroups = [
           {
@@ -183,6 +224,7 @@ class Create$$Page extends React.Component {
   }
 
   async getDataSet() {
+    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
     const res = await this.utils.bff.listDatasets({
       input: {
         namespace: this.utils.getAuthData().project, //'abc'
@@ -207,6 +249,7 @@ class Create$$Page extends React.Component {
       return {
         label: item.name,
         value: item.name,
+        contentType: item.contentType,
         versions: versions,
       };
     });
@@ -219,9 +262,9 @@ class Create$$Page extends React.Component {
         // this.getTableList(values?.pre_data_set_name, values?.pre_data_set_version)
       }
     );
-    return {
-      datasetlist,
-    };
+    form.setFieldState('dataSetContain.dataset', state => {
+      state.dataSource = datasetlist;
+    });
   }
 
   async getTableList(pre_data_set_name, pre_data_set_version) {
@@ -266,6 +309,9 @@ class Create$$Page extends React.Component {
     form.setFieldState('dataSetContain.version', state => {
       state.dataSource = genOptionList;
     });
+    this.setState({
+      contentType: obj.contentType,
+    });
   }
 
   onVersionChange(v) {
@@ -278,6 +324,7 @@ class Create$$Page extends React.Component {
   }
 
   async getEmbedder() {
+    const form = this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
     const project = JSON.parse(localStorage.getItem('authData')).project;
     const params = {
       input: {
@@ -288,17 +335,23 @@ class Create$$Page extends React.Component {
     };
     const { Embedder } = await this.utils.bff.listEmbedders(params);
     const { nodes } = Embedder?.listEmbedders || {};
-    this.setState(
-      {
-        embedderList: nodes,
-      },
-      () => {
-        //  console.log(nodes, 'data', this.state.embedderList)
-      }
-    );
-    return {
-      nodes,
-    };
+    this.setState({
+      embedderList: nodes.map(item => {
+        return {
+          ...item,
+          label: item.displayName,
+          value: item.name,
+        };
+      }),
+    });
+    form.setFieldState('embedder', state => {
+      state.dataSource = nodes.map(item => {
+        return {
+          label: item.displayName,
+          value: item.name,
+        };
+      });
+    });
   }
 
   getCheckBox(rows) {
@@ -321,11 +374,21 @@ class Create$$Page extends React.Component {
     return filename;
   }
 
+  getType() {
+    const contentTypeObj = {
+      text: '文本',
+      image: '图片',
+      video: '视频',
+    };
+    return contentTypeObj[this.state.contentType];
+  }
+
   componentDidMount() {
     console.log('did mount', this);
     this.getEmbedder();
     this.getDataSet();
     // this.getTableList()
+    this.initFormValue();
   }
 
   render() {
@@ -392,12 +455,8 @@ class Create$$Page extends React.Component {
                           colon: false,
                           layout: 'horizontal',
                           labelAlign: 'left',
-                          wrapperCol: 12,
                           labelWidth: '130px',
-                        }}
-                        createFormProps={{
-                          values: null,
-                          initialValues: __$$eval(() => this.state.form),
+                          wrapperCol: 12,
                         }}
                         __component_name="FormilyForm"
                       >
@@ -429,12 +488,7 @@ class Create$$Page extends React.Component {
                             'x-component-props': {
                               disabled: false,
                               allowClear: false,
-                              _sdkSwrGetFunc: {
-                                func: __$$eval(() => this.getEmbedder),
-                                label: 'displayName',
-                                value: 'name',
-                                resKey: __$$eval(() => ['nodes']),
-                              },
+                              _sdkSwrGetFunc: { func: null, label: '', value: '' },
                             },
                           }}
                           decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -470,7 +524,7 @@ class Create$$Page extends React.Component {
                             <Col span={12} __component_name="Col">
                               <FormilySelect
                                 fieldProps={{
-                                  name: 'dataSet',
+                                  name: 'dataset',
                                   title: '',
                                   description: '',
                                   'x-validator': [],
@@ -486,12 +540,7 @@ class Create$$Page extends React.Component {
                                     }.bind(this),
                                     allowClear: false,
                                     placeholder: '请选择数据集',
-                                    _sdkSwrGetFunc: {
-                                      func: __$$eval(() => this.getDataSet),
-                                      label: 'label',
-                                      value: 'value',
-                                      resKey: __$$eval(() => ['datasetlist']),
-                                    },
+                                    _sdkSwrGetFunc: { label: '', value: '' },
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -555,21 +604,37 @@ class Create$$Page extends React.Component {
                         {
                           key: '',
                           title: '名称',
-                          dataIndex: 'path',
                           render: (text, record, index) =>
                             (__$$context => (
                               <Typography.Text
-                                __component_name="Typography.Text"
-                                ellipsis={true}
                                 style={{ fontSize: '' }}
-                                disabled={false}
                                 strong={false}
+                                disabled={false}
+                                ellipsis={true}
+                                __component_name="Typography.Text"
                               >
                                 {__$$eval(() => __$$context.getFileNameFromPath(text))}
                               </Typography.Text>
                             ))(__$$createChildContext(__$$context, { text, record, index })),
+                          dataIndex: 'path',
                         },
-                        { key: '', title: '类型', dataIndex: 'fileType' },
+                        {
+                          key: '',
+                          title: '类型',
+                          render: (text, record, index) =>
+                            (__$$context => (
+                              <Typography.Text
+                                style={{ fontSize: '' }}
+                                strong={false}
+                                disabled={false}
+                                ellipsis={true}
+                                __component_name="Typography.Text"
+                              >
+                                {__$$eval(() => __$$context.getType())}
+                              </Typography.Text>
+                            ))(__$$createChildContext(__$$context, { text, record, index })),
+                          dataIndex: 'fileType',
+                        },
                         { title: '数据量', dataIndex: 'count' },
                         { title: '大小', dataIndex: 'size' },
                       ]}
@@ -647,7 +712,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `文件来源：${item.source || '--'}`)}
+                                {__$$eval(() => `文件来源：${item.version || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -658,7 +723,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `类型：${item.fileTpye || '--'}`)}
+                                {__$$eval(() => `类型：${__$$context.getType() || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -669,7 +734,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `数据量：${item.datacount || '--'}`)}
+                                {__$$eval(() => `数据量：${item.count || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -726,35 +791,7 @@ class Create$$Page extends React.Component {
                       <Input.Search placeholder="请输入" __component_name="Input.Search" />
                     </Col>
                   </Row>
-                  {__$$evalArray(() => [
-                    {
-                      log: '123',
-                      icon: 'success',
-                      type: 'QA文本',
-                      title: 'Kubernetes入门文档.pdf',
-                      source: '文件来源：数据集1-v1',
-                      fileSize: 1024,
-                      datacount: 100,
-                    },
-                    {
-                      log: '123',
-                      icon: 'success',
-                      type: 'QA文本',
-                      title: 'Kubernetes入门文档.pdf',
-                      source: '文件来源：数据集1-v1',
-                      fileSize: 1024,
-                      datacount: 100,
-                    },
-                    {
-                      log: '123',
-                      icon: 'success',
-                      type: 'QA文本',
-                      title: 'Kubernetes入门文档.pdf',
-                      source: '文件来源：数据集1-v1',
-                      fileSize: 1024,
-                      datacount: 100,
-                    },
-                  ]).map((item, index) =>
+                  {__$$evalArray(() => this.state.nextFileList).map((item, index) =>
                     (__$$context => (
                       <Row wrap={false} style={{ marginBottom: '8px' }} __component_name="Row">
                         <Col
@@ -794,7 +831,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.title)}
+                                {__$$eval(() => __$$context.getFileNameFromPath(item.path))}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -805,7 +842,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.source)}
+                                {__$$eval(() => `文件来源：${item.version || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -816,7 +853,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.type)}
+                                {__$$eval(() => `类型：${__$$context.getType() || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -827,7 +864,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.datacount)}
+                                {__$$eval(() => `数据量：${item.count || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
