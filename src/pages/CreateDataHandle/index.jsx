@@ -67,85 +67,63 @@ class $$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      authData: {},
+      numberInputStep: 0.1,
+      currentStep: 0,
+      step1FormData: {},
+      step2FormData: {},
+      dataSetFileSearchParams: {
+        keyword: 'a',
+        currentPage: 1,
+      },
+      dataSetFileList: [],
+      dataSetFileTotal: 0,
+      selectedFileList: [],
       step3Data: {
         QAsplitChecked: true,
         TextSegmentationChecked: false,
         TextSegmentationSegmentationLen: undefined,
         TextSegmentationSegmentationRepeatLen: undefined,
-        RemoveInvisibleCharactersChecked: true,
-        SpaceHandleChecked: true,
-        RemoveGarbledCodeChecked: true,
-        ConvertComplexityToSimplicityChecked: true,
-        RemoveHtmlIdentifyingChecked: true,
-        RemoveEmoteChecked: true,
-        CharacterRepeatFilterChecked: true,
+        RemoveInvisibleCharactersChecked: false,
+        SpaceHandleChecked: false,
+        RemoveGarbledCodeChecked: false,
+        ConvertComplexityToSimplicityChecked: false,
+        RemoveHtmlIdentifyingChecked: false,
+        RemoveEmoteChecked: false,
+        CharacterRepeatFilterChecked: false,
         CharacterRepeatFilterRate: 0.5,
-        WordRepeatFilterChecked: true,
+        WordRepeatFilterChecked: false,
         WordRepeatFilterRate: 0.5,
-        SpecialCharactersRateChecked: true,
+        SpecialCharactersRateChecked: false,
         SpecialCharactersRateRate: 0.5,
-        PornographicViolenceRateChecked: true,
+        PornographicViolenceRateChecked: false,
         PornographicViolenceRateRate: 0.5,
-        SimhashOperatorChecked: true,
+        SimhashOperatorChecked: false,
         SimhashOperatorRate: 5,
-        RemoveEmailChecked: true,
-        RemoveIPAddress: true,
-        RemoveNumber: true,
+        RemoveEmailChecked: false,
+        RemoveIPAddress: false,
+        RemoveNumber: false,
       },
+      configMap: {
+        qa_split: 'QAsplitChecked',
+        document_chunk: 'TextSegmentationChecked',
+        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
+        space_standardization: 'SpaceHandleChecked',
+        remove_garbled_text: 'RemoveGarbledCodeChecked',
+        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
+        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
+        remove_emojis: 'RemoveEmoteChecked',
+        simhash_operator: 'SimhashOperatorChecked',
+        remove_email: 'RemoveEmailChecked',
+        remove_ip_address: 'RemoveIPAddress',
+        remove_number: 'RemoveNumber',
+        character_duplication_rate: 'CharacterRepeatFilterChecked',
+        word_duplication_rate: 'WordRepeatFilterChecked',
+        special_character_rate: 'SpecialCharactersRateChecked',
+        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
+      },
+      configEnableMap: {},
       step4Data: {},
-      currentStep: 0,
-      step2FormData: {},
-      stepForm1Data: {},
-      dataSetDataList: [
-        {
-          value: '文件1',
-          label: '文件1',
-          versions: [
-            {
-              name: 1.0,
-            },
-            {
-              name: 2.0,
-            },
-            {
-              name: 3.0,
-            },
-          ],
-        },
-        {
-          value: '文件2',
-          label: '文件2',
-          versions: [
-            {
-              name: 11.0,
-            },
-            {
-              name: 12.0,
-            },
-            {
-              name: 13.0,
-            },
-          ],
-        },
-        {
-          value: '文件3',
-          label: '文件3',
-          versions: [
-            {
-              name: 21.0,
-            },
-            {
-              name: 32.0,
-            },
-            {
-              name: 43.0,
-            },
-          ],
-        },
-      ],
-      numberInputStep: 0.1,
-      selectedFileList: [],
+      dataSetDataList: [],
       afterTreatmentData: [
         {
           type: '移除不可见字符',
@@ -178,10 +156,6 @@ class $$Page extends React.Component {
           after: '兔子女孩女孩男孩',
         },
       ],
-      dataSetFileSearchParams: {
-        keyword: '',
-        currentPage: 1,
-      },
     };
   }
 
@@ -197,44 +171,6 @@ class $$Page extends React.Component {
     console.log('will unmount');
   }
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
-  async onNext() {
-    if (this.state.currentStep === 0) {
-      await this.getStep1Data();
-      const res = await this.utils.datasetBff.sdk.listDatasets({
-        input: {
-          namespace: 'abc', //this.state.authData.project,
-        },
-
-        versionsInput: {
-          namespace: 'abc', //this.state.authData.project,
-        },
-      });
-
-      console.log(res.data.Dataset.listDatasets.nodes);
-      // const datasetlist = res.data.Dataset.listDatasets.nodes.map(item => ({
-      //   label: item.name,
-      //   value: item.name,
-      //   versions: item.versions.node
-
-      // }));
-      // console.log(datasetlist)
-      this.setState({
-        dataSetDataList: [],
-      });
-    } else if (this.state.currentStep === 1) {
-      this.getStep2Data();
-      // this.onNextStep()
-    } else if (this.state.currentStep === 2) {
-      this.onNextStep();
-    } else {
-      this.onNextStep();
-    }
-  }
-
   debounce(func, delay) {
     let timeoutId;
     return function (...args) {
@@ -245,22 +181,286 @@ class $$Page extends React.Component {
     };
   }
 
-  onFinish() {
-    this.utils.notification.success({
-      message: '成功',
-    });
-    this.history.push('/data-handle');
-  }
-
   onSearch(event) {
     this.debouncedFunction(event);
   }
 
+  updateStep3State(value, event, extraParams = {}) {
+    const fieldName = {
+      ...event,
+      ...extraParams,
+    }.fieldName;
+    const step3 = {
+      ...this.state.step3Data,
+      [fieldName]: value,
+    };
+    this.setState({
+      step3Data: step3,
+    });
+  }
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
+
+  getStep1Data() {
+    this.form('createDataHandleStep1')
+      .validate()
+      .then(res => {
+        const step1FormData = this.form('createDataHandleStep1').values;
+        this.setState({
+          step1FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  getStep2Data() {
+    this.form('createDataHandleStep2')
+      ?.validate()
+      .then(res => {
+        const step2FormData = this.form('createDataHandleStep2').values;
+        this.setState({
+          step2FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  onDataSetChange(v) {
+    this.setState({
+      dataSetFileList: [],
+    });
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_version: undefined,
+      post_data_set_version: undefined,
+      post_data_set_name: v,
+    });
+    this.setDataSetVersionsSource(v);
+  }
+
+  setDataSetVersionsSource(v) {
+    const obj = this.state.dataSetDataList.find(item => item.value === v);
+    const genOptionList = obj.versions;
+    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
+      dataSource: genOptionList,
+    });
+    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
+      dataSource: genOptionList,
+    });
+  }
+
+  onDataSetVersionChange(v) {
+    this.form('createDataHandleStep2').setValues({
+      post_data_set_version: v,
+    });
+    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
+    const name = this.getVersionName(pre_data_set_name, v);
+    this.getTableList(name);
+  }
+
+  onPageChange(page) {
+    this.setState(
+      {
+        dataSetFileSearchParams: {
+          ...this.state.dataSetFileSearchParams,
+          currentPage: page,
+        },
+      },
+      () => {
+        this.getDataSet();
+      }
+    );
+  }
+
+  onSelectFileChange(v) {
+    this.setState({
+      selectedFileList: v,
+    });
+  }
+
+  backToStep2() {
+    console.log(this.state.step2FormData);
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    if (!pre_data_set_name) return;
+    this.setDataSetVersionsSource(pre_data_set_name);
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_name,
+      pre_data_set_version,
+      post_data_set_version: pre_data_set_version,
+      post_data_set_name: pre_data_set_name,
+    });
+  }
+
+  async getDataSet() {
+    const res = await this.utils.bff.listDatasets({
+      input: {
+        namespace: 'abc', //this.utils.getAuthData().project,
+      },
+
+      versionsInput: {
+        namespace: 'abc', // this.utils.getAuthData().project,
+      },
+
+      filesInput: {
+        keyword: this.state.dataSetFileSearchParams.keyword,
+        pageSize: 10,
+        page: this.state.dataSetFileSearchParams.currentPage,
+      },
+    });
+    const datasetlist = res.Dataset.listDatasets.nodes.map(item => {
+      const versions = item.versions.nodes.map(i => ({
+        label: i.displayName,
+        value: i.version,
+        name: i.name,
+        namespace: i.namespace,
+      }));
+      return {
+        label: item.name,
+        value: item.name,
+        versions: versions,
+        namespace: item.namespace,
+      };
+    });
+    this.setState(
+      {
+        dataSetDataList: datasetlist,
+      },
+      () => {
+        const values = this.form('createDataHandleStep2')?.values;
+        const name = this.getVersionName(values?.pre_data_set_name, values?.pre_data_set_version);
+        this.getTableList(name);
+      }
+    );
+  }
+
+  getVersionName(dataset, version) {
+    if (dataset && version) {
+      const datasetObj = this.state.dataSetDataList.find(i => (i.value = dataset));
+      const versionObj = datasetObj.versions.find(i => (i.value = version));
+      console.log(versionObj);
+      return versionObj.name;
+    }
+    return;
+  }
+
+  async getTableList(name) {
+    if (!name) return;
+    console.log(this.utils.bff);
+    const res = await this.utils.bff.getVersionedDataset({
+      name: name,
+      namespace: 'abc',
+      //this.utils.getAuthData().project,
+      input: {
+        keyword: this.state.dataSetFileSearchParams.keyword,
+        pageSize: 1,
+        page: this.state.dataSetFileSearchParams.currentPage,
+      },
+    });
+    const data = res.VersionedDataset.getVersionedDataset.files;
+    this.setState({
+      dataSetFileList: data.nodes || [],
+      dataSetFileTotal: data.totalCount || 0,
+    });
+    console.log(res);
+  }
+
+  async onNext() {
+    if (this.state.currentStep === 0) {
+      this.getStep1Data();
+    } else if (this.state.currentStep === 1) {
+      this.getStep2Data();
+    } else if (this.state.currentStep === 2) {
+      this.onNextStep();
+    } else {
+      this.onNextStep();
+    }
+  }
+
+  valToKey(obj) {
+    const _obj = {};
+    for (let key in obj) {
+      _obj[obj[key]] = key;
+    }
+    return _obj;
+  }
+
+  convertStep3Data() {
+    const list = [];
+    const step3Data = this.state.step3Data;
+    const vTk = this.valToKey(this.state.configMap);
+    console.log(vTk);
+    for (let k in step3Data) {
+      if (k.endsWith('Checked')) {
+        if (step3Data[k]) {
+          list.push({
+            type: vTk[k],
+          });
+        }
+      }
+    }
+    return list;
+  }
+
+  async onFinish() {
+    const list = this.convertStep3Data();
+    const files = this.state.selectedFileList.map(item => {
+      const _item = item.split('/');
+      return {
+        name: _item[_item.length - 1],
+      };
+    });
+    const data = {
+      ...this.state.step1FormData,
+      ...this.state.step2FormData,
+      data_process_config_info: list,
+      file_names: files,
+      bucket_name: 'abc', // this.utils.getAuthData().project,
+    };
+
+    console.log(data);
+    const res = await this.utils.bff.createDataProcessTask({
+      input: {
+        ...data,
+      },
+    });
+    if (res.dataProcess.createDataProcessTask.status === 200) {
+      this.utils.notification.success({
+        message: '成功',
+      });
+      this.history.push('/data-handle');
+    } else {
+      this.utils.notification.success({
+        message: res.dataProcess?.createDataProcessTask?.message || '失败',
+      });
+    }
+  }
+
   onNextStep() {
     const step = this.state.currentStep + 1;
-    this.setState({
-      currentStep: step,
-    });
+    this.setState(
+      {
+        currentStep: step,
+      },
+      () => {
+        if (this.state.currentStep === 1) {
+          this.form('createDataHandleStep2').setFieldState('pre_data_set_name', {
+            dataSource: this.state.dataSetDataList,
+          });
+          this.form('createDataHandleStep2').setFieldState('post_data_set_name', {
+            dataSource: this.state.dataSetDataList,
+          });
+          this.backToStep2();
+        }
+        if (this.state.currentStep === 2) {
+          const enableObj = {};
+          // const data = this.props.useDataProcessSupportType.data.dataProcess.dataProcessSupportType.data;
+          // this.setState({
+          //   configEnableMap: enableObj
+          // })
+        }
+      }
+    );
   }
 
   onPrevious() {
@@ -272,102 +472,29 @@ class $$Page extends React.Component {
       () => {
         if (this.state.currentStep === 0) {
           if (!this.form('createDataHandleStep1')) return;
-          console.log(this.stepForm1Data);
           this.form('createDataHandleStep1').setValues({
-            task_name: this.stepForm1Data.task_name || undefined,
-            file_type: this.stepForm1Data.file_type || undefined,
+            name: this.state.step1FormData.name || undefined,
+            file_type: this.state.step1FormData.file_type || undefined,
           });
+        } else if (this.state.currentStep === 1) {
+          this.form('createDataHandleStep2').setFieldState('pre_data_set_name', {
+            dataSource: this.state.dataSetDataList,
+          });
+          this.form('createDataHandleStep2').setFieldState('post_data_set_name', {
+            dataSource: this.state.dataSetDataList,
+          });
+          this.backToStep2();
         }
       }
     );
   }
 
-  getStep1Data() {
-    this.form('createDataHandleStep1')
-      .validate()
-      .then(res => {
-        this.stepForm1Data = this.form('createDataHandleStep1').values;
-        this.onNextStep();
-      });
-  }
-
-  getStep2Data() {
-    this.form('createDataHandleStep2')
-      ?.validate()
-      .then(res => {
-        this.step2FormData = res;
-        this.onNextStep();
-      });
-  }
-
-  onPageChange(page) {
-    this.setState({
-      dataSetFileSearchParams: {
-        ...this.state.dataSetFileSearchParams,
-        currentPage: page,
-      },
-    });
-  }
-
-  async getDataSetFile() {}
-
-  onDataSetChange(v) {
-    this.form('createDataHandleStep2').setValues({
-      dataset_version: undefined,
-      dataset_after_version: undefined,
-      dataset_after_name: v,
-    });
-    const obj = this.state.dataSetDataList.find(item => item.value === v);
-    const genOptionList = obj.versions.map(item => ({
-      label: item.name,
-      value: item.name,
-    }));
-    this.form('createDataHandleStep2').setFieldState('dataset_version', {
-      dataSource: genOptionList,
-    });
-    this.form('createDataHandleStep2').setFieldState('dataset_after_version', {
-      dataSource: genOptionList,
-    });
-  }
-
-  updateStep3State(value, event, extraParams = {}) {
-    const fieldName = {
-      ...event,
-      ...extraParams,
-    }.fieldName;
-    const step3 = {
-      ...this.state.step3Data,
-      [fieldName]: value,
-      ...(fieldName === 'QAsplitChecked'
-        ? {
-            TextSegmentationChecked: !this.state.step3Data.TextSegmentationChecked,
-          }
-        : {}),
-      ...(fieldName === 'TextSegmentationChecked'
-        ? {
-            QAsplitChecked: !this.state.step3Data.QAsplitChecked,
-          }
-        : {}),
-    };
-    this.setState({
-      step3Data: step3,
-    });
-  }
-
-  onDataSetVersionChange(v) {
-    this.form('createDataHandleStep2').setValues({
-      dataset_after_version: v,
-    });
-  }
-
   componentDidMount() {
-    this.setState({
-      authData: this.utils.getAuthData(),
-    });
+    console.log(this.utils.bff);
     this.debouncedFunction = this.debounce(() => {
-      console.log('防抖函数触发！');
       // 执行你的逻辑
     }, 1000); // 1000 毫秒的防抖延迟
+    this.getDataSet();
   }
 
   render() {
@@ -422,7 +549,9 @@ class $$Page extends React.Component {
               current={__$$eval(() => this.state.currentStep)}
               __component_name="Steps"
             />
-            {!!__$$eval(() => this.state.currentStep === 2) && (
+            {!!__$$eval(
+              () => this.state.currentStep === 2 && this.state.step1FormData.file_type !== 'qa'
+            ) && (
               <Row wrap={true} gutter={['', 0]} __component_name="Row">
                 <Col span={24} style={{ paddingBottom: '8px' }} __component_name="Col">
                   <Typography.Title
@@ -441,7 +570,7 @@ class $$Page extends React.Component {
                       <Card
                         size="default"
                         type="default"
-                        style={{ width: '270px', height: '142px' }}
+                        style={{ height: '142px' }}
                         actions={[]}
                         loading={false}
                         bordered={true}
@@ -574,7 +703,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.TextSegmentationChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -994,7 +1123,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.RemoveGarbledCodeChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1083,7 +1212,7 @@ class $$Page extends React.Component {
                                           this.state.step3Data.ConvertComplexityToSimplicityChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1171,7 +1300,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.RemoveHtmlIdentifyingChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1260,7 +1389,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.RemoveEmoteChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1371,7 +1500,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.CharacterRepeatFilterChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1534,7 +1663,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.WordRepeatFilterChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1690,7 +1819,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.SpecialCharactersRateChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1847,7 +1976,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.PornographicViolenceRateChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2027,7 +2156,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.SimhashOperatorChecked
                                       )}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2298,7 +2427,7 @@ class $$Page extends React.Component {
                                       size="small"
                                       checked={__$$eval(() => this.state.step3Data.RemoveIPAddress)}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2384,7 +2513,7 @@ class $$Page extends React.Component {
                                       size="small"
                                       checked={__$$eval(() => this.state.step3Data.RemoveNumber)}
                                       loading={false}
-                                      disabled={false}
+                                      disabled={true}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2502,7 +2631,7 @@ class $$Page extends React.Component {
                     <FormilyInput
                       style={{ width: '500px' }}
                       fieldProps={{
-                        name: 'task_name',
+                        name: 'name',
                         title: '任务名称',
                         'x-validator': [
                           { id: 'disabled', type: 'disabled', children: '未知', required: true },
@@ -2591,8 +2720,8 @@ class $$Page extends React.Component {
                     <FormilySelect
                       style={{}}
                       fieldProps={{
-                        enum: __$$eval(() => this.state.dataSetDataList),
-                        name: 'dataset_name',
+                        enum: null,
+                        name: 'pre_data_set_name',
                         title: '处理前数据集',
                         required: true,
                         'x-validator': [],
@@ -2609,7 +2738,8 @@ class $$Page extends React.Component {
                           }.bind(this),
                           allowClear: false,
                           placeholder: '请选择数据集',
-                          _sdkSwrGetFunc: { label: 'name', value: 'name' },
+                          _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
+                          _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
                         },
                       }}
                       decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -2620,7 +2750,7 @@ class $$Page extends React.Component {
                     <FormilySelect
                       fieldProps={{
                         enum: null,
-                        name: 'dataset_version',
+                        name: 'pre_data_set_version',
                         title: '',
                         required: true,
                         'x-validator': [],
@@ -2647,7 +2777,7 @@ class $$Page extends React.Component {
                   </Col>
                 </Row>
                 <Row wrap={true} __component_name="Row">
-                  <Col span={24} __component_name="Col">
+                  <Col span={3} __component_name="Col">
                     <FormilyFormItem
                       fieldProps={{
                         name: 'FormilyFormItem',
@@ -2656,111 +2786,158 @@ class $$Page extends React.Component {
                         'x-validator': [],
                       }}
                       decoratorProps={{
-                        'x-decorator-props': { asterisk: true, labelCol: 2, labelEllipsis: true },
+                        'x-decorator-props': {
+                          asterisk: true,
+                          labelCol: 2,
+                          labelEllipsis: true,
+                          wrapperWidth: '0',
+                        },
                       }}
                       __component_name="FormilyFormItem"
-                    >
-                      <Row wrap={true} __component_name="Row">
-                        <Col
-                          span={24}
-                          style={{
-                            paddingTop: '24px',
-                            borderColor: '#9b9b9b',
-                            borderStyle: 'dashed',
-                            borderWidth: '1px',
-                            marginBottom: '16px',
-                            paddingBottom: '24px',
-                          }}
-                          __component_name="Col"
-                        >
-                          <Row wrap={true} __component_name="Row">
-                            <Col span={24} __component_name="Col">
-                              <Row wrap={false} justify="space-between" __component_name="Row">
-                                <Col __component_name="Col">
-                                  <FormilyInput
-                                    style={{ width: '400px' }}
-                                    fieldProps={{ name: 'Input', title: '', 'x-validator': [] }}
-                                    componentProps={{
-                                      'x-component-props': {
-                                        onChange: function () {
-                                          return this.onSearch.apply(
-                                            this,
-                                            Array.prototype.slice.call(arguments).concat([])
-                                          );
-                                        }.bind(this),
-                                        placeholder: '请输入',
-                                      },
-                                    }}
-                                    decoratorProps={{
-                                      'x-decorator-props': { labelEllipsis: true },
-                                    }}
-                                    __component_name="FormilyInput"
-                                  />
+                      style={{}}
+                    />
+                  </Col>
+                  <Col
+                    span={19}
+                    style={{
+                      paddingTop: '24px',
+                      borderColor: '#9b9b9b',
+                      borderStyle: 'dashed',
+                      borderWidth: '1px',
+                      marginBottom: '16px',
+                      paddingBottom: '24px',
+                    }}
+                    __component_name="Col"
+                  >
+                    <Row wrap={true} __component_name="Row">
+                      <Col span={24} __component_name="Col">
+                        <Row __component_name="Row" justify="space-between" wrap={false}>
+                          <Col __component_name="Col">
+                            <FormilyInput
+                              style={{ width: '400px' }}
+                              fieldProps={{ name: 'Input', title: '', 'x-validator': [] }}
+                              componentProps={{
+                                'x-component-props': {
+                                  onChange: function () {
+                                    return this.onSearch.apply(
+                                      this,
+                                      Array.prototype.slice.call(arguments).concat([])
+                                    );
+                                  }.bind(this),
+                                  placeholder: '请输入',
+                                  allowClear: true,
+                                },
+                              }}
+                              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                              __component_name="FormilyInput"
+                            />
+                          </Col>
+                          <Col __component_name="Col">
+                            <Space __component_name="Space" direction="horizontal" align="center">
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col" style={{ paddingTop: '6px' }}>
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    ellipsis={true}
+                                    style={{ fontSize: '' }}
+                                    disabled={false}
+                                    strong={false}
+                                  >
+                                    共
+                                  </Typography.Text>
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    ellipsis={true}
+                                    style={{ fontSize: '' }}
+                                    disabled={false}
+                                    strong={false}
+                                  >
+                                    {__$$eval(() => this.state.dataSetFileTotal)}
+                                  </Typography.Text>
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    ellipsis={true}
+                                    style={{ fontSize: '' }}
+                                    disabled={false}
+                                    strong={false}
+                                  >
+                                    条数据
+                                  </Typography.Text>
                                 </Col>
                                 <Col __component_name="Col">
                                   <Pagination
                                     style={{ textAlign: 'right' }}
-                                    total={50}
+                                    total={__$$eval(() => this.state.dataSetFileTotal)}
                                     simple={false}
-                                    current={1}
+                                    current={__$$eval(
+                                      () => this.state.dataSetFileSearchParams.currentPage
+                                    )}
+                                    onChange={function () {
+                                      return this.onPageChange.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([])
+                                      );
+                                    }.bind(this)}
                                     pageSize={10}
                                     __component_name="Pagination"
                                   />
                                 </Col>
                               </Row>
-                            </Col>
-                          </Row>
-                          <Table
-                            size="default"
-                            style={{ width: '500px' }}
-                            rowKey="id"
-                            scroll={{ scrollToFirstRowOnChange: true }}
-                            columns={[
-                              {
-                                key: 'name',
-                                title: '文件名称',
-                                render: (text, record, index) =>
-                                  (__$$context => (
-                                    <Row wrap={true} __component_name="Row">
-                                      <Col span={24} __component_name="Col">
-                                        <Typography.Text
-                                          style={{ fontSize: '' }}
-                                          strong={false}
-                                          disabled={false}
-                                          ellipsis={true}
-                                          __component_name="Typography.Text"
-                                        >
-                                          text
-                                        </Typography.Text>
-                                      </Col>
-                                    </Row>
-                                  ))(__$$createChildContext(__$$context, { text, record, index })),
-                                dataIndex: 'name',
-                              },
-                              { title: '标签', dataIndex: 'label' },
-                              { key: 'age', title: '文件大小', dataIndex: 'size' },
-                            ]}
-                            bordered={false}
-                            dataSource={[
-                              { id: '1', name: '胡彦斌', size: '50G' },
-                              { id: '2', name: '王一博', size: '100 G' },
-                            ]}
-                            pagination={false}
-                            showHeader={true}
-                            rowSelection={{ type: 'checkbox' }}
-                            __component_name="Table"
-                          />
-                        </Col>
-                      </Row>
-                    </FormilyFormItem>
+                            </Space>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                    <Table
+                      size="default"
+                      style={{ width: '500px' }}
+                      rowKey="path"
+                      scroll={{ scrollToFirstRowOnChange: true }}
+                      columns={[
+                        { key: 'name', title: '文件名称', dataIndex: 'path' },
+                        {
+                          title: '标签',
+                          render: (text, record, index) =>
+                            (__$$context => (
+                              <Typography.Text
+                                style={{ fontSize: '' }}
+                                strong={false}
+                                disabled={false}
+                                ellipsis={true}
+                                __component_name="Typography.Text"
+                              >
+                                QA拆分
+                              </Typography.Text>
+                            ))(__$$createChildContext(__$$context, { text, record, index })),
+                          dataIndex: 'label',
+                        },
+                        { key: 'age', title: '文件大小', dataIndex: 'count' },
+                      ]}
+                      bordered={false}
+                      dataSource={__$$eval(() => this.state.dataSetFileList)}
+                      expandable={{ expandedRowRender: '' }}
+                      pagination={false}
+                      showHeader={true}
+                      rowSelection={{
+                        type: 'checkbox',
+                        onChange: function () {
+                          return this.onSelectFileChange.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
+                        }.bind(this),
+                        selectedRowKeys: __$$eval(() => this.state.selectedFileList),
+                      }}
+                      __component_name="Table"
+                    />
                   </Col>
                 </Row>
                 <Row wrap={true} __component_name="Row">
                   <Col span={12} __component_name="Col">
                     <FormilySelect
                       fieldProps={{
-                        enum: __$$eval(() => this.state.mockDataSet),
-                        name: 'dataset_after_name',
+                        enum: null,
+                        name: 'post_data_set_name',
                         title: '处理后数据集',
                         required: false,
                         'x-validator': [],
@@ -2769,26 +2946,20 @@ class $$Page extends React.Component {
                       componentProps={{
                         'x-component-props': {
                           disabled: true,
-                          onChange: function () {
-                            return this.onDataSetChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this),
                           allowClear: false,
                           placeholder: '请选择数据集',
-                          _sdkSwrGetFunc: {},
+                          _sdkSwrGetFunc: { func: __$$eval(() => this.state.dataSetDataList) },
                         },
                       }}
                       decoratorProps={{
-                        'x-decorator-props': { labelEllipsis: true, asterisk: true },
+                        'x-decorator-props': { asterisk: true, labelEllipsis: true },
                       }}
                       __component_name="FormilySelect"
                     />
                   </Col>
                   <Col span={12} __component_name="Col">
                     <FormilySelect
-                      fieldProps={{ name: 'dataset_after_version', title: '', 'x-validator': [] }}
+                      fieldProps={{ name: 'post_data_set_version', title: '', 'x-validator': [] }}
                       componentProps={{
                         'x-component-props': {
                           disabled: true,
@@ -2942,7 +3113,13 @@ const PageWrapper = () => {
         func: 'undefined',
         params: undefined,
       }}
-      sdkSwrFuncs={[]}
+      sdkSwrFuncs={[
+        {
+          func: 'useDataProcessSupportType',
+          params: undefined,
+          enableLocationSearch: undefined,
+        },
+      ]}
       render={dataProps => <$$Page {...dataProps} self={self} appHelper={appHelper} />}
     />
   );
