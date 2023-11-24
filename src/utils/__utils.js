@@ -7,6 +7,8 @@ import { getAuthData, setAuthData, removeAuthData, isTokenExpired } from '@tenx-
 import { createRef } from 'react';
 import { sdk as bff } from '@tenx-ui/arcadia-bff-sdk';
 
+import _ from 'lodash';
+
 const utils = {};
 
 utils.bff = bff;
@@ -215,6 +217,8 @@ utils.getDataSetFileTypes = function __getDataSetFileTypes() {
 }.apply(utils);
 export const getDataSetFileTypes = utils.getDataSetFileTypes;
 
+utils._ = _;
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -286,4 +290,6 @@ export default {
   getDataSetApplicationScenario,
 
   getDataSetFileTypes,
+
+  _,
 };
