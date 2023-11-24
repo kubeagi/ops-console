@@ -1,6 +1,18 @@
+import SparkMD5 from 'spark-md5';
+
+import qs from 'qs';
+
+import axios from 'axios';
+
 import { createRef } from 'react';
 
 const utils = {};
+
+utils.SparkMD5 = SparkMD5;
+
+utils.qs = qs;
+
+utils.axios = axios;
 
 export class RefsManager {
   constructor() {
@@ -45,4 +57,10 @@ export class RefsManager {
 }
 utils.RefsManager = RefsManager;
 
-export default {};
+export default {
+  SparkMD5,
+
+  qs,
+
+  axios,
+};

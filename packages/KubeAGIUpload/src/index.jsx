@@ -9,7 +9,7 @@ import { AntdIconPlusOutlined } from '@tenx-ui/icon-materials';
 import { DataProvider } from 'shared-components';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
-import { createFetchHandler as __$$createFetchRequestHandler } from '@alilc/lowcode-datasource-fetch-handler';
+import { createAxiosHandler as __$$createAxiosRequestHandler } from '@yunti/lowcode-datasource-axios-handler';
 
 import { create as __$$createDataSourceEngine } from '@alilc/lowcode-datasource-engine/runtime';
 
@@ -34,7 +34,7 @@ class KubeAgiUpload$$Component extends React.Component {
   _dataSourceConfig = this._defineDataSourceConfig();
   _dataSourceEngine = __$$createDataSourceEngine(this._dataSourceConfig, this, {
     runtimeConfig: true,
-    requestHandlersMap: { fetch: __$$createFetchRequestHandler() },
+    requestHandlersMap: { axios: __$$createAxiosRequestHandler(utils.getAxiosHanlderConfig?.()) },
   });
 
   get dataSourceMap() {
@@ -58,7 +58,20 @@ class KubeAgiUpload$$Component extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { status: '初始状态', urlPrex: 'http://127.0.0.1:8081/minio', progress: 0 };
+    this.state = {
+      ids: [],
+      progress: {
+        // 文件上传进度： 0
+      },
+      status: {
+        // 文件处理状态： '初始状态'
+      },
+      urlPrex: 'https://portal.172.22.96.136.nip.io/kubeagi-apis/minio',
+      Authorization:
+        'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImI1MmViYzk1NWRiYjYyNzBiN2YyZDZiNzQ5YWQ0M2RlNmExNTg0MjYifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwODEwNDY0LCJpYXQiOjE3MDA3MjQwNjQsImF0X2hhc2giOiJNWFpoRGhrVGVNOGg2OVYyT193Vl93IiwiY19oYXNoIjoiWHFfQXFKSllsN3VrQ1ZRWVFqak5IZyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.p5r2XN0Jl19FsHv85meDrFExu-TneS7i5_ENsWMMa5ziAxJjC_mLjgeN-4CzdM9flN3U931mSO29H-b2lifLdf7bYwtSOuIMiwoBkklOEa2MQVGDybkgH4QTlaClYYNSVYL4o4ZLmt5CFL7t0cf8UTapeUZTynL1ZPPgLMepPoqvteuNx4rsXXPjmywMK_o8jMRVxPLSdpxAV0e75lEW6wjq-0kqg8j2BFXbIeiftKzlRwAUa6NYAQZxsQGhS7_C3zIymyndoqzK5rAflwiHOZRX_CgQS0MIym1uNkauuH7MekRB2y5h0PMwGZ6tVwvF_h8by8RgjS7lVOb8rxMDcg',
+      bucket: 'xxyy',
+      bucket_path: 'dataset/test/v1',
+    };
   }
 
   $ = refName => {
@@ -75,23 +88,96 @@ class KubeAgiUpload$$Component extends React.Component {
       list: [
         {
           id: 'get_chunks',
-          type: 'fetch',
+          type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              uri: 'https://portal.172.22.96.136.nip.io/kubeagi-apis/minio/get_chunks',
+              uri: `${this.state.urlPrex}/get_chunks`,
               isCors: true,
               method: 'GET',
-              params: {
-                md5: 'test',
-              },
+              params: {},
               headers: {
-                Authorization:
-                  'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImExNDU0Y2VmNjNmNmM1ZTNhODYxYzY3YmVlZTZkYTgxYjc1ZTExMzQifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwNzIxOTYzLCJpYXQiOjE3MDA2MzU1NjMsImF0X2hhc2giOiJIbGNhalBBUDVjemNOZlI1UjBIMFl3IiwiY19oYXNoIjoiSXoyOUYtb1FTNGYyQnowX3JtUUVEdyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.t3jrC7A5d1dd8TfSTvYxoKFPAOOFM6YjmOzF_fiPgGJgUVgo575HeNKykAMOvDBRH40jnp-B6Gxg5xgtLQ5DqQSfEQNaTwsUOoMfV2Y6fP7wlV9IaSOcf-ePcQE3nT-CeeqjllucVX1hcb4PDWohh8mCJvUV30MNwnZoRNfXCWSw7JzyJ2CbsGSq1PQuXcsgQfzf_Up-28GJOgY06IZ1Y0IYxiOYPTC89mTI3uK6MvKAEKuDb8_kcfFKtTKqgK-XDOxazhfXDJkF9Mf1EdaKl0rwtMIsI2ULvJJ-3xAaH3QOrhCFQr861ioZfwk3Zm_q9akS8PuuBnN97Ew7-3h0Vg',
+                Authorization: this.props.Authorization || this.state.Authorization,
               },
               timeout: 5000,
+            };
+          }.bind(_this),
+        },
+        {
+          id: 'new_multipart',
+          type: 'axios',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              uri: `${this.state.urlPrex}/new_multipart`,
+              isCors: true,
+              method: 'GET',
+              params: {},
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
+              timeout: 5000,
+            };
+          }.bind(_this),
+        },
+        {
+          id: 'get_multipart_url',
+          type: 'axios',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              uri: `${this.state.urlPrex}/get_multipart_url`,
+              isCors: true,
+              method: 'GET',
+              params: {},
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
+              timeout: 5000,
+            };
+          }.bind(_this),
+        },
+        {
+          id: 'update_chunk',
+          type: 'axios',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              uri: `${this.state.urlPrex}/update_chunk`,
+              isCors: true,
+              method: 'POST',
+              params: {},
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
+              timeout: 5000000,
+            };
+          }.bind(_this),
+        },
+        {
+          id: 'complete_multipart',
+          type: 'axios',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              uri: `${this.state.urlPrex}/complete_multipart`,
+              isCors: true,
+              method: 'POST',
+              params: {},
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
+              timeout: 5000000,
             };
           }.bind(_this),
         },
@@ -99,8 +185,366 @@ class KubeAgiUpload$$Component extends React.Component {
     };
   }
 
+  getDataSourceMap() {
+    return this.dataSourceMap;
+  }
+
+  getBucketPath() {
+    // bucket_path就是 dataset/<dataset-name>/ < version
+    return this.props.bucket_path || this.state.bucket_path;
+  }
+
+  getBucket() {
+    // namespace
+    return this.props.bucket || this.state.bucket;
+  }
+
+  onFileAdded(file, fileList) {
+    this.setState({
+      ids: [...this.state.ids, file.uid],
+      progress: {
+        ...this.state.progress,
+        [file.uid]: 0,
+      },
+      status: {
+        ...this.state.status,
+        [file.uid]: '初始状态',
+      },
+    });
+    // 1. 计算MD5
+    this.computeMD5(file);
+  }
+
+  computeMD5(file) {
+    let blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+    let chunkSize = 1024 * 1024 * 64;
+    let chunks = Math.ceil(file.size / chunkSize);
+    let currentChunk = 0;
+    console.log(this.utils, this.constants, 'uuuuuuuuuu');
+    let spark = new (this.utils.SparkMD5 || this.props.SparkMD5).ArrayBuffer();
+    let fileReader = new FileReader();
+    let time = new Date().getTime();
+    console.log('计算MD5...');
+    this.setState({
+      status: {
+        ...this.state.status,
+        [file.uid]: '计算MD5',
+      },
+    });
+    file.totalChunkCounts = chunks;
+    loadNext();
+    fileReader.onload = e => {
+      spark.append(e.target.result); // Append array buffer
+      currentChunk++;
+      if (currentChunk < chunks) {
+        console.log(`第${currentChunk}分片解析完成, 开始第${currentChunk + 1}/${chunks}分片解析`);
+        loadNext();
+      } else {
+        let md5 = spark.end();
+        console.log(
+          `MD5计算完成：${file.name} \nMD5：${md5} \n分片：${chunks} 大小:${file.size} 用时：${
+            (new Date().getTime() - time) / 1000
+          } s`
+        );
+        spark.destroy(); //释放缓存
+        file.uniqueIdentifier = md5; //将文件md5赋值给文件唯一标识
+        file.cmd5 = false; //取消计算md5状态
+        // 2. computeMD5Success
+        this.computeMD5Success(file);
+      }
+    };
+    fileReader.onerror = () => {
+      console.warn('oops, something went wrong.');
+      file.cancel();
+    };
+    function loadNext() {
+      let start = currentChunk * chunkSize;
+      let end = start + chunkSize >= file.size ? file.size : start + chunkSize;
+      fileReader.readAsArrayBuffer(blobSlice.call(file.file || file, start, end));
+    }
+  }
+
+  getSuccessChunks(file) {
+    const pageThis = this
+    return new Promise((resolve, reject) => {
+      pageThis.getDataSourceMap()
+        .get_chunks.load({
+          md5: file.uniqueIdentifier,
+          bucket: this.getBucket(),
+          bucket_path: this.getBucketPath(),
+        })
+        .then(function (response) {
+          file.uploadID = response?.uploadID;
+          file.uuid = response?.uuid;
+          file.uploaded = response?.uploaded;
+          file.chunks = response?.chunks;
+          resolve(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+          reject(error);
+        });
+    });
+  }
+
+  newMultiUpload(file) {
+    const pageThis = this
+    return new Promise((resolve, reject) => {
+      pageThis.getDataSourceMap()
+        .new_multipart.load({
+          totalChunkCounts: file.totalChunkCounts,
+          md5: file.uniqueIdentifier,
+          size: file.size,
+          fileName: file.name,
+          bucket: this.getBucket(),
+          bucket_path: this.getBucketPath(),
+        })
+        .then(function (response) {
+          console.log('newMultiUpload then', response);
+          file.uploadID = response?.uploadID;
+          file.uuid = response?.uuid;
+          resolve(response);
+        })
+        .catch(function (error) {
+          console.log('newMultiUpload catch', error);
+          reject(error);
+        });
+    });
+  }
+
+  multipartUpload(file) {
+    let blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
+      chunkSize = 1024 * 1024 * 64,
+      chunks = Math.ceil(file.size / chunkSize),
+      currentChunk = 0,
+      fileReader = new FileReader(),
+      time = new Date().getTime();
+    function loadNext() {
+      let start = currentChunk * chunkSize;
+      let end = start + chunkSize >= file.size ? file.size : start + chunkSize;
+      fileReader.readAsArrayBuffer(blobSlice.call(file.file || file, start, end));
+    }
+    function checkSuccessChunks() {
+      var index = successChunks.indexOf((currentChunk + 1).toString());
+      if (index == -1) {
+        return false;
+      }
+      return true;
+    }
+    const pageThis = this
+    function getUploadChunkUrl(currentChunk, partSize) {
+      return new Promise((resolve, reject) => {
+        pageThis.getDataSourceMap()
+          .get_multipart_url.load({
+            md5: file.uniqueIdentifier,
+            uuid: file.uuid,
+            uploadID: file.uploadID,
+            size: partSize,
+            chunkNumber: currentChunk + 1,
+            bucket: pageThis.getBucket(),
+            bucket_path: pageThis.getBucketPath(),
+          })
+          .then(function (response) {
+            urls[currentChunk] = response?.url;
+            resolve(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+            reject(error);
+          });
+      });
+    }
+    function uploadMinio(url, e) {
+      return new Promise((resolve, reject) => {
+        pageThis.utils.axios
+          .put(url, e.target.result)
+          .then(function (res) {
+            etags[currentChunk] = res.headers.etag;
+            resolve(res);
+          })
+          .catch(function (err) {
+            console.log(err);
+            reject(err);
+          });
+      });
+    }
+    function updateChunk(currentChunk) {
+      const pageThis = this
+      return new Promise((resolve, reject) => {
+        // axios.post(file.urlPrex + '/update_chunk', qs.stringify({
+        //   uuid: file.uuid,
+        //   chunkNumber: currentChunk + 1,
+        //   etag: etags[currentChunk]
+        // }))
+        pageThis.getDataSourceMap()
+          .update_chunk.load({
+            uuid: file.uuid,
+            chunkNumber: currentChunk + 1,
+            etag: etags[currentChunk],
+            bucket: this.getBucket(),
+            bucket_path: this.getBucketPath(),
+            md5: file.uniqueIdentifier,
+          })
+          .then(function (response) {
+            resolve(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+            reject(error);
+          });
+      });
+    }
+    async function uploadChunk(e) {
+      if (!checkSuccessChunks()) {
+        let start = currentChunk * chunkSize;
+        let partSize = start + chunkSize >= file.size ? file.size - start : chunkSize;
+
+        //获取分片上传url
+        await getUploadChunkUrl(currentChunk, partSize);
+        if (urls[currentChunk] != '') {
+          //上传到minio
+          await uploadMinio(urls[currentChunk], e);
+          if (etags[currentChunk] != '') {
+            //更新数据库：分片上传结果
+            //await updateChunk(currentChunk);
+          } else {
+            return;
+          }
+        } else {
+          return;
+        }
+      }
+    }
+    function completeUpload() {
+      return new Promise((resolve, reject) => {
+        // axios.post(file.urlPrex + '/complete_multipart', qs.stringify({
+        //   uuid: file.uuid,
+        //   uploadID: file.uploadID,
+        //   file_name: file.name,
+        //   size: file.size,
+        // }))
+        pageThis.getDataSourceMap()
+          .complete_multipart.load({
+            uuid: file.uuid,
+            uploadID: file.uploadID,
+            file_name: file.name,
+            size: file.size,
+            bucket: pageThis.getBucket(),
+            bucket_path: pageThis.getBucketPath(),
+            md5: file.uniqueIdentifier,
+          })
+          .then(function (response) {
+            resolve(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+            reject(error);
+          });
+      });
+    }
+    var successChunks = new Array();
+    var successParts = new Array();
+    successParts = file.chunks.split(',');
+    for (let i = 0; i < successParts.length; i++) {
+      successChunks[i] = successParts[i].split('-')[0];
+    }
+    var urls = new Array();
+    var etags = new Array();
+    console.log('上传分片...');
+    this.setState({
+      status: {
+        ...this.state.status,
+        [file.uid]: '上传中',
+      },
+    });
+    {
+      loadNext();
+      fileReader.onload = async e => {
+        await uploadChunk(e);
+        currentChunk++;
+        if (currentChunk < chunks) {
+          console.log(
+            `第${currentChunk}个分片上传完成, 开始第${currentChunk + 1}/${chunks}个分片上传`
+          );
+          this.setState({
+            progress: {
+              ...this.state.progress,
+              [file.uid]: Math.ceil((currentChunk / chunks) * 100),
+            },
+          });
+          await loadNext();
+        } else {
+          await completeUpload();
+          console.log(
+            `文件上传完成：${file.name} \n分片：${chunks} 大小:${file.size} 用时：${
+              (new Date().getTime() - time) / 1000
+            } s`
+          );
+          this.setState({
+            progress: {
+              ...this.state.progress,
+              [file.uid]: 100,
+            },
+            status: {
+              ...this.state.status,
+              [file.uid]: '上传完成',
+            },
+          });
+          //window.location.reload();
+        }
+      };
+    }
+  }
+
+  async computeMD5Success(file) {
+    await this.getSuccessChunks(file);
+    if (file.uploadID == '' || file.uuid == '') {
+      //未上传过
+      await this.newMultiUpload(file);
+      if (file.uploadID != '' && file.uuid != '') {
+        file.chunks = '';
+        this.multipartUpload(file);
+      } else {
+        //失败如何处理
+        this.setState({
+          status: {
+            ...this.state.status,
+            [file.uid]: '上传失败',
+          },
+        });
+        return;
+      }
+    } else {
+      if (file.uploaded == '1') {
+        //已上传成功
+        //秒传
+        console.log('文件已上传完成');
+        this.setState({
+          progress: {
+            ...this.state.progress,
+            [file.uid]: 100,
+          },
+          status: {
+            ...this.state.status,
+            [file.uid]: '上传完成',
+          },
+        });
+        //window.location.reload();
+      } else {
+        //断点续传
+        this.multipartUpload(file);
+      }
+    }
+  }
+
   componentDidMount() {
     this._dataSourceEngine.reloadDataSource();
+
+    console.log(
+      this.utils,
+      this.constants,
+      'componentDidMountcomponentDidMountcomponentDidMountcomponentDidMountcomponentDidMountaaaaaaaaaaaaa'
+    );
   }
 
   render() {
@@ -128,6 +572,26 @@ class KubeAgiUpload$$Component extends React.Component {
               'x-validator': [],
               _unsafe_MixedSetter_title_select: 'VariableSetter',
             }}
+            componentProps={{
+              'x-component-props': {
+                beforeUpload: function () {
+                  return this.onFileAdded.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this),
+                disabled: false,
+                fileList: __$$eval(() => [
+                  {
+                    name: 'name',
+                    percent: '10',
+                    status: 'uploading',
+                    uid: '1',
+                    url: '',
+                  },
+                ]),
+              },
+            }}
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
             __component_name="FormilyUpload"
           >
@@ -144,7 +608,7 @@ class KubeAgiUpload$$Component extends React.Component {
               />
               <Typography.Text
                 type="colorTextSecondary"
-                style={{ paddingTop: '16px', paddingBottom: '16px' }}
+                style={{ fontSize: '', paddingTop: '16px', paddingBottom: '16px' }}
                 strong={false}
                 disabled={false}
                 ellipsis={true}
@@ -212,7 +676,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 </Typography.Text>
                 <Typography.Text
                   type="warning"
-                  style={{ paddingLeft: '6px' }}
+                  style={{ paddingLeft: '6px', fontSize: '' }}
                   strong={false}
                   disabled={false}
                   ellipsis={true}
@@ -249,9 +713,8 @@ const ComponentWrapper = (props = {}) => {
       }}
       sdkSwrFuncs={[]}
       render={dataProps => (
-        <KubeAgiUpload$$Component {...dataProps} self={self} appHelper={appHelper} />
+        <KubeAgiUpload$$Component {...props} {...dataProps} self={self} appHelper={appHelper} />
       )}
-      {...props}
     />
   );
 };
