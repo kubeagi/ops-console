@@ -70,7 +70,11 @@ class Create$$Page extends React.Component {
       submited: false,
       embedderList: [],
       dataSetDataList: [],
-      dataSetFileList: [],
+      dataSetFileList: [
+        {
+          path: '/path/to/file.txt',
+        },
+      ],
       form: {
         version: '',
         dataSet: '',
@@ -79,22 +83,6 @@ class Create$$Page extends React.Component {
       formValue: [],
       dataSet: '',
       version: '',
-      versionList: {
-        genOptionList: [
-          {
-            label: 'v1',
-            value: 'v1',
-          },
-          {
-            label: 'v2',
-            value: 'v2',
-          },
-          {
-            label: 'v3',
-            value: 'v3',
-          },
-        ],
-      },
       selectFiles: [],
       nextFileList: [],
     };
@@ -173,8 +161,8 @@ class Create$$Page extends React.Component {
           {
             source: {
               kind: 'VersionedDataset',
-              Name: 'arcadia-local',
-              Namespace: 'arcadia',
+              Name: version,
+              Namespace: this.utils.getAuthData().project,
             },
             path: selectFiles,
           },
@@ -314,12 +302,23 @@ class Create$$Page extends React.Component {
   }
 
   getCheckBox(rows) {
+    const { version } = this.state;
     this.setState({
       selectFiles: rows,
       nextFileList: rows.map(item => {
-        return this.state.dataSetFileList.find(_item => _item.path === item);
+        return {
+          ...this.state.dataSetFileList.find(_item => _item.path === item),
+          version,
+        };
       }),
     });
+  }
+
+  getFileNameFromPath(path) {
+    // 使用正则表达式匹配文件名
+    const regex = /\/[^/]*$/;
+    const filename = path.match(regex)[0].replace(/\//g, '');
+    return filename;
   }
 
   componentDidMount() {
@@ -377,9 +376,9 @@ class Create$$Page extends React.Component {
                 componentProps={{
                   colon: false,
                   layout: 'horizontal',
-                  labelCol: 4,
+                  labelCol: 2,
                   labelAlign: 'left',
-                  wrapperCol: 20,
+                  wrapperCol: 12,
                 }}
                 __component_name="FormilyForm"
               >
@@ -392,9 +391,9 @@ class Create$$Page extends React.Component {
                         componentProps={{
                           colon: false,
                           layout: 'horizontal',
-                          labelCol: 4,
                           labelAlign: 'left',
-                          wrapperCol: 20,
+                          wrapperCol: 12,
+                          labelWidth: '130px',
                         }}
                         createFormProps={{
                           values: null,
@@ -538,7 +537,7 @@ class Create$$Page extends React.Component {
                 <Row wrap={false} __component_name="Row">
                   <Col flex="130px" __component_name="Col">
                     <Typography.Text
-                      style={{ fontSize: '' }}
+                      style={{ fontSize: '', marginLeft: '0px', paddingLeft: '10px' }}
                       strong={false}
                       disabled={false}
                       ellipsis={true}
@@ -553,7 +552,23 @@ class Create$$Page extends React.Component {
                       rowKey="path"
                       scroll={{ scrollToFirstRowOnChange: true }}
                       columns={[
-                        { key: '', title: '名称', dataIndex: 'path' },
+                        {
+                          key: '',
+                          title: '名称',
+                          dataIndex: 'path',
+                          render: (text, record, index) =>
+                            (__$$context => (
+                              <Typography.Text
+                                __component_name="Typography.Text"
+                                ellipsis={true}
+                                style={{ fontSize: '' }}
+                                disabled={false}
+                                strong={false}
+                              >
+                                {__$$eval(() => __$$context.getFileNameFromPath(text))}
+                              </Typography.Text>
+                            ))(__$$createChildContext(__$$context, { text, record, index })),
+                        },
                         { key: '', title: '类型', dataIndex: 'fileType' },
                         { title: '数据量', dataIndex: 'count' },
                         { title: '大小', dataIndex: 'size' },
@@ -632,7 +647,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.source)}
+                                {__$$eval(() => `文件来源：${item.source || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -643,7 +658,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.type)}
+                                {__$$eval(() => `类型：${item.fileTpye || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -654,7 +669,7 @@ class Create$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.datacount)}
+                                {__$$eval(() => `数据量：${item.datacount || '--'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -855,6 +870,7 @@ class Create$$Page extends React.Component {
               />
               <Flex justify="center" __component_name="Flex">
                 <Button
+                  href="/knowledge"
                   icon=""
                   block={false}
                   ghost={false}
@@ -863,7 +879,6 @@ class Create$$Page extends React.Component {
                   danger={false}
                   disabled={false}
                   __component_name="Button"
-                  href="/knowledge"
                 >
                   {__$$eval(() => `${this.state.submited ? '返回' : '取消'}`)}
                 </Button>
