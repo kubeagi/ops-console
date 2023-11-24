@@ -91,7 +91,7 @@ class Corpus$$Page extends React.Component {
     this.setState({
       loading: true,
     });
-    const project = JSON.parse(localStorage.getItem('authData')).project;
+    const project = JSON.parse(localStorage.getItem('authData'))?.project;
     const { currentPage, pageSize } = this.state.pages;
     const params = {
       namespace: project,
