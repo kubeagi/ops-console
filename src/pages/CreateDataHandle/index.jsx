@@ -72,12 +72,14 @@ class $$Page extends React.Component {
       step1FormData: {},
       step2FormData: {},
       dataSetFileSearchParams: {
-        keyword: 'a',
+        keyword: '',
         currentPage: 1,
       },
+      fileTableLoading: false,
       dataSetFileList: [],
       dataSetFileTotal: 0,
       selectedFileList: [],
+      fileSelectCheckErrorFlag: false,
       step3Data: {
         QAsplitChecked: true,
         TextSegmentationChecked: false,
@@ -274,13 +276,17 @@ class $$Page extends React.Component {
   }
 
   onSelectFileChange(v) {
+    if (v.length) {
+      this.setState({
+        fileSelectCheckErrorFlag: false,
+      });
+    }
     this.setState({
       selectedFileList: v,
     });
   }
 
   backToStep2() {
-    console.log(this.state.step2FormData);
     const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
     if (!pre_data_set_name) return;
     this.setDataSetVersionsSource(pre_data_set_name);
@@ -295,13 +301,11 @@ class $$Page extends React.Component {
   async getDataSet() {
     const res = await this.utils.bff.listDatasets({
       input: {
-        namespace: 'abc', //this.utils.getAuthData().project,
+        namespace: this.utils.getAuthData().project,
       },
-
       versionsInput: {
-        namespace: 'abc', // this.utils.getAuthData().project,
+        namespace: this.utils.getAuthData().project,
       },
-
       filesInput: {
         keyword: this.state.dataSetFileSearchParams.keyword,
         pageSize: 10,
@@ -338,7 +342,6 @@ class $$Page extends React.Component {
     if (dataset && version) {
       const datasetObj = this.state.dataSetDataList.find(i => (i.value = dataset));
       const versionObj = datasetObj.versions.find(i => (i.value = version));
-      console.log(versionObj);
       return versionObj.name;
     }
     return;
@@ -346,23 +349,28 @@ class $$Page extends React.Component {
 
   async getTableList(name) {
     if (!name) return;
-    console.log(this.utils.bff);
+    this.setState({
+      fileTableLoading: true,
+    });
     const res = await this.utils.bff.getVersionedDataset({
       name: name,
-      namespace: 'abc',
-      //this.utils.getAuthData().project,
-      input: {
+      namespace: this.utils.getAuthData().project,
+      fileInput: {
         keyword: this.state.dataSetFileSearchParams.keyword,
-        pageSize: 1,
+        pageSize: 10,
         page: this.state.dataSetFileSearchParams.currentPage,
       },
     });
     const data = res.VersionedDataset.getVersionedDataset.files;
     this.setState({
-      dataSetFileList: data.nodes || [],
+      fileTableLoading: false,
+      dataSetFileList:
+        (data.nodes || []).map(i => ({
+          ...i,
+          label: '普通文本',
+        })) || [],
       dataSetFileTotal: data.totalCount || 0,
     });
-    console.log(res);
   }
 
   async onNext() {
@@ -410,15 +418,16 @@ class $$Page extends React.Component {
         name: _item[_item.length - 1],
       };
     });
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
     const data = {
       ...this.state.step1FormData,
       ...this.state.step2FormData,
+      // version_data_set_name: versionName,   todo
       data_process_config_info: list,
       file_names: files,
-      bucket_name: 'abc', // this.utils.getAuthData().project,
+      bucket_name: this.utils.getAuthData().project,
     };
-
-    console.log(data);
     const res = await this.utils.bff.createDataProcessTask({
       input: {
         ...data,
@@ -437,6 +446,15 @@ class $$Page extends React.Component {
   }
 
   onNextStep() {
+    // step2 文件检查
+    if (this.state.currentStep === 1) {
+      if (!this.state.selectedFileList.length) {
+        this.setState({
+          fileSelectCheckErrorFlag: true,
+        });
+        return;
+      }
+    }
     const step = this.state.currentStep + 1;
     this.setState(
       {
@@ -453,7 +471,7 @@ class $$Page extends React.Component {
           this.backToStep2();
         }
         if (this.state.currentStep === 2) {
-          const enableObj = {};
+          // const enableObj = {};
           // const data = this.props.useDataProcessSupportType.data.dataProcess.dataProcessSupportType.data;
           // this.setState({
           //   configEnableMap: enableObj
@@ -489,10 +507,27 @@ class $$Page extends React.Component {
     );
   }
 
+  onBack(event) {
+    // 点击按钮时的回调
+    this.history.push('/data-handle');
+  }
+
   componentDidMount() {
-    console.log(this.utils.bff);
-    this.debouncedFunction = this.debounce(() => {
+    this.debouncedFunction = this.debounce(event => {
       // 执行你的逻辑
+      this.setState(
+        {
+          dataSetFileSearchParams: {
+            keyword: event.target.value,
+            currentPage: 1,
+          },
+        },
+        () => {
+          const values = this.form('createDataHandleStep2')?.values;
+          const name = this.getVersionName(values?.pre_data_set_name, values?.pre_data_set_version);
+          this.getTableList(name);
+        }
+      );
     }, 1000); // 1000 毫秒的防抖延迟
     this.getDataSet();
   }
@@ -2705,7 +2740,7 @@ class $$Page extends React.Component {
             <Col span={24} style={{ color: '#ffffff !important' }} __component_name="Col">
               <FormilyForm
                 ref={this._refsManager.linkRef('createDataHandleStep2')}
-                formHelper={{ autoFocus: true }}
+                formHelper={{ autoFocus: false }}
                 componentProps={{
                   colon: false,
                   layout: 'horizontal',
@@ -2776,9 +2811,14 @@ class $$Page extends React.Component {
                     />
                   </Col>
                 </Row>
-                <Row wrap={true} __component_name="Row">
+                <Row
+                  wrap={true}
+                  __component_name="Row"
+                  style={{ paddingBottom: '0px', marginBottom: '0px' }}
+                >
                   <Col span={3} __component_name="Col">
                     <FormilyFormItem
+                      style={{}}
                       fieldProps={{
                         name: 'FormilyFormItem',
                         title: '选择文件',
@@ -2789,12 +2829,11 @@ class $$Page extends React.Component {
                         'x-decorator-props': {
                           asterisk: true,
                           labelCol: 2,
-                          labelEllipsis: true,
                           wrapperWidth: '0',
+                          labelEllipsis: true,
                         },
                       }}
                       __component_name="FormilyFormItem"
-                      style={{}}
                     />
                   </Col>
                   <Col
@@ -2804,14 +2843,14 @@ class $$Page extends React.Component {
                       borderColor: '#9b9b9b',
                       borderStyle: 'dashed',
                       borderWidth: '1px',
-                      marginBottom: '16px',
+                      marginBottom: '0px',
                       paddingBottom: '24px',
                     }}
                     __component_name="Col"
                   >
                     <Row wrap={true} __component_name="Row">
                       <Col span={24} __component_name="Col">
-                        <Row __component_name="Row" justify="space-between" wrap={false}>
+                        <Row wrap={false} justify="space-between" __component_name="Row">
                           <Col __component_name="Col">
                             <FormilyInput
                               style={{ width: '400px' }}
@@ -2824,8 +2863,8 @@ class $$Page extends React.Component {
                                       Array.prototype.slice.call(arguments).concat([])
                                     );
                                   }.bind(this),
-                                  placeholder: '请输入',
                                   allowClear: true,
+                                  placeholder: '请输入',
                                 },
                               }}
                               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -2833,33 +2872,33 @@ class $$Page extends React.Component {
                             />
                           </Col>
                           <Col __component_name="Col">
-                            <Space __component_name="Space" direction="horizontal" align="center">
-                              <Row __component_name="Row" justify="space-between" wrap={false}>
-                                <Col __component_name="Col" style={{ paddingTop: '6px' }}>
+                            <Space align="center" direction="horizontal" __component_name="Space">
+                              <Row wrap={false} justify="space-between" __component_name="Row">
+                                <Col style={{ paddingTop: '6px' }} __component_name="Col">
                                   <Typography.Text
-                                    __component_name="Typography.Text"
-                                    ellipsis={true}
                                     style={{ fontSize: '' }}
-                                    disabled={false}
                                     strong={false}
+                                    disabled={false}
+                                    ellipsis={true}
+                                    __component_name="Typography.Text"
                                   >
                                     共
                                   </Typography.Text>
                                   <Typography.Text
-                                    __component_name="Typography.Text"
-                                    ellipsis={true}
                                     style={{ fontSize: '' }}
-                                    disabled={false}
                                     strong={false}
+                                    disabled={false}
+                                    ellipsis={true}
+                                    __component_name="Typography.Text"
                                   >
                                     {__$$eval(() => this.state.dataSetFileTotal)}
                                   </Typography.Text>
                                   <Typography.Text
-                                    __component_name="Typography.Text"
-                                    ellipsis={true}
                                     style={{ fontSize: '' }}
-                                    disabled={false}
                                     strong={false}
+                                    disabled={false}
+                                    ellipsis={true}
+                                    __component_name="Typography.Text"
                                   >
                                     条数据
                                   </Typography.Text>
@@ -2895,22 +2934,7 @@ class $$Page extends React.Component {
                       scroll={{ scrollToFirstRowOnChange: true }}
                       columns={[
                         { key: 'name', title: '文件名称', dataIndex: 'path' },
-                        {
-                          title: '标签',
-                          render: (text, record, index) =>
-                            (__$$context => (
-                              <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                QA拆分
-                              </Typography.Text>
-                            ))(__$$createChildContext(__$$context, { text, record, index })),
-                          dataIndex: 'label',
-                        },
+                        { title: '标签', dataIndex: 'label' },
                         { key: 'age', title: '文件大小', dataIndex: 'count' },
                       ]}
                       bordered={false}
@@ -2929,7 +2953,24 @@ class $$Page extends React.Component {
                         selectedRowKeys: __$$eval(() => this.state.selectedFileList),
                       }}
                       __component_name="Table"
+                      loading={__$$eval(() => this.state.fileTableLoading)}
                     />
+                  </Col>
+                </Row>
+                <Row wrap={true} __component_name="Row">
+                  <Col span={3} __component_name="Col" />
+                  <Col span={19} style={{ marginBottom: '16px' }} __component_name="Col">
+                    {!!__$$eval(() => this.state.fileSelectCheckErrorFlag) && (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        ellipsis={true}
+                        style={{ fontSize: '', color: '#f85a5a' }}
+                        disabled={false}
+                        strong={false}
+                      >
+                        请选择文件
+                      </Typography.Text>
+                    )}
                   </Col>
                 </Row>
                 <Row wrap={true} __component_name="Row">
@@ -3019,6 +3060,9 @@ class $$Page extends React.Component {
                 danger={false}
                 disabled={false}
                 __component_name="Button"
+                onClick={function () {
+                  return this.onBack.apply(this, Array.prototype.slice.call(arguments).concat([]));
+                }.bind(this)}
               >
                 取消
               </Button>
@@ -3089,7 +3133,7 @@ class $$Page extends React.Component {
   }
 }
 
-const PageWrapper = () => {
+const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/data-handle/create' }, location.pathname);
@@ -3113,14 +3157,8 @@ const PageWrapper = () => {
         func: 'undefined',
         params: undefined,
       }}
-      sdkSwrFuncs={[
-        {
-          func: 'useDataProcessSupportType',
-          params: undefined,
-          enableLocationSearch: undefined,
-        },
-      ]}
-      render={dataProps => <$$Page {...dataProps} self={self} appHelper={appHelper} />}
+      sdkSwrFuncs={[]}
+      render={dataProps => <$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />}
     />
   );
 };
