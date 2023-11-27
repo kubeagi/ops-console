@@ -401,15 +401,16 @@ class DataSetCreate$$Page extends React.Component {
               </FormilyForm>
               <LccComponentQlsmm
                 accept=".txt,.doc,.docx,.pdf,.md"
-                bucket="xxyy"
+                bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+                bucket_path=""
                 Authorization={__$$eval(() => this.utils.getAuthorization())}
-                __component_name="LccComponentQlsmm"
                 getBucketPath={function () {
                   return this.getBucketPath.apply(
                     this,
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this)}
+                __component_name="LccComponentQlsmm"
               />
               <Divider
                 mode="line"

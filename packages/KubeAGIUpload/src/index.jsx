@@ -181,6 +181,25 @@ class KubeAgiUpload$$Component extends React.Component {
             };
           }.bind(_this),
         },
+        {
+          id: 'delete_files',
+          type: 'axios',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              uri: `${this.getUrlPrex()}/delete_files`,
+              isCors: true,
+              method: 'POST',
+              params: {},
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
+              timeout: 5000000,
+            };
+          }.bind(_this),
+        },
       ],
     };
   }
@@ -195,12 +214,31 @@ class KubeAgiUpload$$Component extends React.Component {
 
   getBucketPath() {
     // bucket_path就是 dataset/<dataset-name>/ < version
-    return this.props.getBucketPath() || this.state.bucket_path;
+    return this.props?.getBucketPath() || this.state.bucket_path;
   }
 
   getBucket() {
     // namespace
     return this.props.bucket || this.state.bucket;
+  }
+
+  handleDelete(file) {
+    const pageThis = this;
+    return new Promise((resolve, reject) => {
+      pageThis
+        .getDataSourceMap()
+        .delete_files.load({
+          files: [file.name],
+          bucket: pageThis.getBucket(),
+          bucket_path: pageThis.getBucketPath(),
+        })
+        .then(function (response) {
+          resolve(response);
+        })
+        .catch(function (error) {
+          reject(error);
+        });
+    });
   }
 
   onFileAdded(file, fileList) {
@@ -224,7 +262,6 @@ class KubeAgiUpload$$Component extends React.Component {
     let chunkSize = 1024 * 1024 * 64;
     let chunks = Math.ceil(file.size / chunkSize);
     let currentChunk = 0;
-    console.log(this.utils, this.constants, 'uuuuuuuuuu');
     let spark = new (this.utils.SparkMD5 || this.props.SparkMD5).ArrayBuffer();
     let fileReader = new FileReader();
     let time = new Date().getTime();
@@ -306,13 +343,11 @@ class KubeAgiUpload$$Component extends React.Component {
           bucket_path: pageThis.getBucketPath(),
         })
         .then(function (response) {
-          console.log('newMultiUpload then', response);
           file.uploadID = response?.uploadID;
           file.uuid = response?.uuid;
           resolve(response);
         })
         .catch(function (error) {
-          console.log('newMultiUpload catch', error);
           reject(error);
         });
     });
@@ -364,15 +399,19 @@ class KubeAgiUpload$$Component extends React.Component {
     function uploadMinio(url, e) {
       return new Promise((resolve, reject) => {
         pageThis.utils.axios
-          .put(url, e.target.result)
-          .then(function (res) {
-            etags[currentChunk] = res.headers.etag;
-            resolve(res);
-          })
-          .catch(function (err) {
-            console.log(err);
-            reject(err);
-          });
+        .put(url, e.target.result, {
+          headers: {
+            timeout: 5000000,
+            Authorization: pageThis.props.Authorization || this.state.Authorization
+          }
+        })
+        .then(function (res) {
+          etags[currentChunk] = res.headers.etag;
+          resolve(res);
+        })
+        .catch(function (err) {
+          reject(err);
+        });
       });
     }
     function updateChunk(currentChunk) {
@@ -547,11 +586,6 @@ class KubeAgiUpload$$Component extends React.Component {
 
   componentDidMount() {
     this._dataSourceEngine.reloadDataSource();
-
-    console.log(
-      this,
-      'componentDidMountcomponentDidMountcomponentDidMountcomponentDidMountcomponentDidMountaaaaaaaaaaaaa'
-    );
   }
 
   render() {
@@ -591,6 +625,12 @@ class KubeAgiUpload$$Component extends React.Component {
                     url: '',
                   },
                 ]),
+                onRemove: function () {
+                  return this.handleDelete.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this),
                 beforeUpload: function () {
                   return this.onFileAdded.apply(
                     this,
@@ -653,7 +693,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 </Typography.Text>
                 <Typography.Text
                   type="colorTextSecondary"
-                  style={{ paddingLeft: '6px', fontSize: '' }}
+                  style={{ fontSize: '', paddingLeft: '6px' }}
                   strong={false}
                   disabled={false}
                   ellipsis={true}
