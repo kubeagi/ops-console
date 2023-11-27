@@ -67,7 +67,7 @@ class DataHandleList$$Page extends React.Component {
       delModalvisible: false,
       logModalVisible: false,
       currentRecord: null,
-      currentPage: 0,
+      currentPage: 1,
       pageSize: 10,
       totalCount: 0,
       keyword: '',
@@ -91,7 +91,7 @@ class DataHandleList$$Page extends React.Component {
       });
       const res = await this.utils.bff.allDataProcessListByPage({
         input: {
-          pageIndex: this.state.currentPage,
+          pageIndex: (this.state.currentPage - 1) * this.state.pageSize,
           pageSize: this.state.pageSize,
           keyword: this.state.keyword,
         },
@@ -168,7 +168,7 @@ class DataHandleList$$Page extends React.Component {
     // 页码或 pageSize 改变的回调
     this.setState(
       {
-        currentPage: page - 1,
+        currentPage: page,
       },
       () => {
         this.getDataList();
@@ -323,7 +323,7 @@ class DataHandleList$$Page extends React.Component {
                         <Pagination
                           total={__$$eval(() => this.state.totalCount)}
                           simple={true}
-                          current={__$$eval(() => this.state.currentPage + 1)}
+                          current={__$$eval(() => this.state.currentPage)}
                           onChange={function () {
                             return this.onCurrentPageChange.apply(
                               this,
