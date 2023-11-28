@@ -30,8 +30,8 @@ importers:
         specifier: ^2.1.4
         version: 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
       '@tenx-ui/arcadia-bff-sdk':
-        specifier: 0.0.18
-        version: 0.0.18(@tenx-ui/materials@1.5.21)(antd@5.11.3)(react@18.2.0)(swr@2.2.4)
+        specifier: 0.0.21
+        version: 0.0.21(@tenx-ui/materials@1.5.21)(antd@5.11.3)(react@18.2.0)(swr@2.2.4)
       '@tenx-ui/auth-utils':
         specifier: 0.0.1
         version: 0.0.1
@@ -4548,8 +4548,8 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  /@tenx-ui/arcadia-bff-sdk@0.0.18(@tenx-ui/materials@1.5.21)(antd@5.11.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-FGF9ObbFFP7XfIdWCrDA1lO5yimrE142xng7KF5odCSnBS/RwV6B4YIpmZfpGVbDW8s84awhQgkk8R+RtKJ6Dg==}
+  /@tenx-ui/arcadia-bff-sdk@0.0.21(@tenx-ui/materials@1.5.21)(antd@5.11.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-bqg9DJyq1vuMFwudu+cxhCKu9q/RRmYEOO5v9ltSAT+RxM1e3o2tl5wznNVzI5V7oEPrVUdVFViBV0yZPiuOfg==}
     peerDependencies:
       '@tenx-ui/materials': '>=1.5.8'
       antd: '>=5.4.0'

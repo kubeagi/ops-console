@@ -39,7 +39,7 @@ import __$$constants from '../../__constants';
 
 import './index.css';
 
-class Corpus$$Page extends React.Component {
+class Knowledge$$Page extends React.Component {
   get location() {
     return this.props.self?.location;
   }
@@ -124,71 +124,6 @@ class Corpus$$Page extends React.Component {
       });
   }
 
-  getData1() {
-    console.log(this, this.bff, this.util);
-    const query = `
-      fragment obj on TypedObjectReference {
-  apiGroup
-  kind
-  Name
-  Namespace
-}
-
-fragment kb on KnowledgeBase {
-  name
-  namespace
-  displayName
-  embedder {
-    ...obj
-  }
-  vectorStore {
-    ...obj
-  }
-  fileGroups {
-    source {
-      ...obj
-    }
-    path
-  }
-  status
-  updateTimestamp
-  description
-}
-query listkb {
-  KnowledgeBase {
-    listKnowledgeBases(input: {namespace: "arcadia"}) {
-      hasNextPage
-      nodes {
-        ...kb
-      }
-      totalCount
-    }
-  }
-}
-    `;
-    fetch('https://portal.172.22.96.136.nip.io/kubeagi-apis/bff', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImExNDU0Y2VmNjNmNmM1ZTNhODYxYzY3YmVlZTZkYTgxYjc1ZTExMzQifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwNzIyNzQzLCJpYXQiOjE3MDA2MzYzNDMsImF0X2hhc2giOiJUTzR5NVEzQVdVRDcwQmVkSzN3RER3IiwiY19oYXNoIjoiUEdONGc2SmQ1RnVoTkRwLXdJTy1qUSIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.NrAjZeHWbZbMEPgSJcO4rhHCv31c36l0M8Hnhaivm_68ATxNXwx3AAJ7VmnKILeg3D9MY5DWKy6qJOsPgRsIFNcB-CthLKlYlT-MWNSFv_-QefbBnIwtjByRb2B1hFovyF43ICJUgIdQpJoYckwT9CvFFlPVX4IBLHnduaPiQaLiMP6rwC3KNCi88KeWrqAEJbZZ5yww9qQvtC38mCrAkX-p_SxY7bkXb3MEVF926Sp7tphqpQGKAZuMlwCN6Wy44LysKlw_CvXpAuX3lfN0MQfCBvlUb6ie0ab07jLFgilu3Y9sJNOBSuzipwphIuAK_9GaG7oKmK0vU3QsrdjoXw`,
-      },
-      body: JSON.stringify({
-        query,
-      }),
-    })
-      .then(response => response.json())
-      .then(res => {
-        console.log(res, 'res');
-        const { data } = res;
-        const { KnowledgeBase } = data || {};
-        const { nodes, totalCount } = KnowledgeBase.listKnowledgeBases || {};
-        console.log(nodes, 'nodes');
-        this.setState({
-          corpusList: nodes || [],
-        });
-      });
-  }
-
   onChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -218,11 +153,6 @@ query listkb {
         this.getData(name);
       }
     );
-  }
-
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
   }
 
   returnTxt(item) {
@@ -268,6 +198,16 @@ query listkb {
     }
   }
 
+  onCreateClick(event) {
+    this.history.push(`/knowledge/create`);
+  }
+
+  onDetailClick(e, extParams) {
+    // 事件的 handler
+    console.log(e, 'onClick');
+    this.history.push(`/knowledge/detail/${extParams.data.name}`);
+  }
+
   onShowSizeChange(current, size) {
     // pageSize 变化的回调
     this.setState({
@@ -306,7 +246,7 @@ query listkb {
               ellipsis={true}
               __component_name="Typography.Title"
             >
-              知识库
+              知识库管理
             </Typography.Title>
           </Col>
           <Col span={24} __component_name="Col">
@@ -324,13 +264,20 @@ query listkb {
                 <Col span={24} __component_name="Col">
                   <Space align="center" direction="horizontal" __component_name="Space">
                     <Button
-                      href="/knowledge/create"
+                      href=""
                       icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
                       type="primary"
                       block={false}
                       ghost={false}
                       shape="default"
                       danger={false}
+                      target="_self"
+                      onClick={function () {
+                        return this.onCreateClick.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
                       disabled={false}
                       __component_name="Button"
                     >
@@ -351,7 +298,7 @@ query listkb {
                       disabled={false}
                       __component_name="Button"
                     >
-                      {this.i18n('i18n-jskgqh8o') /* 刷新 */}
+                      刷新
                     </Button>
                     <Input.Search
                       onSearch={function () {
@@ -401,14 +348,8 @@ query listkb {
                                   <Dropdown
                                     menu={{
                                       items: [
-                                        {
-                                          key: 'edit',
-                                          label: this.i18n('i18n-str3pnrc') /* 编辑 */,
-                                        },
-                                        {
-                                          key: 'delete',
-                                          label: this.i18n('i18n-z0idrepg') /* 删除 */,
-                                        },
+                                        { key: 'edit', label: '编辑' },
+                                        { key: 'delete', label: '删除' },
                                       ],
                                     }}
                                     trigger={['hover']}
@@ -425,7 +366,10 @@ query listkb {
                                       style={{
                                         top: '-10px',
                                         float: 'right',
+                                        right: '-16px',
+                                        width: '48px',
                                         border: 'none',
+                                        zIndex: '2',
                                         padding: '0',
                                       }}
                                       danger={false}
@@ -459,8 +403,18 @@ query listkb {
                                     <Col flex="auto" __component_name="Col">
                                       <Row
                                         wrap={true}
-                                        style={{ paddingLeft: '20px' }}
+                                        style={{ cursor: 'pointer', paddingLeft: '20px' }}
                                         gutter={[0, 0]}
+                                        onClick={function () {
+                                          return this.onDetailClick.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                data: item,
+                                              },
+                                            ])
+                                          );
+                                        }.bind(__$$context)}
                                         __component_name="Row"
                                       >
                                         <Col __component_name="Col">
@@ -483,14 +437,7 @@ query listkb {
                                             strong={false}
                                             disabled={false}
                                             editable={false}
-                                            ellipsis={{
-                                              rows: 2,
-                                              tooltip: {
-                                                title: __$$eval(() => item.description),
-                                                _unsafe_MixedSetter_title_select: 'VariableSetter',
-                                              },
-                                              expandable: false,
-                                            }}
+                                            ellipsis={{ rows: 2 }}
                                             underline={false}
                                           >
                                             {__$$eval(() => item.description || '--')}
@@ -610,7 +557,7 @@ query listkb {
 const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
-  const match = matchPath({ path: '/corpus' }, location.pathname);
+  const match = matchPath({ path: '/knowledge' }, location.pathname);
   history.match = match;
   history.query = qs.parse(location.search);
   const appHelper = {
@@ -639,7 +586,7 @@ const PageWrapper = (props = {}) => {
         },
       ]}
       render={dataProps => (
-        <Corpus$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+        <Knowledge$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
       )}
     />
   );
@@ -649,7 +596,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) { }
+  } catch (error) {}
 }
 
 function __$$evalArray(expr) {
