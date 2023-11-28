@@ -13,11 +13,11 @@ import {
   Card,
   Switch,
   FormilyForm,
+  FormilySelect,
   FormilyNumberPicker,
   Progress,
   Table,
   FormilyInput,
-  FormilySelect,
   FormilyFormItem,
   Pagination,
 } from '@tenx-ui/materials';
@@ -77,7 +77,7 @@ class $$Page extends React.Component {
       },
       fileTableLoading: false,
       dataSetFileList: [],
-      dataSetFileTotal: 0,
+      dataSetFileTotal: '0',
       selectedFileList: [],
       fileSelectCheckErrorFlag: false,
       step3Data: {
@@ -232,6 +232,8 @@ class $$Page extends React.Component {
   onDataSetChange(v) {
     this.setState({
       dataSetFileList: [],
+      selectedFileList: [],
+      dataSetFileTotal: '0',
     });
     this.form('createDataHandleStep2').setValues({
       pre_data_set_version: undefined,
@@ -454,6 +456,7 @@ class $$Page extends React.Component {
         this.setState({
           fileSelectCheckErrorFlag: true,
         });
+        // 调试需要关闭此
         return;
       }
     }
@@ -607,97 +610,12 @@ class $$Page extends React.Component {
                       <Card
                         size="default"
                         type="default"
-                        style={{ height: '142px' }}
+                        style={{ height: '182px' }}
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
-                        __component_name="Card"
-                      >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
-                                  <Col __component_name="Col">
-                                    <Row
-                                      wrap={false}
-                                      justify="space-between"
-                                      __component_name="Row"
-                                    >
-                                      <Col span="" __component_name="Col">
-                                        <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                        />
-                                      </Col>
-                                      <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        __component_name="Col"
-                                      >
-                                        <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
-                                          disabled={false}
-                                          ellipsis={true}
-                                          __component_name="Typography.Text"
-                                        >
-                                          QA 拆分
-                                        </Typography.Text>
-                                      </Col>
-                                    </Row>
-                                  </Col>
-                                  <Col __component_name="Col">
-                                    <Switch
-                                      size="small"
-                                      checked={__$$eval(() => this.state.step3Data.QAsplitChecked)}
-                                      loading={false}
-                                      disabled={false}
-                                      onChange={function () {
-                                        return this.updateStep3State.apply(
-                                          this,
-                                          Array.prototype.slice.call(arguments).concat([
-                                            {
-                                              fieldName: 'QAsplitChecked',
-                                            },
-                                          ])
-                                        );
-                                      }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
-                                    />
-                                  </Col>
-                                </Row>
-                              </Col>
-                              <Col span={24} __component_name="Col">
-                                <Typography.Paragraph
-                                  code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
-                                  delete={false}
-                                  strong={false}
-                                  disabled={false}
-                                  editable={false}
-                                  ellipsis={{ rows: 2 }}
-                                  underline={false}
-                                >
-                                  根据文件中的文章与图表标题，自动将文件做 QA 拆分处理。
-                                </Typography.Paragraph>
-                              </Col>
-                            </Row>
-                          </Col>
-                        </Row>
-                      </Card>
-                    </Col>
-                    <Col span={6} __component_name="Col">
-                      <Card
-                        size="default"
-                        type="default"
-                        actions={[]}
-                        loading={false}
-                        bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -756,6 +674,76 @@ class $$Page extends React.Component {
                                     />
                                   </Col>
                                 </Row>
+                                <Row wrap={false} justify="space-between" __component_name="Row">
+                                  <Col __component_name="Col">
+                                    <Row
+                                      wrap={false}
+                                      justify="space-between"
+                                      __component_name="Row"
+                                    >
+                                      <Col
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                        __component_name="Col"
+                                      />
+                                    </Row>
+                                  </Col>
+                                </Row>
+                              </Col>
+                            </Row>
+                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
+                              <Col
+                                span={24}
+                                style={{ marginBottom: '0px', paddingBottom: '0px' }}
+                                __component_name="Col"
+                              >
+                                <FormilyForm
+                                  ref={this._refsManager.linkRef('formily_ob8rkd34dcj')}
+                                  formHelper={{ autoFocus: true }}
+                                  componentProps={{
+                                    colon: false,
+                                    layout: 'horizontal',
+                                    labelCol: 4,
+                                    labelAlign: 'left',
+                                    wrapperCol: 20,
+                                  }}
+                                  __component_name="FormilyForm"
+                                >
+                                  {!!false && (
+                                    <FormilySelect
+                                      fieldProps={{ name: 'Select', 'x-validator': [] }}
+                                      componentProps={{
+                                        'x-component-props': {
+                                          disabled: false,
+                                          allowClear: false,
+                                          placeholder: '请选择模型',
+                                          _sdkSwrGetFunc: {},
+                                        },
+                                      }}
+                                      decoratorProps={{
+                                        'x-decorator-props': {
+                                          style: { marginBottom: '0px' },
+                                          tooltip: '',
+                                          labelEllipsis: true,
+                                        },
+                                      }}
+                                      __component_name="FormilySelect"
+                                    />
+                                  )}
+                                </FormilyForm>
+                                <Row wrap={false} justify="space-between" __component_name="Row">
+                                  <Col __component_name="Col">
+                                    <Row
+                                      wrap={false}
+                                      justify="space-between"
+                                      __component_name="Row"
+                                    >
+                                      <Col
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                        __component_name="Col"
+                                      />
+                                    </Row>
+                                  </Col>
+                                </Row>
                               </Col>
                             </Row>
                           </Col>
@@ -764,7 +752,7 @@ class $$Page extends React.Component {
                           <Col span={17} style={{}} __component_name="Col">
                             <FormilyForm
                               ref={this._refsManager.linkRef('formily_xv445n80qw')}
-                              formHelper={{ style: { textAlign: 'right' }, autoFocus: true }}
+                              formHelper={{ style: { textAlign: 'right' }, autoFocus: false }}
                               componentProps={{
                                 size: 'small',
                                 colon: true,
@@ -880,7 +868,7 @@ class $$Page extends React.Component {
                                 __component_name="Col"
                               >
                                 <Typography.Text
-                                  style={{ fontSize: '' }}
+                                  style={{ fontSize: '12px' }}
                                   strong={false}
                                   disabled={false}
                                   ellipsis={true}
@@ -895,7 +883,7 @@ class $$Page extends React.Component {
                                 __component_name="Col"
                               >
                                 <Typography.Text
-                                  style={{ fontSize: '' }}
+                                  style={{ fontSize: '12px' }}
                                   strong={false}
                                   disabled={false}
                                   ellipsis={true}
@@ -903,6 +891,153 @@ class $$Page extends React.Component {
                                 >
                                   字符
                                 </Typography.Text>
+                              </Col>
+                            </Row>
+                          </Col>
+                        </Row>
+                      </Card>
+                    </Col>
+                    <Col span={6} __component_name="Col">
+                      <Card
+                        size="default"
+                        type="default"
+                        style={{ height: '182px' }}
+                        actions={[]}
+                        loading={false}
+                        bordered={true}
+                        hoverable={true}
+                        __component_name="Card"
+                      >
+                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
+                          <Col span={22} __component_name="Col">
+                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
+                              <Col span={24} __component_name="Col">
+                                <Row wrap={false} justify="space-between" __component_name="Row">
+                                  <Col __component_name="Col">
+                                    <Row
+                                      wrap={false}
+                                      justify="space-between"
+                                      __component_name="Row"
+                                    >
+                                      <Col span="" __component_name="Col">
+                                        <AntdIconEyeInvisibleFilled
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                          __component_name="AntdIconEyeInvisibleFilled"
+                                        />
+                                      </Col>
+                                      <Col
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                        __component_name="Col"
+                                      >
+                                        <Typography.Text
+                                          style={{ fontSize: '16' }}
+                                          strong={true}
+                                          disabled={false}
+                                          ellipsis={true}
+                                          __component_name="Typography.Text"
+                                        >
+                                          QA 拆分
+                                        </Typography.Text>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                  <Col __component_name="Col">
+                                    <Switch
+                                      size="small"
+                                      checked={__$$eval(() => this.state.step3Data.QAsplitChecked)}
+                                      loading={false}
+                                      disabled={false}
+                                      onChange={function () {
+                                        return this.updateStep3State.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([
+                                            {
+                                              fieldName: 'QAsplitChecked',
+                                            },
+                                          ])
+                                        );
+                                      }.bind(this)}
+                                      defaultChecked={false}
+                                      __component_name="Switch"
+                                    />
+                                  </Col>
+                                </Row>
+                              </Col>
+                              <Col span={24} __component_name="Col">
+                                <Row wrap={true} gutter={['', 8]} __component_name="Row">
+                                  <Col
+                                    span={24}
+                                    style={{ marginBottom: '0px', paddingBottom: '0px' }}
+                                    __component_name="Col"
+                                  >
+                                    <FormilyForm
+                                      ref={this._refsManager.linkRef('formilyform-04uiotn')}
+                                      formHelper={{ autoFocus: true }}
+                                      componentProps={{
+                                        colon: false,
+                                        layout: 'horizontal',
+                                        labelCol: 4,
+                                        labelAlign: 'left',
+                                        wrapperCol: 20,
+                                      }}
+                                      __component_name="FormilyForm"
+                                    >
+                                      {!!false && (
+                                        <FormilySelect
+                                          fieldProps={{ name: 'Select', 'x-validator': [] }}
+                                          componentProps={{
+                                            'x-component-props': {
+                                              disabled: false,
+                                              allowClear: false,
+                                              placeholder: '请选择模型',
+                                              _sdkSwrGetFunc: {},
+                                            },
+                                          }}
+                                          decoratorProps={{
+                                            'x-decorator-props': {
+                                              style: { marginBottom: '0px' },
+                                              tooltip: '',
+                                              labelEllipsis: true,
+                                            },
+                                          }}
+                                          __component_name="FormilySelect"
+                                        />
+                                      )}
+                                    </FormilyForm>
+                                    <Row
+                                      wrap={false}
+                                      justify="space-between"
+                                      __component_name="Row"
+                                    >
+                                      <Col __component_name="Col">
+                                        <Row
+                                          wrap={false}
+                                          justify="space-between"
+                                          __component_name="Row"
+                                        >
+                                          <Col
+                                            style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                            __component_name="Col"
+                                          />
+                                        </Row>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                </Row>
+                                <Typography.Paragraph
+                                  code={false}
+                                  mark={false}
+                                  type="secondary"
+                                  style={{ fontSize: '', paddingTop: '10px' }}
+                                  delete={false}
+                                  strong={false}
+                                  disabled={false}
+                                  editable={false}
+                                  ellipsis={{ rows: 2 }}
+                                  underline={false}
+                                >
+                                  根据文件中的文章与图表标题，自动将文件做 QA 拆分处理。
+                                </Typography.Paragraph>
                               </Col>
                             </Row>
                           </Col>
@@ -1117,7 +1252,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -1205,7 +1341,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -1291,10 +1428,12 @@ class $$Page extends React.Component {
                       <Card
                         size="default"
                         type="default"
+                        style={{ height: '118px' }}
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -1383,7 +1522,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -1494,7 +1634,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -1576,7 +1717,7 @@ class $$Page extends React.Component {
                                       <Col __component_name="Col">
                                         <FormilyForm
                                           ref={this._refsManager.linkRef('formily_bu33ve7fnv')}
-                                          formHelper={{ autoFocus: true }}
+                                          formHelper={{ autoFocus: false }}
                                           componentProps={{
                                             colon: false,
                                             layout: 'horizontal',
@@ -1656,7 +1797,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -1736,7 +1878,7 @@ class $$Page extends React.Component {
                                   <Col __component_name="Col">
                                     <FormilyForm
                                       ref={this._refsManager.linkRef('formilyform-h5d0b6o')}
-                                      formHelper={{ autoFocus: true }}
+                                      formHelper={{ autoFocus: false }}
                                       componentProps={{
                                         colon: false,
                                         layout: 'horizontal',
@@ -1813,7 +1955,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -1892,7 +2035,7 @@ class $$Page extends React.Component {
                                   <Col __component_name="Col">
                                     <FormilyForm
                                       ref={this._refsManager.linkRef('formilyform-kwftate')}
-                                      formHelper={{ autoFocus: true }}
+                                      formHelper={{ autoFocus: false }}
                                       componentProps={{
                                         colon: false,
                                         layout: 'horizontal',
@@ -1970,7 +2113,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -2050,7 +2194,7 @@ class $$Page extends React.Component {
                                   <Col __component_name="Col">
                                     <FormilyForm
                                       ref={this._refsManager.linkRef('formilyform-q8tkxw3')}
-                                      formHelper={{ autoFocus: true }}
+                                      formHelper={{ autoFocus: false }}
                                       componentProps={{
                                         colon: false,
                                         layout: 'horizontal',
@@ -2150,7 +2294,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -2233,7 +2378,7 @@ class $$Page extends React.Component {
                                   <Col __component_name="Col">
                                     <FormilyForm
                                       ref={this._refsManager.linkRef('formilyform-zjbf6fy')}
-                                      formHelper={{ autoFocus: true }}
+                                      formHelper={{ autoFocus: false }}
                                       componentProps={{
                                         colon: false,
                                         layout: 'horizontal',
@@ -2423,7 +2568,8 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -2506,10 +2652,12 @@ class $$Page extends React.Component {
                       <Card
                         size="default"
                         type="default"
+                        style={{ height: '118px' }}
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        hoverable={true}
+                        className="step3_disabled_style"
+                        hoverable={false}
                         __component_name="Card"
                       >
                         <Row wrap={true} gutter={['', 0]} __component_name="Row">
@@ -2810,8 +2958,8 @@ class $$Page extends React.Component {
                 </Row>
                 <Row
                   wrap={true}
+                  style={{ marginBottom: '0px', paddingBottom: '0px' }}
                   __component_name="Row"
-                  style={{ paddingBottom: '0px', marginBottom: '0px' }}
                 >
                   <Col span={3} __component_name="Col">
                     <FormilyFormItem
@@ -2931,9 +3079,10 @@ class $$Page extends React.Component {
                       scroll={{ scrollToFirstRowOnChange: true }}
                       columns={[
                         { key: 'name', title: '文件名称', dataIndex: 'path' },
-                        { title: '标签', dataIndex: 'label', width: 120 },
-                        { key: 'count', title: '文件大小', dataIndex: 'count', width: 100 },
+                        { title: '标签', width: 120, dataIndex: 'label' },
+                        { key: 'count', title: '文件大小', width: 100, dataIndex: 'count' },
                       ]}
+                      loading={__$$eval(() => this.state.fileTableLoading)}
                       bordered={false}
                       dataSource={__$$eval(() => this.state.dataSetFileList)}
                       expandable={{ expandedRowRender: '' }}
@@ -2950,7 +3099,6 @@ class $$Page extends React.Component {
                         selectedRowKeys: __$$eval(() => this.state.selectedFileList),
                       }}
                       __component_name="Table"
-                      loading={__$$eval(() => this.state.fileTableLoading)}
                     />
                   </Col>
                 </Row>
@@ -2959,11 +3107,11 @@ class $$Page extends React.Component {
                   <Col span={19} style={{ marginBottom: '16px' }} __component_name="Col">
                     {!!__$$eval(() => this.state.fileSelectCheckErrorFlag) && (
                       <Typography.Text
-                        __component_name="Typography.Text"
-                        ellipsis={true}
-                        style={{ fontSize: '', color: '#f85a5a' }}
-                        disabled={false}
+                        style={{ color: '#f85a5a', fontSize: '' }}
                         strong={false}
+                        disabled={false}
+                        ellipsis={true}
+                        __component_name="Typography.Text"
                       >
                         请选择文件
                       </Typography.Text>
@@ -3055,11 +3203,11 @@ class $$Page extends React.Component {
                 shape="default"
                 style={{ marginRight: '12px' }}
                 danger={false}
-                disabled={false}
-                __component_name="Button"
                 onClick={function () {
                   return this.onBack.apply(this, Array.prototype.slice.call(arguments).concat([]));
                 }.bind(this)}
+                disabled={false}
+                __component_name="Button"
               >
                 取消
               </Button>
