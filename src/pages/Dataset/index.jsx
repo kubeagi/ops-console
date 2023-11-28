@@ -274,6 +274,34 @@ class Dataset$$Page extends React.Component {
     return `共 ${total} 条`;
   }
 
+  onDelDataset(event, params) {
+    event.stopPropagation();
+    // 点击按钮时的回调
+    const that = this;
+    this.utils.Modal.confirm({
+      title: '删除数据集',
+      content: `确定删除数据集：${params.item.name}？`,
+      async onOk() {
+        const res = await that.utils.bff
+          .deleteDatasets({
+            input: {
+              namespace: params.item.namespace,
+              name: params.item.name,
+            },
+          })
+          .catch(e => {
+            that.utils.notification.warn({
+              message: '删除数据集失败',
+            });
+          });
+        that.utils.notification.success({
+          message: '删除数据集成功',
+        });
+        that.fetchData();
+      },
+    });
+  }
+
   componentDidMount() {
     this.fetchData();
   }
@@ -582,7 +610,7 @@ class Dataset$$Page extends React.Component {
                                 __component_name="Row"
                               >
                                 <Col
-                                  span=""
+                                  span={11}
                                   style={{ display: 'flex', alignItems: 'center' }}
                                   __component_name="Col"
                                 >
@@ -609,13 +637,14 @@ class Dataset$$Page extends React.Component {
                                   </UnifiedLink>
                                 </Col>
                                 <Col
-                                  span={6}
+                                  span={4}
                                   style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                   }}
                                   __component_name="Col"
+                                  flex="200px"
                                 >
                                   <Tag color="warning" closable={false} __component_name="Tag">
                                     {__$$eval(() => item.contentType)}
@@ -625,13 +654,14 @@ class Dataset$$Page extends React.Component {
                                   </Tag>
                                 </Col>
                                 <Col
-                                  span={6}
+                                  span={4}
                                   style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                   }}
                                   __component_name="Col"
+                                  flex="150px"
                                 >
                                   <Typography.Text
                                     style={{ fontSize: '' }}
@@ -644,7 +674,7 @@ class Dataset$$Page extends React.Component {
                                   </Typography.Text>
                                 </Col>
                                 <Col
-                                  span={6}
+                                  span={4}
                                   style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -694,15 +724,19 @@ class Dataset$$Page extends React.Component {
                                     shape="default"
                                     danger={false}
                                     onClick={function () {
-                                      return this.refresh.apply(
+                                      return this.onDelDataset.apply(
                                         this,
-                                        Array.prototype.slice.call(arguments).concat([])
+                                        Array.prototype.slice.call(arguments).concat([
+                                          {
+                                            item: item,
+                                          },
+                                        ])
                                       );
                                     }.bind(__$$context)}
                                     disabled={false}
                                     __component_name="Button"
                                   >
-                                    删除
+                                    {this.i18n('i18n-z0idrepg') /* 删除 */}
                                   </Button>
                                 </Col>
                               </Row>
@@ -722,13 +756,13 @@ class Dataset$$Page extends React.Component {
                                   {
                                     key: 'syncStatus',
                                     title: '导入状态',
+                                    dataIndex: 'syncStatus',
                                     render: (text, record) =>
                                       ({
                                         FileSyncing: '同步中',
                                         FileSyncFailed: '同步失败',
                                         FileSyncSuccess: '同步成功',
                                       }[text] || '未知'),
-                                    dataIndex: 'syncStatus',
                                   },
                                   {
                                     key: 'dataProcessStatus',
@@ -764,20 +798,16 @@ class Dataset$$Page extends React.Component {
                                       (__$$context => (
                                         <Dropdown.Button
                                           menu={{
-                                            items: [
-                                              {
-                                                key: 'release',
-                                                label: this.i18n('i18n-5bu583cw') /* 发布 */,
-                                              },
-                                              {
-                                                key: 'import',
-                                                label: this.i18n('i18n-mh5ck17f') /* 导入数据 */,
-                                              },
-                                              {
-                                                key: 'delete',
-                                                label: this.i18n('i18n-z0idrepg') /* 删除 */,
-                                              },
-                                            ],
+                                            items: __$$eval(() =>
+                                              (() => {
+                                                return [
+                                                  {
+                                                    key: '1',
+                                                    label: '1',
+                                                  },
+                                                ];
+                                              })()
+                                            ),
                                           }}
                                           type="default"
                                           danger={false}
@@ -792,6 +822,7 @@ class Dataset$$Page extends React.Component {
                                           placement="bottomRight"
                                           __component_name="Dropdown.Button"
                                           destroyPopupOnHide={true}
+                                          overlayStyle={{}}
                                         >
                                           <Typography.Text
                                             style={{ fontSize: '' }}
