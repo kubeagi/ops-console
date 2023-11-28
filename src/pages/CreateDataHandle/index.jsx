@@ -17,6 +17,7 @@ import {
   FormilyNumberPicker,
   Progress,
   Table,
+  InnerHtmlContainer,
   FormilyInput,
   FormilyFormItem,
   Pagination,
@@ -129,32 +130,38 @@ class $$Page extends React.Component {
       afterTreatmentData: [
         {
           type: '移除不可见字符',
-          before: '计量水表安装在住宅的公共部位，供水企业抄表到户，按户计量收费。',
+          before:
+            '计量水表安装在住宅<span style="background-color:rgba(250, 205, 145, 0.4);">???</span>的公共部位，供水企业抄表到户，按户计量收费。',
           after: '计量水表安装在住宅的公共部位，供水企业抄表到户，按户计量收费。',
         },
         {
           type: '空格处理',
-          before: '全然不知对方身份，不断反转的剧情即将揭开层层真相。',
+          before:
+            '全然不知对方身份，不断反转的剧情即将揭开层层真相。<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>',
           after: '全然不知对方身份，不断反转的剧情即将揭开层层真相。',
         },
         {
-          type: '去除乱 码',
-          before: '原告孟庆连诉被告李成超凭样品买卖   合同纠纷一案，本院于2015年8月10日受理',
+          type: '去除乱码',
+          before:
+            '原告孟庆连诉被告李成超凭样品买卖<span style="background-color:rgba(250, 205, 145, 0.4);">????</span>合同纠纷一案，本院于2015年8月10日受理',
           after: '原告孟庆连诉被告李成超凭样品买卖合同纠纷一案，本院于2015年8月10日受理',
         },
         {
           type: '繁转简',
-          before: '風暴帶來的暫停使消防員和其他緊急反應人員得以進入禁區進行結構破壞評估。',
+          before:
+            '<span style="background-color:rgba(250, 205, 145, 0.4);">風</span>暴<span style="background-color:rgba(250, 205, 145, 0.4);">帶</span>來的<span style="background-color:rgba(250, 205, 145, 0.4);">暫</span>停使消防<span style="background-color:rgba(250, 205, 145, 0.4);">員</span>和其他<span style="background-color:rgba(250, 205, 145, 0.4);">緊</span>急反<span style="background-color:rgba(250, 205, 145, 0.4);">應</span>人<span style="background-color:rgba(250, 205, 145, 0.4);">員</span>得以<span style="background-color:rgba(250, 205, 145, 0.4);">進</span>入禁<span style="background-color:rgba(250, 205, 145, 0.4);">區進</span>行<span style="background-color:rgba(250, 205, 145, 0.4);">結構</span>破<span style="background-color:rgba(250, 205, 145, 0.4);">壞評</span>估。',
           after: '风暴带来的暂停使消防员和其他紧急反应人员得以进入禁区进行结构破坏评估。',
         },
         {
           type: '去除网页标识符',
-          before: "<div class='center'><span class='bolded'>朗播 SAT 学员成绩单分析报告",
+          before:
+            '<span style="background-color:rgba(250, 205, 145, 0.4);">&ltdiv class="bolded"&gt&lt/div&gt</span>朗播 SAT 学员成绩单分析报告',
           after: '朗播 SAT 学员成绩单分析报告',
         },
         {
           type: '去除表情',
-          before: '🐰兔子👩女孩👩女孩🐰🧑🏼男孩',
+          before:
+            '<span style="background-color:rgba(250, 205, 145, 0.4);">🐰</span>兔子<span style="background-color:rgba(250, 205, 145, 0.4);">👩</span>女孩<span style="background-color:rgba(250, 205, 145, 0.4);">👩</span>女孩<span style="background-color:rgba(250, 205, 145, 0.4);">🐰🧑🏼</span>男孩',
           after: '兔子女孩女孩男孩',
         },
       ],
@@ -427,7 +434,7 @@ class $$Page extends React.Component {
     const data = {
       ...this.state.step1FormData,
       ...this.state.step2FormData,
-      // version_data_set_name: versionName,   todo
+      version_data_set_name: versionName,
       data_process_config_info: list,
       file_names: files,
       bucket_name: this.utils.getAuthData().project,
@@ -457,9 +464,10 @@ class $$Page extends React.Component {
           fileSelectCheckErrorFlag: true,
         });
         // 调试需要关闭此
-        return;
+        //  return;
       }
     }
+
     const step = this.state.currentStep + 1;
     this.setState(
       {
@@ -2772,8 +2780,33 @@ class $$Page extends React.Component {
                 scroll={{ scrollToFirstRowOnChange: true }}
                 columns={[
                   { key: 'name', title: '配置内容', dataIndex: 'type' },
-                  { key: 'age', title: '处理前', dataIndex: 'before' },
-                  { title: '处理后', dataIndex: 'after' },
+                  {
+                    key: 'age',
+                    title: '处理前',
+                    render: (text, record, index) =>
+                      (__$$context => (
+                        <InnerHtmlContainer __component_name="InnerHtmlContainer">
+                          {__$$eval(() => text)}
+                        </InnerHtmlContainer>
+                      ))(__$$createChildContext(__$$context, { text, record, index })),
+                    dataIndex: 'before',
+                  },
+                  {
+                    title: '处理后',
+                    render: (text, record, index) =>
+                      (__$$context => (
+                        <Typography.Text
+                          style={{ fontSize: '' }}
+                          strong={false}
+                          disabled={false}
+                          ellipsis={true}
+                          __component_name="Typography.Text"
+                        >
+                          {__$$eval(() => text)}
+                        </Typography.Text>
+                      ))(__$$createChildContext(__$$context, { text, record, index })),
+                    dataIndex: 'after',
+                  },
                 ]}
                 dataSource={__$$eval(() => this.state.afterTreatmentData)}
                 pagination={false}
