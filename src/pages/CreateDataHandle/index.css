@@ -1,3 +1,30 @@
 body {
   font-size: 12px;
 }
+
+.step3_disabled_style::before {
+  cursor: not-allowed;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(250, 250, 250, 0.5);
+  /* 半透明背景颜色 */
+  z-index: 999;
+  /* 确保叠加层在其他元素之上 */
+}
+
+.step3_disabled_style:hover::before {
+  content: '敬请期待';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  color: #aaaaaa;
+  padding-top: 30px;
+  font-size: 32px;
+  text-align: center;
+  z-index: 9999;
+}
