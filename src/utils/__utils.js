@@ -1,6 +1,6 @@
 import { message } from 'antd';
 
-import { notification } from '@tenx-ui/materials';
+import { notification, Modal } from '@tenx-ui/materials';
 
 import { getAuthData, setAuthData, removeAuthData, isTokenExpired } from '@tenx-ui/auth-utils';
 
@@ -219,6 +219,8 @@ export const getDataSetFileTypes = utils.getDataSetFileTypes;
 
 utils._ = _;
 
+utils.Modal = Modal;
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -292,4 +294,6 @@ export default {
   getDataSetFileTypes,
 
   _,
+
+  Modal,
 };
