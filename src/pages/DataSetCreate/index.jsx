@@ -123,16 +123,60 @@ class DataSetCreate$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  getBucketPath() {
+    return `dataset/${this.form()?.values?.name}/v1`;
+  }
+
+  async validatorName(v) {
+    if (v) {
+      try {
+        const res = await this.props?.appHelper?.utils?.bff?.getDataset({
+          name: v,
+          namespace: this.utils.getAuthData()?.project,
+          versionsInput: {
+            namespace: this.utils.getAuthData()?.project,
+          },
+        });
+        if (res?.Dataset?.getDataset?.name) {
+          return this.i18n('i18n-w9rn8mqn');
+        }
+      } catch (error) {}
+    }
   }
 
   handleCancle() {
     this.history?.go(-1);
   }
 
-  getBucketPath() {
-    return `dataset/${this.form()?.values?.name}/v1`;
+  async handleCreateVersionedDataset({ datasetParams, datasetRes }) {
+    const params = {
+      name: datasetParams.name + '-v1',
+      namespace: datasetParams.namespace,
+      datasetName: datasetParams.name,
+      displayName: datasetParams.name + '-v1',
+      // description: String
+      version: 'v1',
+      released: 0,
+      // inheritedFrom: String
+    };
+
+    try {
+      const res = await this.props.appHelper.utils.bff?.createVersionedDataset({
+        input: params,
+      });
+      this.utils.notification.success({
+        message: this.i18n('i18n-1sgb2qhp'),
+      });
+      this.handleCancle();
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-72kqkgmc'),
+        errors: error?.response?.errors,
+      });
+      this.setState({
+        createLoading: false,
+      });
+    }
   }
 
   handleConfirm() {
@@ -169,41 +213,12 @@ class DataSetCreate$$Page extends React.Component {
     });
   }
 
-  async handleCreateVersionedDataset({ datasetParams, datasetRes }) {
-    const params = {
-      name: datasetParams.name + '-v1',
-      namespace: datasetParams.namespace,
-      datasetName: datasetParams.name,
-      displayName: datasetParams.name + '-v1',
-      // description: String
-      version: datasetParams.contentType,
-      released: 0,
-      // inheritedFrom: String
-    };
-
-    try {
-      const res = await this.props.appHelper.utils.bff?.createVersionedDataset({
-        input: params,
-      });
-      this.utils.notification.success({
-        message: this.i18n('i18n-1sgb2qhp'),
-      });
-      this.handleCancle();
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-72kqkgmc'),
-        errors: error?.response?.errors,
-      });
-      this.setState({
-        createLoading: false,
-      });
-    }
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
   componentDidMount() {
     this._dataSourceEngine.reloadDataSource();
-
-    console.log(this.props);
   }
 
   render() {
@@ -229,6 +244,7 @@ class DataSetCreate$$Page extends React.Component {
               actions={[]}
               loading={false}
               bordered={false}
+              className="datasetCreateCard"
               hoverable={false}
               __component_name="Card"
             >
@@ -238,9 +254,9 @@ class DataSetCreate$$Page extends React.Component {
                 componentProps={{
                   colon: false,
                   layout: 'horizontal',
-                  labelCol: 4,
                   labelAlign: 'left',
-                  wrapperCol: 20,
+                  labelWidth: '120px',
+                  wrapperWidth: '600px',
                 }}
                 __component_name="FormilyForm"
               >
@@ -256,6 +272,18 @@ class DataSetCreate$$Page extends React.Component {
                         message: this.i18n('i18n-585k83dk') /* 数据集名称由 0 ~ 50 字符组成 */,
                         pattern: '^.{0,50}$',
                         children: '未知',
+                      },
+                      {
+                        id: 'disabled',
+                        children: '未知',
+                        type: 'disabled',
+                        validator: function () {
+                          return this.validatorName.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
+                        }.bind(this),
+                        triggerType: 'onBlur',
                       },
                     ],
                   }}
@@ -420,7 +448,7 @@ class DataSetCreate$$Page extends React.Component {
                 __component_name="Divider"
               />
               <Row wrap={true} __component_name="Row">
-                <Col span={4} __component_name="Col" />
+                <Col flex="120px" __component_name="Col" />
                 <Col span={20} __component_name="Col">
                   <Space align="center" direction="horizontal" __component_name="Space">
                     <Button
