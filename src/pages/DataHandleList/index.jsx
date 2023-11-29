@@ -109,7 +109,13 @@ class DataHandleList$$Page extends React.Component {
           listLoading: false,
         });
       }
-    } catch (error) {}
+    } catch (error) {
+      this.setState({
+        dataHandleList: [],
+        totalCount: 0,
+        listLoading: false,
+      });
+    }
   }
 
   onOpenDelModal(e, { record }) {
@@ -180,7 +186,7 @@ class DataHandleList$$Page extends React.Component {
     // 输入框内容变化时的回调
     this.setState(
       {
-        currentPage: 0,
+        currentPage: 1,
       },
       () => {
         this.getDataList();
@@ -197,7 +203,7 @@ class DataHandleList$$Page extends React.Component {
     // 点击按钮时的回调
     this.setState(
       {
-        currentPage: 0,
+        currentPage: 1,
       },
       () => {
         this.getDataList();

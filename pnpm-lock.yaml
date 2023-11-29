@@ -31,7 +31,7 @@ importers:
         version: 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
       '@tenx-ui/arcadia-bff-sdk':
         specifier: 0.0.21
-        version: 0.0.21(@tenx-ui/materials@1.5.21)(antd@5.11.3)(react@18.2.0)(swr@2.2.4)
+        version: 0.0.21(@tenx-ui/materials@1.5.23)(antd@5.11.3)(react@18.2.0)(swr@2.2.4)
       '@tenx-ui/auth-utils':
         specifier: 0.0.1
         version: 0.0.1
@@ -52,7 +52,7 @@ importers:
         version: 3.0.5(antd@5.11.3)(classnames@2.3.2)(prop-types@15.8.1)(rc-dialog@9.3.4)(react-dom@18.2.0)(react@18.2.0)
       '@tenx-ui/materials':
         specifier: latest
-        version: 1.5.21(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+        version: 1.5.23(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
       '@tenx-ui/request':
         specifier: ^1.0.0-beta.6
         version: 1.0.0-beta.6
@@ -4548,7 +4548,7 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  /@tenx-ui/arcadia-bff-sdk@0.0.21(@tenx-ui/materials@1.5.21)(antd@5.11.3)(react@18.2.0)(swr@2.2.4):
+  /@tenx-ui/arcadia-bff-sdk@0.0.21(@tenx-ui/materials@1.5.23)(antd@5.11.3)(react@18.2.0)(swr@2.2.4):
     resolution: {integrity: sha512-bqg9DJyq1vuMFwudu+cxhCKu9q/RRmYEOO5v9ltSAT+RxM1e3o2tl5wznNVzI5V7oEPrVUdVFViBV0yZPiuOfg==}
     peerDependencies:
       '@tenx-ui/materials': '>=1.5.8'
@@ -4556,7 +4556,7 @@ packages:
       react: '>=16.9.0'
       swr: '>=2.0.0'
     dependencies:
-      '@tenx-ui/materials': 1.5.21(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+      '@tenx-ui/materials': 1.5.23(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
       antd: 5.11.3(react-dom@18.2.0)(react@18.2.0)
       graphql: 16.8.1
       graphql-request: 6.1.0(graphql@16.8.1)
@@ -4813,8 +4813,8 @@ packages:
       - typescript
     dev: false
 
-  /@tenx-ui/materials@1.5.21(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5):
-    resolution: {integrity: sha512-cIuGR8z8BsBXSRPlWizvxnuVuQPoU0kiRu4BWlC92zDmVY/XR+JxKVf5x7PISWR7KV3ORvtB0WxYfQ5kvY+Crw==}
+  /@tenx-ui/materials@1.5.23(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5):
+    resolution: {integrity: sha512-iZkyDTmhbE4ERKekpqpJc1t/FPEt2MGUCVYej1/9AWdiv/VO5uz9eME4DUPZb7FYZ+9lPzNCRwb/ZhaBO4eszQ==}
     peerDependencies:
       '@ant-design/icons': ^4.7.0
       antd: ^5.8.6
