@@ -127,6 +127,10 @@ class DataSetCreate$$Page extends React.Component {
     return `dataset/${this.form()?.values?.name}/v1`;
   }
 
+  setUploadState(state) {
+    this.setState(state);
+  }
+
   async validatorName(v) {
     if (v) {
       try {
@@ -196,6 +200,9 @@ class DataSetCreate$$Page extends React.Component {
       try {
         const res = await this.props.appHelper.utils.bff?.createDataset({
           input: params,
+        });
+        this.state.uploadThis?.state?.fileList?.forEach(file => {
+          this.state.uploadThis?.computeMD5(file);
         });
         this.handleCreateVersionedDataset({
           datasetParams: params,
@@ -275,8 +282,8 @@ class DataSetCreate$$Page extends React.Component {
                       },
                       {
                         id: 'disabled',
-                        children: '未知',
                         type: 'disabled',
+                        children: '未知',
                         validator: function () {
                           return this.validatorName.apply(
                             this,
@@ -439,6 +446,12 @@ class DataSetCreate$$Page extends React.Component {
                   );
                 }.bind(this)}
                 __component_name="LccComponentQlsmm"
+                setState={function () {
+                  return this.setUploadState.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
               />
               <Divider
                 mode="line"
