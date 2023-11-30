@@ -4,6 +4,8 @@ import qs from 'qs';
 
 import axios from 'axios';
 
+import { notification } from '@tenx-ui/materials';
+
 import { createRef } from 'react';
 
 const utils = {};
@@ -13,6 +15,8 @@ utils.SparkMD5 = SparkMD5;
 utils.qs = qs;
 
 utils.axios = axios;
+
+utils.notification = notification;
 
 export class RefsManager {
   constructor() {
@@ -63,4 +67,6 @@ export default {
   qs,
 
   axios,
+
+  notification,
 };

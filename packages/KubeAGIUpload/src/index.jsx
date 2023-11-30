@@ -2,7 +2,18 @@
 // 例外：react 框架的导出名和各种组件名除外。
 import React from 'react';
 
-import { Component, FormilyForm, FormilyUpload, Flex, Typography } from '@tenx-ui/materials';
+import {
+  Component,
+  Modal,
+  Row,
+  Col,
+  Typography,
+  UnifiedLink,
+  Button,
+  FormilyForm,
+  FormilyUpload,
+  Flex,
+} from '@tenx-ui/materials';
 
 import { AntdIconPlusOutlined } from '@tenx-ui/icon-materials';
 
@@ -60,17 +71,18 @@ class KubeAgiUpload$$Component extends React.Component {
 
     this.state = {
       ids: [],
-      bucket: 'xxyy',
+      progress: {
+        // 文件上传进度： 0
+      },
       status: {
         // 文件处理状态： '初始状态'
       },
       urlPrex: 'http://172.22.96.17/kubeagi-apis/minio',
-      progress: {
-        // 文件上传进度： 0
-      },
-      bucket_path: 'dataset/test/v1',
       Authorization:
         'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImI1MmViYzk1NWRiYjYyNzBiN2YyZDZiNzQ5YWQ0M2RlNmExNTg0MjYifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwODEwNDY0LCJpYXQiOjE3MDA3MjQwNjQsImF0X2hhc2giOiJNWFpoRGhrVGVNOGg2OVYyT193Vl93IiwiY19oYXNoIjoiWHFfQXFKSllsN3VrQ1ZRWVFqak5IZyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.p5r2XN0Jl19FsHv85meDrFExu-TneS7i5_ENsWMMa5ziAxJjC_mLjgeN-4CzdM9flN3U931mSO29H-b2lifLdf7bYwtSOuIMiwoBkklOEa2MQVGDybkgH4QTlaClYYNSVYL4o4ZLmt5CFL7t0cf8UTapeUZTynL1ZPPgLMepPoqvteuNx4rsXXPjmywMK_o8jMRVxPLSdpxAV0e75lEW6wjq-0kqg8j2BFXbIeiftKzlRwAUa6NYAQZxsQGhS7_C3zIymyndoqzK5rAflwiHOZRX_CgQS0MIym1uNkauuH7MekRB2y5h0PMwGZ6tVwvF_h8by8RgjS7lVOb8rxMDcg',
+      bucket: 'xxyy',
+      bucket_path: 'dataset/test/v1',
+      modalVisible: false,
     };
   }
 
@@ -204,9 +216,73 @@ class KubeAgiUpload$$Component extends React.Component {
     };
   }
 
+  closeModal() {
+    this.setState({
+      modalVisible: false,
+    });
+  }
+
+  getDataSourceMap() {
+    return this.dataSourceMap;
+  }
+
+  getUrlPrex() {
+    return `${window.location.origin}/kubeagi-apis/minio`;
+  }
+
+  getBucketPath() {
+    // bucket_path就是 dataset/<dataset-name>/ < version
+    return this.props?.getBucketPath() || this.state.bucket_path;
+  }
+
   getBucket() {
     // namespace
     return this.props.bucket || this.state.bucket;
+  }
+
+  handleDelete(file) {
+    const pageThis = this;
+    return new Promise((resolve, reject) => {
+      pageThis
+        .getDataSourceMap()
+        .delete_files.load({
+          files: [file.name],
+          bucket: pageThis.getBucket(),
+          bucket_path: pageThis.getBucketPath(),
+        })
+        .then(function (response) {
+          resolve(response);
+        })
+        .catch(function (error) {
+          reject(error);
+        });
+    });
+  }
+
+  onFileAdded(file, fileList) {
+    this.setState({
+      fileList,
+    });
+    this.props?.setState({
+      uploadThis: this,
+    });
+    return false;
+  }
+
+  startUpload() {
+    this.setState({
+      ids: [...this.state.ids, file.uid],
+      progress: {
+        ...this.state.progress,
+        [file.uid]: 0,
+      },
+      status: {
+        ...this.state.status,
+        [file.uid]: '初始状态',
+      },
+    });
+    // 1. 计算MD5
+    this.computeMD5(file);
   }
 
   computeMD5(file) {
@@ -257,48 +333,28 @@ class KubeAgiUpload$$Component extends React.Component {
     }
   }
 
-  getUrlPrex() {
-    return `${window.location.origin}/kubeagi-apis/minio`;
-  }
-
-  onFileAdded(file, fileList) {
-    this.setState({
-      ids: [...this.state.ids, file.uid],
-      progress: {
-        ...this.state.progress,
-        [file.uid]: 0,
-      },
-      status: {
-        ...this.state.status,
-        [file.uid]: '初始状态',
-      },
-    });
-    // 1. 计算MD5
-    this.computeMD5(file);
-  }
-
-  handleDelete(file) {
+  getSuccessChunks(file) {
     const pageThis = this;
     return new Promise((resolve, reject) => {
       pageThis
         .getDataSourceMap()
-        .delete_files.load({
-          files: [file.name],
+        .get_chunks.load({
+          md5: file.uniqueIdentifier,
           bucket: pageThis.getBucket(),
           bucket_path: pageThis.getBucketPath(),
         })
         .then(function (response) {
+          file.uploadID = response?.uploadID;
+          file.uuid = response?.uuid;
+          file.uploaded = response?.uploaded;
+          file.chunks = response?.chunks;
           resolve(response);
         })
         .catch(function (error) {
+          console.log(error);
           reject(error);
         });
     });
-  }
-
-  getBucketPath() {
-    // bucket_path就是 dataset/<dataset-name>/ < version
-    return this.props?.getBucketPath() || this.state.bucket_path;
   }
 
   newMultiUpload(file) {
@@ -382,6 +438,17 @@ class KubeAgiUpload$$Component extends React.Component {
             resolve(res);
           })
           .catch(function (err) {
+            if (err?.code === 'ERR_NETWORK') {
+              pageThis.setState({
+                modalVisible: true,
+                modalLink: url?.split('?')?.[0],
+              });
+            } else {
+              pageThis.utils.notification.warnings({
+                message: pageThis.i18n('i18n-boehucun'),
+                errors: [err],
+              });
+            }
             console.log(err);
             reject(err);
           });
@@ -516,36 +583,6 @@ class KubeAgiUpload$$Component extends React.Component {
     }
   }
 
-  getDataSourceMap() {
-    return this.dataSourceMap;
-  }
-
-  getSuccessChunks(file) {
-    const pageThis = this;
-    return new Promise((resolve, reject) => {
-      pageThis
-        .getDataSourceMap()
-        .get_chunks.load({
-          md5: file.uniqueIdentifier,
-          bucket: pageThis.getBucket(),
-          bucket_path: pageThis.getBucketPath(),
-        })
-        .then(function (response) {
-          file.uploadID = response?.uploadID;
-          file.uuid = response?.uuid;
-          file.uploaded = response?.uploaded;
-          file.chunks = response?.chunks;
-          resolve(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
-    });
-  }
-
-  componentDidMount() {}
-
   async computeMD5Success(file) {
     await this.getSuccessChunks(file);
     if (file.uploadID == '' || file.uuid == '') {
@@ -596,6 +633,64 @@ class KubeAgiUpload$$Component extends React.Component {
     const { state } = __$$context;
     return (
       <Component>
+        <Modal
+          __component_name="Modal"
+          title={this.i18n('i18n-boehucun') /* 上传失败 */}
+          open={__$$eval(() => this.state.modalVisible)}
+          destroyOnClose={true}
+          centered={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          forceRender={false}
+          confirmLoading={false}
+          footer={
+            <Button
+              __component_name="Button"
+              type="default"
+              icon=""
+              danger={false}
+              ghost={false}
+              shape="default"
+              block={false}
+              disabled={false}
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+            >
+              {this.i18n('i18n-zughatwk') /* 取消 */}
+            </Button>
+          }
+          onCancel={function () {
+            return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+        >
+          <Row __component_name="Row" wrap={true}>
+            <Col __component_name="Col" span={24}>
+              <Typography.Text
+                __component_name="Typography.Text"
+                ellipsis={true}
+                style={{ fontSize: '' }}
+                disabled={false}
+                strong={false}
+              >
+                {this.i18n('i18n-g0mdui69') /* 请先打开下面链接手动信任证书 */}
+              </Typography.Text>
+            </Col>
+            <Col __component_name="Col" span={24}>
+              <UnifiedLink
+                __component_name="UnifiedLink"
+                to={__$$eval(() => this.state.modalLink)}
+                target="_blank"
+              >
+                {__$$eval(() => this.state.modalLink || '-')}
+              </UnifiedLink>
+            </Col>
+          </Row>
+        </Modal>
         <FormilyForm
           ref={this._refsManager.linkRef('formily_KubeAGIUpload')}
           formHelper={{ autoFocus: true, className: 'formily_KubeAGIUpload' }}
