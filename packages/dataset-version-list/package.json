@@ -1,0 +1,49 @@
+{
+  "private": true,
+  "name": "dataset-version-list",
+  "description": "空白描述",
+  "version": "0.0.1",
+  "keywords": [],
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "scripts": {
+    "build": "father build",
+    "build:deps": "father prebundle",
+    "dev": "father dev",
+    "prepublishOnly": "father doctor && npm run build",
+    "pub": "npm run prepublishOnly && npm publish --registry http://dev-npm.tenxcloud.net"
+  },
+  "dependencies": {
+    "@formily/antd": "^2.1.4",
+    "@formily/core": "^2.1.4",
+    "@formily/react": "^2.1.4",
+    "@tenx-ui/icon": "^2.4.17",
+    "@tenx-ui/form-helper": "^0.0.2",
+    "@tenx-ui/utils": "^2.3.1",
+    "babel-runtime": "^6.26.0",
+    "react-sortable-hoc": "^2.0.0",
+    "shared-components": "workspace:*",
+    "@alilc/lowcode-datasource-engine": "^1.0.0",
+    "@tenx-ui/materials": "latest",
+    "@tenx-ui/arcadia-bff-sdk": "0.0.23"
+  },
+  "devDependencies": {
+    "react": "^18.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.9.0"
+  },
+  "yunti": {
+    "umd": {
+      "library": "datasetVersionList",
+      "entry": [
+        "/dist/datasetVersionList.js",
+        "/dist/datasetVersionList.css"
+      ]
+    }
+  }
+}
