@@ -95,6 +95,12 @@ importers:
       graphql-tag:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.8.1)
+      kubeagi-knowledge-delete-modal:
+        specifier: workspace:*
+        version: link:packages/kubeagi-knowledge-delete-modal
+      kubeagi-knowledge-edit-modal:
+        specifier: workspace:*
+        version: link:packages/kubeagi-knowledge-edit-modal
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
