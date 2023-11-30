@@ -20,6 +20,10 @@ import {
   Pagination,
 } from '@tenx-ui/materials';
 
+import LccComponentXnggv from 'kubeagi-knowledge-edit-modal';
+
+import LccComponentChj61 from 'kubeagi-knowledge-delete-modal';
+
 import {
   AntdIconPlusOutlined,
   TenxIconRefresh,
@@ -69,23 +73,22 @@ class Knowledge$$Page extends React.Component {
     this.state = {
       pages: {
         currentPage: 1,
-        pageSize: 10,
+        pageSize: 12,
         total: 0,
       },
       loading: false,
       pageRange: [],
       corpusList: [],
       searchName: '',
+      currentItem: {},
+      editModalOpen: false,
+      deleteModalOpen: false,
     };
   }
 
   $ = () => null;
 
   $$ = () => [];
-
-  componentWillUnmount() {
-    console.log('will unmount');
-  }
 
   getData() {
     this.setState({
@@ -156,13 +159,37 @@ class Knowledge$$Page extends React.Component {
   }
 
   returnTxt(item) {
-    console.log(item, 'eeeee');
     return item;
   }
 
   showTotal(total, range) {
     // 用于格式化显示表格数据总量
     return `共 ${total} 条`;
+  }
+
+  onMenuClick({ item, key, keyPath, domEvent }, extParams) {
+    this.setState({
+      currentItem: extParams.data,
+    });
+    console.log('extParams.data', extParams.data);
+    switch (key) {
+      case 'edit':
+        {
+          this.setState({
+            editModalOpen: true,
+          });
+        }
+        break;
+      case 'delete':
+        {
+          this.setState({
+            deleteModalOpen: true,
+          });
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   getDataStatus(isStatus, isTag) {
@@ -203,9 +230,21 @@ class Knowledge$$Page extends React.Component {
   }
 
   onDetailClick(e, extParams) {
-    // 事件的 handler
-    console.log(e, 'onClick');
     this.history.push(`/knowledge/detail/${extParams.data.name}`);
+  }
+
+  onEditModalOk() {
+    this.getData();
+    this.setState({
+      editModalOpen: false,
+    });
+  }
+
+  onDeleteModalOk() {
+    this.getData();
+    this.setState({
+      deleteModalOpen: false,
+    });
   }
 
   onShowSizeChange(current, size) {
@@ -215,6 +254,18 @@ class Knowledge$$Page extends React.Component {
         ...this.state.pages,
         pageSize: size,
       },
+    });
+  }
+
+  onEditModalCancel() {
+    this.setState({
+      editModalOpen: false,
+    });
+  }
+
+  onDeleteModalCancel() {
+    this.setState({
+      deleteModalOpen: false,
     });
   }
 
@@ -228,7 +279,6 @@ class Knowledge$$Page extends React.Component {
   }
 
   componentDidMount() {
-    console.log('did mount', this.utils.bff);
     this.getData();
   }
 
@@ -237,6 +287,47 @@ class Knowledge$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        {!!__$$eval(() => this.state.editModalOpen) && (
+          <LccComponentXnggv
+            name={__$$eval(() => this.state.currentItem?.name)}
+            onOk={function () {
+              return this.onEditModalOk.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            open={__$$eval(() => this.state.editModalOpen)}
+            onCancel={function () {
+              return this.onEditModalCancel.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            namespace={__$$eval(() => this.state.currentItem?.namespace)}
+            initialValues={__$$eval(() => this.state.currentItem)}
+            __component_name="LccComponentXnggv"
+          />
+        )}
+        {!!__$$eval(() => this.state.deleteModalOpen) && (
+          <LccComponentChj61
+            name={__$$eval(() => this.state.currentItem?.name)}
+            onOk={function () {
+              return this.onDeleteModalOk.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            onCancel={function () {
+              return this.onDeleteModalCancel.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            namespace={__$$eval(() => this.state.currentItem?.namespace)}
+            displayName={__$$eval(() => this.state.currentItem?.displayName)}
+            __component_name="LccComponentChj61"
+          />
+        )}
         <Row wrap={true} __component_name="Row">
           <Col span={24} __component_name="Col">
             <Typography.Title
@@ -351,6 +442,16 @@ class Knowledge$$Page extends React.Component {
                                         { key: 'edit', label: '编辑' },
                                         { key: 'delete', label: '删除' },
                                       ],
+                                      onClick: function () {
+                                        return this.onMenuClick.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([
+                                            {
+                                              data: item,
+                                            },
+                                          ])
+                                        );
+                                      }.bind(__$$context),
                                     }}
                                     trigger={['hover']}
                                     disabled={false}
@@ -371,6 +472,7 @@ class Knowledge$$Page extends React.Component {
                                         border: 'none',
                                         zIndex: '2',
                                         padding: '0',
+                                        boxShadow: 'none',
                                       }}
                                       danger={false}
                                       disabled={false}
@@ -425,7 +527,7 @@ class Knowledge$$Page extends React.Component {
                                             ellipsis={true}
                                             __component_name="Typography.Title"
                                           >
-                                            {__$$eval(() => item.displayName)}
+                                            {__$$eval(() => __$$context.utils.getFullName(item))}
                                           </Typography.Title>
                                         </Col>
                                         <Col span={24} __component_name="Col">
@@ -440,7 +542,7 @@ class Knowledge$$Page extends React.Component {
                                             ellipsis={{ rows: 2 }}
                                             underline={false}
                                           >
-                                            {__$$eval(() => item.description || '--')}
+                                            {__$$eval(() => item.description || '-')}
                                           </Typography.Paragraph>
                                         </Col>
                                       </Row>

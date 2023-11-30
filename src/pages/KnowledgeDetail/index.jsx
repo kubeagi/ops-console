@@ -19,6 +19,10 @@ import {
   Table,
 } from '@tenx-ui/materials';
 
+import LccComponentChj61 from 'kubeagi-knowledge-delete-modal';
+
+import LccComponentXnggv from 'kubeagi-knowledge-edit-modal';
+
 import { AntdIconPlusOutlined, AntdIconReloadOutlined } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -61,7 +65,7 @@ class KnowledgeDetail$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = {};
+    this.state = { editModalOpen: false, deleteModalOpen: false };
   }
 
   $ = () => null;
@@ -72,14 +76,46 @@ class KnowledgeDetail$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  getKnowledge() {
+    return this.props.useGetKnowledgeBase?.data?.KnowledgeBase?.getKnowledgeBase;
   }
 
-  getKnowledge() {
-    console.log('this.props.useGetKnowledgeBase', this.props.useGetKnowledgeBase);
-    return this.props.useGetKnowledgeBase?.data?.KnowledgeBase.getKnowledgeBase;
+  openEditModal() {
+    this.setState({
+      editModalOpen: true,
+    });
+  }
+
+  onEditModalOk() {
+    this.props.useGetKnowledgeBase?.mutate();
+    this.setState({
+      editModalOpen: false,
+    });
+  }
+
+  onEditModalCancel() {
+    this.setState({
+      editModalOpen: false,
+    });
+  }
+
+  openDeleteModal() {
+    this.setState({
+      deleteModalOpen: true,
+    });
+  }
+
+  onDeleteModalOk() {
+    this.setState({
+      deleteModalOpen: false,
+    });
+    this.history.relpace('/knowledge');
+  }
+
+  onDeleteModalCancel() {
+    this.setState({
+      deleteModalOpen: false,
+    });
   }
 
   componentDidMount() {
@@ -91,6 +127,47 @@ class KnowledgeDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        {!!__$$eval(() => this.state.deleteModalOpen) && (
+          <LccComponentChj61
+            name={__$$eval(() => this.getKnowledge()?.name)}
+            onOk={function () {
+              return this.onDeleteModalOk.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            onCancel={function () {
+              return this.onDeleteModalCancel.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            namespace={__$$eval(() => this.getKnowledge()?.namespace)}
+            displayName={__$$eval(() => this.getKnowledge()?.displayName)}
+            __component_name="LccComponentChj61"
+          />
+        )}
+        {!!__$$eval(() => this.state.editModalOpen) && (
+          <LccComponentXnggv
+            name={__$$eval(() => this.getKnowledge()?.name)}
+            onOk={function () {
+              return this.onEditModalOk.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            open="true"
+            onCancel={function () {
+              return this.onEditModalCancel.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            namespace={__$$eval(() => this.getKnowledge()?.namespace)}
+            initialValues={__$$eval(() => this.getKnowledge())}
+            __component_name="LccComponentXnggv"
+          />
+        )}
         <Button.Back type="primary" style={{}} title="知识库详情" __component_name="Button.Back" />
         <Row wrap={true} __component_name="Row">
           <Col span={24} __component_name="Col">
@@ -127,7 +204,7 @@ class KnowledgeDetail$$Page extends React.Component {
                             ellipsis={true}
                             __component_name="Typography.Title"
                           >
-                            {__$$eval(() => this.getKnowledge()?.name)}
+                            {__$$eval(() => this.utils.getFullName(this.getKnowledge()))}
                           </Typography.Title>
                         </Col>
                         <Col span={24} __component_name="Col">
@@ -169,6 +246,12 @@ class KnowledgeDetail$$Page extends React.Component {
                       ghost={false}
                       shape="default"
                       danger={false}
+                      onClick={function () {
+                        return this.openEditModal.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
                       disabled={false}
                       __component_name="Button"
                     >
@@ -179,6 +262,12 @@ class KnowledgeDetail$$Page extends React.Component {
                       ghost={false}
                       shape="default"
                       danger={false}
+                      onClick={function () {
+                        return this.openDeleteModal.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
                       disabled={false}
                       __component_name="Button"
                     >
@@ -214,32 +303,32 @@ class KnowledgeDetail$$Page extends React.Component {
                             items={[
                               {
                                 key: '4xwzwtp0wd2',
-                                label: 'ID',
                                 span: 1,
+                                label: 'ID',
                                 children: (
                                   <Typography.Text
-                                    __component_name="Typography.Text"
-                                    ellipsis={true}
                                     style={{ fontSize: '' }}
-                                    disabled={false}
                                     strong={false}
+                                    disabled={false}
+                                    ellipsis={true}
+                                    __component_name="Typography.Text"
                                   >
-                                    {__$$eval(() => this.getKnowledge()?.uid || '-')}
+                                    {__$$eval(() => this.getKnowledge()?.id || '-')}
                                   </Typography.Text>
                                 ),
                               },
                               {
                                 key: 'mgbfuraxql',
                                 span: 1,
+                                label: '创建时间',
                                 children: (
                                   <Typography.Time
-                                    __component_name="Typography.Time"
-                                    time={__$$eval(() => this.getKnowledge()?.createTimestamp)}
+                                    time={__$$eval(() => this.getKnowledge()?.creationTimestamp)}
                                     format=""
                                     relativeTime={false}
+                                    __component_name="Typography.Time"
                                   />
                                 ),
-                                label: '创建时间',
                               },
                               {
                                 key: '6fmv76q6kmh',

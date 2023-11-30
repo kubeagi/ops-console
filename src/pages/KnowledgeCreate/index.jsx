@@ -11,6 +11,7 @@ import {
   Card,
   Flex,
   Steps,
+  Container,
   FormilyForm,
   FormilyInput,
   FormilySelect,
@@ -66,12 +67,8 @@ class KnowledgeCreate$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      currentStep: 0,
-      submited: false,
-      embedderList: [],
-      dataSetDataList: [],
-      dataSetFileList: [],
       form: {
+        name: '',
         displayName: '',
         dataSetContain: {
           version: null,
@@ -82,9 +79,14 @@ class KnowledgeCreate$$Page extends React.Component {
       },
       dataSet: '',
       version: '',
-      selectFiles: [],
-      nextFileList: [],
+      submited: false,
       contentType: '',
+      currentStep: 0,
+      selectFiles: [],
+      embedderList: [],
+      nextFileList: [],
+      dataSetDataList: [],
+      dataSetFileList: [],
     };
   }
 
@@ -100,46 +102,15 @@ class KnowledgeCreate$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  getFormInstence() {
-    return this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-  }
-
-  initFormValue() {
+  getType() {
     try {
-      const form = this.getFormInstence();
-      const { displayName, dataSetContain, description, embedder } = this.state.form;
-      const { dataset, version } = dataSetContain;
-      form.setValues(
-        {
-          displayName,
-          dataSetContain: {
-            dataset,
-            version,
-          },
-          description,
-          embedder,
-        },
-        'deepMerge'
-      );
-      // dataSetDataList: datasetlist
-      const { dataSetDataList, embedderList } = this.state;
-      form.setFieldState('dataSetContain.dataset', state => {
-        state.dataSource = dataSetDataList;
-      });
-      form.setFieldState('embedder', state => {
-        state.dataSource = embedderList;
-      });
-      this.setDataSetAndDataSetVersionsSource(dataset);
+      const contentTypeObj = {
+        text: '文本',
+        image: '图片',
+        video: '视频',
+      };
+      return contentTypeObj[this.state.contentType];
     } catch (error) {}
-  }
-
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
-  }
-
-  handleSave(v) {
-    console.log(v, 'aaaaaaaaaaaaaaaaaaaa');
   }
 
   getStatus() {
@@ -148,96 +119,6 @@ class KnowledgeCreate$$Page extends React.Component {
       id: 'success',
       children: ' ',
     };
-  }
-
-  onStepChange(value) {
-    this.setState({
-      currentStep: value,
-    });
-  }
-
-  handleStep(event, { action }) {
-    // console.log(this.state.currentStep, action)
-    if (action === 'next') {
-      this.checkFileds();
-    } else {
-      this.setState(
-        {
-          currentStep: this.state.currentStep - 1,
-        },
-        () => {
-          this.initFormValue();
-        }
-      );
-    }
-  }
-
-  checkFileds() {
-    try {
-      const form = this.getFormInstence();
-      form.submit(async values => {
-        const { displayName, dataSetContain, description, embedder } = values;
-        const { dataset, version } = dataSetContain;
-        console.log('this.state.selectFiles', this.state.selectFiles);
-        if (this.state.currentStep === 0) {
-          if (this.state.selectFiles.length === 0) {
-            this.utils.message.info('请选择文件');
-            return;
-          }
-        }
-        this.setState({
-          currentStep: this.state.currentStep + 1,
-          form: {
-            displayName,
-            dataSetContain,
-            description,
-            embedder,
-          },
-        });
-      });
-    } catch (error) {}
-  }
-
-  handleSubmit() {
-    this.setState(
-      {
-        submited: true,
-      },
-      async () => {
-        const { embedderList, selectFiles, dataSetFileList, form } = this.state;
-        const { displayName, dataSetContain, description, embedder } = form;
-        const { dataset, version } = dataSetContain;
-        const embedderItem = embedderList.find(item => item.value === embedder);
-        const fileGroups = [
-          {
-            source: {
-              kind: 'VersionedDataset',
-              Name: version,
-              Namespace: this.utils.getAuthData().project,
-            },
-            path: selectFiles,
-          },
-        ];
-        try {
-          await this.utils.bff.createKnowledgeBase({
-            input: {
-              displayName,
-              name: displayName,
-              description,
-              embedder: {
-                kind: embedderItem.kind || 'Embedder',
-                Name: embedderItem.name,
-              },
-              fileGroups,
-              namespace: this.utils.getAuthData().project,
-            },
-          });
-          this.message.success('新增知识库成功');
-        } catch {
-          this.message.warn('新增知识库失败');
-        }
-      }
-    );
   }
 
   async getDataSet() {
@@ -286,66 +167,65 @@ class KnowledgeCreate$$Page extends React.Component {
     } catch (error) {}
   }
 
-  async getTableList(pre_data_set_name, pre_data_set_version) {
-    try {
-      const res = await this.utils.bff.getVersionedDataset({
-        name: pre_data_set_version,
-        namespace: this.utils.getAuthData().project,
-      });
-      const { getVersionedDataset } = res.VersionedDataset || {};
-      const { files } = getVersionedDataset;
+  handleSave(v) {
+    console.log(v, 'aaaaaaaaaaaaaaaaaaaa');
+  }
+
+  handleStep(event, { action }) {
+    // console.log(this.state.currentStep, action)
+    if (action === 'next') {
+      this.checkFileds();
+    } else {
       this.setState(
         {
-          dataSetFileList: files.nodes || [],
+          currentStep: this.state.currentStep - 1,
         },
         () => {
-          // console.log(files,  this.state)
+          this.initFormValue();
         }
       );
-    } catch (error) {}
+    }
   }
 
-  onDataSetChange(v) {
-    // console.log(form.setValues, 'form.setValues')
+  checkFileds() {
     try {
       const form = this.getFormInstence();
-      this.setState({
-        dataSet: v,
-        dataSetFileList: [], // 清空表格
-      });
-
-      form.setValues({
-        dataSetContain: {
-          version: null,
-        },
-      });
-      this.setDataSetAndDataSetVersionsSource(v);
-    } catch (error) {}
-  }
-
-  setDataSetAndDataSetVersionsSource(v) {
-    try {
-      const form = this.getFormInstence();
-      const obj = this.state.dataSetDataList.find(item => item.value === v);
-      const genOptionList = obj.versions;
-      // form.setFieldState('version', { dataSource: genOptionList })
-      form.setFieldState('dataSetContain.version', state => {
-        state.dataSource = genOptionList;
-      });
-      this.setState({
-        contentType: obj.contentType,
+      form.submit(async values => {
+        const { name, displayName, dataSetContain, description, embedder } = values;
+        const { dataset, version } = dataSetContain;
+        console.log('this.state.selectFiles', this.state.selectFiles);
+        if (this.state.currentStep === 0) {
+          if (this.state.selectFiles.length === 0) {
+            this.utils.message.info('请选择文件');
+            return;
+          }
+        }
+        this.setState({
+          currentStep: this.state.currentStep + 1,
+          form: {
+            name,
+            displayName,
+            dataSetContain,
+            description,
+            embedder,
+          },
+        });
       });
     } catch (error) {}
   }
 
-  onVersionChange(v) {
+  getCheckBox(rows) {
     try {
-      const form = this.getFormInstence();
-      // form.setFieldState('version', { dataSource: [{label: 'v2', value: 'v2'}] })
+      const { version } = this.state;
       this.setState({
-        version: v,
+        selectFiles: rows,
+        nextFileList: rows.map(item => {
+          return {
+            ...this.state.dataSetFileList.find(_item => _item.path === item),
+            version,
+          };
+        }),
       });
-      this.getTableList(this.state.dataSet, v);
     } catch (error) {}
   }
 
@@ -382,29 +262,146 @@ class KnowledgeCreate$$Page extends React.Component {
     } catch (error) {}
   }
 
-  getCheckBox(rows) {
+  async getTableList(pre_data_set_name, pre_data_set_version) {
     try {
-      const { version } = this.state;
-      this.setState({
-        selectFiles: rows,
-        nextFileList: rows.map(item => {
-          return {
-            ...this.state.dataSetFileList.find(_item => _item.path === item),
-            version,
-          };
-        }),
+      const res = await this.utils.bff.getVersionedDataset({
+        name: pre_data_set_version,
+        namespace: this.utils.getAuthData().project,
       });
+      const { getVersionedDataset } = res.VersionedDataset || {};
+      const { files } = getVersionedDataset;
+      this.setState(
+        {
+          dataSetFileList: files.nodes || [],
+        },
+        () => {
+          // console.log(files,  this.state)
+        }
+      );
     } catch (error) {}
   }
 
-  getType() {
+  handleSubmit() {
+    this.setState(
+      {
+        submited: true,
+      },
+      async () => {
+        const { embedderList, selectFiles, dataSetFileList, form } = this.state;
+        const { name, displayName, dataSetContain, description, embedder } = form;
+        const { dataset, version } = dataSetContain;
+        const embedderItem = embedderList.find(item => item.value === embedder);
+        const fileGroups = [
+          {
+            source: {
+              kind: 'VersionedDataset',
+              name: version,
+              namespace: this.utils.getAuthData().project,
+            },
+            path: selectFiles,
+          },
+        ];
+        try {
+          await this.utils.bff.createKnowledgeBase({
+            input: {
+              name,
+              displayName,
+              // name: displayName,
+              description,
+              embedder: embedderItem.name,
+              fileGroups,
+              namespace: this.utils.getAuthData().project,
+            },
+          });
+          this.utils.message.success('新增知识库成功');
+        } catch(err) {
+          console.error('新增知识库失败', err)
+          this.utils.message.warning('新增知识库失败');
+        }
+      }
+    );
+  }
+
+  onStepChange(value) {
+    this.setState({
+      currentStep: value,
+    });
+  }
+
+  initFormValue() {
     try {
-      const contentTypeObj = {
-        text: '文本',
-        image: '图片',
-        video: '视频',
-      };
-      return contentTypeObj[this.state.contentType];
+      const form = this.getFormInstence();
+      const { name, displayName, dataSetContain, description, embedder } = this.state.form;
+      const { dataset, version } = dataSetContain;
+      form.setValues(
+        {
+          displayName,
+          dataSetContain: {
+            dataset,
+            version,
+          },
+          description,
+          embedder,
+        },
+        'deepMerge'
+      );
+      // dataSetDataList: datasetlist
+      const { dataSetDataList, embedderList } = this.state;
+      form.setFieldState('dataSetContain.dataset', state => {
+        state.dataSource = dataSetDataList;
+      });
+      form.setFieldState('embedder', state => {
+        state.dataSource = embedderList;
+      });
+      this.setDataSetAndDataSetVersionsSource(dataset);
+    } catch (error) {}
+  }
+
+  getFormInstence() {
+    return this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
+  }
+
+  onDataSetChange(v) {
+    console.log(v, 'form.onDataSetChange');
+    try {
+      const form = this.getFormInstence();
+      this.setState({
+        dataSet: v,
+        dataSetFileList: [], // 清空表格
+      });
+
+      form.setValues({
+        dataSetContain: {
+          version: null,
+        },
+      });
+      this.setDataSetAndDataSetVersionsSource(v);
+    } catch (error) {}
+  }
+
+  onVersionChange(v) {
+    try {
+      const form = this.getFormInstence();
+      // form.setFieldState('version', { dataSource: [{label: 'v2', value: 'v2'}] })
+      this.setState({
+        version: v,
+      });
+      this.getTableList(this.state.dataSet, v);
+    } catch (error) {}
+  }
+
+  setDataSetAndDataSetVersionsSource(v) {
+    try {
+      const form = this.getFormInstence();
+      const obj = this.state.dataSetDataList.find(item => item.value === v);
+      const genOptionList = obj.versions;
+      // form.setFieldState('version', { dataSource: genOptionList })
+      form.setFieldState('dataSetContain.version', state => {
+        state.dataSource = genOptionList;
+      });
+      this.setState({
+        contentType: obj.contentType,
+      });
     } catch (error) {}
   }
 
@@ -457,155 +454,175 @@ class KnowledgeCreate$$Page extends React.Component {
                   __component_name="Steps"
                 />
               </Flex>
-              <FormilyForm
-                ref={this._refsManager.linkRef('step_form')}
-                style={{}}
-                formHelper={{ autoFocus: true }}
-                componentProps={{
-                  colon: false,
-                  layout: 'horizontal',
-                  labelCol: 2,
-                  labelAlign: 'left',
-                  wrapperCol: 12,
-                }}
-                __component_name="FormilyForm"
+              <Container
+                style={__$$eval(() => ({
+                  display: this.state.currentStep === 0 && !this.state.submited ? 'block' : 'none',
+                }))}
+                __component_name="Container"
               >
-                {!!__$$eval(() => this.state.currentStep === 0 && !this.state.submited) && (
-                  <Row wrap={true} __component_name="Row">
-                    <Col span={16} __component_name="Col">
-                      <FormilyForm
-                        ref={this._refsManager.linkRef('formily_iwuyzsdvrhg')}
-                        formHelper={{ autoFocus: true }}
-                        componentProps={{
-                          colon: false,
-                          layout: 'horizontal',
-                          labelAlign: 'left',
-                          labelWidth: '130px',
-                          wrapperCol: 12,
-                        }}
-                        __component_name="FormilyForm"
-                      >
-                        <FormilyInput
-                          fieldProps={{
-                            name: 'displayName',
-                            title: '知识库名称',
-                            required: true,
-                            'x-validator': [],
-                          }}
-                          componentProps={{
-                            'x-component-props': { placeholder: '请输入知识库名称' },
-                          }}
-                          decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                          __component_name="FormilyInput"
-                        />
-                        <FormilySelect
-                          fieldProps={{
-                            enum: [],
-                            name: 'embedder',
-                            title: '向量化模型',
-                            required: true,
-                            description: '',
-                            'x-validator': [],
-                            _unsafe_MixedSetter_enum_select: 'ArraySetter',
-                          }}
-                          componentProps={{
-                            'x-component-props': {
-                              disabled: false,
-                              allowClear: false,
-                              placeholder: '请选择向量化模型',
-                              _sdkSwrGetFunc: { label: '', value: '' },
+                <Row wrap={true} __component_name="Row">
+                  <Col span={16} __component_name="Col">
+                    <FormilyForm
+                      ref={this._refsManager.linkRef('formily_iwuyzsdvrhg')}
+                      formHelper={{ autoFocus: true }}
+                      componentProps={{
+                        colon: false,
+                        layout: 'horizontal',
+                        labelAlign: 'left',
+                        labelWidth: '130px',
+                        wrapperCol: 12,
+                      }}
+                      __component_name="FormilyForm"
+                    >
+                      <FormilyInput
+                        fieldProps={{
+                          name: 'name',
+                          title: '知识库名称',
+                          required: true,
+                          'x-validator': [
+                            {
+                              id: 'disabled',
+                              type: 'disabled',
+                              message:
+                                '只能包含小写字母、数字、连字符（-）和点号（.），且必须以字母或数字开头',
+                              pattern:
+                                '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$',
+                              children: '未知',
+                              required: true,
+                              whitespace: true,
                             },
-                          }}
-                          decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                          __component_name="FormilySelect"
-                        />
-                        <FormilyTextArea
-                          fieldProps={{
-                            name: 'description',
-                            title: '描述',
-                            'x-component': 'Input.TextArea',
-                            'x-validator': [],
-                          }}
-                          componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
-                          decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                          __component_name="FormilyTextArea"
-                        />
-                        <FormilyFormItem
-                          fieldProps={{
-                            name: 'dataSetContain',
-                            title: '处理数据集',
-                            required: true,
-                            'x-component': 'FormilyFormItem',
-                            'x-validator': [],
-                          }}
-                          decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                          __component_name="FormilyFormItem"
-                        >
-                          <Row wrap={true} __component_name="Row">
-                            <Col span={12} __component_name="Col">
-                              <FormilySelect
-                                fieldProps={{
-                                  name: 'dataset',
-                                  title: '',
-                                  required: true,
-                                  description: '',
-                                  'x-validator': [],
-                                }}
-                                componentProps={{
-                                  'x-component-props': {
-                                    disabled: false,
-                                    onChange: function () {
-                                      return this.onDataSetChange.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([])
-                                      );
-                                    }.bind(this),
-                                    allowClear: false,
-                                    placeholder: '请选择数据集',
-                                    _sdkSwrGetFunc: { label: '', value: '' },
-                                  },
-                                }}
-                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                __component_name="FormilySelect"
-                              />
-                            </Col>
-                            <Col span={12} __component_name="Col">
-                              <FormilySelect
-                                fieldProps={{
-                                  name: 'version',
-                                  title: '',
-                                  required: true,
-                                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                                  '_unsafe_MixedSetter_x-validator_select': 'ExpressionSetter',
-                                }}
-                                componentProps={{
-                                  'x-component-props': {
-                                    disabled: false,
-                                    onChange: function () {
-                                      return this.onVersionChange.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([])
-                                      );
-                                    }.bind(this),
-                                    allowClear: false,
-                                    showSearch: false,
-                                    placeholder: '请选择版本',
-                                    _sdkSwrGetFunc: { label: 'label', value: 'value' },
-                                    _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
-                                  },
-                                }}
-                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                __component_name="FormilySelect"
-                              />
-                            </Col>
-                          </Row>
-                        </FormilyFormItem>
-                      </FormilyForm>
-                    </Col>
-                  </Row>
-                )}
-              </FormilyForm>
-              {!!__$$eval(() => this.state.currentStep === 0 && !this.state.submited) && (
+                          ],
+                        }}
+                        componentProps={{
+                          'x-component-props': { placeholder: '请输入知识库名称' },
+                        }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        __component_name="FormilyInput"
+                      />
+                      <FormilyInput
+                        fieldProps={{
+                          name: 'displayName',
+                          title: '知识库别名',
+                          required: false,
+                          description: '',
+                          'x-validator': [],
+                        }}
+                        componentProps={{
+                          'x-component-props': { suffix: '', placeholder: '请输入知识库别名' },
+                        }}
+                        decoratorProps={{
+                          'x-decorator-props': {
+                            tooltip: '展示名称，可以为中文',
+                            labelEllipsis: true,
+                          },
+                        }}
+                        __component_name="FormilyInput"
+                      />
+                      <FormilySelect
+                        fieldProps={{
+                          enum: [],
+                          name: 'embedder',
+                          title: '向量化模型',
+                          required: true,
+                          description: '',
+                          'x-validator': [],
+                          _unsafe_MixedSetter_enum_select: 'ArraySetter',
+                        }}
+                        componentProps={{
+                          'x-component-props': {
+                            disabled: false,
+                            allowClear: false,
+                            placeholder: '请选择向量化模型',
+                            _sdkSwrGetFunc: { label: '', value: '' },
+                          },
+                        }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        __component_name="FormilySelect"
+                      />
+                      <FormilyTextArea
+                        fieldProps={{
+                          name: 'description',
+                          title: '描述',
+                          'x-component': 'Input.TextArea',
+                          'x-validator': [],
+                        }}
+                        componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        __component_name="FormilyTextArea"
+                      />
+                      <FormilyFormItem
+                        fieldProps={{
+                          name: 'dataSetContain',
+                          title: '处理数据集',
+                          required: true,
+                          'x-component': 'FormilyFormItem',
+                          'x-validator': [],
+                        }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        __component_name="FormilyFormItem"
+                      >
+                        <Row wrap={true} __component_name="Row">
+                          <Col span={12} __component_name="Col">
+                            <FormilySelect
+                              fieldProps={{
+                                name: 'dataset',
+                                title: '',
+                                required: true,
+                                description: '',
+                                'x-validator': [],
+                              }}
+                              componentProps={{
+                                'x-component-props': {
+                                  disabled: false,
+                                  onChange: function () {
+                                    return this.onDataSetChange.apply(
+                                      this,
+                                      Array.prototype.slice.call(arguments).concat([])
+                                    );
+                                  }.bind(this),
+                                  allowClear: false,
+                                  placeholder: '请选择数据集',
+                                  _sdkSwrGetFunc: { label: '', value: '' },
+                                },
+                              }}
+                              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                              __component_name="FormilySelect"
+                            />
+                          </Col>
+                          <Col span={12} __component_name="Col">
+                            <FormilySelect
+                              fieldProps={{
+                                name: 'version',
+                                title: '',
+                                required: true,
+                                _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                                '_unsafe_MixedSetter_x-validator_select': 'ExpressionSetter',
+                              }}
+                              componentProps={{
+                                'x-component-props': {
+                                  disabled: false,
+                                  onChange: function () {
+                                    return this.onVersionChange.apply(
+                                      this,
+                                      Array.prototype.slice.call(arguments).concat([])
+                                    );
+                                  }.bind(this),
+                                  allowClear: false,
+                                  showSearch: false,
+                                  placeholder: '请选择版本',
+                                  _sdkSwrGetFunc: { label: 'label', value: 'value' },
+                                  _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                                },
+                              }}
+                              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                              __component_name="FormilySelect"
+                            />
+                          </Col>
+                        </Row>
+                      </FormilyFormItem>
+                    </FormilyForm>
+                  </Col>
+                </Row>
                 <Row wrap={false} __component_name="Row">
                   <Col flex="130px" __component_name="Col">
                     <Typography.Text
@@ -677,7 +694,7 @@ class KnowledgeCreate$$Page extends React.Component {
                     />
                   </Col>
                 </Row>
-              )}
+              </Container>
               {!!__$$eval(() => this.state.currentStep === 1 && !this.state.submited) && (
                 <Flex wrap="nowrap" justify="right" vertical={true} __component_name="Flex">
                   <Row
@@ -746,7 +763,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `类型：${__$$context.getType() || '--'}`)}
+                                {__$$eval(() => `类型：${__$$context.getType() || '-'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -757,7 +774,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `数据量：${item.count?.toString() || '--'}`)}
+                                {__$$eval(() => `数据量：${item.count?.toString() || '-'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -768,22 +785,10 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.fileSize)}
+                                {__$$eval(() => item.fileSize?.toString())}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
-                              <Button
-                                icon=""
-                                block={false}
-                                ghost={false}
-                                shape="default"
-                                danger={false}
-                                disabled={false}
-                                __component_name="Button"
-                              >
-                                删除
-                              </Button>
-                            </Col>
+                            <Col span={4} __component_name="Col" />
                           </Row>
                         </Col>
                       </Row>
@@ -854,7 +859,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => __$$context.getFileNameFromPath(item.path))}
+                                {__$$eval(() => item.path)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -865,7 +870,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `文件来源：${item.version || '--'}`)}
+                                {__$$eval(() => `文件来源：${item.version || '-'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -876,7 +881,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `类型：${__$$context.getType() || '--'}`)}
+                                {__$$eval(() => `类型：${__$$context.getType() || '-'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -887,7 +892,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `数据量：${item.count || '--'}`)}
+                                {__$$eval(() => `数据量：${item.count?.toString() || '-'}`)}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">
@@ -898,7 +903,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => item.fileSize)}
+                                {__$$eval(() => item.fileSize?.toString())}
                               </Typography.Text>
                             </Col>
                             <Col span={4} __component_name="Col">

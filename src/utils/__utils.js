@@ -217,6 +217,19 @@ utils.getDataSetFileTypes = function __getDataSetFileTypes() {
 }.apply(utils);
 export const getDataSetFileTypes = utils.getDataSetFileTypes;
 
+/** - */
+utils.getFullName = function __getFullName() {
+  return source => {
+    if (!source) return '-';
+    const { name, displayName } = source;
+    if (!displayName) {
+      return name;
+    }
+    return `${displayName} (${name})`;
+  };
+}.apply(utils);
+export const getFullName = utils.getFullName;
+
 utils._ = _;
 
 utils.Modal = Modal;
@@ -296,4 +309,6 @@ export default {
   _,
 
   Modal,
+
+  getFullName,
 };

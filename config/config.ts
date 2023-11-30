@@ -39,6 +39,11 @@ export const alias = {
   KubeAGIUpload: join(__dirname, '../packages/KubeAGIUpload/src'),
   CreateDataSource: join(__dirname, '../packages/CreateDataSource/src'),
   SelectCard: join(__dirname, '../packages/SelectCard/src'),
+  'kubeagi-knowledge-edit-modal': join(__dirname, '../packages/kubeagi-knowledge-edit-modal/src'),
+  'kubeagi-knowledge-delete-modal': join(
+    __dirname,
+    '../packages/kubeagi-knowledge-delete-modal/src'
+  ),
 };
 
 export default defineConfig({
