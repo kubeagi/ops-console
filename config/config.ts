@@ -44,6 +44,7 @@ export const alias = {
     __dirname,
     '../packages/kubeagi-knowledge-delete-modal/src'
   ),
+  'dataset-version-list': join(__dirname, '../packages/dataset-version-list/src'),
 };
 
 export default defineConfig({

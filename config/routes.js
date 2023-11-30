@@ -43,6 +43,16 @@ const routes = [
         component: '@/pages/Dataset',
       },
       {
+        name: '数据集管理 - 数据集详情',
+        path: '/dataset/detail/:id',
+        component: '@/pages/DatasetDetail',
+      },
+      {
+        name: '数据集管理 - 版本详情',
+        path: '/dataset/detail/:id/version/:versionId',
+        component: '@/pages/DatasetVersionDetail',
+      },
+      {
         path: '/dataset/create',
         component: '@/pages/DataSetCreate',
       },
