@@ -93,6 +93,7 @@ class Dataset$$Page extends React.Component {
       },
     };
 
+    // 代码中有些 Ds 是 Dataset的简写
     this._fetchData = this.utils._.debounce(this.fetchData, 500);
   }
 
@@ -241,7 +242,11 @@ class Dataset$$Page extends React.Component {
         released: 0,
       },
     };
-    const res = await this.utils.bff.createVersionedDataset(payload);
+    const res = await this.utils.bff.createVersionedDataset(payload).catch(e => {
+      this.utils.notification.warn({
+        message: '新增数据集版本失败',
+      });
+    });
     if (res?.VersionedDataset?.createVersionedDataset?.name) {
       this.utils.notification.success({
         message: '新增数据集版本成功',
@@ -249,10 +254,6 @@ class Dataset$$Page extends React.Component {
       this.onAddVersionCancel();
       this.fetchData();
     }
-    this.setState({
-      data: res?.Dataset?.listDatasets?.nodes,
-      totalCount: res?.Dataset?.listDatasets?.totalCount,
-    });
   }
 
   testFunc() {
@@ -381,6 +382,13 @@ class Dataset$$Page extends React.Component {
         });
         this.fetchData();
       },
+    });
+  }
+
+  delVersionBak(params) {
+    this.setState({
+      delDsVisible: true,
+      delDsData: params,
     });
   }
 
@@ -514,8 +522,8 @@ class Dataset$$Page extends React.Component {
                 fieldProps={{
                   enum: __$$eval(() =>
                     this.state.addVersion.data?.versions.nodes.map(v => ({
-                      label: v.name,
-                      value: v.name,
+                      label: v.version,
+                      value: v.version,
                     }))
                   ),
                   name: 'inheritedFrom',
@@ -530,8 +538,8 @@ class Dataset$$Page extends React.Component {
                     disabled: false,
                     allowClear: false,
                     placeholder: '请选择历史版本',
-                    _sdkSwrGetFunc: {},
                     _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                    _sdkSwrGetFunc: {},
                   },
                 }}
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -731,10 +739,10 @@ class Dataset$$Page extends React.Component {
                                   <UnifiedLink
                                     to={__$$eval(() => `/dataset/detail/${item.name}`)}
                                     style={{ fontSize: '18px', marginLeft: '16px' }}
-                                    target="_blank"
+                                    target="_self"
                                     __component_name="UnifiedLink"
                                   >
-                                    {__$$eval(() => item.displayName || item.name)}
+                                    {__$$eval(() => __$$context.utils.getFullName(item))}
                                   </UnifiedLink>
                                 </Col>
                                 <Col
