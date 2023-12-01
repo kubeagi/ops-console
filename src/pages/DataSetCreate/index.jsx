@@ -124,6 +124,10 @@ class DataSetCreate$$Page extends React.Component {
   componentWillUnmount() {}
 
   handleReUpload() {
+    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
+      this.handleCancle();
+      return;
+    }
     this.state.uploadThis?.state?.fileList?.forEach(file => {
       this.state.uploadThis?.computeMD5(file);
     });
@@ -162,7 +166,7 @@ class DataSetCreate$$Page extends React.Component {
   }
 
   handleCancle() {
-    this.history?.go(-1);
+    this.history?.goBack();
   }
 
   async handleCreateVersionedDataset({ datasetParams, datasetRes }) {
@@ -184,9 +188,7 @@ class DataSetCreate$$Page extends React.Component {
       this.utils.notification.success({
         message: this.i18n('i18n-1sgb2qhp'),
       });
-      this.state.uploadThis?.state?.fileList?.forEach(file => {
-        this.state.uploadThis?.computeMD5(file);
-      });
+      this.handleReUpload();
     } catch (error) {
       this.utils.notification.warnings({
         message: this.i18n('i18n-72kqkgmc'),
@@ -200,9 +202,7 @@ class DataSetCreate$$Page extends React.Component {
 
   handleConfirm() {
     if (this.state.hasCreate) {
-      this.state.uploadThis?.state?.fileList?.forEach(file => {
-        this.state.uploadThis?.computeMD5(file);
-      });
+      this.handleReUpload();
       return;
     }
     this.form()?.submit(async v => {
@@ -436,27 +436,29 @@ class DataSetCreate$$Page extends React.Component {
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   __component_name="FormilyTextArea"
                 />
-                <FormilySelect
-                  fieldProps={{
-                    enum: __$$eval(() => this.utils.getDataSetFileTypes(this)),
-                    name: 'filetype',
-                    title: this.i18n('i18n-y2kflhdo') /* 文件类型 */,
-                    default: __$$eval(() => this.utils.getDataSetFileTypes(this)?.[0]?.value),
-                    'x-validator': [],
-                    _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                    _unsafe_MixedSetter_default_select: 'VariableSetter',
-                  }}
-                  componentProps={{
-                    'x-component-props': {
-                      disabled: false,
-                      allowClear: false,
-                      placeholder: this.i18n('i18n-6gwgta6g') /* 请选择文件类型 */,
-                      _sdkSwrGetFunc: {},
-                    },
-                  }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilySelect"
-                />
+                {!!false && (
+                  <FormilySelect
+                    fieldProps={{
+                      enum: __$$eval(() => this.utils.getDataSetFileTypes(this)),
+                      name: 'filetype',
+                      title: this.i18n('i18n-y2kflhdo') /* 文件类型 */,
+                      default: __$$eval(() => this.utils.getDataSetFileTypes(this)?.[0]?.value),
+                      'x-validator': [],
+                      _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                      _unsafe_MixedSetter_default_select: 'VariableSetter',
+                    }}
+                    componentProps={{
+                      'x-component-props': {
+                        disabled: false,
+                        allowClear: false,
+                        placeholder: this.i18n('i18n-6gwgta6g') /* 请选择文件类型 */,
+                        _sdkSwrGetFunc: {},
+                      },
+                    }}
+                    decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                    __component_name="FormilySelect"
+                  />
+                )}
               </FormilyForm>
               <LccComponentQlsmm
                 accept=".txt,.doc,.docx,.pdf,.md"
@@ -475,9 +477,15 @@ class DataSetCreate$$Page extends React.Component {
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this)}
-                __component_name="LccComponentQlsmm"
                 handleReUpload={function () {
                   return this.handleReUpload.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                __component_name="LccComponentQlsmm"
+                handleSuccess={function () {
+                  return this.handleCancle.apply(
                     this,
                     Array.prototype.slice.call(arguments).concat([])
                   );
