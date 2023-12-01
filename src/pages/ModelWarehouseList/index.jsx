@@ -71,21 +71,11 @@ class ModelWarehouse$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      modelList: [
-        // {
-        //   name: 'lqqtest',
-        //   labels: 'lqqtest',
-        //   annotations: 'lqqtest',
-        //   creator: 'lqq',
-        //   displayName: 'lqqtest',
-        //   description: '这是一段很长的描述',
-        //   modeltypes: 'llm,embedding',
-        //   updateTimestamp: '2023-11-29 12:00:00',
-        // }
-      ],
+      modelList: [],
       keyword: '',
       modeltypes: '',
       loading: false,
+      deleteLoading: false,
       pages: {
         currentPage: 1,
         pageSize: 10,
@@ -225,7 +215,7 @@ class ModelWarehouse$$Page extends React.Component {
     if (key === 'delete') {
       this.openDeleteModal(record.item);
     } else if (key === 'edit') {
-      this.onEdit();
+      this.onEdit(record.item);
     }
   }
 
@@ -236,7 +226,8 @@ class ModelWarehouse$$Page extends React.Component {
     });
   }
 
-  onCloseDeleteModal(isNeedLoad) {
+  onCloseDeleteModal(e, isNeedLoad) {
+    console.log('isNeedLoad', isNeedLoad);
     this.setState({
       deleteModalVisible: false,
       currentRecord: null,
@@ -249,10 +240,9 @@ class ModelWarehouse$$Page extends React.Component {
   onDelete() {
     console.log(this.utils.bff);
     this.setState({
-      loading: true,
+      deleteLoading: true,
     });
     const project = this.utils.getAuthData()?.project;
-    const { currentPage, pageSize } = this.state.pages;
     const params = {
       namespace: project,
       name: this.state.currentRecord.name,
@@ -262,25 +252,33 @@ class ModelWarehouse$$Page extends React.Component {
         input: params,
       })
       .then(res => {
-        console.log(res);
+        this.setState({
+          deleteLoading: false,
+        });
         this.utils.notification.success({
           message: '删除模型成功',
         });
-        this.onCloseDeleteModal(true);
+        // 'event' 传参无意义，仅仅为了占数
+        this.onCloseDeleteModal('event', true);
       })
       .catch(error => {
+        this.setState({
+          deleteLoading: false,
+        });
         this.utils.notification.warn({
           message: '删除模型失败',
         });
       });
   }
 
-  onEdit() {}
+  onEdit(item) {
+    this.history.push(`/model-warehouse/edit/${item.name}`);
+  }
 
   onDetailClick(e, extParams) {
     // 事件的 handler
-    console.log(e, 'onClick');
-    this.history.push(`/knowledge/detail/${extParams.data.name}`);
+
+    this.history.push(`/model-warehouse/detail/${extParams.data.name}`);
   }
 
   onCreateClick(event) {
@@ -339,14 +337,14 @@ class ModelWarehouse$$Page extends React.Component {
                           shape="default"
                           danger={false}
                           target="_self"
-                          disabled={false}
-                          __component_name="Button"
                           onClick={function () {
                             return this.onCreateClick.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
+                          disabled={false}
+                          __component_name="Button"
                         >
                           新增模型
                         </Button>
@@ -418,7 +416,7 @@ class ModelWarehouse$$Page extends React.Component {
                     size="small"
                     split={false}
                     rowKey="id"
-                    loading={false}
+                    loading={__$$eval(() => this.state.loading)}
                     bordered={false}
                     dataSource={__$$eval(() => this.state.modelList)}
                     gridEnable={true}
@@ -426,14 +424,14 @@ class ModelWarehouse$$Page extends React.Component {
                     pagination={false}
                     renderItem={item =>
                       (__$$context => (
-                        <List.Item>
+                        <List.Item style={{ marginTop: '16px' }}>
                           <Card
                             size="default"
                             type="default"
                             actions={[]}
                             loading={false}
-                            bordered={false}
-                            hoverable={false}
+                            bordered={true}
+                            hoverable={true}
                           >
                             <Row wrap={true} gutter={['', 0]} __component_name="Row">
                               <Col span={24} __component_name="Col">
@@ -441,6 +439,16 @@ class ModelWarehouse$$Page extends React.Component {
                                   <Col flex="56px" __component_name="Col">
                                     <AntdIconCodeSandboxCircleFilled
                                       style={{ color: '#4a90e2', fontSize: 56 }}
+                                      onClick={function () {
+                                        return this.onDetailClick.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([
+                                            {
+                                              data: item,
+                                            },
+                                          ])
+                                        );
+                                      }.bind(__$$context)}
                                       __component_name="AntdIconCodeSandboxCircleFilled"
                                     />
                                   </Col>
@@ -455,16 +463,26 @@ class ModelWarehouse$$Page extends React.Component {
                                         <Typography.Title
                                           bold={true}
                                           level={1}
+                                          onClick={function () {
+                                            return this.onDetailClick.apply(
+                                              this,
+                                              Array.prototype.slice.call(arguments).concat([
+                                                {
+                                                  data: item,
+                                                },
+                                              ])
+                                            );
+                                          }.bind(__$$context)}
                                           bordered={false}
                                           ellipsis={true}
                                           __component_name="Typography.Title"
                                         >
-                                          {__$$eval(() => item.name)}
+                                          {__$$eval(() => __$$context.utils.getFullName(item))}
                                         </Typography.Title>
                                         <Typography.Paragraph
                                           code={false}
                                           mark={false}
-                                          style={{ fontSize: '' }}
+                                          style={{ fontSize: '12', marginTop: '8px' }}
                                           delete={false}
                                           strong={false}
                                           disabled={false}
@@ -476,7 +494,7 @@ class ModelWarehouse$$Page extends React.Component {
                                           }}
                                           underline={false}
                                         >
-                                          {__$$eval(() => item.description)}
+                                          {__$$eval(() => item.description || '-')}
                                         </Typography.Paragraph>
                                       </Col>
                                       <Col __component_name="Col">
@@ -536,7 +554,7 @@ class ModelWarehouse$$Page extends React.Component {
                                           __component_name="Row"
                                         >
                                           <Col
-                                            span={11}
+                                            span={18}
                                             style={{ paddingLeft: '16px' }}
                                             __component_name="Col"
                                           >
@@ -552,7 +570,7 @@ class ModelWarehouse$$Page extends React.Component {
                                           </Col>
                                           <Col
                                             span={24}
-                                            style={{ display: 'inline-block', textAlign: 'center' }}
+                                            style={{ display: 'inline-block', textAlign: 'left' }}
                                             __component_name="Col"
                                           >
                                             {__$$evalArray(() => item.modeltypes.split(',')).map(
@@ -565,7 +583,13 @@ class ModelWarehouse$$Page extends React.Component {
                                                     closable={false}
                                                     __component_name="Tag"
                                                   >
-                                                    {__$$eval(() => item)}
+                                                    {__$$eval(() =>
+                                                      item === 'llm'
+                                                        ? 'LLM'
+                                                        : item === 'embedding'
+                                                        ? 'Embedding'
+                                                        : item
+                                                    )}
                                                   </Tag>
                                                 ))(
                                                   __$$createChildContext(__$$context, {
@@ -654,7 +678,7 @@ class ModelWarehouse$$Page extends React.Component {
           forceRender={false}
           maskClosable={false}
           okButtonProps={{ disabled: false }}
-          confirmLoading={false}
+          confirmLoading={__$$eval(() => this.state.deleteLoading)}
           destroyOnClose={true}
           __component_name="Modal"
           cancelButtonProps={{ disabled: false }}
