@@ -1,4 +1,4 @@
-import type { DescriptionsProps } from 'antd';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Descriptions } from 'antd';
 import React, { useEffect, useState } from 'react';
 interface Iprops {
@@ -8,7 +8,10 @@ const Info: React.FC<Iprops> = props => {
   const data = props.data;
 
   const [items, setItems] = useState([]);
-
+  const history = getUnifiedHistory();
+  const Link = path => {
+    history.push(path);
+  };
   useEffect(() => {
     const _items = [
       {
@@ -21,11 +24,49 @@ const Info: React.FC<Iprops> = props => {
       },
       {
         label: '处理前数据集',
-        children: data.pre_dataset_name,
+        children: (
+          <>
+            <a onClick={() => Link('/dataset/detail/' + data.pre_dataset_name)}>
+              {data.pre_dataset_name}
+            </a>
+            ---
+            <a
+              onClick={() =>
+                Link(
+                  '/dataset/detail/' +
+                    data.pre_dataset_name +
+                    '/version/' +
+                    data.pre_dataset_version
+                )
+              }
+            >
+              {data.pre_dataset_version}
+            </a>
+          </>
+        ),
       },
       {
         label: '处理后数据集',
-        children: data.post_dataset_name,
+        children: (
+          <>
+            <a onClick={() => Link('/dataset/detail/' + data.post_dataset_name)}>
+              {data.post_dataset_name}
+            </a>
+            ---
+            <a
+              onClick={() =>
+                Link(
+                  '/dataset/detail/' +
+                    data.post_dataset_name +
+                    '/version/' +
+                    data.post_dataset_version
+                )
+              }
+            >
+              {data.post_dataset_version}
+            </a>
+          </>
+        ),
       },
       {
         label: '创建时间',
