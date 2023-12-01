@@ -80,7 +80,7 @@ class DataSetCreate$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { createLoading: true };
+    this.state = { createLoading: true, name: undefined };
   }
 
   $ = refName => {
@@ -123,8 +123,21 @@ class DataSetCreate$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  handleReUpload() {
+    this.state.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.uploadThis?.computeMD5(file);
+    });
+  }
+
+  setName(e) {
+    this.setState({
+      name: e.target.value,
+      hasCreate: false,
+    });
+  }
+
   getBucketPath() {
-    return `dataset/${this.form()?.values?.name}/v1`;
+    return `dataset/${this.form()?.values?.name || this.state.name}/v1`;
   }
 
   setUploadState(state) {
@@ -171,7 +184,9 @@ class DataSetCreate$$Page extends React.Component {
       this.utils.notification.success({
         message: this.i18n('i18n-1sgb2qhp'),
       });
-      this.handleCancle();
+      this.state.uploadThis?.state?.fileList?.forEach(file => {
+        this.state.uploadThis?.computeMD5(file);
+      });
     } catch (error) {
       this.utils.notification.warnings({
         message: this.i18n('i18n-72kqkgmc'),
@@ -184,6 +199,12 @@ class DataSetCreate$$Page extends React.Component {
   }
 
   handleConfirm() {
+    if (this.state.hasCreate) {
+      this.state.uploadThis?.state?.fileList?.forEach(file => {
+        this.state.uploadThis?.computeMD5(file);
+      });
+      return;
+    }
     this.form()?.submit(async v => {
       this.setState({
         createLoading: true,
@@ -200,9 +221,6 @@ class DataSetCreate$$Page extends React.Component {
       try {
         const res = await this.props.appHelper.utils.bff?.createDataset({
           input: params,
-        });
-        this.state.uploadThis?.state?.fileList?.forEach(file => {
-          this.state.uploadThis?.computeMD5(file);
         });
         this.handleCreateVersionedDataset({
           datasetParams: params,
@@ -296,6 +314,12 @@ class DataSetCreate$$Page extends React.Component {
                   }}
                   componentProps={{
                     'x-component-props': {
+                      onChange: function () {
+                        return this.setName.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
                       placeholder: this.i18n('i18n-9qfjn6yy') /* 请输入数据集名称 */,
                     },
                   }}
@@ -437,6 +461,12 @@ class DataSetCreate$$Page extends React.Component {
               <LccComponentQlsmm
                 accept=".txt,.doc,.docx,.pdf,.md"
                 bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+                setState={function () {
+                  return this.setUploadState.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
                 bucket_path=""
                 Authorization={__$$eval(() => this.utils.getAuthorization())}
                 getBucketPath={function () {
@@ -446,8 +476,8 @@ class DataSetCreate$$Page extends React.Component {
                   );
                 }.bind(this)}
                 __component_name="LccComponentQlsmm"
-                setState={function () {
-                  return this.setUploadState.apply(
+                handleReUpload={function () {
+                  return this.handleReUpload.apply(
                     this,
                     Array.prototype.slice.call(arguments).concat([])
                   );
