@@ -166,7 +166,7 @@ class DataSetCreate$$Page extends React.Component {
   }
 
   handleCancle() {
-    this.history?.goBack();
+    this.history.push('/dataset');
   }
 
   async handleCreateVersionedDataset({ datasetParams, datasetRes }) {
