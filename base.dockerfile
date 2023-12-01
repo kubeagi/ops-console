@@ -2,7 +2,8 @@
 FROM --platform=linux/amd64 node:18.16-alpine
 
 # If you have native dependencies, you'll need extra tools
-RUN apk add --no-cache bash git openssh
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+  && apk update --no-cache && apk add --no-cache bash git openssh
 
 # Create app directory
 RUN mkdir -p /usr/src/app

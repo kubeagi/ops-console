@@ -27,10 +27,7 @@
     "babel-runtime": "^6.26.0",
     "react-sortable-hoc": "^2.0.0",
     "shared-components": "workspace:*",
-    "@alilc/lowcode-datasource-engine": "^1.0.0",
-    "@tenx-ui/materials": "latest",
-    "antd": "latest",
-    "@tenx-ui/auth-utils": "0.0.1"
+    "@alilc/lowcode-datasource-engine": "^1.0.0"
   },
   "devDependencies": {
     "react": "^18.0.0"

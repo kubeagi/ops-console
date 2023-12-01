@@ -28,7 +28,6 @@
     "react-sortable-hoc": "^2.0.0",
     "shared-components": "workspace:*",
     "@alilc/lowcode-datasource-engine": "^1.0.0",
-    "@tenx-ui/materials": "latest",
     "TEST": "workspace:*",
     "antd": "latest",
     "@tenx-ui/auth-utils": "0.0.1"
