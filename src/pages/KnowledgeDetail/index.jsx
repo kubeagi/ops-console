@@ -4,6 +4,8 @@ import React from 'react';
 
 import {
   Page,
+  Modal,
+  Table,
   Button,
   Row,
   Col,
@@ -16,7 +18,6 @@ import {
   Descriptions,
   Flex,
   Input,
-  Table,
 } from '@tenx-ui/materials';
 
 import LccComponentChj61 from 'kubeagi-knowledge-delete-modal';
@@ -65,7 +66,14 @@ class KnowledgeDetail$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { editModalOpen: false, deleteModalOpen: false };
+    this.state = {
+      editModalOpen: false,
+      deleteModalOpen: false,
+      addFilesModalOpen: false,
+      addFilesModalConfirmBtnLoading: false,
+      modalFilesList: [],
+      modalFilesSelectedKeys: [],
+    };
   }
 
   $ = () => null;
@@ -80,6 +88,20 @@ class KnowledgeDetail$$Page extends React.Component {
     return this.props.useGetKnowledgeBase?.data?.KnowledgeBase?.getKnowledgeBase;
   }
 
+  refreshData() {
+    this.props.useGetKnowledgeBase?.mutate();
+  }
+
+  getStatusType(status) {
+    if (status === 'True') {
+      return 'success';
+    }
+    if (status === 'False') {
+      return 'error';
+    }
+    return 'process';
+  }
+
   openEditModal() {
     this.setState({
       editModalOpen: true,
@@ -87,7 +109,7 @@ class KnowledgeDetail$$Page extends React.Component {
   }
 
   onEditModalOk() {
-    this.props.useGetKnowledgeBase?.mutate();
+    this.refreshData();
     this.setState({
       editModalOpen: false,
     });
@@ -118,6 +140,114 @@ class KnowledgeDetail$$Page extends React.Component {
     });
   }
 
+  getFileGroupDetail() {
+    // 第一版本只支持一个数据集
+    const fileGroupDetail = this.getKnowledge()?.fileGroupDetails?.[0] || {};
+    return (fileGroupDetail.filedetails || []).map(detail => ({
+      ...detail,
+      source: fileGroupDetail.source?.name,
+    }));
+  }
+
+  countFileGroupDetail() {
+    const detail = this.getFileGroupDetail();
+    let processing = 0;
+    let succeeded = 0;
+    let failed = 0;
+    detail.forEach(d => {
+      if (d.phase === 'Processing') {
+        processing++;
+      } else if (d.phase === 'Succeeded') {
+        succeeded++;
+      } else if (d.phase === 'Failed') {
+        failed++;
+      }
+    });
+    return {
+      total: detail.length,
+      processing,
+      succeeded,
+      failed,
+    };
+  }
+
+  openAddFilesModal() {
+    const fileGroupDetail = this.getFileGroupDetail();
+    this.getVersionedDataset();
+    this.setState({
+      addFilesModalOpen: true,
+      modalFilesSelectedKeys: fileGroupDetail.map(({ path }) => path),
+    });
+  }
+
+  async onAddFilesModalOk() {
+    const { modalFilesSelectedKeys } = this.state;
+    const knowledge = this.getKnowledge();
+    const fileGroups = {
+      source: knowledge.fileGroupDetails?.[0]?.source,
+      path: modalFilesSelectedKeys,
+    };
+    const input = {
+      name: knowledge.name,
+      namespace: knowledge.namespace,
+      fileGroups,
+    };
+    console.log('input', input);
+    console.log('knowledge', knowledge);
+    console.log('modalFilesSelectedKeys', this.state.modalFilesSelectedKeys);
+    this.setState({
+      addFilesModalConfirmBtnLoading: true,
+    });
+    try {
+      await this.utils.bff.updateKnowledgeBase({
+        input,
+      });
+      this.refreshData();
+      this.setState({
+        addFilesModalOpen: false,
+      });
+    } catch (err) {
+      //
+    } finally {
+      this.setState({
+        addFilesModalConfirmBtnLoading: false,
+      });
+    }
+  }
+
+  onAddFilesCancel() {
+    this.setState({
+      addFilesModalOpen: false,
+    });
+  }
+
+  async getVersionedDataset() {
+    const knowledge = this.getKnowledge();
+    const fileGroupDetail = knowledge?.fileGroupDetails?.[0] || {};
+    const res = await this.utils.bff.getVersionedDataset({
+      namespace: knowledge?.namespace,
+      name: fileGroupDetail.source?.name,
+    });
+    this.setState({
+      modalFilesList: res?.VersionedDataset?.getVersionedDataset?.files?.nodes || [],
+    });
+  }
+
+  getFileModalCheckboxProps(record) {
+    const fileGroupDetail = this.getFileGroupDetail();
+    return {
+      name: record.path,
+      disabled: fileGroupDetail.some(detail => detail.path === record.path),
+    };
+  }
+
+  onFileModalSelectionChange(selectedRowKeys, selectedRows) {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    this.setState({
+      modalFilesSelectedKeys: selectedRowKeys,
+    });
+  }
+
   componentDidMount() {
     console.log('did mount');
   }
@@ -127,6 +257,73 @@ class KnowledgeDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        <Modal
+          mask={true}
+          onOk={function () {
+            return this.onAddFilesModalOk.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.addFilesModalOpen)}
+          title="新增文件"
+          width="800px"
+          centered={false}
+          keyboard={true}
+          onCancel={function () {
+            return this.onAddFilesCancel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          forceRender={false}
+          maskClosable={false}
+          confirmLoading={__$$eval(() => this.state.addFilesModalConfirmBtnLoading)}
+          destroyOnClose={true}
+          __component_name="Modal"
+        >
+          <Table
+            size="middle"
+            rowKey="path"
+            scroll={{ scrollToFirstRowOnChange: true }}
+            columns={[
+              { key: 'name', title: '名称', dataIndex: 'path' },
+              { key: 'age', title: '类型', dataIndex: 'fileType' },
+              { title: '数据量', dataIndex: 'count' },
+              { title: '大小', dataIndex: 'size' },
+            ]}
+            dataSource={__$$eval(() => this.state.modalFilesList)}
+            pagination={{
+              size: 'default',
+              total: __$$eval(() => this.state.modalFilesList.length),
+              simple: false,
+              current: 1,
+              pageSize: 20,
+              position: [],
+              pagination: { pageSize: 10 },
+              showQuickJumper: false,
+              showSizeChanger: false,
+            }}
+            showHeader={true}
+            rowSelection={{
+              type: 'checkbox',
+              onChange: function () {
+                return this.onFileModalSelectionChange.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this),
+              selectedRowKeys: __$$eval(() => this.state.modalFilesSelectedKeys),
+              getCheckboxProps: function () {
+                return this.getFileModalCheckboxProps.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this),
+            }}
+            __component_name="Table"
+          />
+        </Modal>
         {!!__$$eval(() => this.state.deleteModalOpen) && (
           <LccComponentChj61
             name={__$$eval(() => this.getKnowledge()?.name)}
@@ -211,8 +408,17 @@ class KnowledgeDetail$$Page extends React.Component {
                           <Row wrap={true} __component_name="Row">
                             <Col span={6} __component_name="Col">
                               <Status
-                                id="disabled"
-                                types={[{ id: 'disabled', type: 'disabled', children: '未知' }]}
+                                id={__$$eval(() => this.getStatusType(this.getKnowledge()?.status))}
+                                types={[
+                                  {
+                                    id: 'process',
+                                    type: 'primary',
+                                    tooltip: '',
+                                    children: '数据处理中',
+                                  },
+                                  { id: 'success', type: 'success', children: '数据处理完成' },
+                                  { id: 'error', type: 'error', children: '数据处理失败' },
+                                ]}
                                 __component_name="Status"
                               />
                             </Col>
@@ -547,6 +753,12 @@ class KnowledgeDetail$$Page extends React.Component {
                                 shape="default"
                                 style={{ height: '32px', marginRight: '12px' }}
                                 danger={false}
+                                onClick={function () {
+                                  return this.openAddFilesModal.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
                                 disabled={false}
                                 __component_name="Button"
                               >
@@ -561,6 +773,12 @@ class KnowledgeDetail$$Page extends React.Component {
                                 shape="default"
                                 style={{ height: '32px', marginRight: '12px' }}
                                 danger={false}
+                                onClick={function () {
+                                  return this.refreshData.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
                                 disabled={false}
                                 __component_name="Button"
                               >
@@ -571,56 +789,155 @@ class KnowledgeDetail$$Page extends React.Component {
                                 placeholder="请输入文件名称搜索"
                                 __component_name="Input.Search"
                               />
-                              <Typography.Text
-                                style={{ fontSize: '', paddingRight: '12px' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                共有文件：113 个
-                              </Typography.Text>
-                              <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                文件向量化中：10 个 文件向量化成功：100 个 文件向量化失败：3 个。
-                              </Typography.Text>
+                              <Space align="center" direction="horizontal" __component_name="Space">
+                                <Typography.Text
+                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                  strong={false}
+                                  disabled={false}
+                                  ellipsis={true}
+                                  __component_name="Typography.Text"
+                                >
+                                  {__$$eval(
+                                    () => `共有文件：${this.countFileGroupDetail().total} 个`
+                                  )}
+                                </Typography.Text>
+                                <Typography.Text
+                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                  strong={false}
+                                  disabled={false}
+                                  ellipsis={true}
+                                  __component_name="Typography.Text"
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      `文件向量化中：${this.countFileGroupDetail().processing} 个`
+                                  )}
+                                </Typography.Text>
+                                <Typography.Text
+                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                  strong={false}
+                                  disabled={false}
+                                  ellipsis={true}
+                                  __component_name="Typography.Text"
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      `文件向量化成功：${this.countFileGroupDetail().succeeded} 个`
+                                  )}
+                                </Typography.Text>
+                                <Typography.Text
+                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                  strong={false}
+                                  disabled={false}
+                                  ellipsis={true}
+                                  __component_name="Typography.Text"
+                                >
+                                  {__$$eval(
+                                    () => `文件向量化失败：${this.countFileGroupDetail().failed} 个`
+                                  )}
+                                </Typography.Text>
+                              </Space>
                             </Col>
                             <Col span={24} __component_name="Col">
                               <Table
                                 size="middle"
                                 style={{}}
-                                rowKey="id"
+                                rowKey="path"
                                 scroll={{ scrollToFirstRowOnChange: true }}
                                 columns={[
-                                  { key: 'name', title: '姓名', dataIndex: 'name' },
-                                  { key: 'age', title: '年龄', dataIndex: 'age' },
-                                ]}
-                                dataSource={[
+                                  { key: 'path', title: '文件名称', dataIndex: 'path' },
                                   {
-                                    id: '1',
-                                    age: 32,
-                                    name: '胡彦斌',
-                                    address: '西湖区湖底公园1号',
+                                    key: 'age',
+                                    title: '状态',
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Status
+                                          id={__$$eval(() => text)}
+                                          types={[
+                                            { id: 'Skipped', type: 'disabled', children: '跳过' },
+                                            { id: 'Pending', type: 'disabled', children: '待处理' },
+                                            { id: 'Failed', type: 'error', children: '失败' },
+                                            {
+                                              id: 'Succeeded',
+                                              type: 'success',
+                                              children: '已完成',
+                                            },
+                                            {
+                                              id: 'Processing',
+                                              type: 'primary',
+                                              children: '处理中',
+                                            },
+                                          ]}
+                                          __component_name="Status"
+                                        />
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
+                                    dataIndex: 'phase',
+                                  },
+                                  { title: '文件来源', dataIndex: 'source' },
+                                  { title: '类型', dataIndex: 'fileType' },
+                                  { title: '数据量', dataIndex: 'count' },
+                                  { title: '文件大小', dataIndex: 'size' },
+                                  {
+                                    title: '导入时间',
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Typography.Time
+                                          time={__$$eval(() => text)}
+                                          format=""
+                                          relativeTime={true}
+                                          __component_name="Typography.Time"
+                                        />
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
+                                    dataIndex: 'updateTimestamp',
                                   },
                                   {
-                                    id: '2',
-                                    age: 28,
-                                    name: '王一博',
-                                    address: '滨江区网商路699号',
+                                    title: '操作',
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                          __component_name="Space"
+                                        >
+                                          <Button
+                                            block={false}
+                                            ghost={false}
+                                            shape="default"
+                                            danger={false}
+                                            disabled={false}
+                                            __component_name="Button"
+                                          >
+                                            日志
+                                          </Button>
+                                          <Button
+                                            block={false}
+                                            ghost={false}
+                                            shape="default"
+                                            danger={true}
+                                            disabled={true}
+                                            __component_name="Button"
+                                          >
+                                            删除
+                                          </Button>
+                                        </Space>
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
+                                    dataIndex: 'operator',
                                   },
                                 ]}
+                                dataSource={__$$eval(() => this.getFileGroupDetail())}
                                 pagination={{
                                   size: 'default',
-                                  total: 15,
+                                  total: __$$eval(() => this.getFileGroupDetail().length),
                                   simple: false,
                                   current: 1,
-                                  pageSize: 10,
-                                  position: ['topRight'],
+                                  pageSize: 20,
+                                  position: ['bottomRight'],
                                   pagination: { pageSize: 10 },
                                   showQuickJumper: false,
                                   showSizeChanger: false,

@@ -71,24 +71,76 @@ class Knowledge$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      corpusList: [],
+      searchName: '',
+      loading: false,
       pages: {
         currentPage: 1,
         pageSize: 12,
         total: 0,
       },
-      loading: false,
       pageRange: [],
-      corpusList: [],
-      searchName: '',
-      currentItem: {},
       editModalOpen: false,
       deleteModalOpen: false,
+      currentItem: {},
     };
   }
 
   $ = () => null;
 
   $$ = () => [];
+
+  returnTxt(item) {
+    return item;
+  }
+
+  getStatusType(item) {
+    if (item.status === 'True') {
+      return 'success';
+    } else if (item.status === 'False') {
+      return 'error';
+    } else {
+      return 'unknow';
+    }
+  }
+
+  getDataStatus(isStatus, isTag) {
+    return [
+      // 导入中
+      {
+        type: 'primary',
+        [isStatus ? 'id' : 'value']: 'process',
+        [isStatus || isTag ? 'children' : 'text']: '数据处理中',
+      },
+      // 连接成功
+      {
+        type: 'success',
+        [isStatus ? 'id' : 'value']: 'success',
+        [isStatus || isTag ? 'children' : 'text']: '数据处理完成',
+      },
+      {
+        // 连接异常
+        type: 'error',
+        [isStatus ? 'id' : 'value']: 'error',
+        [isStatus || isTag ? 'children' : 'text']: '数据处理失败',
+      },
+    ];
+  }
+
+  onSearch(name) {
+    this.setState(
+      {
+        searchName: name,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData(name);
+      }
+    );
+  }
 
   getData() {
     this.setState({
@@ -127,6 +179,30 @@ class Knowledge$$Page extends React.Component {
       });
   }
 
+  handlePageSizeChange(size) {
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  onShowSizeChange(current, size) {
+    // pageSize 变化的回调
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
   onChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -143,28 +219,12 @@ class Knowledge$$Page extends React.Component {
     );
   }
 
-  onSearch(name) {
-    this.setState(
-      {
-        searchName: name,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData(name);
-      }
-    );
+  onDetailClick(e, extParams) {
+    this.history.push(`/knowledge/detail/${extParams.data.name}`);
   }
 
-  returnTxt(item) {
-    return item;
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
+  onCreateClick(event) {
+    this.history.push(`/knowledge/create`);
   }
 
   onMenuClick({ item, key, keyPath, domEvent }, extParams) {
@@ -192,49 +252,14 @@ class Knowledge$$Page extends React.Component {
     }
   }
 
-  getDataStatus(isStatus, isTag) {
-    return [
-      // 导入中
-      {
-        type: 'primary',
-        [isStatus ? 'id' : 'value']: 'process',
-        [isStatus || isTag ? 'children' : 'text']: '数据处理中',
-      },
-      // 连接成功
-      {
-        type: 'success',
-        [isStatus ? 'id' : 'value']: 'success',
-        [isStatus || isTag ? 'children' : 'text']: '数据处理完成',
-      },
-      {
-        // 连接异常
-        type: 'error',
-        [isStatus ? 'id' : 'value']: 'error',
-        [isStatus || isTag ? 'children' : 'text']: '数据处理失败',
-      },
-    ];
-  }
-
-  getStatusType(item) {
-    if (item.status === 'True') {
-      return 'success';
-    } else if (item.status === 'False') {
-      return 'error';
-    } else {
-      return 'unknow';
-    }
-  }
-
-  onCreateClick(event) {
-    this.history.push(`/knowledge/create`);
-  }
-
-  onDetailClick(e, extParams) {
-    this.history.push(`/knowledge/detail/${extParams.data.name}`);
-  }
-
   onEditModalOk() {
     this.getData();
+    this.setState({
+      editModalOpen: false,
+    });
+  }
+
+  onEditModalCancel() {
     this.setState({
       editModalOpen: false,
     });
@@ -247,39 +272,15 @@ class Knowledge$$Page extends React.Component {
     });
   }
 
-  onShowSizeChange(current, size) {
-    // pageSize 变化的回调
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
-  onEditModalCancel() {
-    this.setState({
-      editModalOpen: false,
-    });
-  }
-
   onDeleteModalCancel() {
     this.setState({
       deleteModalOpen: false,
     });
   }
 
-  handlePageSizeChange(size) {
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
   componentDidMount() {
     this.getData();
+    console.log('getDataStatus', this.getDataStatus(this, true));
   }
 
   render() {
@@ -621,7 +622,7 @@ class Knowledge$$Page extends React.Component {
                 </Col>
                 <Col
                   span={24}
-                  style={{ display: 'flex', justifyContent: 'center' }}
+                  style={{ display: 'flex', justifyContent: 'right' }}
                   __component_name="Col"
                 >
                   <Pagination
