@@ -69,6 +69,15 @@ const routes = [
         path: '/knowledge/detail/:name',
         component: '@/pages/KnowledgeDetail',
       },
+      {
+        name: '模型仓库',
+        path: '/model-warehouse',
+        component: '@/pages/ModelWarehouseList',
+      },
+      {
+        path: '/model-warehouse/create',
+        component: '@/pages/ModelWarehouseCreate',
+      },
     ],
   },
 ];

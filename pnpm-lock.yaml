@@ -435,6 +435,49 @@ importers:
         specifier: ^18.0.0
         version: 18.2.0
 
+  packages/dataset-version-list:
+    dependencies:
+      '@alilc/lowcode-datasource-engine':
+        specifier: ^1.0.0
+        version: 1.1.4
+      '@formily/antd':
+        specifier: ^2.1.4
+        version: 2.2.30(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@formily/core':
+        specifier: ^2.1.4
+        version: 2.2.30
+      '@formily/react':
+        specifier: ^2.1.4
+        version: 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@tenx-ui/arcadia-bff-sdk':
+        specifier: 0.0.23
+        version: 0.0.23(@tenx-ui/materials@1.5.25)(antd@5.11.3)(react@18.2.0)(swr@2.2.4)
+      '@tenx-ui/form-helper':
+        specifier: ^0.0.2
+        version: 0.0.2(react@18.2.0)
+      '@tenx-ui/icon':
+        specifier: ^2.4.17
+        version: 2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
+      '@tenx-ui/materials':
+        specifier: latest
+        version: 1.5.25(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+      '@tenx-ui/utils':
+        specifier: ^2.3.1
+        version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
+      babel-runtime:
+        specifier: ^6.26.0
+        version: 6.26.0
+      react-sortable-hoc:
+        specifier: ^2.0.0
+        version: 2.0.0(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
+      shared-components:
+        specifier: workspace:*
+        version: link:../shared-components
+    devDependencies:
+      react:
+        specifier: ^18.0.0
+        version: 18.2.0
+
   packages/kubeagi-knowledge-delete-modal:
     dependencies:
       '@alilc/lowcode-datasource-engine':
@@ -2938,7 +2981,7 @@ packages:
       '@dnd-kit/core': ^6.0.7
       react: '>=16.8.0'
     dependencies:
-      '@dnd-kit/core': 6.0.8(react-dom@18.2.0)(react@18.2.0)
+      '@dnd-kit/core': 6.0.8(react-dom@17.0.2)(react@18.2.0)
       '@dnd-kit/utilities': 3.2.1(react@18.2.0)
       react: 18.2.0
       tslib: 2.6.2
@@ -4660,6 +4703,26 @@ packages:
       - encoding
     dev: false
 
+  /@tenx-ui/arcadia-bff-sdk@0.0.23(@tenx-ui/materials@1.5.25)(antd@5.11.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-VzkzDj00nXZMaWXwk6RlXTdoTG8aSALTCVqVYL46zx3+nH2hspE28ZyxIg2oZCuBJ0zkIVbSbfyzQKLKYdMi+Q==}
+    peerDependencies:
+      '@tenx-ui/materials': '>=1.5.8'
+      antd: '>=5.4.0'
+      react: '>=16.9.0'
+      swr: '>=2.0.0'
+    dependencies:
+      '@tenx-ui/materials': 1.5.25(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+      antd: 5.11.3(react-dom@18.2.0)(react@18.2.0)
+      graphql: 16.8.1
+      graphql-request: 6.1.0(graphql@16.8.1)
+      graphql-tag: 2.12.6(graphql@16.8.1)
+      query-string: 8.1.0
+      react: 18.2.0
+      swr: 2.2.4(react@18.2.0)
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
   /@tenx-ui/arcadia-bff-sdk@0.0.25(@tenx-ui/materials@1.5.25)(antd@5.11.3)(react@18.2.0)(swr@2.2.4):
     resolution: {integrity: sha512-nHUAlzb9tPUtsa5Fup1QHHN+RCFQ5IapfqYSMRlU7ymT0DxCo3H1KXeKPA6PR+jqBEjSKimm9R/YnsDTIO5aWw==}
     peerDependencies:
@@ -4927,6 +4990,44 @@ packages:
 
   /@tenx-ui/materials@1.5.21(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5):
     resolution: {integrity: sha512-cIuGR8z8BsBXSRPlWizvxnuVuQPoU0kiRu4BWlC92zDmVY/XR+JxKVf5x7PISWR7KV3ORvtB0WxYfQ5kvY+Crw==}
+    peerDependencies:
+      '@ant-design/icons': ^4.7.0
+      antd: ^5.8.6
+      dayjs: ^1.9.8
+      lodash: ^4.17.21
+    dependencies:
+      '@ant-design/icons': 4.8.1(react-dom@17.0.2)(react@18.2.0)
+      '@babel/runtime': 7.23.2
+      '@formily/antd': 2.2.30(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@formily/core': 2.2.30
+      '@formily/json-schema': 2.2.30(typescript@4.9.5)
+      '@formily/react': 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@17.0.2)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
+      '@formily/reactive': 2.2.30
+      '@formily/shared': 2.2.30
+      '@tenx-ui/form-helper': 0.0.2(react@18.2.0)
+      '@tenx-ui/utils': 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
+      antd: 5.11.3(react-dom@18.2.0)(react@18.2.0)
+      classnames: 2.3.2
+      dayjs: 1.11.10
+      lodash: 4.17.21
+      rc-cascader: 3.20.0(react-dom@17.0.2)(react@18.2.0)
+      rc-select: 14.10.0(react-dom@17.0.2)(react@18.2.0)
+      rc-tabs: 12.13.1(react-dom@17.0.2)(react@18.2.0)
+      react-sortable-hoc: 2.0.0(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - moment
+      - prop-types
+      - react
+      - react-dom
+      - react-is
+      - react-router-dom
+      - typescript
+    dev: false
+
+  /@tenx-ui/materials@1.5.25(@ant-design/icons@4.8.1)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5):
+    resolution: {integrity: sha512-BPEeeZ95rcgGKv4N/0NT+d/SqSeppZFZumC/5iuV4EFyL9TZ5R9QBsS9f6UMgLJ7nqvzQ4v3aY7Heg7lkr76fg==}
     peerDependencies:
       '@ant-design/icons': ^4.7.0
       antd: ^5.8.6
