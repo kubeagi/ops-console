@@ -26,6 +26,7 @@ import {
   Tag,
   Divider,
   Table,
+  Status,
   Dropdown,
 } from '@tenx-ui/materials';
 
@@ -78,18 +79,18 @@ class Dataset$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      data: [],
-      page: 1,
+      search: undefined,
       type: undefined,
       field: undefined,
-      search: undefined,
-      loading: false,
+      page: 1,
       pageSize: 10,
+      totalCount: 0,
+      loading: false,
+      data: [],
       addVersion: {
         visible: false,
         data: {},
       },
-      totalCount: 0,
     };
 
     this._fetchData = this.utils._.debounce(this.fetchData, 500);
@@ -105,25 +106,87 @@ class Dataset$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  _data() {
+    return {
+      fields: [
+        {
+          label: '科技',
+          value: 'science',
+        },
+        {
+          label: '金融',
+          value: 'finance',
+        },
+        {
+          label: '教育',
+          value: 'education',
+        },
+        {
+          label: '医疗',
+          value: 'medical',
+        },
+        {
+          label: '能源',
+          value: 'energy',
+        },
+        {
+          label: '法律',
+          value: 'law',
+        },
+        {
+          label: '其他',
+          value: 'others',
+        },
+      ],
+      type: [
+        {
+          label: '文本',
+          value: 'text',
+        },
+        {
+          label: '图片',
+          value: 'image',
+        },
+        {
+          label: '科技',
+          value: 'video',
+        },
+      ],
+      syncStatus: [
+        {
+          children: '同步中',
+          id: 'FileSyncing',
+          type: 'info',
+        },
+        {
+          children: '同步失败',
+          id: 'FileSyncFailed',
+          type: 'error',
+        },
+        {
+          children: '同步成功',
+          id: 'FileSyncSuccess',
+          type: 'success',
+        },
+      ],
+      released: [
+        {
+          children: '未发布',
+          id: 0,
+          type: 'error',
+        },
+        {
+          children: '已发布',
+          id: 1,
+          type: 'success',
+        },
+      ],
+      dataProcessStatus: {},
+    };
+  }
+
   form(name) {
     return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
-  onClick(event) {
-    // 点击按钮时的回调
-  }
-
-  refresh(event) {
-    event.stopPropagation();
-    this.fetchData();
-  }
-
-  testFunc() {
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
-  }
-
-  toDetail(event, params) {
-    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
   }
 
   async fetchData() {
@@ -163,13 +226,37 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  linkClick(event) {
-    event.stopPropagation();
+  async addVersionFetch() {
+    const _version =
+      'v' + (this.getVersionsNumMax(this.state.addVersion.data?.versions?.nodes || []) + 1);
+    const payload = {
+      input: {
+        name: this.state.addVersion.data?.name + '-' + _version,
+        namespace: this.state.addVersion.data?.namespace,
+        datasetName: this.state.addVersion.data?.name,
+        displayName: '',
+        description: this.form().values.description,
+        inheritedFrom: this.form().values.inheritedFrom,
+        version: _version,
+        released: 0,
+      },
+    };
+    const res = await this.utils.bff.createVersionedDataset(payload);
+    if (res?.VersionedDataset?.createVersionedDataset?.name) {
+      this.utils.notification.success({
+        message: '新增数据集版本成功',
+      });
+      this.onAddVersionCancel();
+      this.fetchData();
+    }
+    this.setState({
+      data: res?.Dataset?.listDatasets?.nodes,
+      totalCount: res?.Dataset?.listDatasets?.totalCount,
+    });
   }
 
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
+  testFunc() {
+    return <div className="test-aliLowcode-func">{this.state.test}</div>;
   }
 
   addVersion(event, params) {
@@ -182,29 +269,92 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  delVersion(params) {
-    this.utils.Modal.confirm({
-      title: '删除数据集版本',
-      content: `确定删除数据集：${params.dataset.name} 下版本：${params.version.version}？`,
-      onOk: async () => {
-        const res = await this.utils.bff
-          .deleteVersionedDatasets({
-            input: {
-              namespace: params.dataset.namespace,
-              name: params.version.name,
-            },
-          })
-          .catch(e => {
-            this.utils.notification.warn({
-              message: '删除数据集版本失败',
-            });
-          });
-        this.utils.notification.success({
-          message: '删除数据集版本成功',
-        });
-        this.fetchData();
+  refresh(event) {
+    event.stopPropagation();
+    this.fetchData();
+  }
+
+  getVersionsNumMax(versions) {
+    console.log('getVersionsNumMax', versions);
+    return Math.max(...versions.map(v => parseInt(v?.version?.match(/\d+/)?.[0] || '0')), 0);
+  }
+
+  onClick(event) {
+    // 点击按钮时的回调
+  }
+
+  linkClick(event) {
+    event.stopPropagation();
+  }
+
+  onSearchChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        search: event.target.value,
+      },
+      this._fetchData
+    );
+  }
+
+  onTypeChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        type: event,
+      },
+      this.fetchData
+    );
+  }
+
+  onFieldChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        field: event,
+      },
+      this.fetchData
+    );
+  }
+
+  onPageChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState(
+      {
+        page,
+        pageSize,
+      },
+      this.fetchData
+    );
+  }
+
+  onAddVersionOK() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.form()
+      .validate()
+      .then(this.addVersionFetch.bind(this))
+      .catch(e => {
+        console.error('onAddVersion error:', e);
+      });
+  }
+
+  onAddVersionCancel() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.setState({
+      addVersion: {
+        visible: false,
+        data: {},
       },
     });
+  }
+
+  toDetail(event, params) {
+    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   onDelDataset(event, params) {
@@ -234,81 +384,28 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  onPageChange(page, pageSize) {
-    // 页码或 pageSize 改变的回调
-    this.setState(
-      {
-        page,
-        pageSize,
+  delVersion(params) {
+    this.utils.Modal.confirm({
+      title: '删除数据集版本',
+      content: `确定删除数据集：${params.dataset.name} 下版本：${params.version.version}？`,
+      onOk: async () => {
+        const res = await this.utils.bff
+          .deleteVersionedDatasets({
+            input: {
+              namespace: params.dataset.namespace,
+              name: params.version.name,
+            },
+          })
+          .catch(e => {
+            this.utils.notification.warn({
+              message: '删除数据集版本失败',
+            });
+          });
+        this.utils.notification.success({
+          message: '删除数据集版本成功',
+        });
+        this.fetchData();
       },
-      this.fetchData
-    );
-  }
-
-  onTypeChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        type: event,
-      },
-      this.fetchData
-    );
-  }
-
-  onFieldChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        field: event,
-      },
-      this.fetchData
-    );
-  }
-
-  onAddVersionOK() {
-    // 点击遮罩层或右上角叉或取消按钮的回调
-    this.form()
-      .validate()
-      .then(this.addVersionFetch)
-      .catch(e => {});
-  }
-
-  onSearchChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        search: event.target.value,
-      },
-      this._fetchData
-    );
-  }
-
-  async addVersionFetch() {
-    const _version = 'v' + (this.getVersionsNumMax(this.state.addVersion.data?.versions.nodes) + 1);
-    const payload = {
-      input: {
-        name: this.state.addVersion.data?.name + '-' + _version,
-        namespace: this.state.addVersion.data?.namespace,
-        datasetName: this.state.addVersion.data?.name,
-        displayName: '',
-        description: this.form().values.description,
-        inheritedFrom: this.form().values.inheritedFrom,
-        version: _version,
-        released: 0,
-      },
-    };
-    const res = await this.utils.bff.createVersionedDataset(payload);
-    console.log('ressss', res);
-    if (res?.VersionedDataset?.createVersionedDataset?.name) {
-      this.utils.notification.success({
-        message: '新增数据集版本成功',
-      });
-      this.onAddVersionCancel();
-      this.fetchData();
-    }
-    this.setState({
-      data: res?.Dataset?.listDatasets?.nodes,
-      totalCount: res?.Dataset?.listDatasets?.totalCount,
     });
   }
 
@@ -316,20 +413,6 @@ class Dataset$$Page extends React.Component {
     if (event.key === 'delete') {
       this.delVersion(params);
     }
-  }
-
-  getVersionsNumMax(versions) {
-    return Math.max(...versions.map(v => parseInt(v?.version?.match(/\d+/)?.[0] || '0')), 0);
-  }
-
-  onAddVersionCancel() {
-    // 点击遮罩层或右上角叉或取消按钮的回调
-    this.setState({
-      addVersion: {
-        visible: false,
-        data: {},
-      },
-    });
   }
 
   componentDidMount() {
@@ -436,7 +519,7 @@ class Dataset$$Page extends React.Component {
                     }))
                   ),
                   name: 'inheritedFrom',
-                  title: this.i18n('i18n-ygp6an7a') /* 历史版本 */,
+                  title: '历史版本',
                   required: true,
                   'x-display': "{{ $form.values?.inheritedFromSwitch ? 'visible' : 'hidden' }}",
                   'x-validator': [],
@@ -446,7 +529,7 @@ class Dataset$$Page extends React.Component {
                   'x-component-props': {
                     disabled: false,
                     allowClear: false,
-                    placeholder: this.i18n('i18n-84e86ujo') /* 请选择历史版本 */,
+                    placeholder: '请选择历史版本',
                     _sdkSwrGetFunc: {},
                     _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
                   },
@@ -511,13 +594,9 @@ class Dataset$$Page extends React.Component {
                   shape="default"
                   danger={false}
                   onClick={function () {
-                    return this.onDropdownClick.apply(
+                    return this.fetchData.apply(
                       this,
-                      Array.prototype.slice.call(arguments).concat([
-                        {
-                          item: this.record,
-                        },
-                      ])
+                      Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
                   disabled={false}
@@ -549,11 +628,7 @@ class Dataset$$Page extends React.Component {
                   mode="single"
                   style={{ width: 200 }}
                   value={__$$eval(() => this.state.type)}
-                  options={[
-                    { label: '文本', value: 'text', disabled: false },
-                    { label: '图片', value: 'image', disabled: false },
-                    { label: '视频', value: 'video', disabled: false },
-                  ]}
+                  options={__$$eval(() => this._data().type)}
                   disabled={false}
                   onChange={function () {
                     return this.onTypeChange.apply(
@@ -570,15 +645,7 @@ class Dataset$$Page extends React.Component {
                 />
                 <Select
                   style={{ width: 200 }}
-                  options={[
-                    { label: '科技', value: 'science', disabled: false },
-                    { label: '金融', value: 'finance', disabled: false },
-                    { label: '教育', value: 'education', disabled: false },
-                    { label: '医疗', value: 'medical', disabled: false },
-                    { label: '能源', value: 'energy', disabled: false },
-                    { label: '法律', value: 'law', disabled: false },
-                    { label: '其他', value: 'others', disabled: false },
-                  ]}
+                  options={__$$eval(() => this._data().fields)}
                   disabled={false}
                   onChange={function () {
                     return this.onFieldChange.apply(
@@ -664,7 +731,7 @@ class Dataset$$Page extends React.Component {
                                   <UnifiedLink
                                     to={__$$eval(() => `/dataset/detail/${item.name}`)}
                                     style={{ fontSize: '18px', marginLeft: '16px' }}
-                                    target="_self"
+                                    target="_blank"
                                     __component_name="UnifiedLink"
                                   >
                                     {__$$eval(() => item.displayName || item.name)}
@@ -676,12 +743,17 @@ class Dataset$$Page extends React.Component {
                                   style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
+                                    justifyContent: 'flex-end',
                                   }}
                                   __component_name="Col"
                                 >
                                   <Tag color="warning" closable={false} __component_name="Tag">
-                                    {__$$eval(() => item.contentType)}
+                                    {__$$eval(
+                                      () =>
+                                        __$$context.utils._.find(__$$context._data().type, {
+                                          value: item.contentType,
+                                        })?.label || '未知'
+                                    )}
                                   </Tag>
                                   <Tag color="processing" closable={false} __component_name="Tag">
                                     {__$$eval(() => item.field || '未知')}
@@ -791,12 +863,16 @@ class Dataset$$Page extends React.Component {
                                   {
                                     key: 'syncStatus',
                                     title: '导入状态',
-                                    render: (text, record) =>
-                                      ({
-                                        FileSyncing: '同步中',
-                                        FileSyncFailed: '同步失败',
-                                        FileSyncSuccess: '同步成功',
-                                      }[text] || '未知'),
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Status
+                                          id={__$$eval(() => record.syncStatus)}
+                                          types={__$$eval(() => __$$context._data().syncStatus)}
+                                          __component_name="Status"
+                                        />
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
                                     dataIndex: 'syncStatus',
                                   },
                                   {
@@ -808,11 +884,16 @@ class Dataset$$Page extends React.Component {
                                   {
                                     key: 'released',
                                     title: '发布状态',
-                                    render: (text, record) =>
-                                      ({
-                                        0: '未发布',
-                                        1: '已发布',
-                                      }[text] || '未知'),
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Status
+                                          id={__$$eval(() => record.released)}
+                                          types={__$$eval(() => __$$context._data().released)}
+                                          __component_name="Status"
+                                        />
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
                                     dataIndex: 'released',
                                   },
                                   {
