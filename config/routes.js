@@ -82,6 +82,14 @@ const routes = [
         path: '/model-service/detail/:name',
         component: '@/pages/ModelServiceDetail',
       },
+      {
+        path: '/model-warehouse/detail/:name',
+        component: '@/pages/ModelWarehouseDetail',
+      },
+      {
+        path: '/model-warehouse/edit/:name',
+        component: '@/pages/ModelWarehouseEdit',
+      },
     ],
   },
 ];

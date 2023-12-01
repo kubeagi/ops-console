@@ -62,7 +62,7 @@ class CreateModelWarehouse$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = {};
+    this.state = { loading: false };
   }
 
   $ = refName => {
@@ -75,6 +75,56 @@ class CreateModelWarehouse$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
+  }
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
+
+  linkToList() {
+    this.history.push('/model-warehouse');
+  }
+
+  onSubmit() {
+    this.form('model_form')
+      ?.validate()
+      .then(res => {
+        this.setState({
+          loading: true,
+        });
+        const values = this.form('model_form').values;
+        const params = {
+          namespace: this.utils.getAuthData().project,
+          ...values,
+          modeltypes: values.modeltypes.join(','),
+        };
+        this.utils.bff
+          .createModel({
+            input: params,
+          })
+          .then(res => {
+            if (res?.Model?.createModel) {
+              this.setState({
+                loading: false,
+              });
+              this.utils.notification.success({
+                message: '成功',
+                description: '正在返回列表页',
+              });
+              this.linkToList();
+            }
+          })
+          .catch(err => {
+            console.log(err);
+            this.setState({
+              loading: false,
+            });
+            this.utils.notification.warn({
+              message: '失败',
+              description: err,
+            });
+          });
+      });
   }
 
   testFunc() {
@@ -104,7 +154,7 @@ class CreateModelWarehouse$$Page extends React.Component {
         >
           <Col span={24} __component_name="Col">
             <Space align="center" direction="horizontal" __component_name="Space">
-            <Button.Back type="primary" title="" __component_name="Button.Back" />
+              <Button.Back type="primary" title="" __component_name="Button.Back" />
             </Space>
             <Typography.Title
               bold={true}
@@ -113,7 +163,6 @@ class CreateModelWarehouse$$Page extends React.Component {
               ellipsis={true}
               __component_name="Typography.Title"
             >
-              {' '}
               新增模型
             </Typography.Title>
           </Col>
@@ -130,7 +179,7 @@ class CreateModelWarehouse$$Page extends React.Component {
             __component_name="Col"
           >
             <FormilyForm
-              ref={this._refsManager.linkRef('formily_yla2ctj06bl')}
+              ref={this._refsManager.linkRef('model_form')}
               formHelper={{ style: {}, autoFocus: true }}
               componentProps={{
                 colon: false,
@@ -143,7 +192,21 @@ class CreateModelWarehouse$$Page extends React.Component {
             >
               <FormilyInput
                 style={{ width: '500px' }}
-                fieldProps={{ name: 'name', title: '模型名称', required: true, 'x-validator': [] }}
+                fieldProps={{
+                  name: 'name',
+                  title: '模型名称',
+                  required: true,
+                  'x-validator': [
+                    {
+                      id: 'disabled',
+                      type: 'disabled',
+                      pattern: '^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$',
+                      children: '未知',
+                      message: "必须由小写字母数字和'-'或'.'组成，并且必须以字母数字开头和结尾",
+                    },
+                  ],
+                  '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
+                }}
                 componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
                 decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
                 __component_name="FormilyInput"
@@ -346,8 +409,15 @@ class CreateModelWarehouse$$Page extends React.Component {
                     ghost={false}
                     shape="default"
                     danger={false}
+                    onClick={function () {
+                      return this.onSubmit.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
                     disabled={false}
                     __component_name="Button"
+                    loading={__$$eval(() => this.state.loading)}
                   >
                     确定
                   </Button>
@@ -358,6 +428,12 @@ class CreateModelWarehouse$$Page extends React.Component {
                     danger={false}
                     disabled={false}
                     __component_name="Button"
+                    onClick={function () {
+                      return this.linkToList.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
                   >
                     取消
                   </Button>
