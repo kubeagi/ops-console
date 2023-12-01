@@ -79,6 +79,19 @@ const routes = [
         component: '@/pages/ModelWarehouseCreate',
       },
       {
+        name: '服务模型',
+        path: '/model-service',
+        component: '@/pages/ModelService',
+      },
+      {
+        path: '/model-service/createOutsideModelService',
+        component: '@/pages/CreateOutsideModelService',
+      },
+      {
+        path: '/model-service/createModelService',
+        component: '@/pages/CreateModelService',
+      },
+      {
         path: '/model-service/detail/:name',
         component: '@/pages/ModelServiceDetail',
       },
