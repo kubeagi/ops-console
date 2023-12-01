@@ -100,7 +100,7 @@ class Knowledge$$Page extends React.Component {
     } else if (item.status === 'False') {
       return 'error';
     } else {
-      return 'unknow';
+      return 'process';
     }
   }
 
@@ -280,7 +280,6 @@ class Knowledge$$Page extends React.Component {
 
   componentDidMount() {
     this.getData();
-    console.log('getDataStatus', this.getDataStatus(this, true));
   }
 
   render() {
