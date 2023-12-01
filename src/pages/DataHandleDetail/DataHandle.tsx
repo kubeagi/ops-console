@@ -3,6 +3,8 @@ import { Card, Col, Row, Steps, Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import styles from './datahandle.less';
 
+const SPLIT_TYPE_NAME = '拆分处理';
+
 interface Iprops {
   data: Record<string, any>;
 }
@@ -41,6 +43,32 @@ const DataHandle: React.FC<Iprops> = props => {
     ];
   }, []);
 
+  const getSplitColumns = useMemo(() => {
+    return [
+      {
+        title: '文件名',
+        dataIndex: 'file_name',
+        key: 'file_name',
+        render(text) {
+          return text;
+        },
+      },
+      {
+        title: '处理后',
+        dataIndex: 'post',
+        key: 'post',
+        render(text, record) {
+          return (
+            <>
+              <p>Q: {text.pre}</p>
+              <p>A: {text.post}</p>
+            </>
+          );
+        },
+      },
+    ];
+  }, []);
+
   const renderDesc = (data, type) => {
     // 顺便计算处理了多少文件
     let count = 0;
@@ -64,10 +92,23 @@ const DataHandle: React.FC<Iprops> = props => {
     });
 
     const dataSource = [];
-    _dataSource.forEach(item => {
-      const data = item?.content?.map(ele => ({ file_name: item.file_name, ...ele }));
-      dataSource.push(...data);
-    });
+    // 拆分处理的表格只展示文件名和拆分后
+    if (type === SPLIT_TYPE_NAME) {
+      _dataSource.forEach(item => {
+        const content = item?.content || [];
+        const data = [];
+        content.forEach(ele => {
+          const obj = { file_name: item.file_name, post: ele };
+          data.push(obj);
+        });
+        dataSource.push(...data);
+      });
+    } else {
+      _dataSource.forEach(item => {
+        const data = item?.content?.map(ele => ({ file_name: item.file_name, ...ele }));
+        dataSource.push(...data);
+      });
+    }
 
     return (
       !visibleMap[type] && (
@@ -77,7 +118,11 @@ const DataHandle: React.FC<Iprops> = props => {
             {' '}
             对 {count} 个文件进行了{type}，以下内容为处理效果抽样预览，并非全部内容
           </div>
-          <Table columns={getColumns} dataSource={dataSource} pagination={false} />
+          <Table
+            columns={type === SPLIT_TYPE_NAME ? getSplitColumns : getColumns}
+            dataSource={dataSource}
+            pagination={false}
+          />
         </div>
       )
     );

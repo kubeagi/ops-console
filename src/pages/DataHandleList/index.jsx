@@ -64,15 +64,15 @@ class DataHandleList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      delModalvisible: false,
-      logModalVisible: false,
-      currentRecord: null,
-      currentPage: 1,
+      keyword: '',
       pageSize: 10,
       totalCount: 0,
-      keyword: '',
-      dataHandleList: [],
+      currentPage: 1,
       listLoading: false,
+      currentRecord: null,
+      dataHandleList: [],
+      delModalvisible: false,
+      logModalVisible: false,
     };
   }
 
@@ -82,6 +82,23 @@ class DataHandleList$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
+  }
+
+  onRefresh(event) {
+    // 点击按钮时的回调
+    this.setState(
+      {
+        currentPage: 1,
+      },
+      () => {
+        this.getDataList();
+      }
+    );
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   async getDataList() {
@@ -102,6 +119,7 @@ class DataHandleList$$Page extends React.Component {
         },
       });
       const { data, status } = res?.dataProcess?.allDataProcessListByPage;
+      console.log(data, status);
       if (status === 200) {
         this.setState({
           dataHandleList: data || [],
@@ -118,6 +136,11 @@ class DataHandleList$$Page extends React.Component {
     }
   }
 
+  onLinkCreate() {
+    // 点击按钮时的回调
+    this.history.push('/data-handle/create');
+  }
+
   onOpenDelModal(e, { record }) {
     this.setState({
       delModalvisible: true,
@@ -125,10 +148,18 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onCancelDelModal(e) {
+  onOpenLogModal(e, record) {
     this.setState({
-      delModalvisible: false,
-      currentRecord: null,
+      logModalVisible: true,
+      currentRecord: record,
+    });
+  }
+
+  onhandleChange(event) {
+    // 输入框内容变化时的回调
+    console.log('onChange', event);
+    this.setState({
+      keyword: event.target.value,
     });
   }
 
@@ -151,13 +182,6 @@ class DataHandleList$$Page extends React.Component {
     } catch (error) {}
   }
 
-  onOpenLogModal(e, record) {
-    this.setState({
-      logModalVisible: true,
-      currentRecord: record,
-    });
-  }
-
   onCloseLogModal(isNeedReload) {
     this.setState({
       logModalVisible: false,
@@ -165,9 +189,11 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onLinkCreate() {
-    // 点击按钮时的回调
-    this.history.push('/data-handle/create');
+  onCancelDelModal(e) {
+    this.setState({
+      delModalvisible: false,
+      currentRecord: null,
+    });
   }
 
   onCurrentPageChange(page, pageSize) {
@@ -192,31 +218,6 @@ class DataHandleList$$Page extends React.Component {
         this.getDataList();
       }
     );
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
-  }
-
-  onRefresh(event) {
-    // 点击按钮时的回调
-    this.setState(
-      {
-        currentPage: 1,
-      },
-      () => {
-        this.getDataList();
-      }
-    );
-  }
-
-  onhandleChange(event) {
-    // 输入框内容变化时的回调
-    console.log('onChange', event);
-    this.setState({
-      keyword: event.target.value,
-    });
   }
 
   componentDidMount() {
@@ -432,8 +433,8 @@ class DataHandleList$$Page extends React.Component {
                             render: (text, record, index) =>
                               (__$$context => [
                                 <UnifiedLink
-                                  to="https://alibaba.com"
-                                  target="_blank"
+                                  to={__$$eval(() => '/dataset/detail/' + record.pre_data_set_name)}
+                                  target="_self"
                                   __component_name="UnifiedLink"
                                   key="node_oclpc8ipq71"
                                 >
@@ -451,8 +452,14 @@ class DataHandleList$$Page extends React.Component {
                                   /{' '}
                                 </Typography.Text>,
                                 <UnifiedLink
-                                  to="https://alibaba.com"
-                                  target="_blank"
+                                  to={__$$eval(
+                                    () =>
+                                      '/dataset/detail/' +
+                                      record.post_data_set_name +
+                                      '/version/' +
+                                      record.pre_data_set_version
+                                  )}
+                                  target="_self"
                                   __component_name="UnifiedLink"
                                   key="node_oclpc8ipq77"
                                 >
@@ -467,8 +474,10 @@ class DataHandleList$$Page extends React.Component {
                             render: (text, record, index) =>
                               (__$$context => [
                                 <UnifiedLink
-                                  to="https://alibaba.com"
-                                  target="_blank"
+                                  to={__$$eval(
+                                    () => '/dataset/detail/' + record.post_data_set_name
+                                  )}
+                                  target="_self"
                                   __component_name="UnifiedLink"
                                   key="node_oclpc8ipq78"
                                 >
@@ -485,8 +494,14 @@ class DataHandleList$$Page extends React.Component {
                                   /
                                 </Typography.Text>,
                                 <UnifiedLink
-                                  to="https://alibaba.com"
-                                  target="_blank"
+                                  to={__$$eval(
+                                    () =>
+                                      '/dataset/detail/' +
+                                      record.post_data_set_name +
+                                      '/version/' +
+                                      record.post_data_set_version
+                                  )}
+                                  target="_self"
                                   __component_name="UnifiedLink"
                                   key="node_oclpc8ipq79"
                                 >
