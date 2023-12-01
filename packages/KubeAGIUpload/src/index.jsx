@@ -216,12 +216,16 @@ class KubeAgiUpload$$Component extends React.Component {
     };
   }
 
+  handleBack() {
+    this.props?.handleSuccess();
+  }
+
   handleReUpload() {
     this.props.handleReUpload();
-    this.history?.go(-1);
+    this.handleBack();
     this.setState({
-      modalVisible: false
-    })
+      modalVisible: false,
+    });
   }
 
   closeModal() {
@@ -449,7 +453,7 @@ class KubeAgiUpload$$Component extends React.Component {
             },
           })
           .then(function (res) {
-            pageThis.history?.go(-1);
+            pageThis.handleBack();
             etags[currentChunk] = res.headers.etag;
             resolve(res);
           })
@@ -463,7 +467,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 modalLink: url?.split('?')?.[0],
               });
             } else {
-              pageThis.history?.go(-1);
+              pageThis.handleBack();
               pageThis.utils.notification.warnings({
                 message: pageThis.i18n('i18n-boehucun'),
                 errors: [err],
