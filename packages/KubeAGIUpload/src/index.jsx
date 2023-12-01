@@ -216,6 +216,14 @@ class KubeAgiUpload$$Component extends React.Component {
     };
   }
 
+  handleReUpload() {
+    this.props.handleReUpload();
+    this.history?.go(-1);
+    this.setState({
+      modalVisible: false
+    })
+  }
+
   closeModal() {
     this.setState({
       modalVisible: false,
@@ -241,22 +249,19 @@ class KubeAgiUpload$$Component extends React.Component {
   }
 
   handleDelete(file) {
-    const pageThis = this;
-    return new Promise((resolve, reject) => {
-      pageThis
-        .getDataSourceMap()
-        .delete_files.load({
-          files: [file.name],
-          bucket: pageThis.getBucket(),
-          bucket_path: pageThis.getBucketPath(),
-        })
-        .then(function (response) {
-          resolve(response);
-        })
-        .catch(function (error) {
-          reject(error);
-        });
-    });
+    // const pageThis = this
+    // return new Promise((resolve, reject) => {
+    //   pageThis.getDataSourceMap().delete_files.load({
+    //     files: [file.name],
+    //     bucket: pageThis.getBucket(),
+    //     bucket_path: pageThis.getBucketPath(),
+    //   }).then(function (response) {
+    //     resolve(response);
+    //   }).catch(function (error) {
+    //     reject(error);
+    //   });
+    // })
+    return true;
   }
 
   onFileAdded(file, fileList) {
@@ -351,7 +356,10 @@ class KubeAgiUpload$$Component extends React.Component {
           resolve(response);
         })
         .catch(function (error) {
-          console.log(error);
+          pageThis.utils.notification.warnings({
+            message: pageThis.i18n('i18n-boehucun'),
+            errors: [error],
+          });
           reject(error);
         });
     });
@@ -376,6 +384,10 @@ class KubeAgiUpload$$Component extends React.Component {
           resolve(response);
         })
         .catch(function (error) {
+          pageThis.utils.notification.warnings({
+            message: pageThis.i18n('i18n-boehucun'),
+            errors: [error],
+          });
           reject(error);
         });
     });
@@ -419,7 +431,10 @@ class KubeAgiUpload$$Component extends React.Component {
             resolve(response);
           })
           .catch(function (error) {
-            console.log(error);
+            pageThis.utils.notification.warnings({
+              message: pageThis.i18n('i18n-boehucun'),
+              errors: [error],
+            });
             reject(error);
           });
       });
@@ -434,16 +449,21 @@ class KubeAgiUpload$$Component extends React.Component {
             },
           })
           .then(function (res) {
+            pageThis.history?.go(-1);
             etags[currentChunk] = res.headers.etag;
             resolve(res);
           })
           .catch(function (err) {
+            pageThis.props.setState({
+              hasCreate: true,
+            });
             if (err?.code === 'ERR_NETWORK') {
               pageThis.setState({
                 modalVisible: true,
                 modalLink: url?.split('?')?.[0],
               });
             } else {
+              pageThis.history?.go(-1);
               pageThis.utils.notification.warnings({
                 message: pageThis.i18n('i18n-boehucun'),
                 errors: [err],
@@ -475,7 +495,10 @@ class KubeAgiUpload$$Component extends React.Component {
             resolve(response);
           })
           .catch(function (error) {
-            console.log(error);
+            pageThis.utils.notification.warnings({
+              message: pageThis.i18n('i18n-boehucun'),
+              errors: [error],
+            });
             reject(error);
           });
       });
@@ -524,7 +547,10 @@ class KubeAgiUpload$$Component extends React.Component {
             resolve(response);
           })
           .catch(function (error) {
-            console.log(error);
+            pageThis.utils.notification.warnings({
+              message: pageThis.i18n('i18n-boehucun'),
+              errors: [error],
+            });
             reject(error);
           });
       });
@@ -634,57 +660,57 @@ class KubeAgiUpload$$Component extends React.Component {
     return (
       <Component>
         <Modal
-          __component_name="Modal"
-          title={this.i18n('i18n-boehucun') /* 上传失败 */}
-          open={__$$eval(() => this.state.modalVisible)}
-          destroyOnClose={true}
-          centered={false}
-          keyboard={true}
           mask={true}
-          maskClosable={false}
-          forceRender={false}
-          confirmLoading={false}
+          open={__$$eval(() => this.state.modalVisible)}
+          title={this.i18n('i18n-boehucun') /* 上传失败 */}
           footer={
             <Button
-              __component_name="Button"
-              type="default"
               icon=""
-              danger={false}
+              type="primary"
+              block={false}
               ghost={false}
               shape="default"
-              block={false}
-              disabled={false}
+              danger={false}
               onClick={function () {
-                return this.closeModal.apply(
+                return this.handleReUpload.apply(
                   this,
                   Array.prototype.slice.call(arguments).concat([])
                 );
               }.bind(this)}
+              disabled={false}
+              __component_name="Button"
             >
-              {this.i18n('i18n-zughatwk') /* 取消 */}
+              {this.i18n('i18n-uklfmuzu') /* 重新上传 */}
             </Button>
           }
+          centered={false}
+          keyboard={true}
           onCancel={function () {
             return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
+          forceRender={false}
+          maskClosable={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          __component_name="Modal"
         >
-          <Row __component_name="Row" wrap={true}>
-            <Col __component_name="Col" span={24}>
+          <Row wrap={true} __component_name="Row">
+            <Col span={24} __component_name="Col">
               <Typography.Text
-                __component_name="Typography.Text"
-                ellipsis={true}
                 style={{ fontSize: '' }}
-                disabled={false}
                 strong={false}
+                disabled={false}
+                ellipsis={true}
+                __component_name="Typography.Text"
               >
                 {this.i18n('i18n-g0mdui69') /* 请先打开下面链接手动信任证书 */}
               </Typography.Text>
             </Col>
-            <Col __component_name="Col" span={24}>
+            <Col span={24} __component_name="Col">
               <UnifiedLink
-                __component_name="UnifiedLink"
                 to={__$$eval(() => this.state.modalLink)}
                 target="_blank"
+                __component_name="UnifiedLink"
               >
                 {__$$eval(() => this.state.modalLink || '-')}
               </UnifiedLink>
