@@ -78,6 +78,10 @@ const routes = [
         path: '/model-warehouse/create',
         component: '@/pages/ModelWarehouseCreate',
       },
+      {
+        path: '/model-service/detail/:name',
+        component: '@/pages/ModelServiceDetail',
+      },
     ],
   },
 ];
