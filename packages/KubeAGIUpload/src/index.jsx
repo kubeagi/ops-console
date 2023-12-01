@@ -265,12 +265,18 @@ class KubeAgiUpload$$Component extends React.Component {
     //     reject(error);
     //   });
     // })
+    this.setState({
+      fileList: this.state.fileList?.filter(item => item.uid !== file.uid) 
+    })
     return true;
   }
 
   onFileAdded(file, fileList) {
     this.setState({
-      fileList,
+      fileList: [
+        ...(this.state.fileList || []),
+        file
+      ],
     });
     this.props?.setState({
       uploadThis: this,
@@ -746,15 +752,6 @@ class KubeAgiUpload$$Component extends React.Component {
             componentProps={{
               'x-component-props': {
                 disabled: false,
-                fileList: __$$eval(() => [
-                  {
-                    name: 'name',
-                    percent: '10',
-                    status: 'uploading',
-                    uid: '1',
-                    url: '',
-                  },
-                ]),
                 onRemove: function () {
                   return this.handleDelete.apply(
                     this,
