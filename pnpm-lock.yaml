@@ -29,9 +29,6 @@ importers:
       '@formily/react':
         specifier: ^2.1.4
         version: 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
-      '@tenx-ui/arcadia-bff-sdk':
-        specifier: ^0.0.28
-        version: 0.0.28(@tenx-ui/materials@1.5.25)(antd@5.11.3)(react@18.2.0)(swr@2.2.4)
       '@tenx-ui/auth-utils':
         specifier: 0.0.1
         version: 0.0.1
@@ -65,6 +62,9 @@ importers:
       '@yunti/lowcode-datasource-axios-handler':
         specifier: ^1.0.1
         version: 1.0.1
+      '@yuntijs/arcadia-bff-sdk':
+        specifier: ^1.0.6
+        version: 1.0.6(@tenx-ui/materials@1.5.25)(antd@5.11.3)(react@18.2.0)(swr@2.2.4)
       KubeAGIUpload:
         specifier: workspace:*
         version: link:packages/KubeAGIUpload
@@ -2949,7 +2949,7 @@ packages:
       '@dnd-kit/core': ^6.0.7
       react: '>=16.8.0'
     dependencies:
-      '@dnd-kit/core': 6.0.8(react-dom@17.0.2)(react@18.2.0)
+      '@dnd-kit/core': 6.0.8(react-dom@18.2.0)(react@18.2.0)
       '@dnd-kit/utilities': 3.2.1(react@18.2.0)
       react: 18.2.0
       tslib: 2.6.2
@@ -4691,26 +4691,6 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  /@tenx-ui/arcadia-bff-sdk@0.0.28(@tenx-ui/materials@1.5.25)(antd@5.11.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-amyN7vDsunjVgSHu3yisVjV4GacAWZbOeBpGaTBBe4B1O3fTA2VZevRVGwHE4zFIpDp6AhR1GyoGozJ034mrbg==}
-    peerDependencies:
-      '@tenx-ui/materials': '>=1.5.8'
-      antd: '>=5.4.0'
-      react: '>=16.9.0'
-      swr: '>=2.0.0'
-    dependencies:
-      '@tenx-ui/materials': 1.5.25(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
-      antd: 5.11.3(react-dom@18.2.0)(react@18.2.0)
-      graphql: 16.8.1
-      graphql-request: 6.1.0(graphql@16.8.1)
-      graphql-tag: 2.12.6(graphql@16.8.1)
-      query-string: 8.1.0
-      react: 18.2.0
-      swr: 2.2.4(react@18.2.0)
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
   /@tenx-ui/auth-utils@0.0.1:
     resolution: {integrity: sha512-aCo7kgzZ18i3gZ6ZZryoYP0pBbTDyqKT8nSIwNXgMckL+pxUA+Iy5owvbZ/Hptexn603adg+ppocwxkvGxiBaw==}
     dev: false
@@ -6249,6 +6229,26 @@ packages:
       typescript: 4.9.5
     transitivePeerDependencies:
       - debug
+    dev: false
+
+  /@yuntijs/arcadia-bff-sdk@1.0.6(@tenx-ui/materials@1.5.25)(antd@5.11.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-NuXCGm5jD9OCfOZCbjPSberiRjRqUwI93zOTDiT1rKt+GiEa5JnJ2VRKvDooiBHStH8F579KbwhOStbctIOUmQ==}
+    peerDependencies:
+      '@tenx-ui/materials': '>=1.5.8'
+      antd: '>=5.4.0'
+      react: '>=16.9.0'
+      swr: '>=2.0.0'
+    dependencies:
+      '@tenx-ui/materials': 1.5.25(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.11.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+      antd: 5.11.3(react-dom@18.2.0)(react@18.2.0)
+      graphql: 16.8.1
+      graphql-request: 6.1.0(graphql@16.8.1)
+      graphql-tag: 2.12.6(graphql@16.8.1)
+      query-string: 8.1.0
+      react: 18.2.0
+      swr: 2.2.4(react@18.2.0)
+    transitivePeerDependencies:
+      - encoding
     dev: false
 
   /JSONStream@1.3.5:

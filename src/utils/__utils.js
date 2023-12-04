@@ -5,7 +5,7 @@ import { notification, Modal } from '@tenx-ui/materials';
 import { getAuthData, setAuthData, removeAuthData, isTokenExpired } from '@tenx-ui/auth-utils';
 
 import { createRef } from 'react';
-import { sdk as bff } from '@tenx-ui/arcadia-bff-sdk';
+import { sdk as bff } from '@yuntijs/arcadia-bff-sdk';
 
 import _ from 'lodash';
 

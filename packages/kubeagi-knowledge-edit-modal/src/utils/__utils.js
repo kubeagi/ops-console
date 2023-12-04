@@ -1,4 +1,4 @@
-import { sdk as bff } from '@tenx-ui/arcadia-bff-sdk';
+import { sdk as bff } from '@yuntijs/arcadia-bff-sdk';
 
 import { createRef } from 'react';
 
