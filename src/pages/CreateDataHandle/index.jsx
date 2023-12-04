@@ -68,19 +68,24 @@ class $$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      numberInputStep: 0.1,
-      currentStep: 0,
-      step1FormData: {},
-      step2FormData: {},
-      dataSetFileSearchParams: {
-        keyword: '',
-        currentPage: 1,
+      configMap: {
+        qa_split: 'QAsplitChecked',
+        document_chunk: 'TextSegmentationChecked',
+        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
+        space_standardization: 'SpaceHandleChecked',
+        remove_garbled_text: 'RemoveGarbledCodeChecked',
+        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
+        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
+        remove_emojis: 'RemoveEmoteChecked',
+        simhash_operator: 'SimhashOperatorChecked',
+        remove_email: 'RemoveEmailChecked',
+        remove_ip_address: 'RemoveIPAddress',
+        remove_number: 'RemoveNumber',
+        character_duplication_rate: 'CharacterRepeatFilterChecked',
+        word_duplication_rate: 'WordRepeatFilterChecked',
+        special_character_rate: 'SpecialCharactersRateChecked',
+        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
       },
-      fileTableLoading: false,
-      dataSetFileList: [],
-      dataSetFileTotal: '0',
-      selectedFileList: [],
-      fileSelectCheckErrorFlag: false,
       step3Data: {
         QAsplitChecked: true,
         TextSegmentationChecked: false,
@@ -106,33 +111,23 @@ class $$Page extends React.Component {
         RemoveIPAddress: false,
         RemoveNumber: false,
       },
-      configMap: {
-        qa_split: 'QAsplitChecked',
-        document_chunk: 'TextSegmentationChecked',
-        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
-        space_standardization: 'SpaceHandleChecked',
-        remove_garbled_text: 'RemoveGarbledCodeChecked',
-        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
-        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
-        remove_emojis: 'RemoveEmoteChecked',
-        simhash_operator: 'SimhashOperatorChecked',
-        remove_email: 'RemoveEmailChecked',
-        remove_ip_address: 'RemoveIPAddress',
-        remove_number: 'RemoveNumber',
-        character_duplication_rate: 'CharacterRepeatFilterChecked',
-        word_duplication_rate: 'WordRepeatFilterChecked',
-        special_character_rate: 'SpecialCharactersRateChecked',
-        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
-      },
-      configEnableMap: {},
       step4Data: {},
+      currentStep: 0,
+      step1FormData: {},
+      step2FormData: {},
+      configEnableMap: {},
       dataSetDataList: [],
+      dataSetFileList: [],
+      numberInputStep: 0.1,
+      dataSetFileTotal: '0',
+      fileTableLoading: false,
+      selectedFileList: [],
       afterTreatmentData: [
         {
           type: '移除不可见字符',
           before:
-            '计量水表安装在住宅<span style="background-color:rgba(250, 205, 145, 0.4);">???</span>的公共部位，供水企业抄表到户，按户计量收费。',
-          after: '计量水表安装在住宅的公共部位，供水企业抄表到户，按户计量收费。',
+            '计量水表安装在住宅<span style="background-color:rgba(250, 205, 145, 0.4);">???</span>的公共部位，供水企业抄表到户，按户计量收费。',
+          after: '计量水表安装在住宅的公共部位，供水企业抄表到户，按户计量收费。',
         },
         {
           type: '空格处理',
@@ -165,6 +160,11 @@ class $$Page extends React.Component {
           after: '兔子女孩女孩男孩',
         },
       ],
+      dataSetFileSearchParams: {
+        keyword: '',
+        currentPage: 1,
+      },
+      fileSelectCheckErrorFlag: false,
     };
   }
 
@@ -180,6 +180,27 @@ class $$Page extends React.Component {
     console.log('will unmount');
   }
 
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
+
+  onBack(event) {
+    // 点击按钮时的回调
+    this.history.push('/data-handle');
+  }
+
+  async onNext() {
+    if (this.state.currentStep === 0) {
+      this.getStep1Data();
+    } else if (this.state.currentStep === 1) {
+      this.getStep2Data();
+    } else if (this.state.currentStep === 2) {
+      this.onNextStep();
+    } else {
+      this.onNextStep();
+    }
+  }
+
   debounce(func, delay) {
     let timeoutId;
     return function (...args) {
@@ -190,121 +211,51 @@ class $$Page extends React.Component {
     };
   }
 
+  async onFinish() {
+    const list = this.convertStep3Data();
+    const files = this.state.selectedFileList.map(item => {
+      const _item = item.split('/');
+      return {
+        name: _item[_item.length - 1],
+      };
+    });
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
+    const data = {
+      ...this.state.step1FormData,
+      ...this.state.step2FormData,
+      version_data_set_name: versionName,
+      data_process_config_info: list,
+      file_names: files,
+      bucket_name: this.utils.getAuthData().project,
+    };
+    const res = await this.utils.bff.createDataProcessTask({
+      input: {
+        ...data,
+      },
+    });
+    if (res.dataProcess.createDataProcessTask.status === 200) {
+      this.utils.notification.success({
+        message: '成功',
+      });
+      this.history.push('/data-handle');
+    } else {
+      this.utils.notification.success({
+        message: res.dataProcess?.createDataProcessTask?.message || '失败',
+      });
+    }
+  }
+
   onSearch(event) {
     this.debouncedFunction(event);
   }
 
-  updateStep3State(value, event, extraParams = {}) {
-    const fieldName = {
-      ...event,
-      ...extraParams,
-    }.fieldName;
-    const step3 = {
-      ...this.state.step3Data,
-      [fieldName]: value,
-    };
-    this.setState({
-      step3Data: step3,
-    });
-  }
-
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
-  getStep1Data() {
-    this.form('createDataHandleStep1')
-      .validate()
-      .then(res => {
-        const step1FormData = this.form('createDataHandleStep1').values;
-        this.setState({
-          step1FormData,
-        });
-        this.onNextStep();
-      });
-  }
-
-  getStep2Data() {
-    this.form('createDataHandleStep2')
-      ?.validate()
-      .then(res => {
-        const step2FormData = this.form('createDataHandleStep2').values;
-        this.setState({
-          step2FormData,
-        });
-        this.onNextStep();
-      });
-  }
-
-  onDataSetChange(v) {
-    this.setState({
-      dataSetFileList: [],
-      selectedFileList: [],
-      dataSetFileTotal: '0',
-    });
-    this.form('createDataHandleStep2').setValues({
-      pre_data_set_version: undefined,
-      post_data_set_version: undefined,
-      post_data_set_name: v,
-    });
-    this.setDataSetVersionsSource(v);
-  }
-
-  setDataSetVersionsSource(v) {
-    const obj = this.state.dataSetDataList.find(item => item.value === v);
-    const genOptionList = obj.versions;
-    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
-      dataSource: genOptionList,
-    });
-    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
-      dataSource: genOptionList,
-    });
-  }
-
-  onDataSetVersionChange(v) {
-    this.form('createDataHandleStep2').setValues({
-      post_data_set_version: v,
-    });
-    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
-    const name = this.getVersionName(pre_data_set_name, v);
-    this.getTableList(name);
-  }
-
-  onPageChange(page) {
-    this.setState(
-      {
-        dataSetFileSearchParams: {
-          ...this.state.dataSetFileSearchParams,
-          currentPage: page,
-        },
-      },
-      () => {
-        this.getDataSet();
-      }
-    );
-  }
-
-  onSelectFileChange(v) {
-    if (v.length) {
-      this.setState({
-        fileSelectCheckErrorFlag: false,
-      });
+  valToKey(obj) {
+    const _obj = {};
+    for (let key in obj) {
+      _obj[obj[key]] = key;
     }
-    this.setState({
-      selectedFileList: v,
-    });
-  }
-
-  backToStep2() {
-    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
-    if (!pre_data_set_name) return;
-    this.setDataSetVersionsSource(pre_data_set_name);
-    this.form('createDataHandleStep2').setValues({
-      pre_data_set_name,
-      pre_data_set_version,
-      post_data_set_version: pre_data_set_version,
-      post_data_set_name: pre_data_set_name,
-    });
+    return _obj;
   }
 
   async getDataSet() {
@@ -345,115 +296,6 @@ class $$Page extends React.Component {
         this.getTableList(name);
       }
     );
-  }
-
-  getVersionName(dataset, version) {
-    console.log(dataset, this.state.dataSetDataList);
-    if (dataset && version) {
-      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
-      console.log(datasetObj);
-      const versionObj = datasetObj.versions.find(i => i.value === version);
-      return versionObj.name;
-    }
-    return;
-  }
-
-  async getTableList(name) {
-    if (!name) return;
-    this.setState({
-      fileTableLoading: true,
-    });
-    const res = await this.utils.bff.getVersionedDataset({
-      name: name,
-      namespace: this.utils.getAuthData().project,
-      fileInput: {
-        keyword: this.state.dataSetFileSearchParams.keyword,
-        pageSize: 10,
-        page: this.state.dataSetFileSearchParams.currentPage,
-      },
-    });
-    const data = res.VersionedDataset.getVersionedDataset.files;
-    this.setState({
-      fileTableLoading: false,
-      dataSetFileList:
-        (data.nodes || []).map(i => ({
-          ...i,
-          label: '普通文本',
-        })) || [],
-      dataSetFileTotal: data.totalCount || 0,
-    });
-  }
-
-  async onNext() {
-    if (this.state.currentStep === 0) {
-      this.getStep1Data();
-    } else if (this.state.currentStep === 1) {
-      this.getStep2Data();
-    } else if (this.state.currentStep === 2) {
-      this.onNextStep();
-    } else {
-      this.onNextStep();
-    }
-  }
-
-  valToKey(obj) {
-    const _obj = {};
-    for (let key in obj) {
-      _obj[obj[key]] = key;
-    }
-    return _obj;
-  }
-
-  convertStep3Data() {
-    const list = [];
-    const step3Data = this.state.step3Data;
-    const vTk = this.valToKey(this.state.configMap);
-    console.log(vTk);
-    for (let k in step3Data) {
-      if (k.endsWith('Checked')) {
-        if (step3Data[k]) {
-          list.push({
-            type: vTk[k],
-          });
-        }
-      }
-    }
-    return list;
-  }
-
-  async onFinish() {
-    const list = this.convertStep3Data();
-    const files = this.state.selectedFileList.map(item => {
-      const _item = item.split('/');
-      return {
-        name: _item[_item.length - 1],
-      };
-    });
-    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
-    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
-    const data = {
-      ...this.state.step1FormData,
-      ...this.state.step2FormData,
-      version_data_set_name: versionName,
-      data_process_config_info: list,
-      file_names: files,
-      bucket_name: this.utils.getAuthData().project,
-    };
-    const res = await this.utils.bff.createDataProcessTask({
-      input: {
-        ...data,
-      },
-    });
-    if (res.dataProcess.createDataProcessTask.status === 200) {
-      this.utils.notification.success({
-        message: '成功',
-      });
-      this.history.push('/data-handle');
-    } else {
-      this.utils.notification.success({
-        message: res.dataProcess?.createDataProcessTask?.message || '失败',
-      });
-    }
   }
 
   onNextStep() {
@@ -520,9 +362,167 @@ class $$Page extends React.Component {
     );
   }
 
-  onBack(event) {
-    // 点击按钮时的回调
-    this.history.push('/data-handle');
+  backToStep2() {
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    if (!pre_data_set_name) return;
+    this.setDataSetVersionsSource(pre_data_set_name);
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_name,
+      pre_data_set_version,
+      post_data_set_version: pre_data_set_version,
+      post_data_set_name: pre_data_set_name,
+    });
+  }
+
+  getStep1Data() {
+    this.form('createDataHandleStep1')
+      .validate()
+      .then(res => {
+        const step1FormData = this.form('createDataHandleStep1').values;
+        this.setState({
+          step1FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  getStep2Data() {
+    this.form('createDataHandleStep2')
+      ?.validate()
+      .then(res => {
+        const step2FormData = this.form('createDataHandleStep2').values;
+        this.setState({
+          step2FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  async getTableList(name) {
+    if (!name) return;
+    this.setState({
+      fileTableLoading: true,
+    });
+    const res = await this.utils.bff.getVersionedDataset({
+      name: name,
+      namespace: this.utils.getAuthData().project,
+      fileInput: {
+        keyword: this.state.dataSetFileSearchParams.keyword,
+        pageSize: 10,
+        page: this.state.dataSetFileSearchParams.currentPage,
+      },
+    });
+    const data = res.VersionedDataset.getVersionedDataset.files;
+    this.setState({
+      fileTableLoading: false,
+      dataSetFileList:
+        (data.nodes || []).map(i => ({
+          ...i,
+          label: '普通文本',
+        })) || [],
+      dataSetFileTotal: data.totalCount || 0,
+    });
+  }
+
+  onPageChange(page) {
+    this.setState(
+      {
+        dataSetFileSearchParams: {
+          ...this.state.dataSetFileSearchParams,
+          currentPage: page,
+        },
+      },
+      () => {
+        this.getDataSet();
+      }
+    );
+  }
+
+  getVersionName(dataset, version) {
+    console.log(dataset, this.state.dataSetDataList);
+    if (dataset && version) {
+      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
+      console.log(datasetObj);
+      const versionObj = datasetObj.versions.find(i => i.value === version);
+      return versionObj.name;
+    }
+    return;
+  }
+
+  onDataSetChange(v) {
+    this.setState({
+      dataSetFileList: [],
+      selectedFileList: [],
+      dataSetFileTotal: '0',
+    });
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_version: undefined,
+      post_data_set_version: undefined,
+      post_data_set_name: v,
+    });
+    this.setDataSetVersionsSource(v);
+  }
+
+  convertStep3Data() {
+    const list = [];
+    const step3Data = this.state.step3Data;
+    const vTk = this.valToKey(this.state.configMap);
+    console.log(vTk);
+    for (let k in step3Data) {
+      if (k.endsWith('Checked')) {
+        if (step3Data[k]) {
+          list.push({
+            type: vTk[k],
+          });
+        }
+      }
+    }
+    return list;
+  }
+
+  updateStep3State(value, event, extraParams = {}) {
+    const fieldName = {
+      ...event,
+      ...extraParams,
+    }.fieldName;
+    const step3 = {
+      ...this.state.step3Data,
+      [fieldName]: value,
+    };
+    this.setState({
+      step3Data: step3,
+    });
+  }
+
+  onSelectFileChange(v) {
+    if (v.length) {
+      this.setState({
+        fileSelectCheckErrorFlag: false,
+      });
+    }
+    this.setState({
+      selectedFileList: v,
+    });
+  }
+
+  onDataSetVersionChange(v) {
+    this.form('createDataHandleStep2').setValues({
+      post_data_set_version: v,
+    });
+    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
+    const name = this.getVersionName(pre_data_set_name, v);
+    this.getTableList(name);
+  }
+
+  setDataSetVersionsSource(v) {
+    const obj = this.state.dataSetDataList.find(item => item.value === v);
+    const genOptionList = obj.versions;
+    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
+      dataSource: genOptionList,
+    });
+    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
+      dataSource: genOptionList,
+    });
   }
 
   componentDidMount() {
@@ -2950,12 +2950,20 @@ class $$Page extends React.Component {
                             );
                           }.bind(this),
                           allowClear: false,
+                          showSearch: false,
                           placeholder: '请选择数据集',
                           _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
                           _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
                         },
                       }}
-                      decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                      decoratorProps={{
+                        'x-decorator-props': {
+                          labelCol: 6,
+                          wrapperCol: 18,
+                          wrapperWidth: '',
+                          labelEllipsis: true,
+                        },
+                      }}
                       __component_name="FormilySelect"
                     />
                   </Col>
@@ -2984,7 +2992,9 @@ class $$Page extends React.Component {
                           _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
                         },
                       }}
-                      decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                      decoratorProps={{
+                        'x-decorator-props': { wrapperWidth: '75%', labelEllipsis: true },
+                      }}
                       __component_name="FormilySelect"
                     />
                   </Col>
@@ -3006,7 +3016,7 @@ class $$Page extends React.Component {
                       decoratorProps={{
                         'x-decorator-props': {
                           asterisk: true,
-                          labelCol: 2,
+                          labelCol: 6,
                           wrapperWidth: '0',
                           labelEllipsis: true,
                         },
@@ -3113,7 +3123,7 @@ class $$Page extends React.Component {
                       columns={[
                         { key: 'name', title: '文件名称', dataIndex: 'path' },
                         { title: '标签', width: 120, dataIndex: 'label' },
-                        { key: 'count', title: '文件大小', width: 100, dataIndex: 'count' },
+                        { key: 'size', title: '文件大小', width: 100, dataIndex: 'size' },
                       ]}
                       loading={__$$eval(() => this.state.fileTableLoading)}
                       bordered={false}
@@ -3136,7 +3146,6 @@ class $$Page extends React.Component {
                   </Col>
                 </Row>
                 <Row wrap={true} __component_name="Row">
-                  <Col span={3} __component_name="Col" />
                   <Col span={19} style={{ marginBottom: '16px' }} __component_name="Col">
                     {!!__$$eval(() => this.state.fileSelectCheckErrorFlag) && (
                       <Typography.Text
@@ -3171,7 +3180,7 @@ class $$Page extends React.Component {
                         },
                       }}
                       decoratorProps={{
-                        'x-decorator-props': { asterisk: true, labelEllipsis: true },
+                        'x-decorator-props': { asterisk: true, labelCol: 6, labelEllipsis: true },
                       }}
                       __component_name="FormilySelect"
                     />
@@ -3187,7 +3196,9 @@ class $$Page extends React.Component {
                           _sdkSwrGetFunc: {},
                         },
                       }}
-                      decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                      decoratorProps={{
+                        'x-decorator-props': { wrapperWidth: '75%', labelEllipsis: true },
+                      }}
                       __component_name="FormilySelect"
                     />
                   </Col>

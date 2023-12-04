@@ -14,11 +14,9 @@ import {
   FormilyCheckbox,
   FormilyTextArea,
   Divider,
-  FormilyUpload,
-  Container,
 } from '@tenx-ui/materials';
 
-import { TenxIconPlus } from '@tenx-ui/icon-materials';
+import LccComponentQlsmm from 'KubeAGIUpload';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -62,7 +60,7 @@ class CreateModelWarehouse$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { loading: false };
+    this.state = { loading: false, createLoading: true, name: undefined };
   }
 
   $ = refName => {
@@ -86,6 +84,10 @@ class CreateModelWarehouse$$Page extends React.Component {
   }
 
   onSubmit() {
+    if (this.state.hasCreate) {
+      this.handleReUpload();
+      return;
+    }
     this.form('model_form')
       ?.validate()
       .then(res => {
@@ -96,7 +98,7 @@ class CreateModelWarehouse$$Page extends React.Component {
         const params = {
           namespace: this.utils.getAuthData().project,
           ...values,
-          modeltypes: values.modeltypes.join(','),
+          types: values.types.join(','),
         };
         this.utils.bff
           .createModel({
@@ -127,9 +129,33 @@ class CreateModelWarehouse$$Page extends React.Component {
       });
   }
 
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  setName(e) {
+    this.setState({
+      name: e.target.value,
+      hasCreate: false,
+    });
+  }
+
+  handleReUpload() {
+    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
+      this.handleCancle();
+      return;
+    }
+    this.state.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.uploadThis?.computeMD5(file);
+    });
+  }
+
+  getBucketPath() {
+    return `model-warehouse/${this.form()?.values?.name || this.state.name}/v1`;
+  }
+
+  setUploadState(state) {
+    this.setState(state);
+  }
+
+  handleCancle() {
+    this.history.push('/model-warehouse');
   }
 
   componentDidMount() {
@@ -200,15 +226,17 @@ class CreateModelWarehouse$$Page extends React.Component {
                     {
                       id: 'disabled',
                       type: 'disabled',
-                      pattern: '^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$',
-                      children: '未知',
                       message: "必须由小写字母数字和'-'或'.'组成，并且必须以字母数字开头和结尾",
+                      pattern: '^[a-z0-9][a-z0-9.-]*[a-z0-9]$',
+                      children: '未知',
                     },
                   ],
                   '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
                 }}
                 componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-                decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
+                decoratorProps={{
+                  'x-decorator-props': { labelWidth: '', labelEllipsis: true, labelCol: 2 },
+                }}
                 __component_name="FormilyInput"
               />
               <FormilyInput
@@ -219,8 +247,8 @@ class CreateModelWarehouse$$Page extends React.Component {
                   required: true,
                   'x-validator': [],
                 }}
-                componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-                decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
+                componentProps={{ 'x-component-props': { placeholder: '请输入', addonBefore: '' } }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, labelCol: 2 } }}
                 __component_name="FormilyInput"
               />
               <FormilyCheckbox
@@ -229,7 +257,7 @@ class CreateModelWarehouse$$Page extends React.Component {
                     { label: 'LLM', value: 'llm' },
                     { label: 'Embedding', value: 'embedding' },
                   ],
-                  name: 'modeltypes',
+                  name: 'types',
                   title: '模型类型',
                   required: true,
                   'x-validator': [],
@@ -237,11 +265,11 @@ class CreateModelWarehouse$$Page extends React.Component {
                 componentProps={{ 'x-component-props': { _sdkSwrGetFunc: {} } }}
                 decoratorProps={{
                   'x-decorator-props': {
-                    labelCol: 3,
                     labelAlign: 'left',
                     labelWidth: '',
                     wrapperAlign: 'left',
                     labelEllipsis: true,
+                    labelCol: 2,
                   },
                 }}
                 __component_name="FormilyCheckbox"
@@ -255,7 +283,7 @@ class CreateModelWarehouse$$Page extends React.Component {
                   'x-validator': [],
                 }}
                 componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-                decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, labelCol: 2 } }}
                 __component_name="FormilyTextArea"
               />
               <Divider
@@ -269,120 +297,41 @@ class CreateModelWarehouse$$Page extends React.Component {
               >
                 模型文件
               </Divider>
-              <FormilyUpload
-                style={{ width: '600px' }}
-                fieldProps={{
-                  name: 'Upload',
-                  title: '模型文件',
-                  'x-component': 'FormilyUpload',
-                  'x-validator': [],
-                }}
-                componentProps={{
-                  'x-component-props': { multiple: true, directory: false, showUploadList: true },
-                }}
-                decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
-                __component_name="FormilyUpload"
-              >
-                <Container
-                  style={{
-                    width: '500px',
-                    height: '130px',
-                    borderColor: '#9b9b9b',
-                    borderStyle: 'dashed',
-                    borderWidth: '1px',
-                    backgroundColor: '#ffffff',
-                  }}
-                  defaultStyle={{}}
-                  __component_name="Container"
-                >
-                  <Row
-                    wrap={true}
-                    style={{ textAlign: 'center', paddingTop: '16px' }}
-                    gutter={['', 0]}
-                    __component_name="Row"
-                  >
-                    <Col span={24} __component_name="Col">
-                      <TenxIconPlus __component_name="TenxIconPlus" />
-                    </Col>
-                    <Col span={24} __component_name="Col">
-                      <Typography.Text
-                        style={{ fontSize: '', textAlign: 'center' }}
-                        strong={false}
-                        disabled={false}
-                        ellipsis={true}
-                        __component_name="Typography.Text"
-                      >
-                        点击上传 / 拖拽文件到此区域
-                      </Typography.Text>
-                    </Col>
-                    <Col span={24} __component_name="Col">
-                      <Typography.Text
-                        style={{ color: '#9b9b9b', fontSize: '' }}
-                        strong={false}
-                        disabled={false}
-                        ellipsis={true}
-                        __component_name="Typography.Text"
-                      >
-                        文件限制：
-                      </Typography.Text>
-                      <Typography.Text
-                        style={{ color: '#9b9b9b', fontSize: '' }}
-                        strong={false}
-                        disabled={false}
-                        ellipsis={true}
-                        __component_name="Typography.Text"
-                      >
-                        {' '}
-                        支持上传文件夹{' '}
-                      </Typography.Text>
-                      <Typography.Text
-                        style={{ color: '#9b9b9b', fontSize: '' }}
-                        strong={false}
-                        disabled={false}
-                        ellipsis={true}
-                        __component_name="Typography.Text"
-                      >
-                        、单文件大小{' '}
-                      </Typography.Text>
-                      <Typography.Text
-                        style={{ color: '#f5a623', fontSize: '' }}
-                        strong={false}
-                        disabled={false}
-                        ellipsis={true}
-                        __component_name="Typography.Text"
-                      >
-                        不超过2G
-                      </Typography.Text>
-                      <Typography.Text
-                        style={{ color: '#9b9b9b', fontSize: '' }}
-                        strong={false}
-                        disabled={false}
-                        ellipsis={true}
-                        __component_name="Typography.Text"
-                      >
-                        : 单次上传文件数量
-                      </Typography.Text>
-                      <Typography.Text
-                        style={{ color: '#f5a623', fontSize: '' }}
-                        strong={false}
-                        disabled={false}
-                        ellipsis={true}
-                        __component_name="Typography.Text"
-                      >
-                        {' '}
-                        不超过 20个
-                      </Typography.Text>
-                    </Col>
-                  </Row>
-                  <Row
-                    wrap={true}
-                    style={{ color: '#9b9b9b', textAlign: 'left', marginLeft: '170px' }}
-                    gutter={['', 0]}
-                    __component_name="Row"
-                  />
-                </Container>
-              </FormilyUpload>
             </FormilyForm>
+            <LccComponentQlsmm
+              label="模型文件"
+              accept=".txt,.doc,.docx,.pdf,.md"
+              bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+              labelWidth=""
+              contentWidth=""
+              Authorization={__$$eval(() => this.utils.getAuthorization())}
+              __component_name="LccComponentQlsmm"
+              isSupportFolder={true}
+              getBucketPath={function () {
+                return this.getBucketPath.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              setState={function () {
+                return this.setUploadState.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              handleReUpload={function () {
+                return this.handleReUpload.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              handleSuccess={function () {
+                return this.handleCancle.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+            />
           </Col>
           <Col span={24} style={{ backgroundColor: '#ffffff' }} __component_name="Col">
             <Row wrap={true} __component_name="Row">
@@ -409,6 +358,7 @@ class CreateModelWarehouse$$Page extends React.Component {
                     ghost={false}
                     shape="default"
                     danger={false}
+                    loading={__$$eval(() => this.state.loading)}
                     onClick={function () {
                       return this.onSubmit.apply(
                         this,
@@ -417,7 +367,6 @@ class CreateModelWarehouse$$Page extends React.Component {
                     }.bind(this)}
                     disabled={false}
                     __component_name="Button"
-                    loading={__$$eval(() => this.state.loading)}
                   >
                     确定
                   </Button>
@@ -426,14 +375,14 @@ class CreateModelWarehouse$$Page extends React.Component {
                     ghost={false}
                     shape="default"
                     danger={false}
-                    disabled={false}
-                    __component_name="Button"
                     onClick={function () {
                       return this.linkToList.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
+                    disabled={false}
+                    __component_name="Button"
                   >
                     取消
                   </Button>
