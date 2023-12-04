@@ -423,10 +423,9 @@ class Knowledge$$Page extends React.Component {
                             <Card
                               size="default"
                               type="default"
-                              style={{ border: '1px solid #E2E2E2' }}
                               actions={[]}
                               loading={false}
-                              bordered={false}
+                              bordered={true}
                               bodyStyle={{ position: 'relative' }}
                               hoverable={false}
                             >
