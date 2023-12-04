@@ -73,7 +73,7 @@ class ModelWarehouse$$Page extends React.Component {
     this.state = {
       modelList: [],
       keyword: '',
-      modeltypes: '',
+      types: '',
       loading: false,
       deleteLoading: false,
       pages: {
@@ -100,7 +100,7 @@ class ModelWarehouse$$Page extends React.Component {
     this.setState(
       {
         keyword: name,
-        modeltypes: this.state.modeltypes,
+        types: this.state.types,
         pages: {
           ...this.state.pages,
           currentPage: 1,
@@ -112,11 +112,11 @@ class ModelWarehouse$$Page extends React.Component {
     );
   }
 
-  onModeltypesChange(modeltype) {
+  onTypesChange(type) {
     this.setState(
       {
         keyword: this.state.keyword,
-        modeltypes: modeltype === 'all' ? '' : modeltype,
+        types: type === 'all' ? '' : type,
         pages: {
           ...this.state.pages,
           currentPage: 1,
@@ -138,9 +138,7 @@ class ModelWarehouse$$Page extends React.Component {
     const params = {
       namespace: project,
       keyword: this.state.keyword,
-      labelSelector: this.state.modeltypes
-        ? `arcadia.kubeagi.k8s.com.cn/${this.state.modeltypes}=true`
-        : '',
+      labelSelector: this.state.types ? `arcadia.kubeagi.k8s.com.cn/${this.state.types}=true` : '',
       page: currentPage,
       pageSize,
     };
@@ -393,7 +391,7 @@ class ModelWarehouse$$Page extends React.Component {
                               ]}
                               disabled={false}
                               onChange={function () {
-                                return this.onModeltypesChange.apply(
+                                return this.onTypesChange.apply(
                                   this,
                                   Array.prototype.slice.call(arguments).concat([])
                                 );
@@ -401,8 +399,8 @@ class ModelWarehouse$$Page extends React.Component {
                               allowClear={true}
                               showSearch={true}
                               placeholder="全部类型"
-                              _sdkSwrGetFunc={{}}
                               __component_name="Select"
+                              _sdkSwrGetFunc={{}}
                             />
                           </Col>
                         </Row>
@@ -573,7 +571,7 @@ class ModelWarehouse$$Page extends React.Component {
                                             style={{ display: 'inline-block', textAlign: 'left' }}
                                             __component_name="Col"
                                           >
-                                            {__$$evalArray(() => item.modeltypes.split(',')).map(
+                                            {__$$evalArray(() => item.types.split(',')).map(
                                               (item, index) =>
                                                 (__$$context => (
                                                   <Tag

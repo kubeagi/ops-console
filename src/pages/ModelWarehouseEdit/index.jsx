@@ -85,7 +85,7 @@ class ModelWarehouseEdit$$Page extends React.Component {
   setFormData(data) {
     console.log(this.form('model_edit'), data);
     this.form('model_edit').setValues({
-      modeltypes: data?.modeltypes?.split(','),
+      types: data?.types?.split(','),
       name: data.name,
       displayName: data.displayName,
       description: data.description,
@@ -141,7 +141,7 @@ class ModelWarehouseEdit$$Page extends React.Component {
         const params = {
           namespace: this.utils.getAuthData().project,
           ...values,
-          modeltypes: values.modeltypes.join(','),
+          types: values.types.join(','),
         };
         this.utils.bff
           .updateModel({
@@ -248,7 +248,7 @@ class ModelWarehouseEdit$$Page extends React.Component {
                             type: 'disabled',
                             message:
                               "必须由小写字母数字和'-'或'.'组成，并且必须以字母数字开头和结尾",
-                            pattern: '^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$',
+                            pattern: '^[a-z0-9][a-z0-9.-]*[a-z0-9]$',
                             children: '未知',
                           },
                         ],
@@ -276,7 +276,7 @@ class ModelWarehouseEdit$$Page extends React.Component {
                           { label: 'LLM', value: 'llm' },
                           { label: 'Embedding', value: 'embedding' },
                         ],
-                        name: 'modeltypes',
+                        name: 'types',
                         title: '模型类型',
                         required: true,
                         'x-validator': [],
