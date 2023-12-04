@@ -103,6 +103,15 @@ const routes = [
         path: '/model-warehouse/edit/:name',
         component: '@/pages/ModelWarehouseEdit',
       },
+      {
+        name: '模型应用管理',
+        path: '/model-app',
+        component: '@/pages/ModelAppList',
+      },
+      {
+        path: '/model-app/create',
+        component: '@/pages/ModelAppCreate',
+      },
     ],
   },
 ];
