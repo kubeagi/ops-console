@@ -9,6 +9,8 @@ import { sdk as bff } from '@yuntijs/arcadia-bff-sdk';
 
 import _ from 'lodash';
 
+import axios from 'axios';
+
 const utils = {};
 
 utils.bff = bff;
@@ -234,6 +236,42 @@ utils._ = _;
 
 utils.Modal = Modal;
 
+/** - */
+utils.changeLocationQuery = function __changeLocationQuery() {
+  return (pageThis, func, _search) => {
+    try {
+      const locationSearch = {};
+      const help = pageThis.appHelper;
+      help?.location?.search
+        ?.slice(1)
+        ?.split('&')
+        ?.forEach(item => {
+          if (item.split('=')[0] === '_search') {
+            locationSearch[item.split('=')[0]] = JSON.parse(decodeURI(item.split('=')[1]) || '{}');
+          } else {
+            locationSearch[item.split('=')[0]] = item.split('=')[1];
+          }
+        });
+      const newQuery = {
+        ...(locationSearch || {}),
+        _search: JSON.stringify({
+          ...((locationSearch || {})?._search || {}),
+          ...(_search || {}),
+        }),
+      };
+      const path =
+        help?.match?.pathname +
+        '?' +
+        Object.keys(newQuery || {})
+          ?.filter(key => key && newQuery[key])
+          ?.map(key => `${key}=${newQuery[key]}`)
+          ?.join('&');
+      help.history?.replace(path);
+    } catch (e) {}
+  };
+}.apply(utils);
+export const changeLocationQuery = utils.changeLocationQuery;
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -277,6 +315,8 @@ export class RefsManager {
 }
 utils.RefsManager = RefsManager;
 
+utils.axios = axios;
+
 export default {
   bff,
 
@@ -311,4 +351,8 @@ export default {
   Modal,
 
   getFullName,
+
+  changeLocationQuery,
+
+  axios,
 };

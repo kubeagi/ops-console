@@ -4,6 +4,9 @@ import React from 'react';
 
 import {
   Page,
+  Modal,
+  Alert,
+  FormilyForm,
   Row,
   Col,
   Space,
@@ -18,6 +21,8 @@ import {
   Table,
 } from '@tenx-ui/materials';
 
+import LccComponentQlsmm from 'KubeAGIUpload';
+
 import { TenxIconCircle } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -25,7 +30,7 @@ import { DataProvider } from 'shared-components';
 import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
-import utils from '../../utils/__utils';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
@@ -58,44 +63,324 @@ class DatasetVersionDetail$$Page extends React.Component {
 
     this.utils = utils;
 
+    this._refsManager = new RefsManager();
+
     __$$i18n._inject2(this);
 
-    this.state = {};
+    this.state = {
+      delVersionVisible: false,
+      addFileVisible: false,
+      delFileVisible: false,
+      delFileData: {},
+      upload: {},
+    };
   }
 
-  $ = () => null;
+  $ = refName => {
+    return this._refsManager.get(refName);
+  };
 
-  $$ = () => [];
+  $$ = refName => {
+    return this._refsManager.getAll(refName);
+  };
 
-  componentWillUnmount() {
-    console.log('will unmount');
+  componentWillUnmount() {}
+
+  form(name) {
+    return this.$(name || 'add_file')?.formRef?.current?.form;
   }
 
   data() {
-    console.log(
-      'data',
-      this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset || {}
-    );
     return {
       ...this.props.useGetVersionedDataset,
       data: this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset || {},
     };
   }
 
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  refresh() {
+    this.utils?.changeLocationQuery(this, 'useGetVersionedDataset', {
+      name: this.match?.params?.versionId,
+      namespace: this.utils.getAuthData?.()?.project,
+      _: new Date().getTime(),
+    });
   }
 
-  componentDidMount() {
-    console.log('did mount', this, this.utils, this.constants);
+  delVerClick(event) {
+    this.setState({
+      delVersionVisible: true,
+    });
   }
+
+  delVersionCancle() {
+    this.setState({
+      delVersionVisible: false,
+    });
+  }
+
+  async delVersionOk() {
+    const res = await this.utils.bff.deleteVersionedDatasets({
+      input: {
+        name: this.data().data.name,
+        namespace: this.utils.getAuthData?.()?.project,
+      },
+    });
+    if (res.VersionedDataset) {
+      this.utils.notification.success({
+        message: '删除数据集版本成功',
+      });
+      this.delVersionCancle();
+      this.appHelper.history.back();
+    }
+  }
+
+  setUploadState(state) {
+    this.setState({
+      upload: state,
+    });
+  }
+
+  handleReUpload() {
+    if (!(this.state.upload?.uploadThis?.state?.fileList?.length > 0)) {
+      this.handleCancle();
+      return;
+    }
+    this.state.upload?.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.upload?.uploadThis?.computeMD5(file);
+    });
+  }
+
+  handleCancle() {
+    this.setState({
+      addFileVisible: false,
+    });
+  }
+
+  handleUploadSuccess() {
+    this.setState({
+      addFileVisible: false,
+    });
+    this.utils.notification.success({
+      message: '新增文件成功',
+    });
+    this.refresh();
+  }
+
+  addFileClick(event) {
+    this.setState({
+      addFileVisible: true,
+    });
+  }
+
+  addFileOk() {
+    const fetch = async () => {
+      try {
+        this.handleReUpload();
+      } catch (e) {}
+    };
+    // 点击确定回调
+    this.form()?.submit(fetch);
+  }
+
+  getBucketPath() {
+    return `dataset/${this.props.useGetDataset.data?.Dataset?.getDataset?.name}/${
+      this.data().data?.version
+    }`;
+  }
+
+  handleUploadFinished(file, res) {
+    console.log('handleUploadFinished,', file, res);
+  }
+
+  delFileClick(event, params) {
+    // 点击按钮时的回调
+    this.setState({
+      delFileData: params.data,
+      delFileVisible: true,
+    });
+  }
+
+  delFileCancle() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.setState({
+      delFileData: {},
+      delFileVisible: false,
+    });
+  }
+
+  delFileOk() {
+    this.utils.axios
+      .delete(`${window.location.origin}/kubeagi-apis/minio/versioneddataset/files/delete_files`, {
+        data: {
+          files: [this.state.delFileData.path],
+          bucket: this.utils.getAuthData?.()?.project,
+          bucket_path: this.getBucketPath(),
+        },
+        headers: {
+          Authorization: this.utils.getAuthorization(),
+        },
+      })
+      .then(res => {
+        if (res?.data === 'success') {
+          this.utils.notification.success({
+            message: '删除文件成功',
+          });
+          this.refresh();
+          this.setState({
+            delFileVisible: false,
+            delFileData: {},
+          });
+        }
+      });
+  }
+
+  componentDidMount() {}
 
   render() {
     const __$$context = this._context || this;
     const { state } = __$$context;
     return (
       <Page>
+        {!!__$$eval(() => this.state.delFileVisible) && (
+          <Modal
+            __component_name="Modal"
+            title="删除文件"
+            open={true}
+            destroyOnClose={true}
+            centered={false}
+            keyboard={true}
+            mask={true}
+            maskClosable={false}
+            forceRender={false}
+            confirmLoading={false}
+            onCancel={function () {
+              return this.delFileCancle.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            onOk={function () {
+              return this.delFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+          >
+            <Alert
+              message={__$$eval(() => `确定删除文件：${this.state.delFileData.path} ？`)}
+              __component_name="Alert"
+              type="warning"
+              showIcon={true}
+            />
+          </Modal>
+        )}
+        {!!__$$eval(() => this.state.addFileVisible) && (
+          <Modal
+            mask={true}
+            onOk={function () {
+              return this.addFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            open={true}
+            title="新增文件"
+            width="650px"
+            centered={false}
+            keyboard={true}
+            onCancel={function () {
+              return this.handleCancle.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            forceRender={false}
+            maskClosable={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            __component_name="Modal"
+          >
+            <FormilyForm
+              ref={this._refsManager.linkRef('add_file')}
+              formHelper={{ autoFocus: true }}
+              componentProps={{
+                colon: false,
+                layout: 'horizontal',
+                labelCol: 4,
+                labelAlign: 'left',
+                wrapperCol: 20,
+              }}
+              __component_name="FormilyForm"
+            >
+              <LccComponentQlsmm
+                accept=".txt,.doc,.docx,.pdf,.md"
+                bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+                setState={function () {
+                  return this.setUploadState.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                contentWidth="520px"
+                Authorization={__$$eval(() => this.utils.getAuthorization())}
+                getBucketPath={function () {
+                  return this.getBucketPath.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                handleSuccess={function () {
+                  return this.handleUploadSuccess.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                handleFinished={function () {
+                  return this.handleUploadFinished.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                handleReUpload={function () {
+                  return this.handleReUpload.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                __component_name="LccComponentQlsmm"
+              />
+            </FormilyForm>
+          </Modal>
+        )}
+        {!!__$$eval(() => this.state.delVersionVisible) && (
+          <Modal
+            mask={true}
+            onOk={function () {
+              return this.delVersionOk.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            open={true}
+            title="删除数据集版本"
+            centered={false}
+            keyboard={true}
+            onCancel={function () {
+              return this.delVersionCancle.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            forceRender={false}
+            maskClosable={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            __component_name="Modal"
+          >
+            <Alert
+              icon=""
+              type="warning"
+              message={null}
+              bordered="dashed"
+              showIcon={true}
+              description={__$$eval(() => `确定删除数据集版本：${this.data().data?.version} ？`)}
+              __component_name="Alert"
+            />
+          </Modal>
+        )}
         <Row wrap={true} __component_name="Row">
           <Col span={24} style={{ marginBottom: '16px' }} __component_name="Col">
             <Space align="center" direction="horizontal" __component_name="Space">
@@ -213,6 +498,12 @@ class DatasetVersionDetail$$Page extends React.Component {
                   ghost={false}
                   shape="default"
                   danger={false}
+                  onClick={function () {
+                    return this.delVerClick.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
                   disabled={false}
                   __component_name="Button"
                 >
@@ -350,6 +641,12 @@ class DatasetVersionDetail$$Page extends React.Component {
                           ghost={false}
                           shape="default"
                           danger={false}
+                          onClick={function () {
+                            return this.addFileClick.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                           disabled={false}
                           __component_name="Button"
                         >
@@ -361,10 +658,16 @@ class DatasetVersionDetail$$Page extends React.Component {
                           shape="default"
                           style={{}}
                           danger={false}
+                          onClick={function () {
+                            return this.refresh.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                           disabled={false}
                           __component_name="Button"
                         >
-                          删除
+                          刷新
                         </Button>
                       </Space>
                     </Col>
@@ -423,6 +726,16 @@ class DatasetVersionDetail$$Page extends React.Component {
                               danger={false}
                               disabled={false}
                               __component_name="Button"
+                              onClick={function () {
+                                return this.delFileClick.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      data: record,
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
                             >
                               删除
                             </Button>
@@ -482,6 +795,21 @@ const PageWrapper = (props = {}) => {
             return {
               name: this.match?.params?.versionId,
               namespace: this.utils.getAuthData?.()?.project,
+            };
+          }.apply(self),
+          enableLocationSearch: function applyThis() {
+            return true;
+          }.apply(self),
+        },
+        {
+          func: 'useGetDataset',
+          params: function applyThis() {
+            return {
+              name: this.match?.params?.id,
+              namespace: this.utils.getAuthData?.()?.project,
+              versionsInput: {
+                namespace: this.utils.getAuthData?.()?.project,
+              },
             };
           }.apply(self),
           enableLocationSearch: undefined,
