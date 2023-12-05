@@ -1,0 +1,92 @@
+.container {
+  margin: 24px;
+  .body {
+    display: flex;
+    background-color: #fff;
+    height: calc(100vh - 142px);
+
+    .left {
+      overflow-y: auto;
+      max-width: 300px;
+      padding-left: 12px;
+      border-right: 1px solid #ccc;
+     :global{
+      .ant-list-item-action {
+        margin-inline-start:20px ;
+      }
+
+      .ant-list-item {
+        border-bottom:1px solid rgba(5, 5, 5, 0.06) ;
+      }
+     }
+    }
+
+    .content {
+      position: relative;
+      flex: 1;
+      height: calc(100vh - 142px);
+      overflow: auto;
+      .modelList {
+        position:absolute;
+        left: 20px;
+        top: 20px;
+      }
+
+      .qa {
+        margin: 0 auto;
+        width: 700px;
+        box-sizing: border-box;
+      }
+
+
+      .chat-content {
+        margin-top: 24px;
+        // margin-bottom: 80px;
+        .userContainer {
+          display: flex;
+          margin-bottom: 12px;
+          margin-left: 24px;
+
+          .userIcon {
+            font-size: 18px;
+            margin-right: 8px;
+          }
+
+          .userName {
+            font-size: 15px;
+            line-height: 28px;
+          }
+        }
+
+        .answerContainer {
+          background-color: rgb(241 245 249);
+          border-radius: 20px;
+          margin-bottom: 24px;
+        }
+
+        .tools {
+            height: 40px;
+            padding: 5px 10px 0 0;
+            border-top: 1px solid #ccc;
+            text-align: right;
+        }
+      }
+      
+      .questionFormStyle {
+        display: flex;
+        justify-content: space-between;
+        border-radius: 10px;
+        padding: 20px;
+        width: 700px;
+        position: fixed; /* 添加这一行以固定在底部 */
+        bottom: 20px; /* 添加这一行以固定在底部 */
+      }
+    }
+  }
+
+  .overflow-ellipsis {
+    white-space: nowrap;         /* 防止文字换行 */
+    overflow: hidden;            /* 隐藏溢出部分 */
+    text-overflow: ellipsis;     /* 使用省略号表示溢出 */
+  }
+}

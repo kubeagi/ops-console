@@ -66,6 +66,7 @@
     "KubeAGIUpload": "workspace:*",
     "antd": "latest",
     "app-card": "workspace:*",
+    "axios": "1.6.2",
     "babel-runtime": "^6.26.0",
     "classnames": "^2.2.5",
     "dayjs": "^1.11.7",

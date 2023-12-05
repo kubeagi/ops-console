@@ -112,6 +112,11 @@ const routes = [
         path: '/model-app/create',
         component: '@/pages/ModelAppCreate',
       },
+      {
+        name: '对话管理',
+        path: '/chat',
+        component: '@/pages/Chat',
+      },
     ],
   },
 ];

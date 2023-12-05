@@ -79,18 +79,18 @@ class Dataset$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      search: undefined,
+      data: [],
+      page: 1,
       type: undefined,
       field: undefined,
-      page: 1,
-      pageSize: 10,
-      totalCount: 0,
+      search: undefined,
       loading: false,
-      data: [],
+      pageSize: 10,
       addVersion: {
         visible: false,
         data: {},
       },
+      totalCount: 0,
     };
 
     // 代码中有些 Ds 是 Dataset的简写
@@ -106,6 +106,10 @@ class Dataset$$Page extends React.Component {
   };
 
   componentWillUnmount() {}
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
 
   _data() {
     return {
@@ -186,8 +190,21 @@ class Dataset$$Page extends React.Component {
     };
   }
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  onClick(event) {
+    // 点击按钮时的回调
+  }
+
+  refresh(event) {
+    event.stopPropagation();
+    this.fetchData();
+  }
+
+  testFunc() {
+    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  }
+
+  toDetail(event, params) {
+    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
   }
 
   async fetchData() {
@@ -227,37 +244,13 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  async addVersionFetch() {
-    const _version =
-      'v' + (this.getVersionsNumMax(this.state.addVersion.data?.versions?.nodes || []) + 1);
-    const payload = {
-      input: {
-        name: this.state.addVersion.data?.name + '-' + _version,
-        namespace: this.state.addVersion.data?.namespace,
-        datasetName: this.state.addVersion.data?.name,
-        displayName: '',
-        description: this.form().values.description,
-        inheritedFrom: this.form().values.inheritedFrom,
-        version: _version,
-        released: 0,
-      },
-    };
-    const res = await this.utils.bff.createVersionedDataset(payload).catch(e => {
-      this.utils.notification.warn({
-        message: '新增数据集版本失败',
-      });
-    });
-    if (res?.VersionedDataset?.createVersionedDataset?.name) {
-      this.utils.notification.success({
-        message: '新增数据集版本成功',
-      });
-      this.onAddVersionCancel();
-      this.fetchData();
-    }
+  linkClick(event) {
+    event.stopPropagation();
   }
 
-  testFunc() {
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   addVersion(event, params) {
@@ -270,92 +263,29 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  refresh(event) {
-    event.stopPropagation();
-    this.fetchData();
-  }
-
-  getVersionsNumMax(versions) {
-    console.log('getVersionsNumMax', versions);
-    return Math.max(...versions.map(v => parseInt(v?.version?.match(/\d+/)?.[0] || '0')), 0);
-  }
-
-  onClick(event) {
-    // 点击按钮时的回调
-  }
-
-  linkClick(event) {
-    event.stopPropagation();
-  }
-
-  onSearchChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        search: event.target.value,
-      },
-      this._fetchData
-    );
-  }
-
-  onTypeChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        type: event,
-      },
-      this.fetchData
-    );
-  }
-
-  onFieldChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        field: event,
-      },
-      this.fetchData
-    );
-  }
-
-  onPageChange(page, pageSize) {
-    // 页码或 pageSize 改变的回调
-    this.setState(
-      {
-        page,
-        pageSize,
-      },
-      this.fetchData
-    );
-  }
-
-  onAddVersionOK() {
-    // 点击遮罩层或右上角叉或取消按钮的回调
-    this.form()
-      .validate()
-      .then(this.addVersionFetch.bind(this))
-      .catch(e => {
-        console.error('onAddVersion error:', e);
-      });
-  }
-
-  onAddVersionCancel() {
-    // 点击遮罩层或右上角叉或取消按钮的回调
-    this.setState({
-      addVersion: {
-        visible: false,
-        data: {},
+  delVersion(params) {
+    this.utils.Modal.confirm({
+      title: '删除数据集版本',
+      content: `确定删除数据集：${params.dataset.name} 下版本：${params.version.version}？`,
+      onOk: async () => {
+        const res = await this.utils.bff
+          .deleteVersionedDatasets({
+            input: {
+              namespace: params.dataset.namespace,
+              name: params.version.name,
+            },
+          })
+          .catch(e => {
+            this.utils.notification.warn({
+              message: '删除数据集版本失败',
+            });
+          });
+        this.utils.notification.success({
+          message: '删除数据集版本成功',
+        });
+        this.fetchData();
       },
     });
-  }
-
-  toDetail(event, params) {
-    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
   }
 
   onDelDataset(event, params) {
@@ -385,6 +315,27 @@ class Dataset$$Page extends React.Component {
     });
   }
 
+  onPageChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState(
+      {
+        page,
+        pageSize,
+      },
+      this.fetchData
+    );
+  }
+
+  onTypeChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        type: event,
+      },
+      this.fetchData
+    );
+  }
+
   delVersionBak(params) {
     this.setState({
       delDsVisible: true,
@@ -392,35 +343,84 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  delVersion(params) {
-    this.utils.Modal.confirm({
-      title: '删除数据集版本',
-      content: `确定删除数据集：${params.dataset.name} 下版本：${params.version.version}？`,
-      onOk: async () => {
-        const res = await this.utils.bff
-          .deleteVersionedDatasets({
-            input: {
-              namespace: params.dataset.namespace,
-              name: params.version.name,
-            },
-          })
-          .catch(e => {
-            this.utils.notification.warn({
-              message: '删除数据集版本失败',
-            });
-          });
-        this.utils.notification.success({
-          message: '删除数据集版本成功',
-        });
-        this.fetchData();
+  onFieldChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        field: event,
       },
+      this.fetchData
+    );
+  }
+
+  onAddVersionOK() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.form()
+      .validate()
+      .then(this.addVersionFetch.bind(this))
+      .catch(e => {
+        console.error('onAddVersion error:', e);
+      });
+  }
+
+  onSearchChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        search: event.target.value,
+      },
+      this._fetchData
+    );
+  }
+
+  async addVersionFetch() {
+    const _version =
+      'v' + (this.getVersionsNumMax(this.state.addVersion.data?.versions?.nodes || []) + 1);
+    const payload = {
+      input: {
+        name: this.state.addVersion.data?.name + '-' + _version,
+        namespace: this.state.addVersion.data?.namespace,
+        datasetName: this.state.addVersion.data?.name,
+        displayName: '',
+        description: this.form().values.description,
+        inheritedFrom: this.form().values.inheritedFrom,
+        version: _version,
+        released: 0,
+      },
+    };
+    const res = await this.utils.bff.createVersionedDataset(payload).catch(e => {
+      this.utils.notification.warn({
+        message: '新增数据集版本失败',
+      });
     });
+    if (res?.VersionedDataset?.createVersionedDataset?.name) {
+      this.utils.notification.success({
+        message: '新增数据集版本成功',
+      });
+      this.onAddVersionCancel();
+      this.fetchData();
+    }
   }
 
   onDropdownClick(event, params) {
     if (event.key === 'delete') {
       this.delVersion(params);
     }
+  }
+
+  getVersionsNumMax(versions) {
+    console.log('getVersionsNumMax', versions);
+    return Math.max(...versions.map(v => parseInt(v?.version?.match(/\d+/)?.[0] || '0')), 0);
+  }
+
+  onAddVersionCancel() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.setState({
+      addVersion: {
+        visible: false,
+        data: {},
+      },
+    });
   }
 
   componentDidMount() {
@@ -538,8 +538,8 @@ class Dataset$$Page extends React.Component {
                     disabled: false,
                     allowClear: false,
                     placeholder: '请选择历史版本',
-                    _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
                     _sdkSwrGetFunc: {},
+                    _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
                   },
                 }}
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
