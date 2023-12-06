@@ -246,7 +246,7 @@ class ModelWarehouse$$Page extends React.Component {
       name: this.state.currentRecord.name,
     };
     this.utils.bff
-      .deleteModel({
+      .deleteModels({
         input: params,
       })
       .then(res => {
@@ -399,8 +399,8 @@ class ModelWarehouse$$Page extends React.Component {
                               allowClear={true}
                               showSearch={true}
                               placeholder="全部类型"
-                              __component_name="Select"
                               _sdkSwrGetFunc={{}}
+                              __component_name="Select"
                             />
                           </Col>
                         </Row>
@@ -652,6 +652,12 @@ class ModelWarehouse$$Page extends React.Component {
                     current={__$$eval(() => this.state.pages.currentPage)}
                     pageSize={__$$eval(() => this.state.pages.pageSize)}
                     __component_name="Pagination"
+                    onChange={function () {
+                      return this.onChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
                   />
                 </Col>
               </Row>

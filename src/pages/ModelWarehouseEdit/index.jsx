@@ -15,11 +15,7 @@ import {
   FormilyCheckbox,
   FormilyTextArea,
   Divider,
-  FormilyUpload,
-  Container,
 } from '@tenx-ui/materials';
-
-import { TenxIconPlus } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -253,6 +249,7 @@ class ModelWarehouseEdit$$Page extends React.Component {
                           },
                         ],
                         '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
+                        'x-pattern': 'disabled',
                       }}
                       componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
                       decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
@@ -305,134 +302,6 @@ class ModelWarehouseEdit$$Page extends React.Component {
                       decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
                       __component_name="FormilyTextArea"
                     />
-                    <Divider
-                      mode="line"
-                      dashed={true}
-                      content={[null]}
-                      defaultOpen={true}
-                      orientation="left"
-                      __component_name="Divider"
-                      orientationMargin={0}
-                    >
-                      模型文件
-                    </Divider>
-                    <FormilyUpload
-                      style={{ width: '600px' }}
-                      fieldProps={{
-                        name: 'Upload',
-                        title: '模型文件',
-                        'x-component': 'FormilyUpload',
-                        'x-validator': [],
-                      }}
-                      componentProps={{
-                        'x-component-props': {
-                          multiple: true,
-                          directory: false,
-                          showUploadList: true,
-                        },
-                      }}
-                      decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
-                      __component_name="FormilyUpload"
-                    >
-                      <Container
-                        style={{
-                          width: '500px',
-                          height: '130px',
-                          borderColor: '#9b9b9b',
-                          borderStyle: 'dashed',
-                          borderWidth: '1px',
-                          backgroundColor: '#ffffff',
-                        }}
-                        defaultStyle={{}}
-                        __component_name="Container"
-                      >
-                        <Row
-                          wrap={true}
-                          style={{ textAlign: 'center', paddingTop: '16px' }}
-                          gutter={['', 0]}
-                          __component_name="Row"
-                        >
-                          <Col span={24} __component_name="Col">
-                            <TenxIconPlus __component_name="TenxIconPlus" />
-                          </Col>
-                          <Col span={24} __component_name="Col">
-                            <Typography.Text
-                              style={{ fontSize: '', textAlign: 'center' }}
-                              strong={false}
-                              disabled={false}
-                              ellipsis={true}
-                              __component_name="Typography.Text"
-                            >
-                              点击上传 / 拖拽文件到此区域
-                            </Typography.Text>
-                          </Col>
-                          <Col span={24} __component_name="Col">
-                            <Typography.Text
-                              style={{ color: '#9b9b9b', fontSize: '' }}
-                              strong={false}
-                              disabled={false}
-                              ellipsis={true}
-                              __component_name="Typography.Text"
-                            >
-                              文件限制：
-                            </Typography.Text>
-                            <Typography.Text
-                              style={{ color: '#9b9b9b', fontSize: '' }}
-                              strong={false}
-                              disabled={false}
-                              ellipsis={true}
-                              __component_name="Typography.Text"
-                            >
-                              {' '}
-                              支持上传文件夹{' '}
-                            </Typography.Text>
-                            <Typography.Text
-                              style={{ color: '#9b9b9b', fontSize: '' }}
-                              strong={false}
-                              disabled={false}
-                              ellipsis={true}
-                              __component_name="Typography.Text"
-                            >
-                              、单文件大小{' '}
-                            </Typography.Text>
-                            <Typography.Text
-                              style={{ color: '#f5a623', fontSize: '' }}
-                              strong={false}
-                              disabled={false}
-                              ellipsis={true}
-                              __component_name="Typography.Text"
-                            >
-                              不超过2G
-                            </Typography.Text>
-                            <Typography.Text
-                              style={{ color: '#9b9b9b', fontSize: '' }}
-                              strong={false}
-                              disabled={false}
-                              ellipsis={true}
-                              __component_name="Typography.Text"
-                            >
-                              : 单次上传文件数量
-                            </Typography.Text>
-                            <Typography.Text
-                              style={{ color: '#f5a623', fontSize: '' }}
-                              strong={false}
-                              disabled={false}
-                              ellipsis={true}
-                              __component_name="Typography.Text"
-                            >
-                              {' '}
-                              不超过 20个
-                            </Typography.Text>
-                          </Col>
-                        </Row>
-                        <Row
-                          wrap={true}
-                          style={{ color: '#9b9b9b', textAlign: 'left', marginLeft: '170px' }}
-                          gutter={['', 0]}
-                          __component_name="Row"
-                        />
-                      </Container>
-                    </FormilyUpload>
                   </FormilyForm>
                 </Col>
               </Row>
