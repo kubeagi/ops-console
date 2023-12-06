@@ -7,6 +7,7 @@ import {
   Row,
   Col,
   Typography,
+  Alert,
   Card,
   Space,
   Button,
@@ -341,6 +342,14 @@ class Knowledge$$Page extends React.Component {
             </Typography.Title>
           </Col>
           <Col span={24} __component_name="Col">
+            <Alert
+              message="构建私域文档以及知识管理的能力，支持多种数据类型，上传的数据文件将会储存至向量数据库中。"
+              __component_name="Alert"
+              type="info"
+              showIcon={true}
+            />
+          </Col>
+          <Col span={24} __component_name="Col">
             <Card
               size="default"
               type="inner"
@@ -423,6 +432,8 @@ class Knowledge$$Page extends React.Component {
                             <Card
                               size="default"
                               type="default"
+                              cover=""
+                              style={{}}
                               actions={[]}
                               loading={false}
                               bordered={true}
