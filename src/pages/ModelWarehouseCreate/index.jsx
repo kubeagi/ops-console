@@ -110,17 +110,16 @@ class CreateModelWarehouse$$Page extends React.Component {
                 message: '成功',
                 description: '正在跳转到详情页',
               });
-              this.linkToDetail();
+              this.linkToDetail(res?.Model?.createModel.name);
             }
           })
           .catch(err => {
-            console.log(err);
+            this.utils.notification.warn({
+              message: '创建失败',
+              description: err?.response?.errors[0]?.message || '创建失败',
+            });
             this.setState({
               loading: false,
-            });
-            this.utils.notification.warn({
-              message: '失败',
-              description: err,
             });
           });
       });
@@ -133,8 +132,8 @@ class CreateModelWarehouse$$Page extends React.Component {
     });
   }
 
-  linkToDetail() {
-    this.history.push('/model-warehouse/detail/' + this.state.name);
+  linkToDetail(name) {
+    this.history.push('/model-warehouse/detail/' + name);
   }
 
   componentDidMount() {

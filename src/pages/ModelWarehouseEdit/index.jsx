@@ -161,8 +161,8 @@ class ModelWarehouseEdit$$Page extends React.Component {
               loading: false,
             });
             this.utils.notification.warn({
-              message: '失败',
-              description: err,
+              message: '编辑失败',
+              description: err?.response?.errors[0]?.message || '编辑失败',
             });
           });
       });
@@ -238,6 +238,7 @@ class ModelWarehouseEdit$$Page extends React.Component {
                         name: 'name',
                         title: '模型名称',
                         required: true,
+                        'x-pattern': 'disabled',
                         'x-validator': [
                           {
                             id: 'disabled',
@@ -249,7 +250,6 @@ class ModelWarehouseEdit$$Page extends React.Component {
                           },
                         ],
                         '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
-                        'x-pattern': 'disabled',
                       }}
                       componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
                       decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}

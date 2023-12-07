@@ -19,8 +19,6 @@ import {
   Table,
   Pagination,
   Modal,
-  FormilyForm,
-  FormilyUpload,
 } from '@tenx-ui/materials';
 
 import {
@@ -37,7 +35,7 @@ import { DataProvider } from 'shared-components';
 import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
-import utils, { RefsManager } from '../../utils/__utils';
+import utils from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
@@ -70,8 +68,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
     this.utils = utils;
 
-    this._refsManager = new RefsManager();
-
     __$$i18n._inject2(this);
 
     this.state = {
@@ -84,13 +80,9 @@ class ModelWarehouseDetail$$Page extends React.Component {
     };
   }
 
-  $ = refName => {
-    return this._refsManager.get(refName);
-  };
+  $ = () => null;
 
-  $$ = refName => {
-    return this._refsManager.getAll(refName);
-  };
+  $$ = () => [];
 
   componentWillUnmount() {
     console.log('will unmount');
@@ -149,6 +141,9 @@ class ModelWarehouseDetail$$Page extends React.Component {
   handleReUpload() {
     if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
       this.handleCancle();
+      this.state.uploadThis.setState({
+        fileList: [],
+      });
       return;
     }
     console.log(this.state.uploadThis);
@@ -176,6 +171,12 @@ class ModelWarehouseDetail$$Page extends React.Component {
         // 都曾经上传过
         if (this.state.uploadThis?.state?.fileList?.length === this.state.uploadedFileCount) {
           this.handleCancle();
+          this.setState({
+            uploadedFileCount: 0,
+          });
+          this.state.uploadThis.setState({
+            fileList: [],
+          });
         }
       }
     );
@@ -199,7 +200,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
   handleBackFunc(event) {
     // 点击按钮时的回调
-    history.back(-1);
+    this.history.push('/model-warehouse');
     console.log('onClick', history);
   }
 
@@ -220,6 +221,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
     return (
       <Page style={{}}>
         <Button.Back
+          path=""
           type="ghost"
           style={{ opacity: '0' }}
           title="模型仓库详情"
@@ -572,8 +574,8 @@ class ModelWarehouseDetail$$Page extends React.Component {
                         ]}
                         pagination={false}
                         showHeader={true}
-                        __component_name="Table"
                         rowSelection={{ type: 'checkbox' }}
+                        __component_name="Table"
                       />
                       <Row wrap={true} gutter={['', '']} __component_name="Row">
                         <Col span={24} __component_name="Col">
@@ -625,68 +627,44 @@ class ModelWarehouseDetail$$Page extends React.Component {
           destroyOnClose={true}
           __component_name="Modal"
         >
-          <FormilyForm
-            ref={this._refsManager.linkRef('formily_p9nf61733c')}
-            formHelper={{ autoFocus: false }}
-            componentProps={{
-              colon: false,
-              layout: 'horizontal',
-              labelCol: 4,
-              labelAlign: 'left',
-              wrapperCol: 20,
-            }}
-            __component_name="FormilyForm"
-          >
-            <FormilyUpload
-              fieldProps={{
-                name: 'Upload',
-                title: '',
-                'x-component': 'FormilyUpload',
-                'x-validator': [],
-              }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyUpload"
-            >
-              <LccComponentQlsmm
-                label="上传"
-                accept=".txt,.doc,.docx,.pdf,.md"
-                bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-                setState={function () {
-                  return this.setUploadState.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                Authorization={__$$eval(() => this.utils.getAuthorization())}
-                getBucketPath={function () {
-                  return this.getBucketPath.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleSuccess={function () {
-                  return this.handleCancle.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleReUpload={function () {
-                  return this.handleReUpload.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                isSupportFolder={true}
-                __component_name="LccComponentQlsmm"
-                calcUploadedFile={function () {
-                  return this.calcUploadedFile.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-              />
-            </FormilyUpload>
-          </FormilyForm>
+          <LccComponentQlsmm
+            label="上传"
+            accept=".txt,.doc,.docx,.pdf,.md"
+            bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+            setState={function () {
+              return this.setUploadState.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            Authorization={__$$eval(() => this.utils.getAuthorization())}
+            getBucketPath={function () {
+              return this.getBucketPath.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            handleSuccess={function () {
+              return this.handleCancle.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            handleReUpload={function () {
+              return this.handleReUpload.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            isSupportFolder={true}
+            __component_name="LccComponentQlsmm"
+            calcUploadedFile={function () {
+              return this.calcUploadedFile.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+          />
         </Modal>
       </Page>
     );
