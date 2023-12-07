@@ -75,18 +75,18 @@ class DataSource$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      size: 12,
-      timer: undefined,
-      record: {},
-      sorter: undefined,
-      current: 1,
-      filters: undefined,
-      modalType: 'add',
-      searchKey: 'name',
-      pagination: undefined,
       isOpenModal: false,
+      modalType: 'add',
       searchValue: undefined,
+      searchKey: 'name',
+      size: 12,
+      current: 1,
+      record: {},
+      pagination: undefined,
+      filters: undefined,
+      sorter: undefined,
       modalLoading: false,
+      timer: undefined,
     };
   }
 
@@ -100,12 +100,97 @@ class DataSource$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
   goDetail(e, { record }) {
     this.history?.push(`/data-source/detail/${record?.name}`);
+  }
+
+  handleQueryChange() {
+    const { repositoryType, status } = this.state.filters || {};
+    const params = {
+      input: {
+        page: this.state?.current || 1,
+        pageSize: this.state?.size || 12,
+        keyword: this.state?.searchValue,
+        namespace: this.utils.getAuthData()?.project,
+      },
+    };
+    this.utils?.changeLocationQuery(this, 'useListDatasources', params);
+  }
+
+  handleOperationClick(e, { record }) {
+    e?.domEvent?.stopPropagation();
+    this.openModal(undefined, {
+      record,
+      modalType: e.key,
+    });
+  }
+
+  openModal(e, { record = {}, modalType = 'add' }) {
+    this.setState({
+      isOpenModal: true,
+      modalType,
+      record,
+    });
+    if (modalType === 'edit') {
+      this.initEditForm(record);
+    }
+  }
+
+  initEditForm(record) {
+    if (!this?.editThis?.initEditForm) {
+      this.state.timer && clearTimeout(this.state.timer);
+      this.setState({
+        timer: setTimeout(() => {
+          this.initEditForm({
+            ...(record || {}),
+            bucket: record?.oss?.bucket,
+            object: record?.oss?.object,
+            serverAddress: record?.endpoint?.url,
+            password: record?.endpoint?.auth?.password,
+            username: record?.endpoint?.auth?.username,
+            insecure: record?.endpoint?.insecure ? 'https' : 'http',
+          });
+        }, 200),
+      });
+      return;
+    }
+    this?.editThis?.initEditForm(record);
+  }
+
+  setEditThis(editThis) {
+    this.editThis = editThis;
+  }
+
+  async confirmDeleteModal(e, payload) {
+    this.setState({
+      modalLoading: true,
+    });
+    try {
+      await this.utils.bff.deleteDatasources({
+        input: {
+          name: this.state.record?.name,
+          namespace: this.utils.getAuthData()?.project,
+        },
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-vf1xe64m'),
+      });
+      setTimeout(() => {
+        this.handleRefresh();
+        this.setState({
+          modalLoading: false,
+        });
+      }, 200);
+    } catch (error) {
+      this.setState({
+        modalLoading: false,
+      });
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-yc0jhxgr'),
+        errors: error?.response?.errors,
+      });
+    }
   }
 
   onSubmit(event) {
@@ -172,117 +257,6 @@ class DataSource$$Page extends React.Component {
     });
   }
 
-  openModal(e, { record = {}, modalType = 'add' }) {
-    this.setState({
-      isOpenModal: true,
-      modalType,
-      record,
-    });
-    if (modalType === 'edit') {
-      this.initEditForm(record);
-    }
-  }
-
-  closeModal() {
-    this.setState({
-      isOpenModal: false,
-    });
-  }
-
-  setEditThis(editThis) {
-    this.editThis = editThis;
-  }
-
-  handleSearch(v) {
-    this.setState(
-      {
-        current: 1,
-      },
-      this.handleQueryChange
-    );
-  }
-
-  initEditForm(record) {
-    if (!this?.editThis?.initEditForm) {
-      this.state.timer && clearTimeout(this.state.timer);
-      this.setState({
-        timer: setTimeout(() => {
-          this.initEditForm({
-            ...(record || {}),
-            bucket: record?.oss?.bucket,
-            object: record?.oss?.object,
-            serverAddress: record?.endpoint?.url,
-            password: record?.endpoint?.auth?.password,
-            username: record?.endpoint?.auth?.username,
-            insecure: record?.endpoint?.insecure ? 'https' : 'http',
-          });
-        }, 200),
-      });
-      return;
-    }
-    this?.editThis?.initEditForm(record);
-  }
-
-  handleRefresh(event) {
-    this.props.useListDatasources?.mutate();
-  }
-
-  handleQueryChange() {
-    const { repositoryType, status } = this.state.filters || {};
-    const params = {
-      input: {
-        page: this.state?.current || 1,
-        pageSize: this.state?.size || 12,
-        keyword: this.state?.searchValue,
-        namespace: this.utils.getAuthData()?.project,
-      },
-    };
-    this.utils?.changeLocationQuery(this, 'useListDatasources', params);
-  }
-
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState(
-      {
-        pagination,
-        filters,
-        sorter,
-      },
-      this.handleQueryChange
-    );
-  }
-
-  async confirmDeleteModal(e, payload) {
-    this.setState({
-      modalLoading: true,
-    });
-    try {
-      await this.utils.bff.deleteDatasources({
-        input: {
-          name: this.state.record?.name,
-          namespace: this.utils.getAuthData()?.project,
-        },
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-vf1xe64m'),
-      });
-      setTimeout(() => {
-        this.handleRefresh();
-        this.setState({
-          modalLoading: false,
-        });
-      }, 200);
-    } catch (error) {
-      this.setState({
-        modalLoading: false,
-      });
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-yc0jhxgr'),
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
   async validatorNamespace(value, ...payload) {
     const values = this.form()?.values;
     const curIndex = payload?.[1]?.field?.index;
@@ -299,16 +273,30 @@ class DataSource$$Page extends React.Component {
     } catch (e) {}
   }
 
-  paginationShowTotal(total, range) {
-    return `${this.i18n('i18n-k0zli54g')} ${total} ${this.i18n('i18n-9ruso5ml')}`;
+  handleRefresh(event) {
+    this.props.useListDatasources?.mutate();
   }
 
-  handleOperationClick(e, { record }) {
-    e?.domEvent?.stopPropagation();
-    this.openModal(undefined, {
-      record,
-      modalType: e.key,
+  closeModal() {
+    this.setState({
+      isOpenModal: false,
     });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      // current: 1,
+    });
+  }
+
+  handleSearch(v) {
+    this.setState(
+      {
+        current: 1,
+      },
+      this.handleQueryChange
+    );
   }
 
   handlePaginationChange(c, s) {
@@ -321,11 +309,23 @@ class DataSource$$Page extends React.Component {
     );
   }
 
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-      // current: 1,
-    });
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState(
+      {
+        pagination,
+        filters,
+        sorter,
+      },
+      this.handleQueryChange
+    );
+  }
+
+  paginationShowTotal(total, range) {
+    return `${this.i18n('i18n-k0zli54g')} ${total} ${this.i18n('i18n-9ruso5ml')}`;
+  }
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
   componentDidMount() {}
@@ -690,12 +690,7 @@ class DataSource$$Page extends React.Component {
                                           }}
                                           __component_name="Typography.Title"
                                         >
-                                          {__$$eval(
-                                            () =>
-                                              `${record?.displayName || '-'}(${
-                                                record?.name || '-'
-                                              })`
-                                          )}
+                                          {__$$eval(() => __$$context.utils.getFullName(record))}
                                         </Typography.Title>
                                       </Col>
                                       <Col span={24} __component_name="Col">
