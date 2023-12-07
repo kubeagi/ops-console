@@ -61,9 +61,77 @@ class DataSourceCreate$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  setThis(page) {}
+  setThis(createThis) {
+    this.setState({
+      createThis,
+    });
+  }
 
-  handleSave(v) {}
+  handleSave(v) {
+    const isCreate = true;
+    const form = this.state?.createThis?.form();
+    form.submit(async v => {
+      this.setState({
+        modalLoading: true,
+      });
+      const params = {
+        input: {
+          name: v?.name,
+          displayName: v?.displayName,
+          namespace: this.utils.getAuthData()?.project,
+          description: v?.description,
+          ossinput: {
+            bucket: v?.bucket,
+            object: v?.object,
+          },
+          endpointinput: {
+            url: v?.serverAddress,
+            insecure: v?.insecure === 'https' ? true : false,
+            auth: {
+              username: v?.username,
+              password: v?.password,
+            },
+          },
+        },
+      };
+      const api = {
+        create: {
+          name: 'createDatasource',
+          params,
+          successMessage: 'i18n-ia3gjpq5',
+          faildMessage: 'i18n-p20wuevb',
+        },
+        update: {
+          name: 'updateDatasource',
+          params,
+          successMessage: 'i18n-tz6dwud2',
+          faildMessage: 'i18n-sah3nlrl',
+        },
+      }[isCreate ? 'create' : 'update'];
+      try {
+        const res = await this.props.appHelper.utils.bff[api.name](api.params);
+        this.utils.notification.success({
+          message: this.i18n(api.successMessage),
+        });
+        this.handleCancel();
+        this.setState({
+          modalLoading: false,
+        });
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: this.i18n(api.faildMessage),
+          errors: error?.response?.errors,
+        });
+        this.setState({
+          modalLoading: false,
+        });
+      }
+    });
+  }
+
+  handleCancel(v) {
+    this.history?.go('-1');
+  }
 
   componentDidMount() {}
 
@@ -106,8 +174,22 @@ class DataSourceCreate$$Page extends React.Component {
                 __component_name="FormilyForm"
               >
                 <LccComponentRu83f
+                  bff={__$$eval(() => this.props.appHelper.utils.bff)}
+                  project={__$$eval(() => this.utils.getAuthData()?.project)}
+                  setThis={function () {
+                    return this.setThis.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
                   handleSave={function () {
                     return this.handleSave.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  handelCancel={function () {
+                    return this.handleCancel.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
@@ -123,7 +205,7 @@ class DataSourceCreate$$Page extends React.Component {
   }
 }
 
-const PageWrapper = () => {
+const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/data-source/create' }, location.pathname);
@@ -149,7 +231,7 @@ const PageWrapper = () => {
       }}
       sdkSwrFuncs={[]}
       render={dataProps => (
-        <DataSourceCreate$$Page {...dataProps} self={self} appHelper={appHelper} />
+        <DataSourceCreate$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
       )}
     />
   );

@@ -37,7 +37,7 @@ import { matchPath, useLocation } from '@umijs/max';
 import qs from 'query-string';
 import { DataProvider } from 'shared-components';
 
-import utils from '../../utils/__utils';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
@@ -70,10 +70,12 @@ class DataSource$$Page extends React.Component {
 
     this.utils = utils;
 
+    this._refsManager = new RefsManager();
+
     __$$i18n._inject2(this);
 
     this.state = {
-      size: 10,
+      size: 12,
       timer: undefined,
       record: {},
       sorter: undefined,
@@ -88,9 +90,13 @@ class DataSource$$Page extends React.Component {
     };
   }
 
-  $ = () => null;
+  $ = refName => {
+    return this._refsManager.get(refName);
+  };
 
-  $$ = () => [];
+  $$ = refName => {
+    return this._refsManager.getAll(refName);
+  };
 
   componentWillUnmount() {}
 
@@ -99,54 +105,71 @@ class DataSource$$Page extends React.Component {
   }
 
   goDetail(e, { record }) {
-    this.history?.push(`/data-source/detail/${this.record?.id || 'test'}`);
+    this.history?.push(`/data-source/detail/${record?.name}`);
   }
 
   onSubmit(event) {
-    // const { name, modalType } = this.state
-    // const isCreate = modalType === 'add'
-    // const form = this.form()
-    // form.submit(async v => {
-    //   this.setState({
-    //     modalLoading: true
-    //   })
-    //   const params = {
-    //   }
-    //   const api = {
-    //     create: {
-    //       name: 'createDatasource',
-    //       params: {
-    //       },
-    //       successMessage: 'i18n-zoji4fmj',
-    //       faildMessage: 'i18n-se3su28h',
-    //     },
-    //     update: {
-    //       name: 'updateDatasource',
-    //       params: {
-    //       },
-    //       successMessage: 'i18n-w3z0nief',
-    //       faildMessage: 'i18n-e3qm9bbw',
-    //     }
-    //   }[isCreate ? 'create' : 'update']
-    //   try {
-    //     const res = await this.props.appHelper.utils.bff[api.name](api.params)
-    //     this.utils.notification.success({
-    //       message: this.i18n(api.successMessage),
-    //     })
-    //     this.handleRefresh()
-    //     this.setState({
-    //       modalLoading: false
-    //     })
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n(api.faildMessage),
-    //       errors: error?.response?.errors
-    //     })
-    //     this.setState({
-    //       modalLoading: false
-    //     })
-    //   }
-    // })
+    const { modalType } = this.state;
+    const isCreate = modalType === 'add';
+    const form = this?.editThis?.form();
+    form.submit(async v => {
+      this.setState({
+        modalLoading: true,
+      });
+      const params = {
+        input: {
+          name: v?.name,
+          displayName: v?.displayName,
+          namespace: this.utils.getAuthData()?.project,
+          description: v?.description,
+          ossinput: {
+            bucket: v?.bucket,
+            object: v?.object,
+          },
+          endpointinput: {
+            url: v?.serverAddress,
+            insecure: v?.insecure === 'https' ? true : false,
+            auth: {
+              username: v?.username,
+              password: v?.password,
+            },
+          },
+        },
+      };
+      const api = {
+        create: {
+          name: 'createDatasource',
+          params,
+          successMessage: 'i18n-ia3gjpq5',
+          faildMessage: 'i18n-p20wuevb',
+        },
+        update: {
+          name: 'updateDatasource',
+          params,
+          successMessage: 'i18n-tz6dwud2',
+          faildMessage: 'i18n-sah3nlrl',
+        },
+      }[isCreate ? 'create' : 'update'];
+      try {
+        const res = await this.props.appHelper.utils.bff[api.name](api.params);
+        this.utils.notification.success({
+          message: this.i18n(api.successMessage),
+        });
+        this.handleRefresh();
+        this.closeModal();
+        this.setState({
+          modalLoading: false,
+        });
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: this.i18n(api.faildMessage),
+          errors: error?.response?.errors,
+        });
+        this.setState({
+          modalLoading: false,
+        });
+      }
+    });
   }
 
   openModal(e, { record = {}, modalType = 'add' }) {
@@ -167,9 +190,7 @@ class DataSource$$Page extends React.Component {
   }
 
   setEditThis(editThis) {
-    this.setState({
-      editThis,
-    });
+    this.editThis = editThis;
   }
 
   handleSearch(v) {
@@ -182,43 +203,41 @@ class DataSource$$Page extends React.Component {
   }
 
   initEditForm(record) {
-    if (!this.state?.editThis?.initEditForm) {
+    if (!this?.editThis?.initEditForm) {
       this.state.timer && clearTimeout(this.state.timer);
       this.setState({
         timer: setTimeout(() => {
-          this.initEditForm(record);
+          this.initEditForm({
+            ...(record || {}),
+            bucket: record?.oss?.bucket,
+            object: record?.oss?.object,
+            serverAddress: record?.endpoint?.url,
+            password: record?.endpoint?.auth?.password,
+            username: record?.endpoint?.auth?.username,
+            insecure: record?.endpoint?.insecure ? 'https' : 'http',
+          });
         }, 200),
       });
       return;
     }
-    this.state?.editThis?.initEditForm(record);
+    this?.editThis?.initEditForm(record);
   }
 
   handleRefresh(event) {
-    this.props.useGetDatasourcesPaged?.mutate();
+    this.props.useListDatasources?.mutate();
   }
 
   handleQueryChange() {
-    // const { repositoryType, status } = this.state.filters || {}
-    // const params = {
-    //   "page": this.state?.current || 1,
-    //   "pageSize": this.state?.pageSize || 10,
-    //   "name": this.state?.searchValue,
-    // }
-    // if (this.state.sorter?.order) {
-    //   params.sortField = this.state.sorter?.field
-    //   params.sortDirection = this.state.sorter?.order
-    // }
-    // if (status?.length > 0) {
-    //   params.statuses = status
-    // } else {
-    //   params.statuses = undefined
-    // }
-    // this.utils?.changeLocationQuery(
-    //   this,
-    //   'useGetDatasourcesPaged',
-    //   params
-    // )
+    const { repositoryType, status } = this.state.filters || {};
+    const params = {
+      input: {
+        page: this.state?.current || 1,
+        pageSize: this.state?.size || 12,
+        keyword: this.state?.searchValue,
+        namespace: this.utils.getAuthData()?.project,
+      },
+    };
+    this.utils?.changeLocationQuery(this, 'useListDatasources', params);
   }
 
   handleTableChange(pagination, filters, sorter, extra) {
@@ -233,32 +252,35 @@ class DataSource$$Page extends React.Component {
   }
 
   async confirmDeleteModal(e, payload) {
-    // this.setState({
-    //   modalLoading: true
-    // })
-    // try {
-    //   await this.utils.bff.deleteDatasource({
-    //     name: this.state.record?.name,
-    //   })
-    //   this.closeModal()
-    //   this.utils.notification.success({
-    //     message: this.i18n('i18n-z0rln00w'),
-    //   })
-    //   setTimeout(() => {
-    //     this.handleRefresh()
-    //     this.setState({
-    //       modalLoading: false
-    //     })
-    //   }, 200)
-    // } catch (error) {
-    //   this.setState({
-    //     modalLoading: false
-    //   })
-    //   this.utils.notification.warnings({
-    //     message: this.i18n('i18n-axvyllo6'),
-    //     errors: error?.response?.errors
-    //   })
-    // }
+    this.setState({
+      modalLoading: true,
+    });
+    try {
+      await this.utils.bff.deleteDatasources({
+        input: {
+          name: this.state.record?.name,
+          namespace: this.utils.getAuthData()?.project,
+        },
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-vf1xe64m'),
+      });
+      setTimeout(() => {
+        this.handleRefresh();
+        this.setState({
+          modalLoading: false,
+        });
+      }, 200);
+    } catch (error) {
+      this.setState({
+        modalLoading: false,
+      });
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-yc0jhxgr'),
+        errors: error?.response?.errors,
+      });
+    }
   }
 
   async validatorNamespace(value, ...payload) {
@@ -354,7 +376,12 @@ class DataSource$$Page extends React.Component {
                   ellipsis={true}
                   __component_name="Typography.Text"
                 >
-                  xxxxxxxxxxxxxxxx
+                  {__$$eval(
+                    () =>
+                      `${this?.state?.record?.displayName || '-'}(${
+                        this?.state?.record?.name || '-'
+                      })`
+                  )}
                 </Typography.Text>
                 <Typography.Text
                   style={{ fontSize: '' }}
@@ -407,9 +434,13 @@ class DataSource$$Page extends React.Component {
           __component_name="Drawer"
         >
           <LccComponentRu83f
+            ref={this._refsManager.linkRef('LccComponentRu83f')}
             data={__$$eval(() => this.state?.record || {})}
             setThis={function () {
               return this.setEditThis.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            handleSave={function () {
+              return this.onSubmit.apply(this, Array.prototype.slice.call(arguments).concat([]));
             }.bind(this)}
             handelCancel={function () {
               return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
@@ -431,6 +462,14 @@ class DataSource$$Page extends React.Component {
             >
               {this.i18n('i18n-38tkeb1r') /* 数据源管理 */}
             </Typography.Title>
+          </Col>
+          <Col span={24} __component_name="Col">
+            <Alert
+              type="info"
+              message="管理和查看平台数据源。作为 LLMOps 统一的数据入口，需要优先将训练数据、测试数据、知识库文件等数据内容接入数据源，以供其他模块的数据引用。"
+              showIcon={true}
+              __component_name="Alert"
+            />
           </Col>
           <Col span={24} __component_name="Col">
             <Card
@@ -502,28 +541,26 @@ class DataSource$$Page extends React.Component {
                     footer=""
                     header=""
                     rowKey="id"
+                    loading={__$$eval(
+                      () =>
+                        this.props.useListDatasources?.isLoading ||
+                        this.props?.useListDatasources?.loading ||
+                        false
+                    )}
                     bordered={false}
-                    dataSource={[
-                      {
-                        id: 1,
-                        name: 'aaaaaaa',
-                        text: 'Racing car sprays burning fuel into crowd.',
-                        type: 'localUpload',
-                      },
-                      { id: 2, text: 'Japanese princess to wed commoner.', type: 'fileStorage' },
-                      {
-                        id: 3,
-                        text: 'Australian walks 100km after outback crash.',
-                        type: 'fileStorage',
-                      },
-                      { id: 4, text: 'Man charged over missing wedding girl.', type: 'mysql' },
-                      { id: 5, text: 'Los Angeles battles huge wildfires.', type: 'mongodb' },
-                      { id: 6, text: 'Los Angeles battles huge wildfires.', type: 'api' },
-                    ]}
+                    dataSource={__$$eval(
+                      () =>
+                        this.props.useListDatasources?.data?.Datasource?.listDatasources?.nodes?.map(
+                          item => ({
+                            ...item,
+                            type: item.type || 'objectStorage',
+                          })
+                        ) || []
+                    )}
                     gridEnable={true}
                     itemLayout="horizontal"
                     pagination={false}
-                    renderItem={item =>
+                    renderItem={record =>
                       (__$$context => (
                         <List.Item>
                           <Card
@@ -537,7 +574,7 @@ class DataSource$$Page extends React.Component {
                                 this,
                                 Array.prototype.slice.call(arguments).concat([
                                   {
-                                    record: this.record,
+                                    record: record,
                                   },
                                 ])
                               );
@@ -572,7 +609,7 @@ class DataSource$$Page extends React.Component {
                                         this,
                                         Array.prototype.slice.call(arguments).concat([
                                           {
-                                            record: item,
+                                            record: record,
                                           },
                                         ])
                                       );
@@ -614,7 +651,12 @@ class DataSource$$Page extends React.Component {
                                 >
                                   <Col flex="56px" __component_name="Col">
                                     <Image
-                                      src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                                      src={__$$eval(
+                                        () =>
+                                          __$$context.utils
+                                            .getDataSourceTypes(__$$context)
+                                            ?.find(item => item.value === record.type)?.icon || '-'
+                                      )}
                                       style={{}}
                                       width={56}
                                       height={56}
@@ -635,10 +677,25 @@ class DataSource$$Page extends React.Component {
                                           bold={true}
                                           level={1}
                                           bordered={false}
-                                          ellipsis={true}
+                                          ellipsis={{
+                                            tooltip: {
+                                              title: __$$eval(
+                                                () =>
+                                                  `${record?.displayName || '-'}(${
+                                                    record?.name || '-'
+                                                  })`
+                                              ),
+                                              _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                            },
+                                          }}
                                           __component_name="Typography.Title"
                                         >
-                                          标题
+                                          {__$$eval(
+                                            () =>
+                                              `${record?.displayName || '-'}(${
+                                                record?.name || '-'
+                                              })`
+                                          )}
                                         </Typography.Title>
                                       </Col>
                                       <Col span={24} __component_name="Col">
@@ -657,7 +714,7 @@ class DataSource$$Page extends React.Component {
                                           }}
                                           underline={false}
                                         >
-                                          蚂蚁的企业级产品是一个庞大且复杂的体系。这类产品不仅量级巨大且功能复杂，而且变动和并发频繁，常常需要设计与开发能够快速的做出响应。同时这类产品中有存在很多类似的页面以及组件，可以通过抽象得到一些稳定且高复用性的内容。
+                                          {__$$eval(() => record?.description || '-')}
                                         </Typography.Paragraph>
                                       </Col>
                                     </Row>
@@ -708,7 +765,7 @@ class DataSource$$Page extends React.Component {
                                                   __component_name="Space"
                                                 >
                                                   <Status
-                                                    id="error"
+                                                    id={__$$eval(() => record?.status)}
                                                     types={__$$eval(() =>
                                                       __$$context.utils.getDataSourceStatus(
                                                         __$$context,
@@ -717,26 +774,44 @@ class DataSource$$Page extends React.Component {
                                                     )}
                                                     __component_name="Status"
                                                   />
-                                                  <Typography.Text
-                                                    type="colorPrimary"
-                                                    style={{ top: '-2px', position: 'relative' }}
-                                                    strong={false}
-                                                    disabled={false}
-                                                    ellipsis={true}
-                                                    __component_name="Typography.Text"
-                                                  >
-                                                    (30%)
-                                                  </Typography.Text>
+                                                  {!!false && (
+                                                    <Typography.Text
+                                                      type="colorPrimary"
+                                                      style={{
+                                                        top: '-2px',
+                                                        fontSize: '',
+                                                        position: 'relative',
+                                                      }}
+                                                      strong={false}
+                                                      disabled={false}
+                                                      ellipsis={true}
+                                                      __component_name="Typography.Text"
+                                                    >
+                                                      (30%)
+                                                    </Typography.Text>
+                                                  )}
                                                 </Space>
                                               </Col>
                                               <Col __component_name="Col">
                                                 <Tag
-                                                  color="processing"
+                                                  color={__$$eval(
+                                                    () =>
+                                                      __$$context.utils
+                                                        .getDataSourceTypes(__$$context)
+                                                        ?.find(item => item.value === record.type)
+                                                        ?.tagColor || 'primary'
+                                                  )}
                                                   bordered={false}
                                                   closable={false}
                                                   __component_name="Tag"
                                                 >
-                                                  tag
+                                                  {__$$eval(
+                                                    () =>
+                                                      __$$context.utils
+                                                        .getDataSourceTypes(__$$context)
+                                                        ?.find(item => item.value === record.type)
+                                                        ?.children || '-'
+                                                  )}
                                                 </Tag>
                                               </Col>
                                             </Row>
@@ -750,7 +825,7 @@ class DataSource$$Page extends React.Component {
                                       label: this.i18n('i18n-uag94ndq') /* 更新时间 */,
                                       children: (
                                         <Typography.Time
-                                          time=""
+                                          time={__$$eval(() => record?.updateTimestamp)}
                                           format=""
                                           relativeTime={false}
                                           __component_name="Typography.Time"
@@ -787,7 +862,7 @@ class DataSource$$Page extends React.Component {
                             </Row>
                           </Card>
                         </List.Item>
-                      ))(__$$createChildContext(__$$context, { item }))
+                      ))(__$$createChildContext(__$$context, { record }))
                     }
                     __component_name="List"
                   />
@@ -799,11 +874,27 @@ class DataSource$$Page extends React.Component {
                 >
                   <Pagination
                     style={{ display: 'flex', marginTop: '8px' }}
-                    total={50}
+                    total={__$$eval(
+                      () =>
+                        this.props.useListDatasources?.data?.Datasource?.listDatasources
+                          ?.totalCount || 0
+                    )}
                     simple={false}
-                    current={1}
-                    pageSize={10}
+                    current={__$$eval(() => this.state.current)}
+                    onChange={function () {
+                      return this.handlePaginationChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    pageSize={__$$eval(() => this.state.size)}
                     __component_name="Pagination"
+                    onShowSizeChange={function () {
+                      return this.handlePaginationChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
                   />
                 </Col>
               </Row>
@@ -815,7 +906,7 @@ class DataSource$$Page extends React.Component {
   }
 }
 
-const PageWrapper = () => {
+const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/data-source' }, location.pathname);
@@ -841,11 +932,13 @@ const PageWrapper = () => {
       }}
       sdkSwrFuncs={[
         {
-          func: 'useGetDatasourcesPaged',
+          func: 'useListDatasources',
           params: function applyThis() {
             return {
               input: {
                 namespace: this.utils.getAuthData()?.project,
+                page: 1,
+                pageSize: 12,
               },
             };
           }.apply(self),
@@ -854,7 +947,9 @@ const PageWrapper = () => {
           }.apply(self),
         },
       ]}
-      render={dataProps => <DataSource$$Page {...dataProps} self={self} appHelper={appHelper} />}
+      render={dataProps => (
+        <DataSource$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+      )}
     />
   );
 };

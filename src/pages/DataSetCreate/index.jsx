@@ -80,7 +80,7 @@ class DataSetCreate$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { createLoading: true, name: undefined };
+    this.state = { name: undefined, createLoading: true };
   }
 
   $ = refName => {
@@ -123,14 +123,8 @@ class DataSetCreate$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  handleReUpload() {
-    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
-      this.handleCancle();
-      return;
-    }
-    this.state.uploadThis?.state?.fileList?.forEach(file => {
-      this.state.uploadThis?.computeMD5(file);
-    });
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
   setName(e) {
@@ -140,69 +134,17 @@ class DataSetCreate$$Page extends React.Component {
     });
   }
 
-  getBucketPath() {
-    return `dataset/${this.form()?.values?.name || this.state.name}/v1`;
-  }
-
-  setUploadState(state) {
-    this.setState(state);
-  }
-
-  async validatorName(v) {
-    if (v) {
-      try {
-        const res = await this.props?.appHelper?.utils?.bff?.getDataset({
-          name: v,
-          namespace: this.utils.getAuthData()?.project,
-          versionsInput: {
-            namespace: this.utils.getAuthData()?.project,
-          },
-        });
-        if (res?.Dataset?.getDataset?.name) {
-          return this.i18n('i18n-w9rn8mqn');
-        }
-      } catch (error) {}
-    }
-  }
-
   handleCancle() {
     this.history.push('/dataset');
   }
 
-  async handleCreateVersionedDataset({ datasetParams, datasetRes }) {
-    const params = {
-      name: datasetParams.name + '-v1',
-      namespace: datasetParams.namespace,
-      datasetName: datasetParams.name,
-      displayName: datasetParams.name + '-v1',
-      // description: String
-      version: 'v1',
-      released: 0,
-      // inheritedFrom: String
-    };
-
-    try {
-      const res = await this.props.appHelper.utils.bff?.createVersionedDataset({
-        input: params,
-      });
-      this.utils.notification.success({
-        message: this.i18n('i18n-1sgb2qhp'),
-      });
-      this.handleReUpload();
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-72kqkgmc'),
-        errors: error?.response?.errors,
-      });
-      this.setState({
-        createLoading: false,
-      });
-    }
+  getBucketPath() {
+    return `dataset/${this.form()?.values?.name || this.state.name}/v1`;
   }
 
   handleConfirm() {
     if (this.state.hasCreate) {
-      this.handleReUpload();
+      // this.handleReUpload()
       return;
     }
     this.form()?.submit(async v => {
@@ -238,8 +180,67 @@ class DataSetCreate$$Page extends React.Component {
     });
   }
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  async validatorName(v) {
+    if (v) {
+      try {
+        const res = await this.props?.appHelper?.utils?.bff?.getDataset({
+          name: v,
+          namespace: this.utils.getAuthData()?.project,
+          versionsInput: {
+            namespace: this.utils.getAuthData()?.project,
+          },
+        });
+        if (res?.Dataset?.getDataset?.name) {
+          return this.i18n('i18n-w9rn8mqn');
+        }
+      } catch (error) {}
+    }
+  }
+
+  handleReUpload() {
+    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
+      this.handleCancle();
+      return;
+    }
+    this.state.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.uploadThis?.computeMD5(file);
+    });
+  }
+
+  setUploadState(state) {
+    this.setState(state);
+  }
+
+  async handleCreateVersionedDataset({ datasetParams, datasetRes }) {
+    const params = {
+      name: datasetParams.name + '-v1',
+      namespace: datasetParams.namespace,
+      datasetName: datasetParams.name,
+      displayName: datasetParams.name + '-v1',
+      // description: String
+      version: 'v1',
+      released: 0,
+      // inheritedFrom: String
+    };
+
+    try {
+      const res = await this.props.appHelper.utils.bff?.createVersionedDataset({
+        input: params,
+      });
+      this.utils.notification.success({
+        message: this.i18n('i18n-1sgb2qhp'),
+      });
+      this.history.push(`/dataset/detail/${datasetParams.name}/version/${datasetParams.name}-v1`);
+      // this.handleReUpload()
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-72kqkgmc'),
+        errors: error?.response?.errors,
+      });
+      this.setState({
+        createLoading: false,
+      });
+    }
   }
 
   componentDidMount() {
@@ -460,37 +461,39 @@ class DataSetCreate$$Page extends React.Component {
                   />
                 )}
               </FormilyForm>
-              <LccComponentQlsmm
-                accept=".txt,.doc,.docx,.pdf,.md"
-                bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-                setState={function () {
-                  return this.setUploadState.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                bucket_path=""
-                Authorization={__$$eval(() => this.utils.getAuthorization())}
-                getBucketPath={function () {
-                  return this.getBucketPath.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleReUpload={function () {
-                  return this.handleReUpload.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                __component_name="LccComponentQlsmm"
-                handleSuccess={function () {
-                  return this.handleCancle.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-              />
+              {!!false && (
+                <LccComponentQlsmm
+                  accept=".txt,.doc,.docx,.pdf,.md"
+                  bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+                  setState={function () {
+                    return this.setUploadState.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  bucket_path=""
+                  Authorization={__$$eval(() => this.utils.getAuthorization())}
+                  getBucketPath={function () {
+                    return this.getBucketPath.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  handleSuccess={function () {
+                    return this.handleCancle.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  handleReUpload={function () {
+                    return this.handleReUpload.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  __component_name="LccComponentQlsmm"
+                />
+              )}
               <Divider
                 mode="line"
                 style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
