@@ -39,8 +39,8 @@ importers:
         specifier: ^0.0.2
         version: 0.0.2(react@18.2.0)
       '@tenx-ui/icon':
-        specifier: ^2.4.17
-        version: 2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^2.4.31
+        version: 2.4.31(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@tenx-ui/icon-materials':
         specifier: ^0.1.5
         version: 0.1.5(react-dom@18.2.0)(react@18.2.0)
@@ -2956,7 +2956,7 @@ packages:
       '@dnd-kit/core': ^6.0.7
       react: '>=16.8.0'
     dependencies:
-      '@dnd-kit/core': 6.0.8(react-dom@17.0.2)(react@18.2.0)
+      '@dnd-kit/core': 6.0.8(react-dom@18.2.0)(react@18.2.0)
       '@dnd-kit/utilities': 3.2.1(react@18.2.0)
       react: 18.2.0
       tslib: 2.6.2
@@ -4777,8 +4777,8 @@ packages:
       react-dom: 17.0.2(react@18.2.0)
     dev: false
 
-  /@tenx-ui/icon@2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-e+/Vqtu91HLByJElajy/XWtKNHimEFGtZIr6mLYl1oJ38OPL394Vu2R1JSNpNbldubN91hoN23WLjwIvkMpx/A==}
+  /@tenx-ui/icon@2.4.31(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-dzgVqcY+GFiIEsF/XFE8P6KUBrYa8bu8eSEt/O8hs7hdcnML3yvFaNpilG01X0Ejo/4dvKHH4byYzQ/YdHG/Uw==}
     peerDependencies:
       classnames: '>=2.2.5'
       prop-types: '>=15.6.1'
