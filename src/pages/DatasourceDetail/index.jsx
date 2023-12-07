@@ -118,7 +118,7 @@ class DatasourceDetail$$Page extends React.Component {
   }
 
   getName() {
-    return `${this.getData()?.displayName || '-'}(${this.getData()?.name || '-'})`;
+    return this.utils.getFullName(this.getData());
   }
 
   refresh() {
