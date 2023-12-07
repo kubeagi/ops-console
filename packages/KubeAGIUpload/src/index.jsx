@@ -266,18 +266,31 @@ class KubeAgiUpload$$Component extends React.Component {
     //   });
     // })
     this.setState({
-      fileList: this.state.fileList?.filter(item => item.uid !== file.uid) 
-    })
+      fileList: this.state.fileList?.filter(item => item.uid !== file.uid),
+    });
     return true;
   }
 
-  onFileAdded(file, fileList) {
-    this.setState({
-      fileList: [
-        ...(this.state.fileList || []),
-        file
-      ],
-    });
+  onFileAdded(file, fileAllList) {
+    // 文件夹和文件需要区分一下
+    // 如果支持文件夹
+    if (this.props?.isSupportFolder) {
+      const list = this.state.fileList || [];
+      const newList = [];
+      fileAllList.forEach(item => {
+        // 避免重复添加
+        if (!list.some(ele => ele.webkitRelativePath === item.webkitRelativePath)) {
+          newList.push(item);
+        }
+      });
+      this.setState({
+        fileList: [...(this.state.fileList || []), ...newList],
+      });
+    } else {
+      this.setState({
+        fileList: [...(this.state.fileList || []), file],
+      });
+    }
     this.props?.setState({
       uploadThis: this,
     });
@@ -384,7 +397,7 @@ class KubeAgiUpload$$Component extends React.Component {
           totalChunkCounts: file.totalChunkCounts,
           md5: file.uniqueIdentifier,
           size: file.size,
-          fileName: file.name,
+          fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
           bucket: pageThis.getBucket(),
           bucket_path: pageThis.getBucketPath(),
         })
@@ -555,6 +568,7 @@ class KubeAgiUpload$$Component extends React.Component {
           })
           .then(function (response) {
             resolve(response);
+            pageThis.props?.handleFinished && pageThis.props.handleFinished(file, response);
           })
           .catch(function (error) {
             pageThis.utils.notification.warnings({
@@ -652,6 +666,8 @@ class KubeAgiUpload$$Component extends React.Component {
             [file.uid]: '上传完成',
           },
         });
+        // 向父级通知这文件已经上传过的了
+        this.props.calcUploadedFile && this.props.calcUploadedFile(file);
         //window.location.reload();
       } else {
         //断点续传
@@ -758,6 +774,7 @@ class KubeAgiUpload$$Component extends React.Component {
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this),
+                directory: __$$eval(() => this.props.isSupportFolder),
                 beforeUpload: function () {
                   return this.onFileAdded.apply(
                     this,

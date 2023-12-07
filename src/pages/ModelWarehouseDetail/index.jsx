@@ -21,7 +21,6 @@ import {
   Modal,
   FormilyForm,
   FormilyUpload,
-  Container,
 } from '@tenx-ui/materials';
 
 import {
@@ -30,6 +29,8 @@ import {
   AntdIconReloadOutlined,
   AntdIconDeleteOutlined,
 } from '@tenx-ui/icon-materials';
+
+import LccComponentQlsmm from 'KubeAGIUpload';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -73,7 +74,14 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { data: {}, loading: false, uploadModalVisible: false };
+    this.state = {
+      uploadModalVisible: false,
+      loading: false,
+      name: this.match.params.name,
+      data: {},
+      submitLoading: false,
+      uploadedFileCount: 0,
+    };
   }
 
   $ = refName => {
@@ -86,6 +94,18 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
+  }
+
+  openUploadModal() {
+    this.setState({
+      uploadModalVisible: true,
+    });
+  }
+
+  closeUploadModal() {
+    this.setState({
+      uploadModalVisible: false,
+    });
   }
 
   getData() {
@@ -108,6 +128,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
         this.setState({
           loading: false,
           data: getModel,
+          name: this.match.params.name,
         });
       })
       .catch(error => {
@@ -116,6 +137,58 @@ class ModelWarehouseDetail$$Page extends React.Component {
           data: {},
         });
       });
+  }
+
+  onSubmitUpload() {
+    this.setState({
+      submitLoading: true,
+    });
+    this.handleReUpload();
+  }
+
+  handleReUpload() {
+    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
+      this.handleCancle();
+      return;
+    }
+    console.log(this.state.uploadThis);
+    this.state.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.uploadThis?.computeMD5(file);
+    });
+  }
+
+  getBucketPath() {
+    return `model/${this.state.name}`;
+  }
+
+  setUploadState(state) {
+    this.setState(state);
+  }
+
+  calcUploadedFile(file) {
+    console.log(file);
+    const count = this.state.uploadedFileCount + 1;
+    this.setState(
+      {
+        uploadedFileCount: count,
+      },
+      () => {
+        // 都曾经上传过
+        if (this.state.uploadThis?.state?.fileList?.length === this.state.uploadedFileCount) {
+          this.handleCancle();
+        }
+      }
+    );
+  }
+
+  handleCancle() {
+    this.utils.notification.success({
+      message: '上传成功',
+    });
+    this.setState({
+      submitLoading: false,
+      uploadModalVisible: false,
+    });
   }
 
   onClick(event) {
@@ -134,18 +207,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
     // 变化时回调函数
     this.state.switchState = checked;
     console.log('onChange', checked, event, this.state);
-  }
-
-  openUploadModal() {
-    this.setState({
-      uploadModalVisible: true,
-    });
-  }
-
-  closeUploadModal() {
-    this.setState({
-      uploadModalVisible: false,
-    });
   }
 
   componentDidMount() {
@@ -170,7 +231,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(this)}
           __component_name="Button.Back"
         />
-        <Spin __component_name="Spin" spinning={__$$eval(() => this.state.loading)}>
+        <Spin spinning={__$$eval(() => this.state.loading)} __component_name="Spin">
           <Card
             size="default"
             type="default"
@@ -293,7 +354,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                         key: 'hdx1if55is',
                         span: 1,
                         label: '模型类型',
-                        children: __$$evalArray(() => this.state.data?.modeltypes?.split(',')).map(
+                        children: __$$evalArray(() => this.state.data?.types?.split(',')).map(
                           (item, index) =>
                             (__$$context => (
                               <Tag color="success" closable={false} __component_name="Tag">
@@ -310,10 +371,10 @@ class ModelWarehouseDetail$$Page extends React.Component {
                         label: '创建时间',
                         children: (
                           <Typography.Time
-                            __component_name="Typography.Time"
                             time={__$$eval(() => this.state.data?.creationTimestamp)}
                             format=""
                             relativeTime={false}
+                            __component_name="Typography.Time"
                           />
                         ),
                       },
@@ -460,68 +521,69 @@ class ModelWarehouseDetail$$Page extends React.Component {
                     </Col>
                     <Col span={24} __component_name="Col">
                       <Table
-                        __component_name="Table"
+                        size="middle"
                         rowKey="id"
-                        dataSource={[
-                          { id: '1', name: '胡彦斌', age: 32, address: '西湖区湖底公园1号' },
-                          { id: '2', name: '王一博', age: 28, address: '滨江区网商路699号' },
-                        ]}
+                        scroll={{ scrollToFirstRowOnChange: true }}
                         columns={[
-                          { title: '姓名', dataIndex: 'name', key: 'name' },
-                          { title: '状态', dataIndex: 'status', key: 'status' },
-                          { title: '文件大小', dataIndex: 'size', key: 'size' },
+                          { key: 'name', title: '姓名', dataIndex: 'name' },
+                          { key: 'status', title: '状态', dataIndex: 'status' },
+                          { key: 'size', title: '文件大小', dataIndex: 'size' },
                           {
-                            title: '操作',
-                            dataIndex: 'op',
                             key: 'op',
+                            title: '操作',
+                            width: 160,
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Space
-                                  __component_name="Space"
-                                  direction="horizontal"
                                   align="center"
+                                  direction="horizontal"
+                                  __component_name="Space"
                                 >
                                   <Button
-                                    __component_name="Button"
-                                    danger={false}
+                                    size="small"
+                                    block={false}
                                     ghost={false}
                                     shape="default"
-                                    block={false}
+                                    danger={false}
                                     disabled={false}
-                                    size="small"
+                                    __component_name="Button"
                                   >
                                     下载
                                   </Button>
                                   <Button
-                                    __component_name="Button"
-                                    danger={false}
-                                    ghost={false}
                                     size="small"
-                                    shape="default"
                                     block={false}
+                                    ghost={false}
+                                    shape="default"
+                                    danger={false}
                                     disabled={false}
+                                    __component_name="Button"
                                   >
                                     删除
                                   </Button>
                                 </Space>
                               ))(__$$createChildContext(__$$context, { text, record, index })),
-                            width: 160,
+                            dataIndex: 'op',
                           },
+                        ]}
+                        dataSource={[
+                          { id: '1', age: 32, name: '胡彦斌', address: '西湖区湖底公园1号' },
+                          { id: '2', age: 28, name: '王一博', address: '滨江区网商路699号' },
                         ]}
                         pagination={false}
                         showHeader={true}
-                        size="middle"
-                        scroll={{ scrollToFirstRowOnChange: true }}
+                        __component_name="Table"
+                        rowSelection={{ type: 'checkbox' }}
                       />
-                      <Row __component_name="Row" wrap={true} gutter={['', '']}>
-                        <Col __component_name="Col" span={24}>
+                      <Row wrap={true} gutter={['', '']} __component_name="Row">
+                        <Col span={24} __component_name="Col">
                           <Pagination
+                            style={{ marginTop: '16px', textAlign: 'right', marginBottom: '24px' }}
                             total={50}
                             simple={false}
                             current={1}
                             pageSize={10}
                             __component_name="Pagination"
-                            style={{ textAlign: 'right', marginTop: '16px', marginBottom: '24px' }}
                           />
                         </Col>
                       </Row>
@@ -541,13 +603,14 @@ class ModelWarehouseDetail$$Page extends React.Component {
         <Modal
           mask={true}
           onOk={function () {
-            return this.closeUploadModal.apply(
+            return this.onSubmitUpload.apply(
               this,
               Array.prototype.slice.call(arguments).concat([])
             );
           }.bind(this)}
           open={__$$eval(() => this.state.uploadModalVisible)}
           title="文件上传"
+          width="700px"
           centered={false}
           keyboard={true}
           onCancel={function () {
@@ -558,13 +621,13 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(this)}
           forceRender={false}
           maskClosable={false}
-          confirmLoading={false}
+          confirmLoading={__$$eval(() => this.state.submitLoading)}
           destroyOnClose={true}
           __component_name="Modal"
         >
           <FormilyForm
             ref={this._refsManager.linkRef('formily_p9nf61733c')}
-            formHelper={{ autoFocus: true }}
+            formHelper={{ autoFocus: false }}
             componentProps={{
               colon: false,
               layout: 'horizontal',
@@ -584,85 +647,44 @@ class ModelWarehouseDetail$$Page extends React.Component {
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               __component_name="FormilyUpload"
             >
-              <Container
-                defaultStyle={{
-                  paddingTop: '16px',
-                  borderColor: '#9b9b9b',
-                  borderStyle: 'dashed',
-                  borderWidth: '1px',
-                  paddingLeft: '16px',
-                  paddingRight: '16px',
-                  paddingBottom: '16px',
-                }}
-                __component_name="Container"
-              >
-                <Row
-                  wrap={true}
-                  style={{
-                    textAlign: 'center',
-                    paddingTop: '16px',
-                    paddingLeft: '16px',
-                    paddingRight: '16px',
-                    paddingBottom: '24px',
-                  }}
-                  gutter={['', 0]}
-                  __component_name="Row"
-                >
-                  <Col span={24} __component_name="Col">
-                    <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
-                  </Col>
-                  <Col span={24} __component_name="Col">
-                    <Typography.Text
-                      style={{ fontSize: '14px' }}
-                      strong={false}
-                      disabled={false}
-                      ellipsis={true}
-                      __component_name="Typography.Text"
-                    >
-                      点击上传 / 拖拽文件到此区域
-                    </Typography.Text>
-                  </Col>
-                  <Col span={23} style={{ textAlign: 'left' }} __component_name="Col">
-                    <Typography.Text
-                      style={{ color: '#9b9b9b', fontSize: '' }}
-                      strong={false}
-                      disabled={false}
-                      ellipsis={true}
-                      __component_name="Typography.Text"
-                    >
-                      文件限制：仅支持 .txt,.doc,.docx,.pdf,.md 文件、单文件大小
-                    </Typography.Text>
-                    <Typography.Text
-                      style={{ color: '#f5a623', fontSize: '' }}
-                      strong={false}
-                      disabled={false}
-                      ellipsis={true}
-                      __component_name="Typography.Text"
-                    >
-                      {' '}
-                      不超过 2G
-                    </Typography.Text>
-                    <Typography.Text
-                      style={{ color: '#9b9b9b', fontSize: '' }}
-                      strong={false}
-                      disabled={false}
-                      ellipsis={true}
-                      __component_name="Typography.Text"
-                    >
-                      、单次上传文件数量
-                    </Typography.Text>
-                    <Typography.Text
-                      style={{ color: '#f5a623', fontSize: '' }}
-                      strong={false}
-                      disabled={false}
-                      ellipsis={true}
-                      __component_name="Typography.Text"
-                    >
-                      不超过 20个
-                    </Typography.Text>
-                  </Col>
-                </Row>
-              </Container>
+              <LccComponentQlsmm
+                label="上传"
+                accept=".txt,.doc,.docx,.pdf,.md"
+                bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+                setState={function () {
+                  return this.setUploadState.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                Authorization={__$$eval(() => this.utils.getAuthorization())}
+                getBucketPath={function () {
+                  return this.getBucketPath.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                handleSuccess={function () {
+                  return this.handleCancle.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                handleReUpload={function () {
+                  return this.handleReUpload.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                isSupportFolder={true}
+                __component_name="LccComponentQlsmm"
+                calcUploadedFile={function () {
+                  return this.calcUploadedFile.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+              />
             </FormilyUpload>
           </FormilyForm>
         </Modal>

@@ -16,8 +16,6 @@ import {
   Divider,
 } from '@tenx-ui/materials';
 
-import LccComponentQlsmm from 'KubeAGIUpload';
-
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
 import qs from 'query-string';
@@ -84,10 +82,6 @@ class CreateModelWarehouse$$Page extends React.Component {
   }
 
   onSubmit() {
-    if (this.state.hasCreate) {
-      this.handleReUpload();
-      return;
-    }
     this.form('model_form')
       ?.validate()
       .then(res => {
@@ -95,8 +89,10 @@ class CreateModelWarehouse$$Page extends React.Component {
           loading: true,
         });
         const values = this.form('model_form').values;
+        const name = values.name;
         const params = {
           namespace: this.utils.getAuthData().project,
+          // creator:this.utils.getAuthData()?.user?.name,
           ...values,
           types: values.types.join(','),
         };
@@ -108,12 +104,13 @@ class CreateModelWarehouse$$Page extends React.Component {
             if (res?.Model?.createModel) {
               this.setState({
                 loading: false,
+                name: name,
               });
               this.utils.notification.success({
                 message: '成功',
-                description: '正在返回列表页',
+                description: '正在跳转到详情页',
               });
-              this.linkToList();
+              this.linkToDetail();
             }
           })
           .catch(err => {
@@ -136,26 +133,8 @@ class CreateModelWarehouse$$Page extends React.Component {
     });
   }
 
-  handleReUpload() {
-    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
-      this.handleCancle();
-      return;
-    }
-    this.state.uploadThis?.state?.fileList?.forEach(file => {
-      this.state.uploadThis?.computeMD5(file);
-    });
-  }
-
-  getBucketPath() {
-    return `model-warehouse/${this.form()?.values?.name || this.state.name}/v1`;
-  }
-
-  setUploadState(state) {
-    this.setState(state);
-  }
-
-  handleCancle() {
-    this.history.push('/model-warehouse');
+  linkToDetail() {
+    this.history.push('/model-warehouse/detail/' + this.state.name);
   }
 
   componentDidMount() {
@@ -235,7 +214,7 @@ class CreateModelWarehouse$$Page extends React.Component {
                 }}
                 componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
                 decoratorProps={{
-                  'x-decorator-props': { labelWidth: '', labelEllipsis: true, labelCol: 2 },
+                  'x-decorator-props': { labelCol: 2, labelWidth: '', labelEllipsis: true },
                 }}
                 __component_name="FormilyInput"
               />
@@ -247,8 +226,8 @@ class CreateModelWarehouse$$Page extends React.Component {
                   required: true,
                   'x-validator': [],
                 }}
-                componentProps={{ 'x-component-props': { placeholder: '请输入', addonBefore: '' } }}
-                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, labelCol: 2 } }}
+                componentProps={{ 'x-component-props': { addonBefore: '', placeholder: '请输入' } }}
+                decoratorProps={{ 'x-decorator-props': { labelCol: 2, labelEllipsis: true } }}
                 __component_name="FormilyInput"
               />
               <FormilyCheckbox
@@ -265,11 +244,11 @@ class CreateModelWarehouse$$Page extends React.Component {
                 componentProps={{ 'x-component-props': { _sdkSwrGetFunc: {} } }}
                 decoratorProps={{
                   'x-decorator-props': {
+                    labelCol: 2,
                     labelAlign: 'left',
                     labelWidth: '',
                     wrapperAlign: 'left',
                     labelEllipsis: true,
-                    labelCol: 2,
                   },
                 }}
                 __component_name="FormilyCheckbox"
@@ -283,55 +262,10 @@ class CreateModelWarehouse$$Page extends React.Component {
                   'x-validator': [],
                 }}
                 componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, labelCol: 2 } }}
+                decoratorProps={{ 'x-decorator-props': { labelCol: 2, labelEllipsis: true } }}
                 __component_name="FormilyTextArea"
               />
-              <Divider
-                mode="line"
-                dashed={true}
-                content={[null]}
-                defaultOpen={true}
-                orientation="left"
-                __component_name="Divider"
-                orientationMargin={0}
-              >
-                模型文件
-              </Divider>
             </FormilyForm>
-            <LccComponentQlsmm
-              label="模型文件"
-              accept=".txt,.doc,.docx,.pdf,.md"
-              bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-              labelWidth=""
-              contentWidth=""
-              Authorization={__$$eval(() => this.utils.getAuthorization())}
-              __component_name="LccComponentQlsmm"
-              isSupportFolder={true}
-              getBucketPath={function () {
-                return this.getBucketPath.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              setState={function () {
-                return this.setUploadState.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              handleReUpload={function () {
-                return this.handleReUpload.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              handleSuccess={function () {
-                return this.handleCancle.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-            />
           </Col>
           <Col span={24} style={{ backgroundColor: '#ffffff' }} __component_name="Col">
             <Row wrap={true} __component_name="Row">
