@@ -7,6 +7,7 @@ import {
   Row,
   Col,
   Typography,
+  Alert,
   Card,
   Space,
   Button,
@@ -20,7 +21,6 @@ import {
   Tag,
   Pagination,
   Modal,
-  Alert,
 } from '@tenx-ui/materials';
 
 import {
@@ -71,20 +71,20 @@ class ModelWarehouse$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      modelList: [],
-      keyword: '',
-      types: '',
-      loading: false,
-      deleteLoading: false,
       pages: {
         currentPage: 1,
         pageSize: 10,
         total: 0,
       },
+      types: '',
+      keyword: '',
+      loading: false,
+      modelList: [],
       pageRange: [],
-      deleteModalVisible: false,
       currentRecord: null,
+      deleteLoading: false,
       deleteBtnLoading: false,
+      deleteModalVisible: false,
     };
   }
 
@@ -96,36 +96,8 @@ class ModelWarehouse$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  onSearch(name) {
-    this.setState(
-      {
-        keyword: name,
-        types: this.state.types,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
-  }
-
-  onTypesChange(type) {
-    this.setState(
-      {
-        keyword: this.state.keyword,
-        types: type === 'all' ? '' : type,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
+  onEdit(item) {
+    this.history.push(`/model-warehouse/edit/${item.name}`);
   }
 
   getData() {
@@ -168,30 +140,6 @@ class ModelWarehouse$$Page extends React.Component {
       });
   }
 
-  handlePageSizeChange(size) {
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
-  }
-
-  onShowSizeChange(current, size) {
-    // pageSize 变化的回调
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
   onChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -206,33 +154,6 @@ class ModelWarehouse$$Page extends React.Component {
         this.getData();
       }
     );
-  }
-
-  onMenuClick(opItem, record) {
-    const { key } = opItem;
-    if (key === 'delete') {
-      this.openDeleteModal(record.item);
-    } else if (key === 'edit') {
-      this.onEdit(record.item);
-    }
-  }
-
-  openDeleteModal(item) {
-    this.setState({
-      deleteModalVisible: true,
-      currentRecord: item,
-    });
-  }
-
-  onCloseDeleteModal(e, isNeedLoad) {
-    console.log('isNeedLoad', isNeedLoad);
-    this.setState({
-      deleteModalVisible: false,
-      currentRecord: null,
-    });
-    if (isNeedLoad) {
-      this.getData();
-    }
   }
 
   onDelete() {
@@ -269,8 +190,38 @@ class ModelWarehouse$$Page extends React.Component {
       });
   }
 
-  onEdit(item) {
-    this.history.push(`/model-warehouse/edit/${item.name}`);
+  onSearch(name) {
+    this.setState(
+      {
+        keyword: name,
+        types: this.state.types,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  onMenuClick(opItem, record) {
+    const { key } = opItem;
+    if (key === 'delete') {
+      this.openDeleteModal(record.item);
+    } else if (key === 'edit') {
+      this.onEdit(record.item);
+    }
+  }
+
+  onCreateClick(event) {
+    this.history.push(`/model-warehouse/create`);
   }
 
   onDetailClick(e, extParams) {
@@ -279,8 +230,57 @@ class ModelWarehouse$$Page extends React.Component {
     this.history.push(`/model-warehouse/detail/${extParams.data.name}`);
   }
 
-  onCreateClick(event) {
-    this.history.push(`/model-warehouse/create`);
+  onTypesChange(type) {
+    this.setState(
+      {
+        keyword: this.state.keyword,
+        types: type === 'all' ? '' : type,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  openDeleteModal(item) {
+    this.setState({
+      deleteModalVisible: true,
+      currentRecord: item,
+    });
+  }
+
+  onShowSizeChange(current, size) {
+    // pageSize 变化的回调
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
+  onCloseDeleteModal(e, isNeedLoad) {
+    console.log('isNeedLoad', isNeedLoad);
+    this.setState({
+      deleteModalVisible: false,
+      currentRecord: null,
+    });
+    if (isNeedLoad) {
+      this.getData();
+    }
+  }
+
+  handlePageSizeChange(size) {
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
   }
 
   componentDidMount() {
@@ -304,6 +304,14 @@ class ModelWarehouse$$Page extends React.Component {
             >
               模型仓库
             </Typography.Title>
+          </Col>
+          <Col span={24} __component_name="Col" style={{}}>
+            <Alert
+              message="模型托管模块，集中管理通过平台训练或手动导入的大模型，支持对模型进行评估及部署。"
+              __component_name="Alert"
+              type="info"
+              showIcon={true}
+            />
           </Col>
           <Col span={24} __component_name="Col">
             <Card
@@ -650,14 +658,14 @@ class ModelWarehouse$$Page extends React.Component {
                     total={__$$eval(() => this.state.pages.total)}
                     simple={false}
                     current={__$$eval(() => this.state.pages.currentPage)}
-                    pageSize={__$$eval(() => this.state.pages.pageSize)}
-                    __component_name="Pagination"
                     onChange={function () {
                       return this.onChange.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
+                    pageSize={__$$eval(() => this.state.pages.pageSize)}
+                    __component_name="Pagination"
                   />
                 </Col>
               </Row>
