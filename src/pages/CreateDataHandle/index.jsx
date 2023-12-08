@@ -311,9 +311,13 @@ class $$Page extends React.Component {
     const res = await this.utils.bff.listDatasets({
       input: {
         namespace: this.utils.getAuthData().project,
+        pageSize: 9999,
+        page: 1,
       },
       versionsInput: {
         namespace: this.utils.getAuthData().project,
+        pageSize: 9999,
+        page: 1,
       },
       filesInput: {
         keyword: this.state.dataSetFileSearchParams.keyword,

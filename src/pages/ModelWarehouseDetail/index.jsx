@@ -12,13 +12,14 @@ import {
   Typography,
   Status,
   Tabs,
+  Modal,
   Descriptions,
   Tag,
   Space,
   Input,
   Table,
   Pagination,
-  Modal,
+  Alert,
 } from '@tenx-ui/materials';
 
 import {
@@ -34,6 +35,10 @@ import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
 import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
+
+import { createAxiosHandler as __$$createAxiosRequestHandler } from '@yunti/lowcode-datasource-axios-handler';
+
+import { create as __$$createDataSourceEngine } from '@alilc/lowcode-datasource-engine/runtime';
 
 import utils from '../../utils/__utils';
 
@@ -59,6 +64,20 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
   _context = this;
 
+  _dataSourceConfig = this._defineDataSourceConfig();
+  _dataSourceEngine = __$$createDataSourceEngine(this._dataSourceConfig, this, {
+    runtimeConfig: true,
+    requestHandlersMap: { axios: __$$createAxiosRequestHandler(utils.getAxiosHanlderConfig?.()) },
+  });
+
+  get dataSourceMap() {
+    return this._dataSourceEngine.dataSourceMap || {};
+  }
+
+  reloadDataSource = async () => {
+    await this._dataSourceEngine.reloadDataSource();
+  };
+
   get constants() {
     return __$$constants || {};
   }
@@ -77,6 +96,15 @@ class ModelWarehouseDetail$$Page extends React.Component {
       data: {},
       submitLoading: false,
       uploadedFileCount: 0,
+      deleteFilesVisible: false,
+      selectedFileList: [],
+      currentFile: '',
+      deleteType: 'single',
+      deleteLoading: false,
+      fileSearchParams: {
+        keyword: '',
+        currentPage: 1,
+      },
     };
   }
 
@@ -84,8 +112,39 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
   $$ = () => [];
 
+  _defineDataSourceConfig() {
+    const _this = this;
+    return {
+      list: [
+        {
+          type: 'axios',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              params: {},
+              method: 'DELETE',
+              isCors: true,
+              timeout: 5000,
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
+              uri: `${this.getUrlPrex()}/model/files/delete_files`,
+            };
+          }.bind(_this),
+          id: 'delete_files',
+        },
+      ],
+    };
+  }
+
   componentWillUnmount() {
     console.log('will unmount');
+  }
+
+  getDataSourceMap() {
+    return this.dataSourceMap;
   }
 
   openUploadModal() {
@@ -109,6 +168,11 @@ class ModelWarehouseDetail$$Page extends React.Component {
     const params = {
       namespace: project,
       name,
+      filesInput: {
+        keyword: this.state.fileSearchParams.keyword,
+        pageSize: 10,
+        page: this.state.fileSearchParams.currentPage,
+      },
     };
     this.utils.bff
       .getModel(params)
@@ -116,7 +180,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
         console.log(res);
         const { Model } = res;
         const { getModel } = Model || {};
-        console.log(getModel);
         this.setState({
           loading: false,
           data: getModel,
@@ -129,6 +192,36 @@ class ModelWarehouseDetail$$Page extends React.Component {
           data: {},
         });
       });
+  }
+
+  onPageChange(page) {
+    this.setState(
+      {
+        fileSearchParams: {
+          ...this.state.fileSearchParams,
+          currentPage: page,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  onSearch(value) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        fileSearchParams: {
+          ...this.state.fileSearchParams,
+          currentPage: 1,
+          keyword: value,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
   }
 
   onSubmitUpload() {
@@ -154,6 +247,15 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
   getBucketPath() {
     return `model/${this.state.name}`;
+  }
+
+  getUrlPrex() {
+    return `${window.location.origin}/kubeagi-apis/minio`;
+  }
+
+  getBucket() {
+    // namespace
+    return this.utils.getAuthData()?.project;
   }
 
   setUploadState(state) {
@@ -192,6 +294,92 @@ class ModelWarehouseDetail$$Page extends React.Component {
     });
   }
 
+  openDeleteFilesModal(e, { record }) {
+    this.setState({
+      deleteFilesVisible: true,
+      currentFile: record?.path,
+      deleteType: 'single',
+    });
+  }
+
+  onDeleteBatch() {
+    if (!this.state.selectedFileList.length) {
+      this.utils.notification.warn({
+        message: '请选择要删除的文件！',
+      });
+      return;
+    }
+    this.setState({
+      deleteFilesVisible: true,
+      deleteType: 'batch',
+    });
+  }
+
+  onRowSelectedChange(keys) {
+    console.log(keys);
+    this.setState({
+      selectedFileList: keys,
+    });
+  }
+
+  onSubmitDel() {
+    console.log(files);
+    const files = [];
+    if (this.state.deleteType === 'batch') {
+      this.onDelete(this.state.selectedFileList);
+    }
+    if (this.state.deleteType === 'single') {
+      this.onDelete([this.state.currentFile]);
+    }
+  }
+
+  onDelete(selectedDeleteFileList) {
+    this.setState({
+      deleteLoading: true,
+    });
+    const pageThis = this;
+    return new Promise((resolve, reject) => {
+      pageThis
+        .getDataSourceMap()
+        .delete_files.load({
+          files: selectedDeleteFileList,
+          bucket: pageThis.getBucket(),
+          bucket_path: pageThis.getBucketPath(),
+        })
+        .then(function (response) {
+          console.log(response);
+          if (response === 'success') {
+            pageThis.utils.notification.success({
+              message: '删除文件成功！',
+            });
+            pageThis.closeDeleteFilesModal();
+            pageThis.getData();
+          } else {
+            pageThis.utils.notification.warn({
+              message: response,
+            });
+          }
+          pageThis.setState({
+            deleteLoading: false,
+          });
+          resolve(response);
+        })
+        .catch(function (error) {
+          pageThis.setState({
+            deleteLoading: false,
+          });
+          reject(error);
+        });
+    });
+  }
+
+  closeDeleteFilesModal() {
+    this.setState({
+      deleteFilesVisible: false,
+      currentFile: '',
+    });
+  }
+
   onClick(event) {
     // 点击按钮时的回调
 
@@ -211,6 +399,8 @@ class ModelWarehouseDetail$$Page extends React.Component {
   }
 
   componentDidMount() {
+    this._dataSourceEngine.reloadDataSource();
+
     this.getData();
     console.log('did mount');
   }
@@ -286,7 +476,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                           id={__$$eval(() => this.state.data.status)}
                           types={[
                             { id: 'False', type: 'error', children: '失败' },
-                            { id: 'True', type: 'disabled', children: '成功' },
+                            { id: 'True', type: 'success', children: '成功' },
                           ]}
                           __component_name="Status"
                         />
@@ -402,11 +592,11 @@ class ModelWarehouseDetail$$Page extends React.Component {
                         label: '描述',
                         children: (
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
-                            disabled={false}
-                            ellipsis={true}
                             __component_name="Typography.Text"
+                            ellipsis={false}
+                            style={{ fontSize: '' }}
+                            disabled={false}
+                            strong={false}
                           >
                             {__$$eval(() => this.state.data?.description)}
                           </Typography.Text>
@@ -483,7 +673,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                               shape="default"
                               danger={false}
                               onClick={function () {
-                                return this.handleRefresh.apply(
+                                return this.getData.apply(
                                   this,
                                   Array.prototype.slice.call(arguments).concat([])
                                 );
@@ -503,13 +693,19 @@ class ModelWarehouseDetail$$Page extends React.Component {
                               danger={false}
                               disabled={false}
                               __component_name="Button"
+                              onClick={function () {
+                                return this.onDeleteBatch.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([])
+                                );
+                              }.bind(this)}
                             >
                               删除
                             </Button>
                             <Input.Search
                               style={{ width: '240px' }}
                               onSearch={function () {
-                                return this.handleSearchValueChange.apply(
+                                return this.onSearch.apply(
                                   this,
                                   Array.prototype.slice.call(arguments).concat([])
                                 );
@@ -524,10 +720,10 @@ class ModelWarehouseDetail$$Page extends React.Component {
                     <Col span={24} __component_name="Col">
                       <Table
                         size="middle"
-                        rowKey="id"
+                        rowKey="path"
                         scroll={{ scrollToFirstRowOnChange: true }}
                         columns={[
-                          { key: 'name', title: '姓名', dataIndex: 'name' },
+                          { key: 'name', title: '名称', dataIndex: 'path' },
                           { key: 'status', title: '状态', dataIndex: 'status' },
                           { key: 'size', title: '文件大小', dataIndex: 'size' },
                           {
@@ -547,7 +743,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                     ghost={false}
                                     shape="default"
                                     danger={false}
-                                    disabled={false}
+                                    disabled={true}
                                     __component_name="Button"
                                   >
                                     下载
@@ -560,6 +756,16 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                     danger={false}
                                     disabled={false}
                                     __component_name="Button"
+                                    onClick={function () {
+                                      return this.openDeleteFilesModal.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([
+                                          {
+                                            record: record,
+                                          },
+                                        ])
+                                      );
+                                    }.bind(__$$context)}
                                   >
                                     删除
                                   </Button>
@@ -568,24 +774,35 @@ class ModelWarehouseDetail$$Page extends React.Component {
                             dataIndex: 'op',
                           },
                         ]}
-                        dataSource={[
-                          { id: '1', age: 32, name: '胡彦斌', address: '西湖区湖底公园1号' },
-                          { id: '2', age: 28, name: '王一博', address: '滨江区网商路699号' },
-                        ]}
+                        dataSource={__$$eval(() => this.state.data?.files?.nodes || [])}
                         pagination={false}
                         showHeader={true}
-                        rowSelection={{ type: 'checkbox' }}
+                        rowSelection={{
+                          type: 'checkbox',
+                          onChange: function () {
+                            return this.onRowSelectedChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this),
+                        }}
                         __component_name="Table"
                       />
                       <Row wrap={true} gutter={['', '']} __component_name="Row">
                         <Col span={24} __component_name="Col">
                           <Pagination
                             style={{ marginTop: '16px', textAlign: 'right', marginBottom: '24px' }}
-                            total={50}
+                            total={__$$eval(() => this.state.data?.files?.totalCount || 0)}
                             simple={false}
-                            current={1}
+                            current={__$$eval(() => this.state.fileSearchParams.currentPage)}
                             pageSize={10}
                             __component_name="Pagination"
+                            onChange={function () {
+                              return this.onPageChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
                           />
                         </Col>
                       </Row>
@@ -600,8 +817,51 @@ class ModelWarehouseDetail$$Page extends React.Component {
             tabBarGutter={24}
             __component_name="Tabs"
             destroyInactiveTabPane="true"
-          />
+          >
+            <Modal
+              __component_name="Modal"
+              title="弹框标题"
+              open={true}
+              destroyOnClose={true}
+              centered={false}
+              keyboard={true}
+              mask={true}
+              maskClosable={false}
+              forceRender={false}
+              confirmLoading={false}
+            />
+          </Tabs>
         </Card>
+        <Modal
+          __component_name="Modal"
+          title="弹框标题"
+          open={__$$eval(() => this.state.deleteFilesVisible)}
+          destroyOnClose={true}
+          centered={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          forceRender={false}
+          confirmLoading={__$$eval(() => this.state.deleteLoading)}
+          onCancel={function () {
+            return this.closeDeleteFilesModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.onSubmitDel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([
+                {
+                  files: 123,
+                },
+              ])
+            );
+          }.bind(this)}
+        >
+          <Alert message="确认删除文件？" __component_name="Alert" type="warning" showIcon={true} />
+        </Modal>
         <Modal
           mask={true}
           onOk={function () {
@@ -629,7 +889,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
         >
           <LccComponentQlsmm
             label="上传"
-            accept=".txt,.doc,.docx,.pdf,.md"
+            accept=""
             bucket={__$$eval(() => this.utils.getAuthData()?.project)}
             setState={function () {
               return this.setUploadState.apply(
@@ -679,6 +939,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -692,7 +953,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
