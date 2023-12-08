@@ -14,6 +14,7 @@ import {
   Card,
   Image,
   Typography,
+  Status,
   Divider,
   Tabs,
   Descriptions,
@@ -22,8 +23,6 @@ import {
 } from '@tenx-ui/materials';
 
 import LccComponentQlsmm from 'KubeAGIUpload';
-
-import { TenxIconCircle } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -242,31 +241,31 @@ class DatasetVersionDetail$$Page extends React.Component {
       <Page>
         {!!__$$eval(() => this.state.delFileVisible) && (
           <Modal
-            __component_name="Modal"
-            title="删除文件"
+            mask={true}
+            onOk={function () {
+              return this.delFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
             open={true}
-            destroyOnClose={true}
+            title="删除文件"
             centered={false}
             keyboard={true}
-            mask={true}
-            maskClosable={false}
-            forceRender={false}
-            confirmLoading={false}
             onCancel={function () {
               return this.delFileCancle.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
             }.bind(this)}
-            onOk={function () {
-              return this.delFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
-            }.bind(this)}
+            forceRender={false}
+            maskClosable={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            __component_name="Modal"
           >
             <Alert
-              message={__$$eval(() => `确定删除文件：${this.state.delFileData.path} ？`)}
-              __component_name="Alert"
               type="warning"
+              message={__$$eval(() => `确定删除文件：${this.state.delFileData.path} ？`)}
               showIcon={true}
+              __component_name="Alert"
             />
           </Modal>
         )}
@@ -435,30 +434,11 @@ class DatasetVersionDetail$$Page extends React.Component {
                         direction="horizontal"
                         __component_name="Space"
                       >
-                        <Row wrap={true} __component_name="Row">
-                          <Col span={24} style={{ display: 'flex' }} __component_name="Col">
-                            <TenxIconCircle
-                              style={{ marginRight: '4px' }}
-                              __component_name="TenxIconCircle"
-                            />
-                            <Typography.Text
-                              style={{ fontSize: '' }}
-                              strong={false}
-                              disabled={false}
-                              ellipsis={true}
-                              __component_name="Typography.Text"
-                            >
-                              {__$$eval(
-                                () =>
-                                  ({
-                                    FileSyncing: '同步中',
-                                    FileSyncFailed: '同步失败',
-                                    FileSyncSuccess: '同步成功',
-                                  }[this.data().data?.syncStatus] || '未知')
-                              )}
-                            </Typography.Text>
-                          </Col>
-                        </Row>
+                        <Status
+                          id={__$$eval(() => this.data().data?.syncStatus)}
+                          types={__$$eval(() => this.constants.DATASET_DATA.syncStatus)}
+                          __component_name="Status"
+                        />
                         <Divider
                           mode="default"
                           type="vertical"
@@ -546,42 +526,47 @@ class DatasetVersionDetail$$Page extends React.Component {
                         key: '2y97byqciee',
                         span: 24,
                         label: 'ID',
-                        children: __$$eval(() => this.data().data?.ID || '-'),
+                        children: __$$eval(() => this.data().data?.id || '-'),
                         _unsafe_MixedSetter_children_select: 'VariableSetter',
                       },
                       {
                         key: 'xvcp3obfu',
                         span: 24,
-                        label: this.i18n('i18n-ks28cpqo') /* 导入状态 */,
-                        children: __$$eval(
-                          () =>
-                            ({
-                              FileSyncing: '同步中',
-                              FileSyncFailed: '同步失败',
-                              FileSyncSuccess: '同步成功',
-                            }[this.data().data?.syncStatus] || '未知')
+                        label: '同步状态',
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
+                        children: (
+                          <Status
+                            __component_name="Status"
+                            id={__$$eval(() => this.data().data?.syncStatus)}
+                            types={__$$eval(() => this.constants.DATASET_DATA.syncStatus)}
+                          />
                         ),
-                        _unsafe_MixedSetter_children_select: 'VariableSetter',
                       },
                       {
                         key: 'er0ptk5lill',
                         span: 24,
                         label: this.i18n('i18n-p5qipded') /* 数据处理状态 */,
-                        children: __$$eval(() => this.data().data?.dataProcessStatus || '未开始'),
-                        _unsafe_MixedSetter_children_select: 'VariableSetter',
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
+                        children: (
+                          <Status
+                            __component_name="Status"
+                            id={__$$eval(() => this.data().data?.dataProcessStatus)}
+                            types={__$$eval(() => this.constants.DATASET_DATA.dataProcessStatus)}
+                          />
+                        ),
                       },
                       {
                         key: 'vu3tjo4pcas',
                         span: 24,
                         label: '发布状态',
-                        children: __$$eval(
-                          () =>
-                            ({
-                              0: '未发布',
-                              1: '已发布',
-                            }[this.data().data?.released] || '未知')
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
+                        children: (
+                          <Status
+                            __component_name="Status"
+                            id={__$$eval(() => this.data().data?.released)}
+                            types={__$$eval(() => this.constants.DATASET_DATA.released)}
+                          />
                         ),
-                        _unsafe_MixedSetter_children_select: 'VariableSetter',
                       },
                       {
                         key: 'ww04wf6evps',
@@ -724,8 +709,6 @@ class DatasetVersionDetail$$Page extends React.Component {
                               ghost={false}
                               shape="default"
                               danger={false}
-                              disabled={false}
-                              __component_name="Button"
                               onClick={function () {
                                 return this.delFileClick.apply(
                                   this,
@@ -736,6 +719,8 @@ class DatasetVersionDetail$$Page extends React.Component {
                                   ])
                                 );
                               }.bind(__$$context)}
+                              disabled={false}
+                              __component_name="Button"
                             >
                               删除
                             </Button>
@@ -772,6 +757,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -785,7 +771,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[
