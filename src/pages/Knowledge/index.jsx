@@ -18,6 +18,7 @@ import {
   Divider,
   Descriptions,
   Status,
+  Tooltip,
   Pagination,
 } from '@tenx-ui/materials';
 
@@ -29,6 +30,7 @@ import {
   AntdIconPlusOutlined,
   TenxIconRefresh,
   AntdIconSettingOutlined,
+  AntdIconInfoCircleOutlined,
 } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -98,11 +100,14 @@ class Knowledge$$Page extends React.Component {
   getStatusType(item) {
     if (item.status === 'True') {
       return 'success';
-    } else if (item.status === 'False') {
-      return 'error';
-    } else {
-      return 'process';
     }
+    if (item.status === 'False') {
+      return 'error';
+    }
+    if (item.status === 'Deleting') {
+      return 'deleting';
+    }
+    return 'process';
   }
 
   getDataStatus(isStatus, isTag) {
@@ -119,11 +124,17 @@ class Knowledge$$Page extends React.Component {
         [isStatus ? 'id' : 'value']: 'success',
         [isStatus || isTag ? 'children' : 'text']: '数据处理完成',
       },
+      // 连接异常
       {
-        // 连接异常
         type: 'error',
         [isStatus ? 'id' : 'value']: 'error',
         [isStatus || isTag ? 'children' : 'text']: '数据处理失败',
+      },
+      // 删除中
+      {
+        type: 'info',
+        [isStatus ? 'id' : 'value']: 'deleting',
+        [isStatus || isTag ? 'children' : 'text']: '删除中',
       },
     ];
   }
@@ -229,6 +240,7 @@ class Knowledge$$Page extends React.Component {
   }
 
   onMenuClick({ item, key, keyPath, domEvent }, extParams) {
+    domEvent.stopPropagation();
     this.setState({
       currentItem: extParams.data,
     });
@@ -277,6 +289,10 @@ class Knowledge$$Page extends React.Component {
     this.setState({
       deleteModalOpen: false,
     });
+  }
+
+  stopPropagation(e) {
+    e.stopPropagation();
   }
 
   componentDidMount() {
@@ -343,10 +359,10 @@ class Knowledge$$Page extends React.Component {
           </Col>
           <Col span={24} __component_name="Col">
             <Alert
-              message="构建私域文档以及知识管理的能力，支持多种数据类型，上传的数据文件将会储存至向量数据库中。"
-              __component_name="Alert"
               type="info"
+              message="构建私域文档以及知识管理的能力，支持多种数据类型，上传的数据文件将会储存至向量数据库中。"
               showIcon={true}
+              __component_name="Alert"
             />
           </Col>
           <Col span={24} __component_name="Col">
@@ -438,7 +454,17 @@ class Knowledge$$Page extends React.Component {
                               loading={false}
                               bordered={true}
                               bodyStyle={{ position: 'relative' }}
-                              hoverable={false}
+                              hoverable={true}
+                              onClick={function () {
+                                return this.onDetailClick.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      data: item,
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
                             >
                               <Row wrap={true} gutter={[0, 0]} __component_name="Row">
                                 <Col
@@ -487,6 +513,12 @@ class Knowledge$$Page extends React.Component {
                                       danger={false}
                                       disabled={false}
                                       __component_name="Button"
+                                      onClick={function () {
+                                        return this.stopPropagation.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([])
+                                        );
+                                      }.bind(__$$context)}
                                     >
                                       {
                                         <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
@@ -517,16 +549,6 @@ class Knowledge$$Page extends React.Component {
                                         wrap={true}
                                         style={{ cursor: 'pointer', paddingLeft: '20px' }}
                                         gutter={[0, 0]}
-                                        onClick={function () {
-                                          return this.onDetailClick.apply(
-                                            this,
-                                            Array.prototype.slice.call(arguments).concat([
-                                              {
-                                                data: item,
-                                              },
-                                            ])
-                                          );
-                                        }.bind(__$$context)}
                                         __component_name="Row"
                                       >
                                         <Col __component_name="Col">
@@ -584,7 +606,7 @@ class Knowledge$$Page extends React.Component {
                                         key: 'ssfd772g2sk',
                                         span: 1,
                                         label: '状态',
-                                        children: (
+                                        children: [
                                           <Status
                                             id={__$$eval(() => __$$context.getStatusType(item))}
                                             types={__$$eval(() =>
@@ -592,8 +614,23 @@ class Knowledge$$Page extends React.Component {
                                             )}
                                             getTypes={null}
                                             __component_name="Status"
-                                          />
-                                        ),
+                                            key="node_oclp0ut4csq"
+                                          />,
+                                          !!__$$eval(
+                                            () => item.status !== 'True' && item.message
+                                          ) && (
+                                            <Tooltip
+                                              __component_name="Tooltip"
+                                              title={__$$eval(() => item.message)}
+                                              key="node_oclpvzqlpa2"
+                                            >
+                                              <AntdIconInfoCircleOutlined
+                                                __component_name="AntdIconInfoCircleOutlined"
+                                                style={{ color: '#9b9b9b', marginLeft: '4px' }}
+                                              />
+                                            </Tooltip>
+                                          ),
+                                        ],
                                       },
                                       {
                                         key: '3nv8b79bh9d',
@@ -674,6 +711,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -687,12 +725,10 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[
         {
-          func: 'undefined',
           params: undefined,
           enableLocationSearch: undefined,
         },

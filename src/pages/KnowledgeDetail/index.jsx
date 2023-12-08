@@ -13,6 +13,7 @@ import {
   Image,
   Typography,
   Status,
+  Tooltip,
   Space,
   Tabs,
   Descriptions,
@@ -24,7 +25,11 @@ import LccComponentChj61 from 'kubeagi-knowledge-delete-modal';
 
 import LccComponentXnggv from 'kubeagi-knowledge-edit-modal';
 
-import { AntdIconPlusOutlined, AntdIconReloadOutlined } from '@tenx-ui/icon-materials';
+import {
+  AntdIconInfoCircleOutlined,
+  AntdIconPlusOutlined,
+  AntdIconReloadOutlined,
+} from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -68,11 +73,11 @@ class KnowledgeDetail$$Page extends React.Component {
 
     this.state = {
       editModalOpen: false,
+      modalFilesList: [],
       deleteModalOpen: false,
       addFilesModalOpen: false,
-      addFilesModalConfirmBtnLoading: false,
-      modalFilesList: [],
       modalFilesSelectedKeys: [],
+      addFilesModalConfirmBtnLoading: false,
     };
   }
 
@@ -84,12 +89,12 @@ class KnowledgeDetail$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  getKnowledge() {
-    return this.props.useGetKnowledgeBase?.data?.KnowledgeBase?.getKnowledgeBase;
-  }
-
   refreshData() {
     this.props.useGetKnowledgeBase?.mutate();
+  }
+
+  getKnowledge() {
+    return this.props.useGetKnowledgeBase?.data?.KnowledgeBase?.getKnowledgeBase;
   }
 
   getStatusType(status) {
@@ -102,12 +107,6 @@ class KnowledgeDetail$$Page extends React.Component {
     return 'process';
   }
 
-  openEditModal() {
-    this.setState({
-      editModalOpen: true,
-    });
-  }
-
   onEditModalOk() {
     this.refreshData();
     this.setState({
@@ -115,15 +114,9 @@ class KnowledgeDetail$$Page extends React.Component {
     });
   }
 
-  onEditModalCancel() {
+  openEditModal() {
     this.setState({
-      editModalOpen: false,
-    });
-  }
-
-  openDeleteModal() {
-    this.setState({
-      deleteModalOpen: true,
+      editModalOpen: true,
     });
   }
 
@@ -134,49 +127,15 @@ class KnowledgeDetail$$Page extends React.Component {
     this.history.relpace('/knowledge');
   }
 
-  onDeleteModalCancel() {
+  openDeleteModal() {
     this.setState({
-      deleteModalOpen: false,
+      deleteModalOpen: true,
     });
   }
 
-  getFileGroupDetail() {
-    // 第一版本只支持一个数据集
-    const fileGroupDetail = this.getKnowledge()?.fileGroupDetails?.[0] || {};
-    return (fileGroupDetail.filedetails || []).map(detail => ({
-      ...detail,
-      source: fileGroupDetail.source?.name,
-    }));
-  }
-
-  countFileGroupDetail() {
-    const detail = this.getFileGroupDetail();
-    let processing = 0;
-    let succeeded = 0;
-    let failed = 0;
-    detail.forEach(d => {
-      if (d.phase === 'Processing') {
-        processing++;
-      } else if (d.phase === 'Succeeded') {
-        succeeded++;
-      } else if (d.phase === 'Failed') {
-        failed++;
-      }
-    });
-    return {
-      total: detail.length,
-      processing,
-      succeeded,
-      failed,
-    };
-  }
-
-  openAddFilesModal() {
-    const fileGroupDetail = this.getFileGroupDetail();
-    this.getVersionedDataset();
+  onAddFilesCancel() {
     this.setState({
-      addFilesModalOpen: true,
-      modalFilesSelectedKeys: fileGroupDetail.map(({ path }) => path),
+      addFilesModalOpen: false,
     });
   }
 
@@ -215,10 +174,28 @@ class KnowledgeDetail$$Page extends React.Component {
     }
   }
 
-  onAddFilesCancel() {
+  onEditModalCancel() {
     this.setState({
-      addFilesModalOpen: false,
+      editModalOpen: false,
     });
+  }
+
+  openAddFilesModal() {
+    const fileGroupDetail = this.getFileGroupDetail();
+    this.getVersionedDataset();
+    this.setState({
+      addFilesModalOpen: true,
+      modalFilesSelectedKeys: fileGroupDetail.map(({ path }) => path),
+    });
+  }
+
+  getFileGroupDetail() {
+    // 第一版本只支持一个数据集
+    const fileGroupDetail = this.getKnowledge()?.fileGroupDetails?.[0] || {};
+    return (fileGroupDetail.filedetails || []).map(detail => ({
+      ...detail,
+      source: fileGroupDetail.source?.name,
+    }));
   }
 
   async getVersionedDataset() {
@@ -231,6 +208,34 @@ class KnowledgeDetail$$Page extends React.Component {
     this.setState({
       modalFilesList: res?.VersionedDataset?.getVersionedDataset?.files?.nodes || [],
     });
+  }
+
+  onDeleteModalCancel() {
+    this.setState({
+      deleteModalOpen: false,
+    });
+  }
+
+  countFileGroupDetail() {
+    const detail = this.getFileGroupDetail();
+    let processing = 0;
+    let succeeded = 0;
+    let failed = 0;
+    detail.forEach(d => {
+      if (d.phase === 'Processing') {
+        processing++;
+      } else if (d.phase === 'Succeeded') {
+        succeeded++;
+      } else if (d.phase === 'Failed') {
+        failed++;
+      }
+    });
+    return {
+      total: detail.length,
+      processing,
+      succeeded,
+      failed,
+    };
   }
 
   getFileModalCheckboxProps(record) {
@@ -416,11 +421,33 @@ class KnowledgeDetail$$Page extends React.Component {
                                     tooltip: '',
                                     children: '数据处理中',
                                   },
-                                  { id: 'success', type: 'success', children: '数据处理完成' },
+                                  {
+                                    id: 'success',
+                                    type: 'success',
+                                    tooltip: '',
+                                    children: '数据处理完成',
+                                  },
                                   { id: 'error', type: 'error', children: '数据处理失败' },
+                                  { id: 'deleting', type: 'info', children: '删除中' },
                                 ]}
                                 __component_name="Status"
                               />
+                              {!!__$$eval(() =>
+                                (() => {
+                                  const k = this.getKnowledge();
+                                  return k?.status !== 'True' && k.message;
+                                })()
+                              ) && (
+                                <Tooltip
+                                  title={__$$eval(() => this.getKnowledge()?.message)}
+                                  __component_name="Tooltip"
+                                >
+                                  <AntdIconInfoCircleOutlined
+                                    style={{ color: '#9b9b9b', marginLeft: '4px' }}
+                                    __component_name="AntdIconInfoCircleOutlined"
+                                  />
+                                </Tooltip>
+                              )}
                             </Col>
                             <Col span={8} __component_name="Col">
                               <Typography.Text
@@ -973,6 +1000,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -986,7 +1014,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[
