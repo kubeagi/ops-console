@@ -2,8 +2,8 @@
 set -e
 
 # build base image
-base_image="172.22.96.119/front-end/kubeagi-portal-base:base-dev"
+base_image="kubeagi/portal-base:main"
 
-docker build --build-arg _authToken=$1 -t ${base_image} -f base.dockerfile .
+docker build -t ${base_image} -f base.dockerfile --secret id=npmrc,src=$HOME/.npmrc .
 # push base image
 # docker push ${base_image}

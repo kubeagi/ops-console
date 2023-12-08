@@ -46,19 +46,13 @@ nr build
 执行以下命令可在本地构建镜像：
 ```bash
 chmod +x ./build.sh ./update_base_image.sh
-./build.sh <npm auth token>
-```
-
-执行以下命令可在本地构建镜像 (使用 aio.dockerfile)：
-```bash
-# you should npm login first or run `npm set` command first, like: npm set //dev-npm.tenxcloud.net/:_authToken=xxxxx
-docker build -t kubeagi/portal:latest -f aio.dockerfile --secret id=npmrc,src=$HOME/.npmrc .
+./build.sh
 ```
 
 运行镜像：
 
 ```bash
-docker run -d -p 8000:80 172.22.50.223/dev-branch/kubeagi-portal:main
+docker run -d -p 8000:80 kubeagi:portal:main
 ```
 
 然后浏览器中打开 http://localhost:8000/kubeagi-portal/test 即可访问 portal。

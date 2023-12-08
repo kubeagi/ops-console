@@ -5,6 +5,7 @@ on:
     branches: [main]
 env:
   REGISTRY: docker.io
+  BASE_IMAGE_NAME: kubeagi/portal-base
   IMAGE_NAME: kubeagi/portal
   DOCKER_USER: kubeagi
 
@@ -16,6 +17,14 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            package:
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'packages/**/package.json'
       - name: Set Variable
         id: set-env
         run: |
@@ -53,12 +62,28 @@ jobs:
       - name: setting token to npmrc
         run: |
           echo '//dev-npm.tenxcloud.net/:_authToken="${{ secrets.NPMTOKEN }}"' > /tmp/npmrc
-      - name: Build and push
+      - name: Build and push base image
+        id: base-push
+        if: steps.changes.outputs.package == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: base.dockerfile
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:main
+          push: true
+          build-args: |
+            BUILD_ID=${{ env.SEMREV_LABEL }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+          secret-files: |
+            "npmrc=/tmp/npmrc"
+      - name: Build and push image
         id: push
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: aio.dockerfile
+          file: Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

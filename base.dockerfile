@@ -1,18 +1,14 @@
 # dockerfile of base image
-FROM --platform=linux/amd64 node:18.16-alpine
+FROM node:18.19-alpine
 
 # If you have native dependencies, you'll need extra tools
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
-  && apk update --no-cache && apk add --no-cache bash git openssh
+RUN apk add --no-cache bash git openssh
 
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install dependencies modules
-COPY package.json /usr/src/app/
-COPY pnpm-lock.yaml /usr/src/app/
-COPY .npmrc /usr/src/app/
-RUN npm set //dev-npm.tenxcloud.net/:_authToken="${_authToken}" \
-  && npm i pnpm @antfu/ni -g \
-  && ni
+ADD .npmrc package.json pnpm-lock.yaml .pnpmfile.cjs pnpm-workspace.yaml ./
+ADD packages ./packages
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm i pnpm @antfu/ni -g && ni
