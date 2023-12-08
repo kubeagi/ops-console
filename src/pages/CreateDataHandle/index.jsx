@@ -68,24 +68,19 @@ class $$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      configMap: {
-        qa_split: 'QAsplitChecked',
-        document_chunk: 'TextSegmentationChecked',
-        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
-        space_standardization: 'SpaceHandleChecked',
-        remove_garbled_text: 'RemoveGarbledCodeChecked',
-        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
-        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
-        remove_emojis: 'RemoveEmoteChecked',
-        simhash_operator: 'SimhashOperatorChecked',
-        remove_email: 'RemoveEmailChecked',
-        remove_ip_address: 'RemoveIPAddress',
-        remove_number: 'RemoveNumber',
-        character_duplication_rate: 'CharacterRepeatFilterChecked',
-        word_duplication_rate: 'WordRepeatFilterChecked',
-        special_character_rate: 'SpecialCharactersRateChecked',
-        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
+      numberInputStep: 0.1,
+      currentStep: 0,
+      step1FormData: {},
+      step2FormData: {},
+      dataSetFileSearchParams: {
+        keyword: '',
+        currentPage: 1,
       },
+      fileTableLoading: false,
+      dataSetFileList: [],
+      dataSetFileTotal: '0',
+      selectedFileList: [],
+      fileSelectCheckErrorFlag: false,
       step3Data: {
         QAsplitChecked: true,
         TextSegmentationChecked: false,
@@ -111,47 +106,57 @@ class $$Page extends React.Component {
         RemoveIPAddress: false,
         RemoveNumber: false,
       },
-      step4Data: {},
-      currentStep: 0,
-      step1FormData: {},
-      step2FormData: {},
+      configMap: {
+        qa_split: 'QAsplitChecked',
+        document_chunk: 'TextSegmentationChecked',
+        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
+        space_standardization: 'SpaceHandleChecked',
+        remove_garbled_text: 'RemoveGarbledCodeChecked',
+        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
+        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
+        remove_emojis: 'RemoveEmoteChecked',
+        simhash_operator: 'SimhashOperatorChecked',
+        remove_email: 'RemoveEmailChecked',
+        remove_ip_address: 'RemoveIPAddress',
+        remove_number: 'RemoveNumber',
+        character_duplication_rate: 'CharacterRepeatFilterChecked',
+        word_duplication_rate: 'WordRepeatFilterChecked',
+        special_character_rate: 'SpecialCharactersRateChecked',
+        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
+      },
       configEnableMap: {},
+      step4Data: {},
       dataSetDataList: [],
-      dataSetFileList: [],
-      numberInputStep: 0.1,
-      dataSetFileTotal: '0',
-      fileTableLoading: false,
-      selectedFileList: [],
       afterTreatmentData: [
         {
           type: '移除不可见字符',
           before:
-            '计量水表安装在住宅<span style="background-color:rgba(250, 205, 145, 0.4);">???</span>的公共部位，供水企业抄表到户，按户计量收费。',
-          after: '计量水表安装在住宅的公共部位，供水企业抄表到户，按户计量收费。',
+            ' 这是一段不可见字符<span style="background-color:rgba(250, 205, 145, 0.4);">%EF%BF%BD%EF%BF%BD%EF%BF%BD</span>，移除之后并不影响文章内容。',
+          after: '这是一段不可见字符，移除之后并不影响文章内容。',
         },
         {
           type: '空格处理',
           before:
-            '全然不知对方身份，不断反转的剧情即将揭开层层真相。<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>',
-          after: '全然不知对方身份，不断反转的剧情即将揭开层层真相。',
+            '这段文字<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>中有<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>很多<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>空格。<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>',
+          after: '这段文字中有很多空格。',
         },
         {
           type: '去除乱码',
           before:
-            '原告孟庆连诉被告李成超凭样品买卖<span style="background-color:rgba(250, 205, 145, 0.4);">????</span>合同纠纷一案，本院于2015年8月10日受理',
-          after: '原告孟庆连诉被告李成超凭样品买卖合同纠纷一案，本院于2015年8月10日受理',
+            '%E8%BF%99%E6%AE%B5%E6%96%87%E5%AD%97%E4%B8%AD%E6%9C%89%E5%BE%88%E5%A4%9A%E4%B9%B1%E7%A0%81%EF%BC%8C%3Cspan%20style%3D%22background-color%3Argba(250%2C%20205%2C%20145%2C%200.4)%3B%22%3E%20%20%20%C3%A7%E2%80%9D%C2%B1%C3%A6%C5%93%CB%86%C3%A8%C2%A6%20%C3%A5%C2%A5%C2%BD%C3%A5%C2%A5%C2%BD%C3%A5%C2%AD%C2%A6%C3%A4%C2%B9%20%C3%A5%C2%A4%C2%A9%C3%A5%C2%A4%C2%A9%C3%A5%20%E2%80%98%C3%A4%C2%B8%C5%A0%20%3C%2Fspan%3E%E8%BF%99%E4%BA%9B%E4%B9%B1%E7%A0%81%E6%B2%A1%E6%9C%89%E4%BB%BB%E4%BD%95%E6%84%8F%E4%B9%89%E3%80%82',
+          after: '这段文字中有很多乱码，这些乱码没有任何意义。',
         },
         {
           type: '繁转简',
           before:
-            '<span style="background-color:rgba(250, 205, 145, 0.4);">風</span>暴<span style="background-color:rgba(250, 205, 145, 0.4);">帶</span>來的<span style="background-color:rgba(250, 205, 145, 0.4);">暫</span>停使消防<span style="background-color:rgba(250, 205, 145, 0.4);">員</span>和其他<span style="background-color:rgba(250, 205, 145, 0.4);">緊</span>急反<span style="background-color:rgba(250, 205, 145, 0.4);">應</span>人<span style="background-color:rgba(250, 205, 145, 0.4);">員</span>得以<span style="background-color:rgba(250, 205, 145, 0.4);">進</span>入禁<span style="background-color:rgba(250, 205, 145, 0.4);">區進</span>行<span style="background-color:rgba(250, 205, 145, 0.4);">結構</span>破<span style="background-color:rgba(250, 205, 145, 0.4);">壞評</span>估。',
-          after: '风暴带来的暂停使消防员和其他紧急反应人员得以进入禁区进行结构破坏评估。',
+            '新的<span style="background-color:rgba(250, 205, 145, 0.4);">風</span>暴已<span style="background-color:rgba(250, 205, 145, 0.4);">經</span>出<span style="background-color:rgba(250, 205, 145, 0.4);">現</span>，怎<span style="background-color:rgba(250, 205, 145, 0.4);">麽</span>能<span style="background-color:rgba(250, 205, 145, 0.4);">夠</span>停<span style="background-color:rgba(250, 205, 145, 0.4);">滯</span>不前。',
+          after: '新的风暴已经出现，怎么能够停滞不前。',
         },
         {
           type: '去除网页标识符',
           before:
-            '<span style="background-color:rgba(250, 205, 145, 0.4);">&ltdiv class="bolded"&gt&lt/div&gt</span>朗播 SAT 学员成绩单分析报告',
-          after: '朗播 SAT 学员成绩单分析报告',
+            '<span style="background-color:rgba(250, 205, 145, 0.4);">&ltdiv class="bolded"&gt&lt/div&gt</span>这是一段网页标识符',
+          after: '这是一段网页标识符',
         },
         {
           type: '去除表情',
@@ -160,11 +165,6 @@ class $$Page extends React.Component {
           after: '兔子女孩女孩男孩',
         },
       ],
-      dataSetFileSearchParams: {
-        keyword: '',
-        currentPage: 1,
-      },
-      fileSelectCheckErrorFlag: false,
     };
   }
 
@@ -180,27 +180,6 @@ class $$Page extends React.Component {
     console.log('will unmount');
   }
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
-  onBack(event) {
-    // 点击按钮时的回调
-    this.history.push('/data-handle');
-  }
-
-  async onNext() {
-    if (this.state.currentStep === 0) {
-      this.getStep1Data();
-    } else if (this.state.currentStep === 1) {
-      this.getStep2Data();
-    } else if (this.state.currentStep === 2) {
-      this.onNextStep();
-    } else {
-      this.onNextStep();
-    }
-  }
-
   debounce(func, delay) {
     let timeoutId;
     return function (...args) {
@@ -211,51 +190,121 @@ class $$Page extends React.Component {
     };
   }
 
-  async onFinish() {
-    const list = this.convertStep3Data();
-    const files = this.state.selectedFileList.map(item => {
-      const _item = item.split('/');
-      return {
-        name: _item[_item.length - 1],
-      };
-    });
-    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
-    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
-    const data = {
-      ...this.state.step1FormData,
-      ...this.state.step2FormData,
-      version_data_set_name: versionName,
-      data_process_config_info: list,
-      file_names: files,
-      bucket_name: this.utils.getAuthData().project,
-    };
-    const res = await this.utils.bff.createDataProcessTask({
-      input: {
-        ...data,
-      },
-    });
-    if (res.dataProcess.createDataProcessTask.status === 200) {
-      this.utils.notification.success({
-        message: '成功',
-      });
-      this.history.push('/data-handle');
-    } else {
-      this.utils.notification.success({
-        message: res.dataProcess?.createDataProcessTask?.message || '失败',
-      });
-    }
-  }
-
   onSearch(event) {
     this.debouncedFunction(event);
   }
 
-  valToKey(obj) {
-    const _obj = {};
-    for (let key in obj) {
-      _obj[obj[key]] = key;
+  updateStep3State(value, event, extraParams = {}) {
+    const fieldName = {
+      ...event,
+      ...extraParams,
+    }.fieldName;
+    const step3 = {
+      ...this.state.step3Data,
+      [fieldName]: value,
+    };
+    this.setState({
+      step3Data: step3,
+    });
+  }
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
+
+  getStep1Data() {
+    this.form('createDataHandleStep1')
+      .validate()
+      .then(res => {
+        const step1FormData = this.form('createDataHandleStep1').values;
+        this.setState({
+          step1FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  getStep2Data() {
+    this.form('createDataHandleStep2')
+      ?.validate()
+      .then(res => {
+        const step2FormData = this.form('createDataHandleStep2').values;
+        this.setState({
+          step2FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  onDataSetChange(v) {
+    this.setState({
+      dataSetFileList: [],
+      selectedFileList: [],
+      dataSetFileTotal: '0',
+    });
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_version: undefined,
+      post_data_set_version: undefined,
+      post_data_set_name: v,
+    });
+    this.setDataSetVersionsSource(v);
+  }
+
+  setDataSetVersionsSource(v) {
+    const obj = this.state.dataSetDataList.find(item => item.value === v);
+    const genOptionList = obj.versions;
+    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
+      dataSource: genOptionList,
+    });
+    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
+      dataSource: genOptionList,
+    });
+  }
+
+  onDataSetVersionChange(v) {
+    this.form('createDataHandleStep2').setValues({
+      post_data_set_version: v,
+    });
+    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
+    const name = this.getVersionName(pre_data_set_name, v);
+    this.getTableList(name);
+  }
+
+  onPageChange(page) {
+    this.setState(
+      {
+        dataSetFileSearchParams: {
+          ...this.state.dataSetFileSearchParams,
+          currentPage: page,
+        },
+      },
+      () => {
+        this.getDataSet();
+      }
+    );
+  }
+
+  onSelectFileChange(v) {
+    if (v.length) {
+      this.setState({
+        fileSelectCheckErrorFlag: false,
+      });
     }
-    return _obj;
+    this.setState({
+      selectedFileList: v,
+    });
+  }
+
+  backToStep2() {
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    if (!pre_data_set_name) return;
+    this.setDataSetVersionsSource(pre_data_set_name);
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_name,
+      pre_data_set_version,
+      post_data_set_version: pre_data_set_version,
+      post_data_set_name: pre_data_set_name,
+    });
   }
 
   async getDataSet() {
@@ -274,7 +323,7 @@ class $$Page extends React.Component {
     });
     const datasetlist = res.Dataset.listDatasets.nodes.map(item => {
       const versions = item.versions.nodes.map(i => ({
-        label: i.displayName,
+        label: i.version,
         value: i.version,
         name: i.name,
         namespace: i.namespace,
@@ -298,6 +347,117 @@ class $$Page extends React.Component {
     );
   }
 
+  getVersionName(dataset, version) {
+    console.log(dataset, this.state.dataSetDataList);
+    if (dataset && version) {
+      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
+      console.log(datasetObj);
+      const versionObj = datasetObj.versions.find(i => i.value === version);
+      return versionObj.name;
+    }
+    return;
+  }
+
+  async getTableList(name) {
+    if (!name) return;
+    this.setState({
+      fileTableLoading: true,
+    });
+    const res = await this.utils.bff.getVersionedDataset({
+      name: name,
+      namespace: this.utils.getAuthData().project,
+      fileInput: {
+        keyword: this.state.dataSetFileSearchParams.keyword,
+        pageSize: 10,
+        page: this.state.dataSetFileSearchParams.currentPage,
+      },
+    });
+    const data = res.VersionedDataset.getVersionedDataset.files;
+    this.setState({
+      fileTableLoading: false,
+      dataSetFileList:
+        (data.nodes || []).map(i => ({
+          ...i,
+          label: '普通文本',
+        })) || [],
+      dataSetFileTotal: data.totalCount || 0,
+    });
+  }
+
+  async onNext() {
+    if (this.state.currentStep === 0) {
+      this.getStep1Data();
+    } else if (this.state.currentStep === 1) {
+      this.getStep2Data();
+    } else if (this.state.currentStep === 2) {
+      this.onNextStep();
+    } else {
+      this.onNextStep();
+    }
+  }
+
+  valToKey(obj) {
+    const _obj = {};
+    for (let key in obj) {
+      _obj[obj[key]] = key;
+    }
+    return _obj;
+  }
+
+  convertStep3Data() {
+    const list = [];
+    const step3Data = this.state.step3Data;
+    const vTk = this.valToKey(this.state.configMap);
+    console.log(vTk);
+    for (let k in step3Data) {
+      if (k.endsWith('Checked')) {
+        if (step3Data[k]) {
+          list.push({
+            type: vTk[k],
+          });
+        }
+      }
+    }
+    return list;
+  }
+
+  async onFinish() {
+    const list = this.convertStep3Data();
+    const files = this.state.selectedFileList.map(item => {
+      const _item = item.split('/');
+      return {
+        name: _item[_item.length - 1],
+      };
+    });
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
+    const data = {
+      ...this.state.step1FormData,
+      ...this.state.step2FormData,
+      version_data_set_name: versionName,
+      data_process_config_info: list,
+      file_names: files,
+      bucket_name: this.utils.getAuthData().project,
+      namespace: this.utils.getAuthData().project,
+      creator: this.utils.getAuthData().user?.name,
+    };
+    const res = await this.utils.bff.createDataProcessTask({
+      input: {
+        ...data,
+      },
+    });
+    if (res.dataProcess.createDataProcessTask.status === 200) {
+      this.utils.notification.success({
+        message: '成功',
+      });
+      this.history.push('/data-handle');
+    } else {
+      this.utils.notification.warn({
+        message: res.dataProcess?.createDataProcessTask?.message || '失败',
+      });
+    }
+  }
+
   onNextStep() {
     // step2 文件检查
     if (this.state.currentStep === 1) {
@@ -306,10 +466,19 @@ class $$Page extends React.Component {
           fileSelectCheckErrorFlag: true,
         });
         // 调试需要关闭此
-        //  return;
+        return;
       }
     }
-
+    if (this.state.currentStep === 2) {
+      // 判断是否选了处理的选项。不选不行
+      const list = this.convertStep3Data();
+      if (!list.length) {
+        this.utils.notification.warn({
+          message: '请选择处理配置',
+        });
+        return;
+      }
+    }
     const step = this.state.currentStep + 1;
     this.setState(
       {
@@ -362,167 +531,9 @@ class $$Page extends React.Component {
     );
   }
 
-  backToStep2() {
-    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
-    if (!pre_data_set_name) return;
-    this.setDataSetVersionsSource(pre_data_set_name);
-    this.form('createDataHandleStep2').setValues({
-      pre_data_set_name,
-      pre_data_set_version,
-      post_data_set_version: pre_data_set_version,
-      post_data_set_name: pre_data_set_name,
-    });
-  }
-
-  getStep1Data() {
-    this.form('createDataHandleStep1')
-      .validate()
-      .then(res => {
-        const step1FormData = this.form('createDataHandleStep1').values;
-        this.setState({
-          step1FormData,
-        });
-        this.onNextStep();
-      });
-  }
-
-  getStep2Data() {
-    this.form('createDataHandleStep2')
-      ?.validate()
-      .then(res => {
-        const step2FormData = this.form('createDataHandleStep2').values;
-        this.setState({
-          step2FormData,
-        });
-        this.onNextStep();
-      });
-  }
-
-  async getTableList(name) {
-    if (!name) return;
-    this.setState({
-      fileTableLoading: true,
-    });
-    const res = await this.utils.bff.getVersionedDataset({
-      name: name,
-      namespace: this.utils.getAuthData().project,
-      fileInput: {
-        keyword: this.state.dataSetFileSearchParams.keyword,
-        pageSize: 10,
-        page: this.state.dataSetFileSearchParams.currentPage,
-      },
-    });
-    const data = res.VersionedDataset.getVersionedDataset.files;
-    this.setState({
-      fileTableLoading: false,
-      dataSetFileList:
-        (data.nodes || []).map(i => ({
-          ...i,
-          label: '普通文本',
-        })) || [],
-      dataSetFileTotal: data.totalCount || 0,
-    });
-  }
-
-  onPageChange(page) {
-    this.setState(
-      {
-        dataSetFileSearchParams: {
-          ...this.state.dataSetFileSearchParams,
-          currentPage: page,
-        },
-      },
-      () => {
-        this.getDataSet();
-      }
-    );
-  }
-
-  getVersionName(dataset, version) {
-    console.log(dataset, this.state.dataSetDataList);
-    if (dataset && version) {
-      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
-      console.log(datasetObj);
-      const versionObj = datasetObj.versions.find(i => i.value === version);
-      return versionObj.name;
-    }
-    return;
-  }
-
-  onDataSetChange(v) {
-    this.setState({
-      dataSetFileList: [],
-      selectedFileList: [],
-      dataSetFileTotal: '0',
-    });
-    this.form('createDataHandleStep2').setValues({
-      pre_data_set_version: undefined,
-      post_data_set_version: undefined,
-      post_data_set_name: v,
-    });
-    this.setDataSetVersionsSource(v);
-  }
-
-  convertStep3Data() {
-    const list = [];
-    const step3Data = this.state.step3Data;
-    const vTk = this.valToKey(this.state.configMap);
-    console.log(vTk);
-    for (let k in step3Data) {
-      if (k.endsWith('Checked')) {
-        if (step3Data[k]) {
-          list.push({
-            type: vTk[k],
-          });
-        }
-      }
-    }
-    return list;
-  }
-
-  updateStep3State(value, event, extraParams = {}) {
-    const fieldName = {
-      ...event,
-      ...extraParams,
-    }.fieldName;
-    const step3 = {
-      ...this.state.step3Data,
-      [fieldName]: value,
-    };
-    this.setState({
-      step3Data: step3,
-    });
-  }
-
-  onSelectFileChange(v) {
-    if (v.length) {
-      this.setState({
-        fileSelectCheckErrorFlag: false,
-      });
-    }
-    this.setState({
-      selectedFileList: v,
-    });
-  }
-
-  onDataSetVersionChange(v) {
-    this.form('createDataHandleStep2').setValues({
-      post_data_set_version: v,
-    });
-    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
-    const name = this.getVersionName(pre_data_set_name, v);
-    this.getTableList(name);
-  }
-
-  setDataSetVersionsSource(v) {
-    const obj = this.state.dataSetDataList.find(item => item.value === v);
-    const genOptionList = obj.versions;
-    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
-      dataSource: genOptionList,
-    });
-    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
-      dataSource: genOptionList,
-    });
+  onBack(event) {
+    // 点击按钮时的回调
+    this.history.push('/data-handle');
   }
 
   componentDidMount() {
@@ -1260,7 +1271,6 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        className="step3_disabled_style"
                         hoverable={false}
                         __component_name="Card"
                       >
@@ -1304,7 +1314,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.RemoveGarbledCodeChecked
                                       )}
                                       loading={false}
-                                      disabled={true}
+                                      disabled={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1349,7 +1359,6 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        className="step3_disabled_style"
                         hoverable={false}
                         __component_name="Card"
                       >
@@ -1394,7 +1403,7 @@ class $$Page extends React.Component {
                                           this.state.step3Data.ConvertComplexityToSimplicityChecked
                                       )}
                                       loading={false}
-                                      disabled={true}
+                                      disabled={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1440,7 +1449,6 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        className="step3_disabled_style"
                         hoverable={false}
                         __component_name="Card"
                       >
@@ -1484,7 +1492,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.RemoveHtmlIdentifyingChecked
                                       )}
                                       loading={false}
-                                      disabled={true}
+                                      disabled={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1530,7 +1538,6 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        className="step3_disabled_style"
                         hoverable={false}
                         __component_name="Card"
                       >
@@ -1574,7 +1581,7 @@ class $$Page extends React.Component {
                                         () => this.state.step3Data.RemoveEmoteChecked
                                       )}
                                       loading={false}
-                                      disabled={true}
+                                      disabled={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2786,7 +2793,7 @@ class $$Page extends React.Component {
                     render: (text, record, index) =>
                       (__$$context => (
                         <InnerHtmlContainer __component_name="InnerHtmlContainer">
-                          {__$$eval(() => text)}
+                          {__$$eval(() => decodeURIComponent(text))}
                         </InnerHtmlContainer>
                       ))(__$$createChildContext(__$$context, { text, record, index })),
                     dataIndex: 'before',
@@ -2950,7 +2957,7 @@ class $$Page extends React.Component {
                             );
                           }.bind(this),
                           allowClear: false,
-                          showSearch: false,
+                          showSearch: true,
                           placeholder: '请选择数据集',
                           _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
                           _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
@@ -2987,6 +2994,7 @@ class $$Page extends React.Component {
                             );
                           }.bind(this),
                           allowClear: false,
+                          showSearch: true,
                           placeholder: '请选择数据集版本',
                           _sdkSwrGetFunc: {},
                           _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
@@ -3124,6 +3132,7 @@ class $$Page extends React.Component {
                         { key: 'name', title: '文件名称', dataIndex: 'path' },
                         { title: '标签', width: 120, dataIndex: 'label' },
                         { key: 'size', title: '文件大小', width: 100, dataIndex: 'size' },
+                        { title: '数据量', dataIndex: 'count' },
                       ]}
                       loading={__$$eval(() => this.state.fileTableLoading)}
                       bordered={false}
@@ -3330,6 +3339,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -3343,7 +3353,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
