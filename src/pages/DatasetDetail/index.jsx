@@ -88,22 +88,11 @@ class DatasetDetail$$Page extends React.Component {
     return this.$(name || 'edit-dataset')?.formRef?.current?.form;
   }
 
-  refresh(params) {
-    // 刷新数据回调
-    console.log('onClick', params, extParams);
-  }
-
-  onEditOk() {
-    // 点击确定回调
-    this.form()
-      .validate()
-      .then(this.doEditDataset)
-      .catch(e => {});
-  }
-
-  testFunc() {
-    console.log('test aliLowcode func');
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  onEditBtnClick(event) {
+    // 点击按钮时的回调
+    this.setState({
+      editVisible: true,
+    });
   }
 
   onEditCancel() {
@@ -135,11 +124,17 @@ class DatasetDetail$$Page extends React.Component {
     });
   }
 
-  onEditBtnClick(event) {
-    // 点击按钮时的回调
-    this.setState({
-      editVisible: true,
-    });
+  onEditOk() {
+    // 点击确定回调
+    this.form()
+      .validate()
+      .then(this.doEditDataset)
+      .catch(e => {});
+  }
+
+  refresh(params) {
+    // 刷新数据回调
+    console.log('onClick', params, extParams);
   }
 
   componentDidMount() {
@@ -331,36 +326,44 @@ class DatasetDetail$$Page extends React.Component {
                     size="default"
                     colon={false}
                     items={[
-                      { key: '2y97byqciee', span: 24, label: 'ID', children: '123' },
                       {
-                        key: 'xvcp3obfu',
+                        key: '2y97byqciee',
                         span: 24,
-                        label: this.i18n('i18n-ks28cpqo') /* 导入状态 */,
-                        children: '文本',
+                        label: 'ID',
+                        children: __$$eval(
+                          () => this.data()?.data?.id || this.data()?.data?.ID || '-'
+                        ),
+                        _unsafe_MixedSetter_children_select: 'VariableSetter',
                       },
-                      {
-                        key: 'er0ptk5lill',
-                        span: 24,
-                        label: this.i18n('i18n-p5qipded') /* 数据处理状态 */,
-                        children: '科技',
-                      },
+                      { key: 'xvcp3obfu', span: 24, children: '文本', label: '数据类型' },
+                      { key: 'er0ptk5lill', span: 24, label: '应用场景', children: '科技' },
                       {
                         key: 'ww04wf6evps',
                         span: 24,
                         label: this.i18n('i18n-qjodl1nn') /* 创建时间 */,
-                        children: '2023.01.02',
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
+                        children: (
+                          <Typography.Time
+                            __component_name="Typography.Time"
+                            time={__$$eval(() => this.data().data?.creationTimestamp)}
+                            format=""
+                            relativeTime={true}
+                          />
+                        ),
                       },
                       {
                         key: 'ajc9nhn140i',
                         span: 24,
                         label: this.i18n('i18n-sg7nu8tx') /* 创建者 */,
-                        children: 'admin',
+                        children: __$$eval(() => this.data().data?.creator || '-'),
+                        _unsafe_MixedSetter_children_select: 'VariableSetter',
                       },
                       {
                         key: '3p5bkjlrh9u',
                         span: 24,
                         label: this.i18n('i18n-txt5kh4m') /* 描述 */,
-                        children: '行行行好',
+                        children: __$$eval(() => this.data().data?.description || '-'),
+                        _unsafe_MixedSetter_children_select: 'VariableSetter',
                       },
                     ]}
                     title=""
@@ -414,6 +417,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -427,7 +431,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[

@@ -30,6 +30,8 @@ import {
   Dropdown,
 } from '@tenx-ui/materials';
 
+import LccComponentSbva0 from 'confirm';
+
 import {
   AntdIconPlusOutlined,
   TenxIconRefresh,
@@ -79,18 +81,19 @@ class Dataset$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      data: [],
-      page: 1,
+      search: undefined,
       type: undefined,
       field: undefined,
-      search: undefined,
-      loading: false,
+      page: 1,
       pageSize: 10,
+      totalCount: 0,
+      loading: false,
+      data: [],
       addVersion: {
         visible: false,
         data: {},
       },
-      totalCount: 0,
+      confirm: {},
     };
 
     // 代码中有些 Ds 是 Dataset的简写
@@ -107,104 +110,17 @@ class Dataset$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  async asyncFunc(error) {
+    const res = await new Promise((res, rej) => {
+      setTimeout(() => {
+        error ? rej('error') : res('ok');
+      }, 1000);
+    });
+    return res;
+  }
+
   form(name) {
     return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
-  _data() {
-    return {
-      fields: [
-        {
-          label: '科技',
-          value: 'science',
-        },
-        {
-          label: '金融',
-          value: 'finance',
-        },
-        {
-          label: '教育',
-          value: 'education',
-        },
-        {
-          label: '医疗',
-          value: 'medical',
-        },
-        {
-          label: '能源',
-          value: 'energy',
-        },
-        {
-          label: '法律',
-          value: 'law',
-        },
-        {
-          label: '其他',
-          value: 'others',
-        },
-      ],
-      type: [
-        {
-          label: '文本',
-          value: 'text',
-        },
-        {
-          label: '图片',
-          value: 'image',
-        },
-        {
-          label: '科技',
-          value: 'video',
-        },
-      ],
-      syncStatus: [
-        {
-          children: '同步中',
-          id: 'FileSyncing',
-          type: 'info',
-        },
-        {
-          children: '同步失败',
-          id: 'FileSyncFailed',
-          type: 'error',
-        },
-        {
-          children: '同步成功',
-          id: 'FileSyncSuccess',
-          type: 'success',
-        },
-      ],
-      released: [
-        {
-          children: '未发布',
-          id: 0,
-          type: 'error',
-        },
-        {
-          children: '已发布',
-          id: 1,
-          type: 'success',
-        },
-      ],
-      dataProcessStatus: {},
-    };
-  }
-
-  onClick(event) {
-    // 点击按钮时的回调
-  }
-
-  refresh(event) {
-    event.stopPropagation();
-    this.fetchData();
-  }
-
-  testFunc() {
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
-  }
-
-  toDetail(event, params) {
-    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
   }
 
   async fetchData() {
@@ -244,135 +160,6 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  linkClick(event) {
-    event.stopPropagation();
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
-  }
-
-  addVersion(event, params) {
-    event.stopPropagation();
-    this.setState({
-      addVersion: {
-        visible: true,
-        data: params.data,
-      },
-    });
-  }
-
-  delVersion(params) {
-    this.utils.Modal.confirm({
-      title: '删除数据集版本',
-      content: `确定删除数据集：${params.dataset.name} 下版本：${params.version.version}？`,
-      onOk: async () => {
-        const res = await this.utils.bff
-          .deleteVersionedDatasets({
-            input: {
-              namespace: params.dataset.namespace,
-              name: params.version.name,
-            },
-          })
-          .catch(e => {
-            this.utils.notification.warn({
-              message: '删除数据集版本失败',
-            });
-          });
-        this.utils.notification.success({
-          message: '删除数据集版本成功',
-        });
-        this.fetchData();
-      },
-    });
-  }
-
-  onDelDataset(event, params) {
-    event.stopPropagation();
-    // 点击按钮时的回调
-    this.utils.Modal.confirm({
-      title: '删除数据集',
-      content: `确定删除数据集：${params.item.name}？`,
-      onOk: async () => {
-        const res = await this.utils.bff
-          .deleteDatasets({
-            input: {
-              namespace: params.item.namespace,
-              name: params.item.name,
-            },
-          })
-          .catch(e => {
-            this.utils.notification.warn({
-              message: '删除数据集失败',
-            });
-          });
-        this.utils.notification.success({
-          message: '删除数据集成功',
-        });
-        this.fetchData();
-      },
-    });
-  }
-
-  onPageChange(page, pageSize) {
-    // 页码或 pageSize 改变的回调
-    this.setState(
-      {
-        page,
-        pageSize,
-      },
-      this.fetchData
-    );
-  }
-
-  onTypeChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        type: event,
-      },
-      this.fetchData
-    );
-  }
-
-  delVersionBak(params) {
-    this.setState({
-      delDsVisible: true,
-      delDsData: params,
-    });
-  }
-
-  onFieldChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        field: event,
-      },
-      this.fetchData
-    );
-  }
-
-  onAddVersionOK() {
-    // 点击遮罩层或右上角叉或取消按钮的回调
-    this.form()
-      .validate()
-      .then(this.addVersionFetch.bind(this))
-      .catch(e => {
-        console.error('onAddVersion error:', e);
-      });
-  }
-
-  onSearchChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        search: event.target.value,
-      },
-      this._fetchData
-    );
-  }
-
   async addVersionFetch() {
     const _version =
       'v' + (this.getVersionsNumMax(this.state.addVersion.data?.versions?.nodes || []) + 1);
@@ -402,15 +189,86 @@ class Dataset$$Page extends React.Component {
     }
   }
 
-  onDropdownClick(event, params) {
-    if (event.key === 'delete') {
-      this.delVersion(params);
-    }
+  testFunc() {
+    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  }
+
+  addVersion(event, params) {
+    event.stopPropagation();
+    this.setState({
+      addVersion: {
+        visible: true,
+        data: params.data,
+      },
+    });
+  }
+
+  refresh(event) {
+    event.stopPropagation();
+    this.fetchData();
   }
 
   getVersionsNumMax(versions) {
-    console.log('getVersionsNumMax', versions);
     return Math.max(...versions.map(v => parseInt(v?.version?.match(/\d+/)?.[0] || '0')), 0);
+  }
+
+  onClick(event) {
+    // 点击按钮时的回调
+  }
+
+  linkClick(event) {
+    event.stopPropagation();
+  }
+
+  onSearchChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        search: event.target.value,
+      },
+      this._fetchData
+    );
+  }
+
+  onTypeChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        type: event,
+      },
+      this.fetchData
+    );
+  }
+
+  onFieldChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        field: event,
+      },
+      this.fetchData
+    );
+  }
+
+  onPageChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState(
+      {
+        page,
+        pageSize,
+      },
+      this.fetchData
+    );
+  }
+
+  onAddVersionOK() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.form()
+      .validate()
+      .then(this.addVersionFetch.bind(this))
+      .catch(e => {
+        console.error('onAddVersion error:', e);
+      });
   }
 
   onAddVersionCancel() {
@@ -423,8 +281,116 @@ class Dataset$$Page extends React.Component {
     });
   }
 
+  toDetail(event, params) {
+    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  onDelDataset(event, params) {
+    event.stopPropagation();
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除数据集',
+        content: `确定删除数据集：${params.item.name}？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .deleteDatasets({
+              input: {
+                namespace: params.item.namespace,
+                name: params.item.name,
+              },
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '删除数据集失败',
+              });
+            });
+          this.utils.notification.success({
+            message: '删除数据集成功',
+          });
+          this.fetchData();
+        },
+      },
+    });
+  }
+
+  delVersion(params) {
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除数据集版本',
+        content: `确定删除数据集：${params.dataset.name}-${params.version.version}？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .deleteVersionedDatasets({
+              input: {
+                namespace: params.dataset.namespace,
+                name: params.version.name,
+              },
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '删除数据集版本失败',
+              });
+            });
+          this.utils.notification.success({
+            message: '删除数据集版本成功',
+          });
+          this.fetchData();
+        },
+      },
+    });
+  }
+
+  release(params) {
+    console.log('hhhhh');
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '发布数据集',
+        content: `数据发布后不可更改，确定发布：${params.dataset.name}-${params.version.version}？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .updateVersionedDataset({
+              input: {
+                namespace: params.dataset.namespace,
+                name: params.version.name,
+                released: 1,
+              },
+            })
+            .then(res => {
+              this.utils.notification.success({
+                message: '发布数据集版本成功',
+              });
+              this.fetchData();
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '发布数据集版本失败',
+              });
+            });
+        },
+      },
+    });
+  }
+
+  onDropdownClick(event, params) {
+    if (event.key === 'delete') {
+      return this.delVersion(params);
+    }
+    if (event.key === 'release') {
+      return this.release(params);
+    }
+  }
+
   componentDidMount() {
     this.fetchData();
+    console.log('didmount', this.constants.DATASET_DATA);
   }
 
   render() {
@@ -548,6 +514,10 @@ class Dataset$$Page extends React.Component {
             </FormilyForm>
           </Modal>
         )}
+        <LccComponentSbva0
+          data={__$$eval(() => this.state.confirm)}
+          __component_name="LccComponentSbva0"
+        />
         <Row wrap={true} __component_name="Row">
           <Col span={24} __component_name="Col">
             <Typography.Title
@@ -564,7 +534,7 @@ class Dataset$$Page extends React.Component {
             <Alert
               type="info"
               style={{ marginBottom: '8px' }}
-              message="数据集描述----------暂时还未想好，后续补充"
+              message="可用数据统一纳管，包含训练数据集、知识库数据集等。支持自主版本迭代、数据查看和数据更新等操作。"
               showIcon={true}
               __component_name="Alert"
             />
@@ -636,7 +606,7 @@ class Dataset$$Page extends React.Component {
                   mode="single"
                   style={{ width: 200 }}
                   value={__$$eval(() => this.state.type)}
-                  options={__$$eval(() => this._data().type)}
+                  options={__$$eval(() => this.constants.DATASET_DATA.type)}
                   disabled={false}
                   onChange={function () {
                     return this.onTypeChange.apply(
@@ -653,7 +623,7 @@ class Dataset$$Page extends React.Component {
                 />
                 <Select
                   style={{ width: 200 }}
-                  options={__$$eval(() => this._data().fields)}
+                  options={__$$eval(() => this.constants.DATASET_DATA.fields)}
                   disabled={false}
                   onChange={function () {
                     return this.onFieldChange.apply(
@@ -758,13 +728,24 @@ class Dataset$$Page extends React.Component {
                                   <Tag color="warning" closable={false} __component_name="Tag">
                                     {__$$eval(
                                       () =>
-                                        __$$context.utils._.find(__$$context._data().type, {
-                                          value: item.contentType,
-                                        })?.label || '未知'
+                                        __$$context.utils._.find(
+                                          __$$context.constants.DATASET_DATA.type,
+                                          {
+                                            value: item.contentType,
+                                          }
+                                        )?.label || '未知'
                                     )}
                                   </Tag>
                                   <Tag color="processing" closable={false} __component_name="Tag">
-                                    {__$$eval(() => item.field || '未知')}
+                                    {__$$eval(
+                                      () =>
+                                        __$$context.utils._.find(
+                                          __$$context.constants.DATASET_DATA.fields,
+                                          {
+                                            value: item.field,
+                                          }
+                                        )?.label || '未知'
+                                    )}
                                   </Tag>
                                 </Col>
                                 <Col
@@ -875,7 +856,9 @@ class Dataset$$Page extends React.Component {
                                       (__$$context => (
                                         <Status
                                           id={__$$eval(() => record.syncStatus)}
-                                          types={__$$eval(() => __$$context._data().syncStatus)}
+                                          types={__$$eval(
+                                            () => __$$context.constants.DATASET_DATA.syncStatus
+                                          )}
                                           __component_name="Status"
                                         />
                                       ))(
@@ -886,7 +869,19 @@ class Dataset$$Page extends React.Component {
                                   {
                                     key: 'dataProcessStatus',
                                     title: '数据处理状态',
-                                    render: (text, record) => text || '未开始',
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Status
+                                          __component_name="Status"
+                                          id="this.record. dataProcessStatus"
+                                          types={__$$eval(
+                                            () =>
+                                              __$$context.constants.DATASET_DATA.dataProcessStatus
+                                          )}
+                                        />
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
                                     dataIndex: 'dataProcessStatus',
                                   },
                                   {
@@ -896,7 +891,9 @@ class Dataset$$Page extends React.Component {
                                       (__$$context => (
                                         <Status
                                           id={__$$eval(() => record.released)}
-                                          types={__$$eval(() => __$$context._data().released)}
+                                          types={__$$eval(
+                                            () => __$$context.constants.DATASET_DATA.released
+                                          )}
                                           __component_name="Status"
                                         />
                                       ))(
@@ -1064,6 +1061,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -1077,12 +1075,10 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[
         {
-          func: 'undefined',
           params: undefined,
           enableLocationSearch: undefined,
         },
