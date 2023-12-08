@@ -36,6 +36,8 @@ const Info: React.FC<Iprops> = props => {
                   '/dataset/detail/' +
                     data.pre_dataset_name +
                     '/version/' +
+                    data.pre_dataset_name +
+                    '-' +
                     data.pre_dataset_version
                 )
               }
@@ -59,6 +61,8 @@ const Info: React.FC<Iprops> = props => {
                   '/dataset/detail/' +
                     data.post_dataset_name +
                     '/version/' +
+                    data.post_dataset_name +
+                    '-' +
                     data.post_dataset_version
                 )
               }
@@ -67,6 +71,10 @@ const Info: React.FC<Iprops> = props => {
             </a>
           </>
         ),
+      },
+      {
+        label: '创建人',
+        children: data.creator,
       },
       {
         label: '创建时间',
