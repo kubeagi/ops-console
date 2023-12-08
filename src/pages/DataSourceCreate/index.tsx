@@ -86,7 +86,7 @@ class DataSourceCreate$$Page extends React.Component {
           },
           endpointinput: {
             url: v?.serverAddress,
-            insecure: v?.insecure === 'https' ? true : false,
+            insecure: v?.insecure === 'https' ? false : true,
             auth: {
               username: v?.username,
               password: v?.password,
@@ -213,6 +213,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -226,7 +227,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}

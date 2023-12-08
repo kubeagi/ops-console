@@ -14,15 +14,20 @@ import {
   Col,
   FormilyUpload,
   Flex,
+  FormilyPassword,
   FormilyRadio,
   Space,
-  Button,
   Tooltip,
+  Button,
 } from '@tenx-ui/materials';
 
 import LccComponentC6ipk from 'SelectCard';
 
-import { AntdIconPlusOutlined } from '@tenx-ui/icon-materials';
+import {
+  AntdIconPlusOutlined,
+  AntdIconCloseCircleFilled,
+  AntdIconCheckCircleFilled,
+} from '@tenx-ui/icon-materials';
 
 import { DataProvider } from 'shared-components';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
@@ -58,7 +63,7 @@ class CreateDataSource$$Component extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { type: undefined, timer: undefined, checked: false };
+    this.state = { type: undefined, checked: undefined, timer: undefined };
   }
 
   $ = refName => {
@@ -71,61 +76,14 @@ class CreateDataSource$$Component extends React.Component {
 
   componentWillUnmount() {}
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
-  getType() {
-    return (
-      this.props?.data?.type ||
-      this.state.type ||
-      this.getDataSourceTypes(this, 'label')?.[0]?.value
-    );
+  handelCancel() {
+    this.props.handelCancel && this.props.handelCancel();
   }
 
   handleSave() {
     this.form().submit(async v => {
       this.props.handleSave && this.props.handleSave(v);
     });
-  }
-
-  handleCheck() {
-    console.log('check');
-    this.setState({
-      checked: true,
-    });
-    // this.props.handleCheck
-  }
-
-  onItemClick(item) {
-    this.form()?.setValues({
-      type: item.value,
-    });
-    this.setState({
-      type: item.value,
-    });
-  }
-
-  getTypeForms() {
-    return this.getDataSourceTypes(this, 'label')?.find(item => item.value === this.getType())
-      ?.forms;
-  }
-
-  handelCancel() {
-    this.props.handelCancel && this.props.handelCancel();
-  }
-
-  initEditForm(values) {
-    if (!this.form()) {
-      this.state.timer && clearTimeout(this.state.timer);
-      this.setState({
-        timer: setTimeout(() => {
-          this.initEditForm(values);
-        }, 200),
-      });
-      return;
-    }
-    this.form()?.setValues(values || {});
   }
 
   async validatorName(v) {
@@ -181,11 +139,92 @@ class CreateDataSource$$Component extends React.Component {
     ];
   }
 
-  componentDidMount() {
-    this.props.setThis && this.props.setThis(this);
+  handleResetChecked() {
+    this.setState({
+      checked: undefined,
+    });
   }
 
-  componentWillUnmount() {}
+  handleCheck() {
+    this.form().submit(async v => {
+      const params = {
+        input: {
+          name: v?.name,
+          displayName: v?.displayName,
+          namespace: this.props?.project,
+          description: v?.description,
+          ossinput: {
+            bucket: v?.bucket,
+            object: v?.object,
+          },
+          endpointinput: {
+            url: v?.serverAddress,
+            insecure: v?.insecure === 'https' ? false : true,
+            auth: {
+              username: v?.username,
+              password: v?.password,
+            },
+          },
+        },
+      };
+      try {
+        const res = await this.props?.bff?.checkDatasource(params);
+        if (res?.Datasource?.checkDatasource?.status === 'True') {
+          this.setState({
+            checked: true,
+          });
+        } else {
+          this.setState({
+            checked: false,
+          });
+        }
+      } catch (error) {
+        this.setState({
+          checked: false,
+          checkedMessage: error?.response?.errors?.[0]?.message,
+        });
+      }
+    });
+  }
+
+  getType() {
+    return (
+      this.props?.data?.type ||
+      this.state.type ||
+      this.getDataSourceTypes(this, 'label')?.[0]?.value
+    );
+  }
+
+  initEditForm(values) {
+    if (!this.form()) {
+      this.state.timer && clearTimeout(this.state.timer);
+      this.setState({
+        timer: setTimeout(() => {
+          this.initEditForm(values);
+        }, 200),
+      });
+      return;
+    }
+    this.form()?.setValues(values || {});
+  }
+
+  getTypeForms() {
+    return this.getDataSourceTypes(this, 'label')?.find(item => item.value === this.getType())
+      ?.forms;
+  }
+
+  onItemClick(item) {
+    this.form()?.setValues({
+      type: item.value,
+    });
+    this.setState({
+      type: item.value,
+    });
+  }
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
 
   componentDidMount() {
     this.props.setThis && this.props.setThis(this);
@@ -260,6 +299,12 @@ class CreateDataSource$$Component extends React.Component {
               'x-component-props': {
                 disabled: __$$eval(() => this.props.data),
                 placeholder: this.i18n('i18n-u4ayeyas') /* 请输入数据源名称 */,
+                onChange: function () {
+                  return this.handleResetChecked.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this),
               },
             }}
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -269,7 +314,7 @@ class CreateDataSource$$Component extends React.Component {
             fieldProps={{
               name: 'displayName',
               title: this.i18n('i18n-fr3ipxlc') /* 数据源别名 */,
-              required: true,
+              required: false,
               'x-validator': [
                 {
                   id: 'disabled',
@@ -497,6 +542,12 @@ class CreateDataSource$$Component extends React.Component {
               }}
               componentProps={{
                 'x-component-props': {
+                  onChange: function () {
+                    return this.handleResetChecked.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                   placeholder: this.i18n('i18n-6spbbojn') /* 请输入服务地址 */,
                 },
               }}
@@ -528,22 +579,15 @@ class CreateDataSource$$Component extends React.Component {
                 'x-validator': [],
               }}
               componentProps={{
-                'x-component-props': { placeholder: this.i18n('i18n-tnfvqdxl') /* 请输入用户名 */ },
-              }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
-            />
-          )}
-          {!!__$$eval(() => this.getTypeForms()?.includes('password')) && (
-            <FormilyInput
-              fieldProps={{
-                name: 'password',
-                title: this.i18n('i18n-mtolrn4c') /* 密码 */,
-                required: true,
-                'x-validator': [],
-              }}
-              componentProps={{
-                'x-component-props': { placeholder: this.i18n('i18n-yzicgjma') /* 请输入密码 */ },
+                'x-component-props': {
+                  onChange: function () {
+                    return this.handleResetChecked.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                  placeholder: this.i18n('i18n-tnfvqdxl') /* 请输入用户名 */,
+                },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               __component_name="FormilyInput"
@@ -581,28 +625,28 @@ class CreateDataSource$$Component extends React.Component {
               __component_name="FormilyInput"
             />
           )}
-          {!!__$$eval(() => !this.getTypeForms()?.includes('upload')) && (
-            <Row wrap={true} __component_name="Row">
-              <Col span={4} style={{}} __component_name="Col" />
-              <Col span={20} style={{ marginBottom: '20px' }} __component_name="Col">
-                <Typography.Text
-                  type="colorPrimary"
-                  style={{ cursor: 'pointer', fontSize: '' }}
-                  strong={false}
-                  onClick={function () {
-                    return this.handleCheck.apply(
+          {!!__$$eval(() => this.getTypeForms()?.includes('password')) && (
+            <FormilyPassword
+              __component_name="FormilyPassword"
+              fieldProps={{
+                name: 'password',
+                title: this.i18n('i18n-mtolrn4c') /* 密码 */,
+                'x-validator': [],
+                required: true,
+              }}
+              componentProps={{
+                'x-component-props': {
+                  placeholder: this.i18n('i18n-yzicgjma') /* 请输入密码 */,
+                  onChange: function () {
+                    return this.handleResetChecked.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
-                  }.bind(this)}
-                  disabled={false}
-                  ellipsis={true}
-                  __component_name="Typography.Text"
-                >
-                  {this.i18n('i18n-z7scyw9j') /* 测试连接 */}
-                </Typography.Text>
-              </Col>
-            </Row>
+                  }.bind(this),
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+            />
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('bucket')) && (
             <FormilyInput
@@ -615,6 +659,12 @@ class CreateDataSource$$Component extends React.Component {
               componentProps={{
                 'x-component-props': {
                   placeholder: this.i18n('i18n-9vkabv9j') /* 请输入 Bucket */,
+                  onChange: function () {
+                    return this.handleResetChecked.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -632,6 +682,12 @@ class CreateDataSource$$Component extends React.Component {
               componentProps={{
                 'x-component-props': {
                   placeholder: this.i18n('i18n-iazmtrsp') /* 请输入 Object */,
+                  onChange: function () {
+                    return this.handleResetChecked.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -641,8 +697,8 @@ class CreateDataSource$$Component extends React.Component {
           <FormilyRadio
             fieldProps={{
               enum: [
-                { label: 'Https', value: 'https' },
-                { label: 'Http', value: 'http' },
+                { label: 'HTTPS', value: 'https' },
+                { label: 'HTTP', value: 'http' },
               ],
               name: 'insecure',
               title: this.i18n('i18n-oe4qfho1') /* 协议类型 */,
@@ -653,6 +709,12 @@ class CreateDataSource$$Component extends React.Component {
               'x-component-props': {
                 size: 'middle',
                 disabled: false,
+                onChange: function () {
+                  return this.handleResetChecked.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this),
                 buttonStyle: 'outline',
                 _sdkSwrGetFunc: {},
               },
@@ -660,6 +722,79 @@ class CreateDataSource$$Component extends React.Component {
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
             __component_name="FormilyRadio"
           />
+          {!!__$$eval(() => !this.getTypeForms()?.includes('upload')) && (
+            <Row wrap={true} __component_name="Row">
+              <Col span={4} style={{}} __component_name="Col" />
+              <Col span={20} style={{ marginBottom: '20px' }} __component_name="Col">
+                <Space __component_name="Space" direction="horizontal" align="center" size={5}>
+                  {!!__$$eval(() => this.state.checked === undefined) && (
+                    <Typography.Text
+                      type="colorPrimary"
+                      style={{ cursor: 'pointer', fontSize: '' }}
+                      strong={false}
+                      onClick={function () {
+                        return this.handleCheck.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
+                      disabled={false}
+                      ellipsis={true}
+                      __component_name="Typography.Text"
+                    >
+                      {this.i18n('i18n-z7scyw9j') /* 测试连接 */}
+                    </Typography.Text>
+                  )}
+                  <Tooltip
+                    __component_name="Tooltip"
+                    title={__$$eval(() => this.state.checkedMessage)}
+                  >
+                    {!!__$$eval(() => this.state.checked === false) && (
+                      <Space
+                        __component_name="Space"
+                        direction="horizontal"
+                        align="center"
+                        size={5}
+                      >
+                        <AntdIconCloseCircleFilled
+                          __component_name="AntdIconCloseCircleFilled"
+                          style={{ color: '#ff4d4f' }}
+                        />
+                        <Typography.Text
+                          type="danger"
+                          style={{ cursor: 'pointer', fontSize: '' }}
+                          strong={false}
+                          disabled={false}
+                          ellipsis={true}
+                          __component_name="Typography.Text"
+                        >
+                          连接异常
+                        </Typography.Text>
+                      </Space>
+                    )}
+                  </Tooltip>
+                  {!!__$$eval(() => this.state.checked === true) && (
+                    <AntdIconCheckCircleFilled
+                      __component_name="AntdIconCheckCircleFilled"
+                      style={{ color: '#7ed321' }}
+                    />
+                  )}
+                  {!!__$$eval(() => this.state.checked === true) && (
+                    <Typography.Text
+                      type="success"
+                      style={{ cursor: 'pointer', fontSize: '' }}
+                      strong={false}
+                      disabled={false}
+                      ellipsis={true}
+                      __component_name="Typography.Text"
+                    >
+                      连接成功
+                    </Typography.Text>
+                  )}
+                </Space>
+              </Col>
+            </Row>
+          )}
           {!!__$$eval(() => !this.props.data) && (
             <Divider
               mode="line"
@@ -705,7 +840,12 @@ class CreateDataSource$$Component extends React.Component {
                   {this.i18n('i18n-0ujub8i3') /* 取消 */}
                 </Button>
                 <Tooltip
-                  title={this.i18n('i18n-umfzqrmt') /* 请测试连接并通过 */}
+                  title={__$$eval(
+                    () =>
+                      !this.state.checked &&
+                      !this.getTypeForms()?.includes('upload') &&
+                      '请先测试连接并通过'
+                  )}
                   __component_name="Tooltip"
                 >
                   <Button
@@ -737,10 +877,11 @@ class CreateDataSource$$Component extends React.Component {
   }
 }
 
-const ComponentWrapper = (props = {}) => {
+const ComponentWrapper = React.forwardRef((props = {}, ref) => {
   const history = getUnifiedHistory();
   const appHelper = {
     utils,
+    constants: __$$constants,
     history,
   };
   const self = {
@@ -752,16 +893,21 @@ const ComponentWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
       render={dataProps => (
-        <CreateDataSource$$Component {...props} {...dataProps} self={self} appHelper={appHelper} />
+        <CreateDataSource$$Component
+          ref={ref}
+          {...props}
+          {...dataProps}
+          self={self}
+          appHelper={appHelper}
+        />
       )}
     />
   );
-};
+});
 export default ComponentWrapper;
 
 function __$$eval(expr) {

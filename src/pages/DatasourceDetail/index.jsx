@@ -78,15 +78,15 @@ class DatasourceDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      timer: undefined,
-      total: 3,
-      loading: false,
-      tableData: [],
-      currentPage: 1,
+      uploadFileVisible: false,
       editVisible: false,
       deleteVisible: false,
       dataSourceDetail: {},
-      uploadFileVisible: false,
+      tableData: [],
+      loading: false,
+      currentPage: 1,
+      total: 3,
+      timer: undefined,
     };
   }
 
@@ -100,14 +100,8 @@ class DatasourceDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  search(event) {
-    console.log(event.target.value);
-    const newData = this.state.tableData.filter(
-      item => item.fileName.indexOf(event.target.value) > -1
-    );
-    this.setState({
-      tableData: newData,
-    });
+  refresh() {
+    this.props.useGetDatasource?.mutate();
   }
 
   getData() {
@@ -121,8 +115,133 @@ class DatasourceDetail$$Page extends React.Component {
     return this.utils.getFullName(this.getData());
   }
 
-  refresh() {
-    this.props.useGetDatasource?.mutate();
+  clickEditBtn() {
+    this.setState({
+      editVisible: true,
+    });
+    this.initEditForm();
+  }
+
+  initEditForm() {
+    const record = this.getData();
+    const form = this.$('edit_form_ref')?.formRef?.current?.form;
+    this.state.timer && clearTimeout(this.state.timer);
+    if (form) {
+      form.setValues({
+        ...(record || {}),
+        bucket: record?.oss?.bucket,
+        object: record?.oss?.object,
+      });
+      return;
+    }
+    this.setState({
+      timer: setTimeout(() => {
+        this.initEditForm();
+      }, 200),
+    });
+  }
+
+  cancelEdit() {
+    this.setState({
+      editVisible: false,
+    });
+  }
+
+  editDatasource() {
+    const form = this.$('edit_form_ref')?.formRef?.current?.form;
+    const isCreate = false;
+    form.submit(async v => {
+      this.setState({
+        loading: true,
+      });
+      const params = {
+        input: {
+          name: v?.name,
+          displayName: v?.displayName,
+          namespace: this.utils.getAuthData()?.project,
+          description: v?.description,
+        },
+      };
+      const api = {
+        create: {
+          name: 'createDatasource',
+          params,
+          successMessage: 'i18n-ia3gjpq5',
+          faildMessage: 'i18n-p20wuevb',
+        },
+        update: {
+          name: 'updateDatasource',
+          params,
+          successMessage: 'i18n-tz6dwud2',
+          faildMessage: 'i18n-sah3nlrl',
+        },
+      }[isCreate ? 'create' : 'update'];
+      try {
+        const res = await this.props.appHelper.utils.bff[api.name](api.params);
+        this.utils.notification.success({
+          message: this.i18n(api.successMessage),
+        });
+        this.refresh();
+        this.setState({
+          loading: false,
+          editVisible: false,
+        });
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: this.i18n(api.faildMessage),
+          errors: error?.response?.errors,
+        });
+        this.setState({
+          loading: false,
+        });
+      }
+    });
+  }
+
+  clickDeleteBtn() {
+    this.setState({
+      deleteVisible: true,
+    });
+  }
+
+  cancelDelete() {
+    this.setState({
+      deleteVisible: false,
+    });
+  }
+
+  async deleteDatasource() {
+    this.setState({
+      loading: true,
+    });
+    try {
+      await this.utils.bff.deleteDatasources({
+        input: {
+          name: this.getData()?.name,
+          namespace: this.utils.getAuthData()?.project,
+        },
+      });
+      this.setState({
+        deleteVisible: true,
+      });
+      this.utils.notification.success({
+        message: this.i18n('i18n-vf1xe64m'),
+      });
+      setTimeout(() => {
+        this.history?.go(-1);
+        this.setState({
+          loading: false,
+        });
+      }, 200);
+    } catch (error) {
+      this.setState({
+        loading: false,
+      });
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-yc0jhxgr'),
+        errors: error?.response?.errors,
+      });
+    }
   }
 
   loadData() {
@@ -202,37 +321,34 @@ class DatasourceDetail$$Page extends React.Component {
     return sizestr;
   }
 
-  cancelEdit() {
+  search(event) {
+    console.log(event.target.value);
+    const newData = this.state.tableData.filter(
+      item => item.fileName.indexOf(event.target.value) > -1
+    );
     this.setState({
-      editVisible: false,
+      tableData: newData,
     });
   }
 
-  deleteFile(event, record) {
-    console.log(record);
-    const newData = this.state.tableData.filter(item => item.id !== record.id);
-    console.log(newData);
-    this.setState(state => {
-      return {
-        tableData: newData,
-        total: state.total - 1,
-      };
+  clickUploadFileBtn() {
+    this.setState({
+      uploadFileVisible: true,
+    });
+  }
+
+  cancelUploadFile() {
+    this.setState({
+      uploadFileVisible: false,
     });
   }
 
   uploadFile() {}
 
-  cancelDelete() {
+  tablePageChange(value) {
     this.setState({
-      deleteVisible: false,
+      currentPage: value,
     });
-  }
-
-  clickEditBtn() {
-    this.setState({
-      editVisible: true,
-    });
-    this.initEditForm();
   }
 
   downloadFile(event, record) {
@@ -253,126 +369,16 @@ class DatasourceDetail$$Page extends React.Component {
     }
   }
 
-  initEditForm() {
-    const record = this.getData();
-    const form = this.$('edit_form_ref')?.formRef?.current?.form;
-    this.state.timer && clearTimeout(this.state.timer);
-    if (form) {
-      form.setValues({
-        ...(record || {}),
-        bucket: record?.oss?.bucket,
-        object: record?.oss?.object,
-      });
-      return;
-    }
-    this.setState({
-      timer: setTimeout(() => {
-        this.initEditForm();
-      }, 200),
-    });
-  }
-
-  clickDeleteBtn() {
-    this.setState({
-      deleteVisible: true,
-    });
-  }
-
-  editDatasource() {
-    const form = this.$('edit_form_ref')?.formRef?.current?.form;
-    const isCreate = false;
-    form.submit(async v => {
-      this.setState({
-        loading: true,
-      });
-      const params = {
-        input: {
-          name: v?.name,
-          displayName: v?.displayName,
-          namespace: this.utils.getAuthData()?.project,
-          description: v?.description,
-        },
+  deleteFile(event, record) {
+    console.log(record);
+    const newData = this.state.tableData.filter(item => item.id !== record.id);
+    console.log(newData);
+    this.setState(state => {
+      return {
+        tableData: newData,
+        total: state.total - 1,
       };
-      const api = {
-        create: {
-          name: 'createDatasource',
-          params,
-          successMessage: 'i18n-ia3gjpq5',
-          faildMessage: 'i18n-p20wuevb',
-        },
-        update: {
-          name: 'updateDatasource',
-          params,
-          successMessage: 'i18n-tz6dwud2',
-          faildMessage: 'i18n-sah3nlrl',
-        },
-      }[isCreate ? 'create' : 'update'];
-      try {
-        const res = await this.props.appHelper.utils.bff[api.name](api.params);
-        this.utils.notification.success({
-          message: this.i18n(api.successMessage),
-        });
-        this.refresh();
-        this.setState({
-          loading: false,
-          editVisible: false,
-        });
-      } catch (error) {
-        this.utils.notification.warnings({
-          message: this.i18n(api.faildMessage),
-          errors: error?.response?.errors,
-        });
-        this.setState({
-          loading: false,
-        });
-      }
     });
-  }
-
-  tablePageChange(value) {
-    this.setState({
-      currentPage: value,
-    });
-  }
-
-  cancelUploadFile() {
-    this.setState({
-      uploadFileVisible: false,
-    });
-  }
-
-  async deleteDatasource() {
-    this.setState({
-      loading: true,
-    });
-    try {
-      await this.utils.bff.deleteDatasources({
-        input: {
-          name: this.getData()?.name,
-          namespace: this.utils.getAuthData()?.project,
-        },
-      });
-      this.setState({
-        deleteVisible: true,
-      });
-      this.utils.notification.success({
-        message: this.i18n('i18n-vf1xe64m'),
-      });
-      setTimeout(() => {
-        this.history?.go(-1);
-        this.setState({
-          loading: false,
-        });
-      }, 200);
-    } catch (error) {
-      this.setState({
-        loading: false,
-      });
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-yc0jhxgr'),
-        errors: error?.response?.errors,
-      });
-    }
   }
 
   selectFileChange(event) {
@@ -386,12 +392,6 @@ class DatasourceDetail$$Page extends React.Component {
         message: '文件：' + event.file.name + '内容过大',
       });
     }
-  }
-
-  clickUploadFileBtn() {
-    this.setState({
-      uploadFileVisible: true,
-    });
   }
 
   componentDidMount() {}
@@ -723,7 +723,7 @@ class DatasourceDetail$$Page extends React.Component {
                                 __component_name="Typography.Text"
                               >
                                 {__$$eval(() =>
-                                  this.getData()?.endpoint?.insecure ? 'HTTPS' : 'HTTP'
+                                  this.getData()?.endpoint?.insecure ? 'HTTP' : 'HTTPS'
                                 )}
                               </Typography.Text>
                             ),
@@ -1563,6 +1563,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -1576,7 +1577,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: false,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[
