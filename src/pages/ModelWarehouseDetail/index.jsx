@@ -292,6 +292,93 @@ class ModelWarehouseDetail$$Page extends React.Component {
       submitLoading: false,
       uploadModalVisible: false,
     });
+    this.getData();
+  }
+
+  openDeleteFilesModal(e, { record }) {
+    this.setState({
+      deleteFilesVisible: true,
+      currentFile: record?.path,
+      deleteType: 'single',
+    });
+  }
+
+  onDeleteBatch() {
+    if (!this.state.selectedFileList.length) {
+      this.utils.notification.warn({
+        message: '请选择要删除的文件！',
+      });
+      return;
+    }
+    this.setState({
+      deleteFilesVisible: true,
+      deleteType: 'batch',
+    });
+  }
+
+  onRowSelectedChange(keys) {
+    console.log(keys);
+    this.setState({
+      selectedFileList: keys,
+    });
+  }
+
+  onSubmitDel() {
+    console.log(files);
+    const files = [];
+    if (this.state.deleteType === 'batch') {
+      this.onDelete(this.state.selectedFileList);
+    }
+    if (this.state.deleteType === 'single') {
+      this.onDelete([this.state.currentFile]);
+    }
+  }
+
+  onDelete(selectedDeleteFileList) {
+    this.setState({
+      deleteLoading: true,
+    });
+    const pageThis = this;
+    return new Promise((resolve, reject) => {
+      pageThis
+        .getDataSourceMap()
+        .delete_files.load({
+          files: selectedDeleteFileList,
+          bucket: pageThis.getBucket(),
+          bucket_path: pageThis.getBucketPath(),
+        })
+        .then(function (response) {
+          console.log(response);
+          if (response === 'success') {
+            pageThis.utils.notification.success({
+              message: '删除文件成功！',
+            });
+            pageThis.closeDeleteFilesModal();
+            pageThis.getData();
+          } else {
+            pageThis.utils.notification.warn({
+              message: response,
+            });
+          }
+          pageThis.setState({
+            deleteLoading: false,
+          });
+          resolve(response);
+        })
+        .catch(function (error) {
+          pageThis.setState({
+            deleteLoading: false,
+          });
+          reject(error);
+        });
+    });
+  }
+
+  closeDeleteFilesModal() {
+    this.setState({
+      deleteFilesVisible: false,
+      currentFile: '',
+    });
   }
 
   openDeleteFilesModal(e, { record }) {
@@ -691,6 +778,12 @@ class ModelWarehouseDetail$$Page extends React.Component {
                               ghost={false}
                               shape="default"
                               danger={false}
+                              onClick={function () {
+                                return this.onDeleteBatch.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([])
+                                );
+                              }.bind(this)}
                               disabled={false}
                               __component_name="Button"
                               onClick={function () {
@@ -754,6 +847,16 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                     ghost={false}
                                     shape="default"
                                     danger={false}
+                                    onClick={function () {
+                                      return this.openDeleteFilesModal.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([
+                                          {
+                                            record: record,
+                                          },
+                                        ])
+                                      );
+                                    }.bind(__$$context)}
                                     disabled={false}
                                     __component_name="Button"
                                     onClick={function () {
@@ -861,6 +964,36 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(this)}
         >
           <Alert message="确认删除文件？" __component_name="Alert" type="warning" showIcon={true} />
+        </Modal>
+        <Modal
+          mask={true}
+          onOk={function () {
+            return this.onSubmitDel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([
+                {
+                  files: 123,
+                },
+              ])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.deleteFilesVisible)}
+          title="弹框标题"
+          centered={false}
+          keyboard={true}
+          onCancel={function () {
+            return this.closeDeleteFilesModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          forceRender={false}
+          maskClosable={false}
+          confirmLoading={__$$eval(() => this.state.deleteLoading)}
+          destroyOnClose={true}
+          __component_name="Modal"
+        >
+          <Alert type="warning" message="确认删除文件？" showIcon={true} __component_name="Alert" />
         </Modal>
         <Modal
           mask={true}
