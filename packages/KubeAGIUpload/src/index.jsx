@@ -71,18 +71,18 @@ class KubeAgiUpload$$Component extends React.Component {
 
     this.state = {
       ids: [],
-      bucket: 'xxyy',
+      progress: {
+        // 文件上传进度： 0
+      },
       status: {
         // 文件处理状态： '初始状态'
       },
       urlPrex: 'http://172.22.96.17/kubeagi-apis/minio',
-      progress: {
-        // 文件上传进度： 0
-      },
-      bucket_path: 'dataset/test/v1',
-      modalVisible: false,
       Authorization:
         'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImI1MmViYzk1NWRiYjYyNzBiN2YyZDZiNzQ5YWQ0M2RlNmExNTg0MjYifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwODEwNDY0LCJpYXQiOjE3MDA3MjQwNjQsImF0X2hhc2giOiJNWFpoRGhrVGVNOGg2OVYyT193Vl93IiwiY19oYXNoIjoiWHFfQXFKSllsN3VrQ1ZRWVFqak5IZyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.p5r2XN0Jl19FsHv85meDrFExu-TneS7i5_ENsWMMa5ziAxJjC_mLjgeN-4CzdM9flN3U931mSO29H-b2lifLdf7bYwtSOuIMiwoBkklOEa2MQVGDybkgH4QTlaClYYNSVYL4o4ZLmt5CFL7t0cf8UTapeUZTynL1ZPPgLMepPoqvteuNx4rsXXPjmywMK_o8jMRVxPLSdpxAV0e75lEW6wjq-0kqg8j2BFXbIeiftKzlRwAUa6NYAQZxsQGhS7_C3zIymyndoqzK5rAflwiHOZRX_CgQS0MIym1uNkauuH7MekRB2y5h0PMwGZ6tVwvF_h8by8RgjS7lVOb8rxMDcg',
+      bucket: 'xxyy',
+      bucket_path: 'dataset/test/v1',
+      modalVisible: false,
     };
   }
 
@@ -216,15 +216,101 @@ class KubeAgiUpload$$Component extends React.Component {
     };
   }
 
-  getBucket() {
-    // namespace
-    return this.props.bucket || this.state.bucket;
+  handleBack() {
+    this.props?.handleSuccess();
+  }
+
+  handleReUpload() {
+    this.props.handleReUpload();
+    this.handleBack();
+    this.setState({
+      modalVisible: false,
+    });
   }
 
   closeModal() {
     this.setState({
       modalVisible: false,
     });
+  }
+
+  getDataSourceMap() {
+    return this.dataSourceMap;
+  }
+
+  getUrlPrex() {
+    return `${window.location.origin}/kubeagi-apis/minio`;
+  }
+
+  getBucketPath() {
+    // bucket_path就是 dataset/<dataset-name>/ < version
+    return this.props?.getBucketPath() || this.state.bucket_path;
+  }
+
+  getBucket() {
+    // namespace
+    return this.props.bucket || this.state.bucket;
+  }
+
+  handleDelete(file) {
+    // const pageThis = this
+    // return new Promise((resolve, reject) => {
+    //   pageThis.getDataSourceMap().delete_files.load({
+    //     files: [file.name],
+    //     bucket: pageThis.getBucket(),
+    //     bucket_path: pageThis.getBucketPath(),
+    //   }).then(function (response) {
+    //     resolve(response);
+    //   }).catch(function (error) {
+    //     reject(error);
+    //   });
+    // })
+    this.setState({
+      fileList: this.state.fileList?.filter(item => item.uid !== file.uid),
+    });
+    return true;
+  }
+
+  onFileAdded(file, fileAllList) {
+    // 文件夹和文件需要区分一下
+    // 如果支持文件夹
+    if (this.props?.isSupportFolder) {
+      const list = this.state.fileList || [];
+      const newList = [];
+      fileAllList.forEach(item => {
+        // 避免重复添加
+        if (!list.some(ele => ele.webkitRelativePath === item.webkitRelativePath)) {
+          newList.push(item);
+        }
+      });
+      this.setState({
+        fileList: [...(this.state.fileList || []), ...newList],
+      });
+    } else {
+      this.setState({
+        fileList: [...(this.state.fileList || []), file],
+      });
+    }
+    this.props?.setState({
+      uploadThis: this,
+    });
+    return false;
+  }
+
+  startUpload() {
+    this.setState({
+      ids: [...this.state.ids, file.uid],
+      progress: {
+        ...this.state.progress,
+        [file.uid]: 0,
+      },
+      status: {
+        ...this.state.status,
+        [file.uid]: '初始状态',
+      },
+    });
+    // 1. 计算MD5
+    this.computeMD5(file);
   }
 
   computeMD5(file) {
@@ -275,85 +361,30 @@ class KubeAgiUpload$$Component extends React.Component {
     }
   }
 
-  getUrlPrex() {
-    return `${window.location.origin}/kubeagi-apis/minio`;
-  }
-
-  handleBack() {
-    this.props?.handleSuccess();
-  }
-
-  onFileAdded(file, fileAllList) {
-    // 文件夹和文件需要区分一下
-    // 如果支持文件夹
-    if (this.props?.isSupportFolder) {
-      const list = this.state.fileList || [];
-      const newList = [];
-      fileAllList.forEach(item => {
-        // 避免重复添加
-        if (!list.some(ele => ele.webkitRelativePath === item.webkitRelativePath)) {
-          newList.push(item);
-        }
-      });
-      this.setState({
-        fileList: [...(this.state.fileList || []), ...newList],
-      });
-    } else {
-      this.setState({
-        fileList: [...(this.state.fileList || []), file],
-      });
-    }
-    this.props?.setState({
-      uploadThis: this,
-    });
-    return false;
-  }
-
-  startUpload() {
-    this.setState({
-      ids: [...this.state.ids, file.uid],
-      progress: {
-        ...this.state.progress,
-        [file.uid]: 0,
-      },
-      status: {
-        ...this.state.status,
-        [file.uid]: '初始状态',
-      },
-    });
-    // 1. 计算MD5
-    this.computeMD5(file);
-  }
-
-  handleDelete(file) {
-    // const pageThis = this
-    // return new Promise((resolve, reject) => {
-    //   pageThis.getDataSourceMap().delete_files.load({
-    //     files: [file.name],
-    //     bucket: pageThis.getBucket(),
-    //     bucket_path: pageThis.getBucketPath(),
-    //   }).then(function (response) {
-    //     resolve(response);
-    //   }).catch(function (error) {
-    //     reject(error);
-    //   });
-    // })
-    this.setState({
-      fileList: this.state.fileList?.filter(item => item.uid !== file.uid),
-    });
-    return true;
-  }
-
-  getBucketPath() {
-    // bucket_path就是 dataset/<dataset-name>/ < version
-    return this.props?.getBucketPath() || this.state.bucket_path;
-  }
-
-  handleReUpload() {
-    this.props.handleReUpload();
-    this.handleBack();
-    this.setState({
-      modalVisible: false,
+  getSuccessChunks(file) {
+    const pageThis = this;
+    return new Promise((resolve, reject) => {
+      pageThis
+        .getDataSourceMap()
+        .get_chunks.load({
+          md5: file.uniqueIdentifier,
+          bucket: pageThis.getBucket(),
+          bucket_path: pageThis.getBucketPath(),
+        })
+        .then(function (response) {
+          file.uploadID = response?.uploadID;
+          file.uuid = response?.uuid;
+          file.uploaded = response?.uploaded;
+          file.chunks = response?.chunks;
+          resolve(response);
+        })
+        .catch(function (error) {
+          pageThis.utils.notification.warnings({
+            message: pageThis.i18n('i18n-boehucun'),
+            errors: [error],
+          });
+          reject(error);
+        });
     });
   }
 
@@ -602,37 +633,6 @@ class KubeAgiUpload$$Component extends React.Component {
     }
   }
 
-  getDataSourceMap() {
-    return this.dataSourceMap;
-  }
-
-  getSuccessChunks(file) {
-    const pageThis = this;
-    return new Promise((resolve, reject) => {
-      pageThis
-        .getDataSourceMap()
-        .get_chunks.load({
-          md5: file.uniqueIdentifier,
-          bucket: pageThis.getBucket(),
-          bucket_path: pageThis.getBucketPath(),
-        })
-        .then(function (response) {
-          file.uploadID = response?.uploadID;
-          file.uuid = response?.uuid;
-          file.uploaded = response?.uploaded;
-          file.chunks = response?.chunks;
-          resolve(response);
-        })
-        .catch(function (error) {
-          pageThis.utils.notification.warnings({
-            message: pageThis.i18n('i18n-boehucun'),
-            errors: [error],
-          });
-          reject(error);
-        });
-    });
-  }
-
   async computeMD5Success(file) {
     await this.getSuccessChunks(file);
     if (file.uploadID == '' || file.uuid == '') {
@@ -676,8 +676,6 @@ class KubeAgiUpload$$Component extends React.Component {
     }
   }
 
-  componentDidMount() {}
-
   componentDidMount() {
     this._dataSourceEngine.reloadDataSource();
   }
@@ -690,22 +688,23 @@ class KubeAgiUpload$$Component extends React.Component {
         <Modal
           mask={true}
           open={__$$eval(() => this.state.modalVisible)}
+          style={{ width: '800px' }}
           title={this.i18n('i18n-msjvy7uv') /* 提示 */}
           footer={
-            <Space __component_name="Space" direction="horizontal" align="center">
+            <Space align="center" direction="horizontal" __component_name="Space">
               <Button
-                __component_name="Button"
-                danger={false}
+                block={false}
                 ghost={false}
                 shape="default"
-                block={false}
-                disabled={false}
+                danger={false}
                 onClick={function () {
                   return this.closeModal.apply(
                     this,
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this)}
+                disabled={false}
+                __component_name="Button"
               >
                 {this.i18n('i18n-zughatwk') /* 取消 */}
               </Button>
@@ -739,7 +738,6 @@ class KubeAgiUpload$$Component extends React.Component {
           confirmLoading={false}
           destroyOnClose={true}
           __component_name="Modal"
-          style={{ width: '800px' }}
         >
           <Row wrap={true} __component_name="Row">
             <Col span={24} __component_name="Col">
@@ -753,7 +751,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 {this.i18n('i18n-432m045e') /* 文件上传失败，可能的原因包括： */}
               </Typography.Text>
             </Col>
-            <Col span={24} __component_name="Col" style={{ display: 'flex', alignItems: 'center' }}>
+            <Col span={24} style={{ display: 'flex', alignItems: 'center' }} __component_name="Col">
               <Typography.Text
                 style={{ fontSize: '' }}
                 strong={false}
@@ -764,38 +762,38 @@ class KubeAgiUpload$$Component extends React.Component {
                 {this.i18n('i18n-mzls5g8w') /* 1. 证书不受信任。 */}
               </Typography.Text>
               <Button
-                __component_name="Button"
-                type="link"
-                icon=""
                 href={__$$eval(() => this.state.modalLink || '-')}
-                danger={false}
+                icon=""
+                type="link"
+                block={false}
                 ghost={false}
                 shape="default"
-                block={false}
-                disabled={false}
                 style={{
                   paddingTop: '0px',
-                  paddingBottom: '0px',
                   paddingLeft: '0px',
                   paddingRight: '0px',
+                  paddingBottom: '0px',
                 }}
+                danger={false}
                 target="_blank"
+                disabled={false}
+                __component_name="Button"
               >
                 {[
                   <Typography.Text
-                    __component_name="Typography.Text"
-                    ellipsis={true}
-                    style={{ fontSize: '' }}
-                    disabled={false}
-                    strong={false}
                     type="colorPrimary"
+                    style={{ fontSize: '' }}
+                    strong={false}
+                    disabled={false}
+                    ellipsis={true}
+                    __component_name="Typography.Text"
                     key="node_oclpuxu40yg"
                   >
                     {this.i18n('i18n-ymkxjalg') /* 点击信任证书 */}
                   </Typography.Text>,
                   <TenxIconLinkTo
-                    __component_name="TenxIconLinkTo"
                     color="#4461EB"
+                    __component_name="TenxIconLinkTo"
                     key="node_oclpuxu40yb"
                   />,
                 ]}
@@ -829,15 +827,15 @@ class KubeAgiUpload$$Component extends React.Component {
             </Col>
           </Row>
           <Typography.Paragraph
-            ellipsis={false}
-            style={{ fontSize: '', paddingTop: '20px' }}
             code={false}
+            mark={false}
+            style={{ fontSize: '', paddingTop: '20px' }}
             delete={false}
+            strong={false}
             disabled={false}
             editable={false}
-            mark={false}
+            ellipsis={false}
             underline={false}
-            strong={false}
           >
             {
               this.i18n(
@@ -927,7 +925,7 @@ class KubeAgiUpload$$Component extends React.Component {
                   ellipsis={true}
                   __component_name="Typography.Text"
                 >
-                  {__$$eval(() => this.props.accept || '-')}
+                  {__$$eval(() => this.props.accept || '')}
                 </Typography.Text>
                 <Typography.Text
                   style={{ fontSize: '' }}
@@ -936,7 +934,25 @@ class KubeAgiUpload$$Component extends React.Component {
                   ellipsis={true}
                   __component_name="Typography.Text"
                 >
-                  {this.i18n('i18n-u0ndjcyg') /* 文件； */}
+                  文件
+                </Typography.Text>
+                <Typography.Text
+                  style={{ fontSize: '' }}
+                  strong={false}
+                  disabled={false}
+                  ellipsis={true}
+                  __component_name="Typography.Text"
+                >
+                  {__$$eval(() => (this.props.isSupportFolder ? '夹' : ''))}
+                </Typography.Text>
+                <Typography.Text
+                  style={{ fontSize: '' }}
+                  strong={false}
+                  disabled={false}
+                  ellipsis={true}
+                  __component_name="Typography.Text"
+                >
+                  ；
                 </Typography.Text>
                 <Typography.Text
                   type="colorTextSecondary"
@@ -987,10 +1003,11 @@ class KubeAgiUpload$$Component extends React.Component {
   }
 }
 
-const ComponentWrapper = (props = {}) => {
+const ComponentWrapper = React.forwardRef((props = {}, ref) => {
   const history = getUnifiedHistory();
   const appHelper = {
     utils,
+    constants: __$$constants,
     history,
   };
   const self = {
@@ -1002,16 +1019,21 @@ const ComponentWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
       render={dataProps => (
-        <KubeAgiUpload$$Component {...props} {...dataProps} self={self} appHelper={appHelper} />
+        <KubeAgiUpload$$Component
+          ref={ref}
+          {...props}
+          {...dataProps}
+          self={self}
+          appHelper={appHelper}
+        />
       )}
     />
   );
-};
+});
 export default ComponentWrapper;
 
 function __$$eval(expr) {
