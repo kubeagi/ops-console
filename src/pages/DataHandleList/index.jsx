@@ -64,15 +64,15 @@ class DataHandleList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      keyword: '',
-      pageSize: 10,
-      totalCount: 0,
-      currentPage: 1,
-      listLoading: false,
-      currentRecord: null,
-      dataHandleList: [],
       delModalvisible: false,
       logModalVisible: false,
+      currentRecord: null,
+      currentPage: 1,
+      pageSize: 10,
+      totalCount: 0,
+      keyword: '',
+      dataHandleList: [],
+      listLoading: false,
     };
   }
 
@@ -82,23 +82,6 @@ class DataHandleList$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
-  }
-
-  onRefresh(event) {
-    // 点击按钮时的回调
-    this.setState(
-      {
-        currentPage: 1,
-      },
-      () => {
-        this.getDataList();
-      }
-    );
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
   }
 
   async getDataList() {
@@ -111,11 +94,13 @@ class DataHandleList$$Page extends React.Component {
           pageIndex: (this.state.currentPage - 1) * this.state.pageSize,
           pageSize: this.state.pageSize,
           keyword: this.state.keyword,
+          namespace: this.utils.getAuthData().project,
         },
       });
       const counts = await this.utils.bff.allDataProcessListByCount({
         input: {
           keyword: this.state.keyword,
+          namespace: this.utils.getAuthData().project,
         },
       });
       const { data, status } = res?.dataProcess?.allDataProcessListByPage;
@@ -136,11 +121,6 @@ class DataHandleList$$Page extends React.Component {
     }
   }
 
-  onLinkCreate() {
-    // 点击按钮时的回调
-    this.history.push('/data-handle/create');
-  }
-
   onOpenDelModal(e, { record }) {
     this.setState({
       delModalvisible: true,
@@ -148,18 +128,10 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onOpenLogModal(e, record) {
+  onCancelDelModal(e) {
     this.setState({
-      logModalVisible: true,
-      currentRecord: record,
-    });
-  }
-
-  onhandleChange(event) {
-    // 输入框内容变化时的回调
-    console.log('onChange', event);
-    this.setState({
-      keyword: event.target.value,
+      delModalvisible: false,
+      currentRecord: null,
     });
   }
 
@@ -182,6 +154,13 @@ class DataHandleList$$Page extends React.Component {
     } catch (error) {}
   }
 
+  onOpenLogModal(e, record) {
+    this.setState({
+      logModalVisible: true,
+      currentRecord: record,
+    });
+  }
+
   onCloseLogModal(isNeedReload) {
     this.setState({
       logModalVisible: false,
@@ -189,11 +168,9 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onCancelDelModal(e) {
-    this.setState({
-      delModalvisible: false,
-      currentRecord: null,
-    });
+  onLinkCreate() {
+    // 点击按钮时的回调
+    this.history.push('/data-handle/create');
   }
 
   onCurrentPageChange(page, pageSize) {
@@ -218,6 +195,31 @@ class DataHandleList$$Page extends React.Component {
         this.getDataList();
       }
     );
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  onRefresh(event) {
+    // 点击按钮时的回调
+    this.setState(
+      {
+        currentPage: 1,
+      },
+      () => {
+        this.getDataList();
+      }
+    );
+  }
+
+  onhandleChange(event) {
+    // 输入框内容变化时的回调
+    console.log('onChange', event);
+    this.setState({
+      keyword: event.target.value,
+    });
   }
 
   componentDidMount() {
@@ -457,6 +459,8 @@ class DataHandleList$$Page extends React.Component {
                                       '/dataset/detail/' +
                                       record.post_data_set_name +
                                       '/version/' +
+                                      record.post_data_set_name +
+                                      '-' +
                                       record.pre_data_set_version
                                   )}
                                   target="_self"
@@ -499,6 +503,8 @@ class DataHandleList$$Page extends React.Component {
                                       '/dataset/detail/' +
                                       record.post_data_set_name +
                                       '/version/' +
+                                      record.post_data_set_name +
+                                      '-' +
                                       record.post_data_set_version
                                   )}
                                   target="_self"
