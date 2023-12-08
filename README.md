@@ -46,7 +46,13 @@ nr build
 执行以下命令可在本地构建镜像：
 ```bash
 chmod +x ./build.sh ./update_base_image.sh
-./build.sh
+./build.sh <npm auth token>
+```
+
+执行以下命令可在本地构建镜像 (使用 aio.dockerfile)：
+```bash
+# you should npm login first or run `npm set` command first, like: npm set //dev-npm.tenxcloud.net/:_authToken=xxxxx
+docker build -t kubeagi/portal:latest -f aio.dockerfile --secret id=npmrc,src=$HOME/.npmrc .
 ```
 
 运行镜像：

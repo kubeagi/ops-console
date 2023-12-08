@@ -13,6 +13,6 @@ WORKDIR /usr/src/app
 COPY package.json /usr/src/app/
 COPY pnpm-lock.yaml /usr/src/app/
 COPY .npmrc /usr/src/app/
-RUN npm set //dev-npm.tenxcloud.net/:_authToken="pswHLzvzEb0OM8RTvqW6dApj44PF8ZGajEmAVUgeQxs=" \
+RUN npm set //dev-npm.tenxcloud.net/:_authToken="${_authToken}" \
   && npm i pnpm @antfu/ni -g \
   && ni
