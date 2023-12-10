@@ -6,6 +6,7 @@ on:
 env:
   REGISTRY: docker.io
   BASE_IMAGE_NAME: kubeagi/portal-base
+  DIST_IMAGE_NAME: kubeagi/portal-dist
   IMAGE_NAME: kubeagi/portal
   DOCKER_USER: kubeagi
 
@@ -63,23 +64,30 @@ jobs:
         run: |
           echo '//dev-npm.tenxcloud.net/:_authToken="${{ secrets.NPMTOKEN }}"' > /tmp/npmrc
       - name: Build and push base image
-        id: base-push
+        id: base-buid-push
         if: steps.changes.outputs.package == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
           file: base.dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: |
             ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:main
           push: true
-          build-args: |
-            BUILD_ID=${{ env.SEMREV_LABEL }}
-            BUILD_DATE=${{ env.BUILD_DATE }}
           secret-files: |
             "npmrc=/tmp/npmrc"
+      - name: Build dist
+        id: dist-build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: build.dockerfile
+          platforms: linux/amd64
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.DIST_IMAGE_NAME }}:main
+          push: true
       - name: Build and push image
-        id: push
+        id: build-push
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -95,5 +103,3 @@ jobs:
           build-args: |
             BUILD_ID=${{ env.SEMREV_LABEL }}
             BUILD_DATE=${{ env.BUILD_DATE }}
-          secret-files: |
-            "npmrc=/tmp/npmrc"
