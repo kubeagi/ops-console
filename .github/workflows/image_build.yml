@@ -96,7 +96,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.set-env.outputs.TAG }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ steps.set-env.outputs.DATE }}-${{ steps.short-sha.outputs.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.set-env.outputs.TAG }}-${{ steps.set-env.outputs.DATE }}-${{ steps.short-sha.outputs.sha }}
             ${{ steps.meta.outputs.tags }}
           push: true
