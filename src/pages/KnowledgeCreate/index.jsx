@@ -98,10 +98,6 @@ class KnowledgeCreate$$Page extends React.Component {
     return this._refsManager.getAll(refName);
   };
 
-  componentWillUnmount() {
-    console.log('will unmount');
-  }
-
   getFormInstence() {
     return this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
   }
@@ -136,7 +132,7 @@ class KnowledgeCreate$$Page extends React.Component {
   }
 
   handleSave(v) {
-    console.log(v, 'aaaaaaaaaaaaaaaaaaaa');
+    // console.log(v, 'aaaaaaaaaaaaaaaaaaaa')
   }
 
   getStatus() {
@@ -175,7 +171,6 @@ class KnowledgeCreate$$Page extends React.Component {
       form.submit(async values => {
         const { name, displayName, dataSetContain, description, embedder } = values;
         const { dataset, version } = dataSetContain;
-        console.log('this.state.selectFiles', this.state.selectFiles);
         if (this.state.currentStep === 0) {
           if (this.state.selectFiles.length === 0) {
             this.utils.message.info('请选择文件');
@@ -229,8 +224,8 @@ class KnowledgeCreate$$Page extends React.Component {
             },
           });
           this.utils.message.success('新增知识库成功');
-        } catch(err) {
-          console.error('新增知识库失败', err)
+        } catch (err) {
+          console.error('新增知识库失败', err);
           this.utils.message.warning('新增知识库失败');
         }
       }
@@ -257,7 +252,7 @@ class KnowledgeCreate$$Page extends React.Component {
       });
       const datasetlist = res.Dataset.listDatasets.nodes.map(item => {
         const versions = item.versions.nodes.map(i => ({
-          label: i.displayName,
+          label: i.version,
           value: i.name,
           files: i.files.nodes,
         }));
@@ -303,7 +298,6 @@ class KnowledgeCreate$$Page extends React.Component {
   }
 
   onDataSetChange(v) {
-    console.log(v, 'form.onDataSetChange');
     try {
       const form = this.getFormInstence();
       this.setState({
@@ -406,7 +400,6 @@ class KnowledgeCreate$$Page extends React.Component {
   }
 
   componentDidMount() {
-    console.log('did mount', this);
     this.getEmbedder();
     this.getDataSet();
     // this.getTableList()
@@ -1030,6 +1023,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -1043,12 +1037,10 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[
         {
-          func: 'undefined',
           params: undefined,
           enableLocationSearch: undefined,
         },
