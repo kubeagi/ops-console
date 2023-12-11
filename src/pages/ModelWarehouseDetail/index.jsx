@@ -117,23 +117,23 @@ class ModelWarehouseDetail$$Page extends React.Component {
     return {
       list: [
         {
+          id: 'delete_files',
           type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              params: {},
-              method: 'DELETE',
+              uri: `${this.getUrlPrex()}/model/files/delete_files`,
               isCors: true,
-              timeout: 5000,
+              method: 'DELETE',
+              params: {},
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
               },
-              uri: `${this.getUrlPrex()}/model/files/delete_files`,
+              timeout: 5000,
             };
           }.bind(_this),
-          id: 'delete_files',
         },
       ],
     };
@@ -192,6 +192,11 @@ class ModelWarehouseDetail$$Page extends React.Component {
           data: {},
         });
       });
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   onPageChange(page) {
@@ -288,97 +293,15 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this.utils.notification.success({
       message: '上传成功',
     });
-    this.setState({
-      submitLoading: false,
-      uploadModalVisible: false,
-    });
-    this.getData();
-  }
-
-  openDeleteFilesModal(e, { record }) {
-    this.setState({
-      deleteFilesVisible: true,
-      currentFile: record?.path,
-      deleteType: 'single',
-    });
-  }
-
-  onDeleteBatch() {
-    if (!this.state.selectedFileList.length) {
-      this.utils.notification.warn({
-        message: '请选择要删除的文件！',
-      });
-      return;
-    }
-    this.setState({
-      deleteFilesVisible: true,
-      deleteType: 'batch',
-    });
-  }
-
-  onRowSelectedChange(keys) {
-    console.log(keys);
-    this.setState({
-      selectedFileList: keys,
-    });
-  }
-
-  onSubmitDel() {
-    console.log(files);
-    const files = [];
-    if (this.state.deleteType === 'batch') {
-      this.onDelete(this.state.selectedFileList);
-    }
-    if (this.state.deleteType === 'single') {
-      this.onDelete([this.state.currentFile]);
-    }
-  }
-
-  onDelete(selectedDeleteFileList) {
-    this.setState({
-      deleteLoading: true,
-    });
-    const pageThis = this;
-    return new Promise((resolve, reject) => {
-      pageThis
-        .getDataSourceMap()
-        .delete_files.load({
-          files: selectedDeleteFileList,
-          bucket: pageThis.getBucket(),
-          bucket_path: pageThis.getBucketPath(),
-        })
-        .then(function (response) {
-          console.log(response);
-          if (response === 'success') {
-            pageThis.utils.notification.success({
-              message: '删除文件成功！',
-            });
-            pageThis.closeDeleteFilesModal();
-            pageThis.getData();
-          } else {
-            pageThis.utils.notification.warn({
-              message: response,
-            });
-          }
-          pageThis.setState({
-            deleteLoading: false,
-          });
-          resolve(response);
-        })
-        .catch(function (error) {
-          pageThis.setState({
-            deleteLoading: false,
-          });
-          reject(error);
-        });
-    });
-  }
-
-  closeDeleteFilesModal() {
-    this.setState({
-      deleteFilesVisible: false,
-      currentFile: '',
-    });
+    this.setState(
+      {
+        submitLoading: false,
+        uploadModalVisible: false,
+      },
+      () => {
+        this.getData();
+      }
+    );
   }
 
   openDeleteFilesModal(e, { record }) {
@@ -679,11 +602,11 @@ class ModelWarehouseDetail$$Page extends React.Component {
                         label: '描述',
                         children: (
                           <Typography.Text
-                            __component_name="Typography.Text"
-                            ellipsis={false}
                             style={{ fontSize: '' }}
-                            disabled={false}
                             strong={false}
+                            disabled={false}
+                            ellipsis={false}
+                            __component_name="Typography.Text"
                           >
                             {__$$eval(() => this.state.data?.description)}
                           </Typography.Text>
@@ -786,12 +709,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
                               }.bind(this)}
                               disabled={false}
                               __component_name="Button"
-                              onClick={function () {
-                                return this.onDeleteBatch.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
-                              }.bind(this)}
                             >
                               删除
                             </Button>
@@ -859,16 +776,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                     }.bind(__$$context)}
                                     disabled={false}
                                     __component_name="Button"
-                                    onClick={function () {
-                                      return this.openDeleteFilesModal.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([
-                                          {
-                                            record: record,
-                                          },
-                                        ])
-                                      );
-                                    }.bind(__$$context)}
                                   >
                                     删除
                                   </Button>
@@ -898,10 +805,16 @@ class ModelWarehouseDetail$$Page extends React.Component {
                             total={__$$eval(() => this.state.data?.files?.totalCount || 0)}
                             simple={false}
                             current={__$$eval(() => this.state.fileSearchParams.currentPage)}
-                            pageSize={10}
-                            __component_name="Pagination"
                             onChange={function () {
                               return this.onPageChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            pageSize={10}
+                            __component_name="Pagination"
+                            showTotal={function () {
+                              return this.showTotal.apply(
                                 this,
                                 Array.prototype.slice.call(arguments).concat([])
                               );
@@ -922,50 +835,20 @@ class ModelWarehouseDetail$$Page extends React.Component {
             destroyInactiveTabPane="true"
           >
             <Modal
-              __component_name="Modal"
-              title="弹框标题"
+              mask={true}
               open={true}
-              destroyOnClose={true}
+              title="弹框标题"
               centered={false}
               keyboard={true}
-              mask={true}
-              maskClosable={false}
               forceRender={false}
+              maskClosable={false}
               confirmLoading={false}
+              destroyOnClose={true}
+              __component_name="Modal"
             />
           </Tabs>
         </Card>
         <Modal
-          __component_name="Modal"
-          title="弹框标题"
-          open={__$$eval(() => this.state.deleteFilesVisible)}
-          destroyOnClose={true}
-          centered={false}
-          keyboard={true}
-          mask={true}
-          maskClosable={false}
-          forceRender={false}
-          confirmLoading={__$$eval(() => this.state.deleteLoading)}
-          onCancel={function () {
-            return this.closeDeleteFilesModal.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
-          }.bind(this)}
-          onOk={function () {
-            return this.onSubmitDel.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([
-                {
-                  files: 123,
-                },
-              ])
-            );
-          }.bind(this)}
-        >
-          <Alert message="确认删除文件？" __component_name="Alert" type="warning" showIcon={true} />
-        </Modal>
-        <Modal
           mask={true}
           onOk={function () {
             return this.onSubmitDel.apply(
@@ -978,7 +861,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(() => this.state.deleteFilesVisible)}
-          title="弹框标题"
+          title="删除文件"
           centered={false}
           keyboard={true}
           onCancel={function () {
