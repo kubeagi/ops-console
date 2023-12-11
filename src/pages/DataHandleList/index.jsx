@@ -64,15 +64,15 @@ class DataHandleList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      delModalvisible: false,
-      logModalVisible: false,
-      currentRecord: null,
-      currentPage: 1,
+      keyword: '',
       pageSize: 10,
       totalCount: 0,
-      keyword: '',
-      dataHandleList: [],
+      currentPage: 1,
       listLoading: false,
+      currentRecord: null,
+      dataHandleList: [],
+      delModalvisible: false,
+      logModalVisible: false,
     };
   }
 
@@ -82,6 +82,23 @@ class DataHandleList$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
+  }
+
+  onRefresh(event) {
+    // 点击按钮时的回调
+    this.setState(
+      {
+        currentPage: 1,
+      },
+      () => {
+        this.getDataList();
+      }
+    );
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   async getDataList() {
@@ -121,6 +138,11 @@ class DataHandleList$$Page extends React.Component {
     }
   }
 
+  onLinkCreate() {
+    // 点击按钮时的回调
+    this.history.push('/data-handle/create');
+  }
+
   onOpenDelModal(e, { record }) {
     this.setState({
       delModalvisible: true,
@@ -128,10 +150,18 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onCancelDelModal(e) {
+  onOpenLogModal(e, record) {
     this.setState({
-      delModalvisible: false,
-      currentRecord: null,
+      logModalVisible: true,
+      currentRecord: record,
+    });
+  }
+
+  onhandleChange(event) {
+    // 输入框内容变化时的回调
+    console.log('onChange', event);
+    this.setState({
+      keyword: event.target.value,
     });
   }
 
@@ -154,13 +184,6 @@ class DataHandleList$$Page extends React.Component {
     } catch (error) {}
   }
 
-  onOpenLogModal(e, record) {
-    this.setState({
-      logModalVisible: true,
-      currentRecord: record,
-    });
-  }
-
   onCloseLogModal(isNeedReload) {
     this.setState({
       logModalVisible: false,
@@ -168,9 +191,11 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onLinkCreate() {
-    // 点击按钮时的回调
-    this.history.push('/data-handle/create');
+  onCancelDelModal(e) {
+    this.setState({
+      delModalvisible: false,
+      currentRecord: null,
+    });
   }
 
   onCurrentPageChange(page, pageSize) {
@@ -195,31 +220,6 @@ class DataHandleList$$Page extends React.Component {
         this.getDataList();
       }
     );
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
-  }
-
-  onRefresh(event) {
-    // 点击按钮时的回调
-    this.setState(
-      {
-        currentPage: 1,
-      },
-      () => {
-        this.getDataList();
-      }
-    );
-  }
-
-  onhandleChange(event) {
-    // 输入框内容变化时的回调
-    console.log('onChange', event);
-    this.setState({
-      keyword: event.target.value,
-    });
   }
 
   componentDidMount() {
@@ -250,7 +250,12 @@ class DataHandleList$$Page extends React.Component {
             </Typography.Title>
           </Col>
           <Col span={24} __component_name="Col">
-            <Alert type="info" message="数据处理描述" showIcon={true} __component_name="Alert" />
+            <Alert
+              type="info"
+              message="一站式数据处理方案，支持文本数据的拆分、数据异常清洗、数据过滤、数据去重以及数据去除隐私等处理配置，可大幅提升数据质量。"
+              showIcon={true}
+              __component_name="Alert"
+            />
           </Col>
           <Col span={24} style={{}} __component_name="Col">
             <Row wrap={true} __component_name="Row">
@@ -689,6 +694,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -702,7 +708,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}

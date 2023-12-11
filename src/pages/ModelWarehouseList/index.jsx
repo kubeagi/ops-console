@@ -71,20 +71,20 @@ class ModelWarehouse$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      modelList: [],
+      keyword: '',
+      types: '',
+      loading: false,
+      deleteLoading: false,
       pages: {
         currentPage: 1,
         pageSize: 10,
         total: 0,
       },
-      types: '',
-      keyword: '',
-      loading: false,
-      modelList: [],
       pageRange: [],
-      currentRecord: null,
-      deleteLoading: false,
-      deleteBtnLoading: false,
       deleteModalVisible: false,
+      currentRecord: null,
+      deleteBtnLoading: false,
     };
   }
 
@@ -96,8 +96,36 @@ class ModelWarehouse$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  onEdit(item) {
-    this.history.push(`/model-warehouse/edit/${item.name}`);
+  onSearch(name) {
+    this.setState(
+      {
+        keyword: name,
+        types: this.state.types,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  onTypesChange(type) {
+    this.setState(
+      {
+        keyword: this.state.keyword,
+        types: type === 'all' ? '' : type,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
   }
 
   getData() {
@@ -140,6 +168,30 @@ class ModelWarehouse$$Page extends React.Component {
       });
   }
 
+  handlePageSizeChange(size) {
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  onShowSizeChange(current, size) {
+    // pageSize 变化的回调
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
   onChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -154,6 +206,34 @@ class ModelWarehouse$$Page extends React.Component {
         this.getData();
       }
     );
+  }
+
+  onMenuClick(opItem, record) {
+    const { key, domEvent } = opItem;
+    domEvent.stopPropagation();
+    if (key === 'delete') {
+      this.openDeleteModal(record.item);
+    } else if (key === 'edit') {
+      this.onEdit(record.item);
+    }
+  }
+
+  openDeleteModal(item) {
+    this.setState({
+      deleteModalVisible: true,
+      currentRecord: item,
+    });
+  }
+
+  onCloseDeleteModal(e, isNeedLoad) {
+    console.log('isNeedLoad', isNeedLoad);
+    this.setState({
+      deleteModalVisible: false,
+      currentRecord: null,
+    });
+    if (isNeedLoad) {
+      this.getData();
+    }
   }
 
   onDelete() {
@@ -190,38 +270,8 @@ class ModelWarehouse$$Page extends React.Component {
       });
   }
 
-  onSearch(name) {
-    this.setState(
-      {
-        keyword: name,
-        types: this.state.types,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
-  }
-
-  onMenuClick(opItem, record) {
-    const { key } = opItem;
-    if (key === 'delete') {
-      this.openDeleteModal(record.item);
-    } else if (key === 'edit') {
-      this.onEdit(record.item);
-    }
-  }
-
-  onCreateClick(event) {
-    this.history.push(`/model-warehouse/create`);
+  onEdit(item) {
+    this.history.push(`/model-warehouse/edit/${item.name}`);
   }
 
   onDetailClick(e, extParams) {
@@ -230,57 +280,8 @@ class ModelWarehouse$$Page extends React.Component {
     this.history.push(`/model-warehouse/detail/${extParams.data.name}`);
   }
 
-  onTypesChange(type) {
-    this.setState(
-      {
-        keyword: this.state.keyword,
-        types: type === 'all' ? '' : type,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
-  }
-
-  openDeleteModal(item) {
-    this.setState({
-      deleteModalVisible: true,
-      currentRecord: item,
-    });
-  }
-
-  onShowSizeChange(current, size) {
-    // pageSize 变化的回调
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
-  onCloseDeleteModal(e, isNeedLoad) {
-    console.log('isNeedLoad', isNeedLoad);
-    this.setState({
-      deleteModalVisible: false,
-      currentRecord: null,
-    });
-    if (isNeedLoad) {
-      this.getData();
-    }
-  }
-
-  handlePageSizeChange(size) {
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
+  onCreateClick(event) {
+    this.history.push(`/model-warehouse/create`);
   }
 
   componentDidMount() {
@@ -305,12 +306,12 @@ class ModelWarehouse$$Page extends React.Component {
               模型仓库
             </Typography.Title>
           </Col>
-          <Col span={24} __component_name="Col" style={{}}>
+          <Col span={24} style={{}} __component_name="Col">
             <Alert
-              message="模型托管模块，集中管理通过平台训练或手动导入的大模型，支持对模型进行评估及部署。"
-              __component_name="Alert"
               type="info"
+              message="模型托管模块，集中管理通过平台训练或手动导入的大模型，支持对模型进行评估及部署。"
               showIcon={true}
+              __component_name="Alert"
             />
           </Col>
           <Col span={24} __component_name="Col">
@@ -436,6 +437,16 @@ class ModelWarehouse$$Page extends React.Component {
                             type="default"
                             actions={[]}
                             loading={false}
+                            onClick={function () {
+                              return this.onDetailClick.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([
+                                  {
+                                    data: item,
+                                  },
+                                ])
+                              );
+                            }.bind(__$$context)}
                             bordered={true}
                             hoverable={true}
                           >
@@ -445,16 +456,6 @@ class ModelWarehouse$$Page extends React.Component {
                                   <Col flex="56px" __component_name="Col">
                                     <AntdIconCodeSandboxCircleFilled
                                       style={{ color: '#4a90e2', fontSize: 56 }}
-                                      onClick={function () {
-                                        return this.onDetailClick.apply(
-                                          this,
-                                          Array.prototype.slice.call(arguments).concat([
-                                            {
-                                              data: item,
-                                            },
-                                          ])
-                                        );
-                                      }.bind(__$$context)}
                                       __component_name="AntdIconCodeSandboxCircleFilled"
                                     />
                                   </Col>
@@ -469,16 +470,6 @@ class ModelWarehouse$$Page extends React.Component {
                                         <Typography.Title
                                           bold={true}
                                           level={1}
-                                          onClick={function () {
-                                            return this.onDetailClick.apply(
-                                              this,
-                                              Array.prototype.slice.call(arguments).concat([
-                                                {
-                                                  data: item,
-                                                },
-                                              ])
-                                            );
-                                          }.bind(__$$context)}
                                           bordered={false}
                                           ellipsis={true}
                                           __component_name="Typography.Title"
@@ -525,8 +516,10 @@ class ModelWarehouse$$Page extends React.Component {
                                           trigger={['hover']}
                                           disabled={false}
                                           placement="bottomLeft"
+                                          overlayStyle={{}}
                                           __component_name="Dropdown"
                                           destroyPopupOnHide={true}
+                                          style={{}}
                                         >
                                           <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
                                         </Dropdown>
@@ -665,6 +658,12 @@ class ModelWarehouse$$Page extends React.Component {
                       );
                     }.bind(this)}
                     pageSize={__$$eval(() => this.state.pages.pageSize)}
+                    showTotal={function () {
+                      return this.showTotal.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
                     __component_name="Pagination"
                   />
                 </Col>
@@ -715,6 +714,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -728,7 +728,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
