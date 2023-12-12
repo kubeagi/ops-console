@@ -106,7 +106,7 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/get_chunks`,
+              uri: `${this.getUrlPrex()}/files/chunks`,
               isCors: true,
               method: 'GET',
               params: {},
@@ -125,9 +125,9 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/new_multipart`,
+              uri: `${this.getUrlPrex()}/files/chunks`,
               isCors: true,
-              method: 'GET',
+              method: 'POST',
               params: {},
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
@@ -144,33 +144,14 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/get_multipart_url`,
-              isCors: true,
-              method: 'GET',
-              params: {},
-              headers: {
-                Authorization: this.props.Authorization || this.state.Authorization,
-              },
-              timeout: 5000,
-            };
-          }.bind(_this),
-        },
-        {
-          id: 'update_chunk',
-          type: 'axios',
-          isInit: function () {
-            return false;
-          }.bind(_this),
-          options: function () {
-            return {
-              uri: `${this.getUrlPrex()}/update_chunk`,
+              uri: `${this.getUrlPrex()}/files/chunk_url`,
               isCors: true,
               method: 'POST',
               params: {},
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
               },
-              timeout: 5000000,
+              timeout: 5000,
             };
           }.bind(_this),
         },
@@ -182,9 +163,9 @@ class KubeAgiUpload$$Component extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/complete_multipart`,
+              uri: `${this.getUrlPrex()}/files/chunks`,
               isCors: true,
-              method: 'POST',
+              method: 'PUT',
               params: {},
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
@@ -239,7 +220,9 @@ class KubeAgiUpload$$Component extends React.Component {
   }
 
   getUrlPrex() {
-    return `${window.location.origin}/kubeagi-apis/minio`;
+    return `${window.location.origin}/kubeagi-apis/bff/${
+      this.props?.isSupportFolder ? 'model' : 'versioneddataset'
+    }`;
   }
 
   getBucketPath() {
@@ -253,18 +236,6 @@ class KubeAgiUpload$$Component extends React.Component {
   }
 
   handleDelete(file) {
-    // const pageThis = this
-    // return new Promise((resolve, reject) => {
-    //   pageThis.getDataSourceMap().delete_files.load({
-    //     files: [file.name],
-    //     bucket: pageThis.getBucket(),
-    //     bucket_path: pageThis.getBucketPath(),
-    //   }).then(function (response) {
-    //     resolve(response);
-    //   }).catch(function (error) {
-    //     reject(error);
-    //   });
-    // })
     this.setState({
       fileList: this.state.fileList?.filter(item => item.uid !== file.uid),
     });
@@ -321,6 +292,8 @@ class KubeAgiUpload$$Component extends React.Component {
     let spark = new (this.utils.SparkMD5 || this.props.SparkMD5).ArrayBuffer();
     let fileReader = new FileReader();
     let time = new Date().getTime();
+    let blockMD5s = []; // 用于存储每个数据块的MD5
+
     console.log('计算MD5...');
     this.setState({
       status: {
@@ -333,6 +306,12 @@ class KubeAgiUpload$$Component extends React.Component {
     fileReader.onload = e => {
       spark.append(e.target.result); // Append array buffer
       currentChunk++;
+      let chunkSpark = new (this.utils.SparkMD5 || this.props.SparkMD5).ArrayBuffer();
+      chunkSpark.append(e.target.result); // 追加数据块的 MD5
+      let chunkMD5 = chunkSpark.end(); // 获取数据块的 MD5
+      blockMD5s.push(chunkMD5); // 将数据块的 MD5 存入数组
+      chunkSpark.destroy(); //释放缓存
+
       if (currentChunk < chunks) {
         console.log(`第${currentChunk}分片解析完成, 开始第${currentChunk + 1}/${chunks}分片解析`);
         loadNext();
@@ -346,6 +325,9 @@ class KubeAgiUpload$$Component extends React.Component {
         spark.destroy(); //释放缓存
         file.uniqueIdentifier = md5; //将文件md5赋值给文件唯一标识
         file.cmd5 = false; //取消计算md5状态
+
+        let fileMD5 = calculateTotalMD5(blockMD5s); // 计算所有块MD5的总MD5
+        file.etag = fileMD5; // 将总MD5作为etag属性
         // 2. computeMD5Success
         this.computeMD5Success(file);
       }
@@ -359,6 +341,16 @@ class KubeAgiUpload$$Component extends React.Component {
       let end = start + chunkSize >= file.size ? file.size : start + chunkSize;
       fileReader.readAsArrayBuffer(blobSlice.call(file.file || file, start, end));
     }
+    const pageThis = this;
+    function calculateTotalMD5(md5Array) {
+      let totalSpark = new (pageThis.utils.SparkMD5 || pageThis.props.SparkMD5).ArrayBuffer();
+      for (let i = 0; i < md5Array.length; i++) {
+        totalSpark.append(md5Array[i]);
+      }
+      let totalMD5 = totalSpark.end();
+      totalSpark.destroy();
+      return totalMD5;
+    }
   }
 
   getSuccessChunks(file) {
@@ -368,12 +360,14 @@ class KubeAgiUpload$$Component extends React.Component {
         .getDataSourceMap()
         .get_chunks.load({
           md5: file.uniqueIdentifier,
+          etag: file.etag,
           bucket: pageThis.getBucket(),
-          bucket_path: pageThis.getBucketPath(),
+          bucketPath: pageThis.getBucketPath(),
+          fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
         })
         .then(function (response) {
-          file.uploadID = response?.uploadID;
-          file.uuid = response?.uuid;
+          file.done = response?.done;
+          file.uploadID = response?.uploadID || '';
           file.uploaded = response?.uploaded;
           file.chunks = response?.chunks;
           resolve(response);
@@ -394,16 +388,15 @@ class KubeAgiUpload$$Component extends React.Component {
       pageThis
         .getDataSourceMap()
         .new_multipart.load({
-          totalChunkCounts: file.totalChunkCounts,
+          chunkCount: file.totalChunkCounts,
           md5: file.uniqueIdentifier,
           size: file.size,
           fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
           bucket: pageThis.getBucket(),
-          bucket_path: pageThis.getBucketPath(),
+          bucketPath: pageThis.getBucketPath(),
         })
         .then(function (response) {
           file.uploadID = response?.uploadID;
-          file.uuid = response?.uuid;
           resolve(response);
         })
         .catch(function (error) {
@@ -442,12 +435,11 @@ class KubeAgiUpload$$Component extends React.Component {
           .getDataSourceMap()
           .get_multipart_url.load({
             md5: file.uniqueIdentifier,
-            uuid: file.uuid,
             uploadID: file.uploadID,
             size: partSize,
-            chunkNumber: currentChunk + 1,
+            partNumber: currentChunk + 1,
             bucket: pageThis.getBucket(),
-            bucket_path: pageThis.getBucketPath(),
+            bucketPath: pageThis.getBucketPath(),
           })
           .then(function (response) {
             urls[currentChunk] = response?.url;
@@ -497,54 +489,27 @@ class KubeAgiUpload$$Component extends React.Component {
           });
       });
     }
-    function updateChunk(currentChunk) {
-      return new Promise((resolve, reject) => {
-        // axios.post(file.urlPrex + '/update_chunk', qs.stringify({
-        //   uuid: file.uuid,
-        //   chunkNumber: currentChunk + 1,
-        //   etag: etags[currentChunk]
-        // }))
-        pageThis
-          .getDataSourceMap()
-          .update_chunk.load({
-            uuid: file.uuid,
-            chunkNumber: currentChunk + 1,
-            etag: etags[currentChunk],
-            bucket: pageThis.getBucket(),
-            bucket_path: pageThis.getBucketPath(),
-            md5: file.uniqueIdentifier,
-          })
-          .then(function (response) {
-            resolve(response);
-          })
-          .catch(function (error) {
-            pageThis.utils.notification.warnings({
-              message: pageThis.i18n('i18n-boehucun'),
-              errors: [error],
-            });
-            reject(error);
-          });
-      });
-    }
     async function uploadChunk(e) {
-      if (!checkSuccessChunks()) {
-        let start = currentChunk * chunkSize;
-        let partSize = start + chunkSize >= file.size ? file.size - start : chunkSize;
+      let start = currentChunk * chunkSize;
+      let partSize = start + chunkSize >= file.size ? file.size - start : chunkSize;
 
-        //获取分片上传url
-        await getUploadChunkUrl(currentChunk, partSize);
-        if (urls[currentChunk] != '') {
-          //上传到minio
-          await uploadMinio(urls[currentChunk], e);
-          if (etags[currentChunk] != '') {
-            //更新数据库：分片上传结果
-            //await updateChunk(currentChunk);
-          } else {
-            return;
-          }
+      //获取分片上传url
+      const res = await getUploadChunkUrl(currentChunk, partSize);
+      console.log('这一部分是否上传过：', res);
+      if (res.completed) {
+        return; // 上传过
+      }
+
+      if (urls[currentChunk] != '') {
+        //上传到minio
+        await uploadMinio(urls[currentChunk], e);
+        if (etags[currentChunk] != '') {
+          //更新数据库：分片上传结果
         } else {
           return;
         }
+      } else {
+        return;
       }
     }
     function completeUpload() {
@@ -558,12 +523,10 @@ class KubeAgiUpload$$Component extends React.Component {
         pageThis
           .getDataSourceMap()
           .complete_multipart.load({
-            uuid: file.uuid,
             uploadID: file.uploadID,
-            file_name: file.name,
-            size: file.size,
+            fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
             bucket: pageThis.getBucket(),
-            bucket_path: pageThis.getBucketPath(),
+            bucketPath: pageThis.getBucketPath(),
             md5: file.uniqueIdentifier,
           })
           .then(function (response) {
@@ -579,12 +542,14 @@ class KubeAgiUpload$$Component extends React.Component {
           });
       });
     }
-    var successChunks = new Array();
-    var successParts = new Array();
-    successParts = file.chunks.split(',');
-    for (let i = 0; i < successParts.length; i++) {
-      successChunks[i] = successParts[i].split('-')[0];
-    }
+
+    // var successChunks = new Array();
+    // var successParts = new Array();
+    // successParts = file.chunks.split(",");
+    // for (let i = 0; i < successParts.length; i++) {
+    //   successChunks[i] = successParts[i].split("-")[0];
+    // }
+
     var urls = new Array();
     var etags = new Array();
     console.log('上传分片...');
@@ -635,10 +600,10 @@ class KubeAgiUpload$$Component extends React.Component {
 
   async computeMD5Success(file) {
     await this.getSuccessChunks(file);
-    if (file.uploadID == '' || file.uuid == '') {
+    if (file.uploadID == '') {
       //未上传过
       await this.newMultiUpload(file);
-      if (file.uploadID != '' && file.uuid != '') {
+      if (file.uploadID != '') {
         file.chunks = '';
         this.multipartUpload(file);
       } else {
@@ -652,7 +617,7 @@ class KubeAgiUpload$$Component extends React.Component {
         return;
       }
     } else {
-      if (file.uploaded == '1') {
+      if (file.done) {
         //已上传成功
         //秒传
         console.log('文件已上传完成');
