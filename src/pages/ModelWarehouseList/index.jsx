@@ -71,20 +71,20 @@ class ModelWarehouse$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      modelList: [],
-      keyword: '',
-      types: '',
-      loading: false,
-      deleteLoading: false,
       pages: {
         currentPage: 1,
         pageSize: 10,
         total: 0,
       },
+      types: '',
+      keyword: '',
+      loading: false,
+      modelList: [],
       pageRange: [],
-      deleteModalVisible: false,
       currentRecord: null,
+      deleteLoading: false,
       deleteBtnLoading: false,
+      deleteModalVisible: false,
     };
   }
 
@@ -96,36 +96,8 @@ class ModelWarehouse$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  onSearch(name) {
-    this.setState(
-      {
-        keyword: name,
-        types: this.state.types,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
-  }
-
-  onTypesChange(type) {
-    this.setState(
-      {
-        keyword: this.state.keyword,
-        types: type === 'all' ? '' : type,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
+  onEdit(item) {
+    this.history.push(`/model-warehouse/edit/${item.name}`);
   }
 
   getData() {
@@ -168,30 +140,6 @@ class ModelWarehouse$$Page extends React.Component {
       });
   }
 
-  handlePageSizeChange(size) {
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
-  }
-
-  onShowSizeChange(current, size) {
-    // pageSize 变化的回调
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
   onChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -206,34 +154,6 @@ class ModelWarehouse$$Page extends React.Component {
         this.getData();
       }
     );
-  }
-
-  onMenuClick(opItem, record) {
-    const { key, domEvent } = opItem;
-    domEvent.stopPropagation();
-    if (key === 'delete') {
-      this.openDeleteModal(record.item);
-    } else if (key === 'edit') {
-      this.onEdit(record.item);
-    }
-  }
-
-  openDeleteModal(item) {
-    this.setState({
-      deleteModalVisible: true,
-      currentRecord: item,
-    });
-  }
-
-  onCloseDeleteModal(e, isNeedLoad) {
-    console.log('isNeedLoad', isNeedLoad);
-    this.setState({
-      deleteModalVisible: false,
-      currentRecord: null,
-    });
-    if (isNeedLoad) {
-      this.getData();
-    }
   }
 
   onDelete() {
@@ -270,8 +190,45 @@ class ModelWarehouse$$Page extends React.Component {
       });
   }
 
-  onEdit(item) {
-    this.history.push(`/model-warehouse/edit/${item.name}`);
+  onSearch(name) {
+    this.setState(
+      {
+        keyword: name,
+        types: this.state.types,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  onMenuClick(opItem, record) {
+    const { key, domEvent } = opItem;
+    domEvent.stopPropagation();
+    if (key === 'delete') {
+      this.openDeleteModal(record.item);
+    } else if (key === 'edit') {
+      this.onEdit(record.item);
+    }
+  }
+
+  onDeployment(e, extParams) {
+    // 事件的 handler
+    e.stopPropagation();
+    console.log(extParams);
+  }
+
+  onCreateClick(event) {
+    this.history.push(`/model-warehouse/create`);
   }
 
   onDetailClick(e, extParams) {
@@ -280,8 +237,57 @@ class ModelWarehouse$$Page extends React.Component {
     this.history.push(`/model-warehouse/detail/${extParams.data.name}`);
   }
 
-  onCreateClick(event) {
-    this.history.push(`/model-warehouse/create`);
+  onTypesChange(type) {
+    this.setState(
+      {
+        keyword: this.state.keyword,
+        types: type === 'all' ? '' : type,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  openDeleteModal(item) {
+    this.setState({
+      deleteModalVisible: true,
+      currentRecord: item,
+    });
+  }
+
+  onShowSizeChange(current, size) {
+    // pageSize 变化的回调
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
+  onCloseDeleteModal(e, isNeedLoad) {
+    console.log('isNeedLoad', isNeedLoad);
+    this.setState({
+      deleteModalVisible: false,
+      currentRecord: null,
+    });
+    if (isNeedLoad) {
+      this.getData();
+    }
+  }
+
+  handlePageSizeChange(size) {
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
   }
 
   componentDidMount() {
@@ -498,7 +504,6 @@ class ModelWarehouse$$Page extends React.Component {
                                         <Dropdown
                                           menu={{
                                             items: [
-                                              { key: 'deployment', label: '部署' },
                                               { key: 'edit', label: '编辑' },
                                               { key: 'delete', label: '删除' },
                                             ],
@@ -513,13 +518,13 @@ class ModelWarehouse$$Page extends React.Component {
                                               );
                                             }.bind(__$$context),
                                           }}
+                                          style={{}}
                                           trigger={['hover']}
                                           disabled={false}
                                           placement="bottomLeft"
                                           overlayStyle={{}}
                                           __component_name="Dropdown"
                                           destroyPopupOnHide={true}
-                                          style={{}}
                                         >
                                           <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
                                         </Dropdown>
@@ -606,12 +611,54 @@ class ModelWarehouse$$Page extends React.Component {
                                       span: 1,
                                       label: '更新时间',
                                       children: (
-                                        <Typography.Time
-                                          time={__$$eval(() => item.updateTimestamp)}
-                                          format=""
-                                          relativeTime={false}
-                                          __component_name="Typography.Time"
-                                        />
+                                        <Row wrap={true} __component_name="Row">
+                                          <Col span={24} __component_name="Col">
+                                            <Row
+                                              wrap={false}
+                                              justify="space-between"
+                                              __component_name="Row"
+                                            >
+                                              <Col __component_name="Col">
+                                                <Typography.Time
+                                                  time={__$$eval(() => item.updateTimestamp)}
+                                                  format=""
+                                                  relativeTime={false}
+                                                  __component_name="Typography.Time"
+                                                />
+                                              </Col>
+                                              <Col __component_name="Col">
+                                                <Button
+                                                  icon=""
+                                                  size="small"
+                                                  block={false}
+                                                  ghost={false}
+                                                  shape="default"
+                                                  danger={false}
+                                                  onClick={function () {
+                                                    return this.onDeployment.apply(
+                                                      this,
+                                                      Array.prototype.slice.call(arguments).concat([
+                                                        {
+                                                          data: item,
+                                                        },
+                                                      ])
+                                                    );
+                                                  }.bind(__$$context)}
+                                                  disabled={false}
+                                                  __component_name="Button"
+                                                  href={__$$eval(
+                                                    () =>
+                                                      '/model-service/createModelService?name=' +
+                                                      item.name
+                                                  )}
+                                                  target="_self"
+                                                >
+                                                  部署
+                                                </Button>
+                                              </Col>
+                                            </Row>
+                                          </Col>
+                                        </Row>
                                       ),
                                       labelStyle: { marginTop: '0px' },
                                     },

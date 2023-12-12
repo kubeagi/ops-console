@@ -71,10 +71,8 @@ const DataHandle: React.FC<Iprops> = props => {
 
   const renderDesc = (data, type) => {
     // 顺便计算处理了多少文件
-    let count = 0;
     const _dataSource = [];
     const _data = data.map(item => {
-      count += item.preview.length;
       _dataSource.push(...item.preview);
       return (
         <Col span={6} key={item.zh_name}>
@@ -116,7 +114,7 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0' }}>
             {' '}
-            对 {count} 个文件进行了{type}，以下内容为处理效果抽样预览，并非全部内容
+            对 {props?.data?.file_num} 个文件进行了{type}，以下内容为处理效果抽样预览，并非全部内容
           </div>
           <Table
             columns={type === SPLIT_TYPE_NAME ? getSplitColumns : getColumns}

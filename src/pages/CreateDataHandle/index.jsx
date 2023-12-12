@@ -125,44 +125,64 @@ class $$Page extends React.Component {
         pornography_violence_word_rate: 'PornographicViolenceRateChecked',
       },
       configEnableMap: {},
-      step4Data: {},
+      step4Data: [],
       dataSetDataList: [],
       afterTreatmentData: [
         {
+          _type: 'qa_split',
+          type: 'QA拆分',
+          before:
+            ' 为了保证知识库问答质量，需要对文档做 QA 拆分，QA 拆分时需要选择对应的模型服务。',
+          after: `Q：为什么要做 QA 拆分？<br />A：为了保证知识库问答质量。<br />Q：QA 拆分需要注意什么？<br /> A：QA 拆分时需要选择对应的模型服务。`,
+        },
+        {
+          _type: 'remove_invisible_characters',
           type: '移除不可见字符',
           before:
             ' 这是一段不可见字符<span style="background-color:rgba(250, 205, 145, 0.4);">%EF%BF%BD%EF%BF%BD%EF%BF%BD</span>，移除之后并不影响文章内容。',
           after: '这是一段不可见字符，移除之后并不影响文章内容。',
         },
         {
+          _type: 'space_standardization',
           type: '空格处理',
           before:
             '这段文字<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>中有<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>很多<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>空格。<span style="background-color:rgba(250, 205, 145, 0.4);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>',
           after: '这段文字中有很多空格。',
         },
         {
+          _type: 'remove_garbled_text',
           type: '去除乱码',
           before:
             '%E8%BF%99%E6%AE%B5%E6%96%87%E5%AD%97%E4%B8%AD%E6%9C%89%E5%BE%88%E5%A4%9A%E4%B9%B1%E7%A0%81%EF%BC%8C%3Cspan%20style%3D%22background-color%3Argba(250%2C%20205%2C%20145%2C%200.4)%3B%22%3E%20%20%20%C3%A7%E2%80%9D%C2%B1%C3%A6%C5%93%CB%86%C3%A8%C2%A6%20%C3%A5%C2%A5%C2%BD%C3%A5%C2%A5%C2%BD%C3%A5%C2%AD%C2%A6%C3%A4%C2%B9%20%C3%A5%C2%A4%C2%A9%C3%A5%C2%A4%C2%A9%C3%A5%20%E2%80%98%C3%A4%C2%B8%C5%A0%20%3C%2Fspan%3E%E8%BF%99%E4%BA%9B%E4%B9%B1%E7%A0%81%E6%B2%A1%E6%9C%89%E4%BB%BB%E4%BD%95%E6%84%8F%E4%B9%89%E3%80%82',
           after: '这段文字中有很多乱码，这些乱码没有任何意义。',
         },
         {
+          _type: 'traditional_to_simplified',
           type: '繁转简',
           before:
             '新的<span style="background-color:rgba(250, 205, 145, 0.4);">風</span>暴已<span style="background-color:rgba(250, 205, 145, 0.4);">經</span>出<span style="background-color:rgba(250, 205, 145, 0.4);">現</span>，怎<span style="background-color:rgba(250, 205, 145, 0.4);">麽</span>能<span style="background-color:rgba(250, 205, 145, 0.4);">夠</span>停<span style="background-color:rgba(250, 205, 145, 0.4);">滯</span>不前。',
           after: '新的风暴已经出现，怎么能够停滞不前。',
         },
         {
+          _type: 'remove_html_tag',
           type: '去除网页标识符',
           before:
             '<span style="background-color:rgba(250, 205, 145, 0.4);">&ltdiv class="bolded"&gt&lt/div&gt</span>这是一段网页标识符',
           after: '这是一段网页标识符',
         },
         {
+          _type: 'remove_emojis',
           type: '去除表情',
           before:
             '<span style="background-color:rgba(250, 205, 145, 0.4);">🐰</span>兔子<span style="background-color:rgba(250, 205, 145, 0.4);">👩</span>女孩<span style="background-color:rgba(250, 205, 145, 0.4);">👩</span>女孩<span style="background-color:rgba(250, 205, 145, 0.4);">🐰🧑🏼</span>男孩',
           after: '兔子女孩女孩男孩',
+        },
+        {
+          _type: 'remove_email',
+          type: '去除邮箱',
+          before:
+            '这个文档中的 Email 信息将会被去除，如：<span style="background-color:rgba(250, 205, 145, 0.4);">example@gmail.com</span>',
+          after: '这个文档中的 IPv4 或 IPv6 地址信息将会被去除，如：',
         },
       ],
     };
@@ -425,6 +445,18 @@ class $$Page extends React.Component {
     return list;
   }
 
+  getStep4TableData() {
+    const list = this.convertStep3Data();
+    const result = [];
+    list.forEach(item => {
+      const cur = this.state.afterTreatmentData.find(ele => ele._type === item.type);
+      if (cur) {
+        result.push(cur);
+      }
+    });
+    return result;
+  }
+
   async onFinish() {
     const list = this.convertStep3Data();
     const files = this.state.selectedFileList.map(item => {
@@ -504,6 +536,12 @@ class $$Page extends React.Component {
           // this.setState({
           //   configEnableMap: enableObj
           // })
+        }
+        if (this.state.currentStep === 3) {
+          const list = this.getStep4TableData();
+          this.setState({
+            step4Data: list,
+          });
         }
       }
     );
@@ -2806,20 +2844,14 @@ class $$Page extends React.Component {
                     title: '处理后',
                     render: (text, record, index) =>
                       (__$$context => (
-                        <Typography.Text
-                          style={{ fontSize: '' }}
-                          strong={false}
-                          disabled={false}
-                          ellipsis={true}
-                          __component_name="Typography.Text"
-                        >
+                        <InnerHtmlContainer __component_name="InnerHtmlContainer">
                           {__$$eval(() => text)}
-                        </Typography.Text>
+                        </InnerHtmlContainer>
                       ))(__$$createChildContext(__$$context, { text, record, index })),
                     dataIndex: 'after',
                   },
                 ]}
-                dataSource={__$$eval(() => this.state.afterTreatmentData)}
+                dataSource={__$$eval(() => this.state.step4Data)}
                 pagination={false}
                 showHeader={true}
                 __component_name="Table"

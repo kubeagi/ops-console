@@ -124,7 +124,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/model/files/delete_files`,
+              uri: `${this.getUrlPrex()}/model/files`,
               isCors: true,
               method: 'DELETE',
               params: {},
@@ -255,7 +255,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
   }
 
   getUrlPrex() {
-    return `${window.location.origin}/kubeagi-apis/minio`;
+    return `${window.location.origin}/kubeagi-apis/bff`;
   }
 
   getBucket() {
@@ -354,7 +354,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
         .delete_files.load({
           files: selectedDeleteFileList,
           bucket: pageThis.getBucket(),
-          bucket_path: pageThis.getBucketPath(),
+          bucketPath: pageThis.getBucketPath(),
         })
         .then(function (response) {
           console.log(response);
@@ -812,13 +812,13 @@ class ModelWarehouseDetail$$Page extends React.Component {
                               );
                             }.bind(this)}
                             pageSize={10}
-                            __component_name="Pagination"
                             showTotal={function () {
                               return this.showTotal.apply(
                                 this,
                                 Array.prototype.slice.call(arguments).concat([])
                               );
                             }.bind(this)}
+                            __component_name="Pagination"
                           />
                         </Col>
                       </Row>
