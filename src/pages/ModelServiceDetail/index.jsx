@@ -163,7 +163,7 @@ class ModelServiceDetail$$Page extends React.Component {
     const { name } = this.getBaseInfo();
     switch (e.key) {
       case 'edit':
-        this.history.push(`/model-service/createModelService?type=edit&name=${name}`);
+        this.history.push(`/model-service/editModelService?name=${name}`);
         break;
       case 'delete':
         this.setState({
