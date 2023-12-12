@@ -38,7 +38,7 @@ import __$$constants from '../../__constants';
 
 import './index.css';
 
-class CreateModelService$$Page extends React.Component {
+class EditModelService$$Page extends React.Component {
   get location() {
     return this.props.self?.location;
   }
@@ -143,6 +143,41 @@ class CreateModelService$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  async getWorkersDetail() {
+    try {
+      const res = await this.props?.appHelper?.utils?.bff?.getWorker({
+        namespace: this.appHelper?.utils?.getAuthData()?.project || 'system-tce',
+        name: this.history?.query?.name,
+      });
+      const {
+        Worker: { getWorker },
+      } = res;
+      const { resources = {} } = getWorker;
+      const { marks, gpuMarks } = this.state;
+      const isMarksCpu = Object.values(marks).includes(resources.cpu);
+      const isMarksMemory = Object.values(marks).includes(resources.memory?.split('Gi')[0]);
+      this.form().setValues({
+        name: getWorker.name,
+        displayName: getWorker.displayName,
+        model: getWorker.model,
+        description: getWorker.description,
+        modelTypes: getWorker.modelTypes,
+        resources: {
+          cpu: isMarksCpu ? marks[Object.values(marks).findIndex(v => v === resources.cpu)] : 0,
+          memory: isMarksMemory
+            ? marks[Object.values(marks).findIndex(v => v === resources.memory?.split('Gi')[0])]
+            : 0,
+          nvidiaGPU: gpuMarks[resources.nvidiaGPU] || 1,
+          customCPU: !isMarksCpu ? resources.cpu : undefined,
+          customMemory: !isMarksMemory ? resources.memory?.split('Gi')[0] : undefined,
+          customGPU: !gpuMarks[resources.nvidiaGPU] ? resources.nvidiaGPU : undefined,
+        },
+      });
+    } catch (error) {
+      // console.log(error, '===> error')
+    }
+  }
+
   async getListModels() {
     try {
       const res = await this.props.appHelper.utils.bff?.listModels({
@@ -157,19 +192,9 @@ class CreateModelService$$Page extends React.Component {
       this.form()?.setFieldState('model', {
         dataSource: _listModels,
       });
-      this.setState(
-        {
-          listModels: res.Model.listModels.nodes,
-        },
-        () => {
-          if (this.history?.query?.name) {
-            this.form()?.setValues({
-              model: this.history?.query?.name,
-            });
-            this.onChangeModel(this.history?.query?.name);
-          }
-        }
-      );
+      this.setState({
+        listModels: res.Model.listModels.nodes,
+      });
     } catch (error) {
       // console.log(error, '===> err')
     }
@@ -197,17 +222,18 @@ class CreateModelService$$Page extends React.Component {
       };
       delete params.modelSource;
       delete params.modelTypes;
+      delete params.model;
       try {
-        const res = await this.props.appHelper.utils.bff?.createWorker({
+        const res = await this.props.appHelper.utils.bff?.updateWorker({
           input: params,
         });
         this.utils.notification.success({
-          message: '新增模型服务成功',
+          message: '编辑模型服务成功',
         });
         this.handleCancle();
       } catch (error) {
         this.utils.notification.warnings({
-          message: '新增模型服务失败',
+          message: '编辑模型服务失败',
           errors: error?.response?.errors,
         });
         this.setState({
@@ -231,6 +257,7 @@ class CreateModelService$$Page extends React.Component {
   componentDidMount() {
     this._dataSourceEngine.reloadDataSource();
 
+    this.getWorkersDetail();
     this.getListModels();
   }
 
@@ -245,7 +272,7 @@ class CreateModelService$$Page extends React.Component {
               <Button.Back
                 name={this.i18n('i18n-wourf2xg') /* 返回 */}
                 type="primary"
-                title="新增本地模型服务"
+                title="编辑本地模型服务"
                 __component_name="Button.Back"
               />
             </Space>
@@ -302,7 +329,7 @@ class CreateModelService$$Page extends React.Component {
                     name: 'name',
                     title: this.i18n('i18n-cqapbnun') /* 模型服务名称 */,
                     required: true,
-                    'x-pattern': '',
+                    'x-pattern': 'disabled',
                     'x-validator': [
                       {
                         id: 'disabled',
@@ -401,6 +428,7 @@ class CreateModelService$$Page extends React.Component {
                     name: 'model',
                     title: '模型',
                     required: true,
+                    'x-pattern': 'disabled',
                     'x-validator': [],
                     _unsafe_MixedSetter_enum_select: 'ArraySetter',
                   }}
@@ -810,7 +838,7 @@ class CreateModelService$$Page extends React.Component {
 const PageWrapper = (props = {}) => {
   const location = useLocation();
   const history = getUnifiedHistory();
-  const match = matchPath({ path: '/model-service/createModelService' }, location.pathname);
+  const match = matchPath({ path: '/model-service/editModelService' }, location.pathname);
   history.match = match;
   history.query = qs.parse(location.search);
   const appHelper = {
@@ -833,7 +861,7 @@ const PageWrapper = (props = {}) => {
       }}
       sdkSwrFuncs={[]}
       render={dataProps => (
-        <CreateModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+        <EditModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
       )}
     />
   );

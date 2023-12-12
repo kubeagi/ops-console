@@ -8,7 +8,6 @@ import {
   Col,
   Typography,
   Card,
-  Tabs,
   Space,
   Button,
   Input,
@@ -71,13 +70,13 @@ class ModelService$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      page: 1,
-      keyword: '',
-      pageSize: 12,
       dataSource: [],
       delVisible: false,
-      modelTypes: '',
       currentModel: {},
+      modelTypes: '',
+      keyword: '',
+      page: 1,
+      pageSize: 12,
     };
   }
 
@@ -86,47 +85,6 @@ class ModelService$$Page extends React.Component {
   $$ = () => [];
 
   componentWillUnmount() {}
-
-  async onDelOk() {
-    try {
-      const namespace = this.utils.getAuthData().project || 'system-tce';
-      const input = {
-        namespace,
-        name: this.state.currentModel.name,
-      };
-      const res = await this.props.appHelper.utils.bff?.deleteWorkers({
-        input,
-      });
-      this.utils.notification.success({
-        message: '删除成功',
-      });
-      this.getListWorkers();
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: '删除失败',
-        errors: error?.response?.errors,
-      });
-    }
-    this.setState({
-      delVisible: false,
-      currentModel: {},
-    });
-  }
-
-  onSearch(value, event) {
-    this.getListWorkers();
-  }
-
-  onRefresh(event) {
-    this.getListWorkers();
-  }
-
-  onDelCancel() {
-    this.setState({
-      delVisible: false,
-      currentModel: {},
-    });
-  }
 
   async getListWorkers() {
     try {
@@ -154,20 +112,14 @@ class ModelService$$Page extends React.Component {
     }
   }
 
-  onChangeKeyword(event) {
-    this.setState({
-      keyword: event.target.value,
-    });
-  }
-
-  onClickToDetail(e, { id }) {
-    this.history.push(`/model-service/detail/${id}?type=local`);
+  onClickCreatModel(event) {
+    this.history.push('/model-service/createModelService');
   }
 
   localMenuOnClick(e, item) {
     switch (e.key) {
       case 'edit':
-        this.history.push(`/model-service/createModelService?type=edit&name=${item.name}`);
+        this.history.push(`/model-service/editModelService?name=${item.name}`);
         break;
       case 'delete':
         this.setState({
@@ -178,8 +130,55 @@ class ModelService$$Page extends React.Component {
     }
   }
 
-  onClickCreatModel(event) {
-    this.history.push('/model-service/createModelService');
+  onClickCreatOutsideModel(event) {
+    this.history.push('/model-service/createOutsideModelService');
+  }
+
+  onClickToDetail(e, { id }) {
+    this.history.push(`/model-service/detail/${id}?type=local`);
+  }
+
+  onDelCancel() {
+    this.setState({
+      delVisible: false,
+      currentModel: {},
+    });
+  }
+
+  async onDelOk() {
+    try {
+      const namespace = this.utils.getAuthData().project || 'system-tce';
+      const input = {
+        namespace,
+        name: this.state.currentModel.name,
+      };
+      const res = await this.props.appHelper.utils.bff?.deleteWorkers({
+        input,
+      });
+      this.utils.notification.success({
+        message: '删除成功',
+      });
+      this.getListWorkers();
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: '删除失败',
+        errors: error?.response?.errors,
+      });
+    }
+    this.setState({
+      delVisible: false,
+      currentModel: {},
+    });
+  }
+
+  onChangeKeyword(event) {
+    this.setState({
+      keyword: event.target.value,
+    });
+  }
+
+  onSearch(value, event) {
+    this.getListWorkers();
   }
 
   onChangeModelTypes(e) {
@@ -191,20 +190,8 @@ class ModelService$$Page extends React.Component {
     );
   }
 
-  onClickOutToDetail(e, { id }) {
-    this.history.push(`/model-service/detail/${id}?type=external`);
-  }
-
-  externalMenuOnClick(e) {
-    switch (e.key) {
-      case 'edit':
-        this.history.push('/model-service/createOutsideModelService?type=edit');
-        break;
-    }
-  }
-
-  onClickCreatOutsideModel(event) {
-    this.history.push('/model-service/createOutsideModelService');
+  onRefresh(event) {
+    this.getListWorkers();
   }
 
   componentDidMount() {
@@ -238,401 +225,347 @@ class ModelService$$Page extends React.Component {
               hoverable={false}
               __component_name="Card"
             >
-              <Tabs
-                size="default"
-                type="line"
-                items={[
-                  {
-                    key: 'local-model',
-                    label: this.i18n('i18n-5bh3fx4n') /* 本地模型服务 */,
-                    children: (
-                      <Row wrap={true} __component_name="Row">
-                        <Col span={24} __component_name="Col">
-                          <Row wrap={false} justify="space-between" __component_name="Row">
-                            <Col span={8} __component_name="Col">
-                              <Space align="center" direction="horizontal" __component_name="Space">
-                                <Button
-                                  icon={
-                                    <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
-                                  }
-                                  type="primary"
-                                  block={false}
-                                  ghost={false}
-                                  shape="default"
-                                  danger={false}
-                                  onClick={function () {
-                                    return this.onClickCreatModel.apply(
-                                      this,
-                                      Array.prototype.slice.call(arguments).concat([])
-                                    );
-                                  }.bind(this)}
-                                  disabled={false}
-                                  __component_name="Button"
-                                >
-                                  {this.i18n('i18n-d43b7hfv') /* 新增模型服务 */}
-                                </Button>
-                                <Button
-                                  icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
-                                  block={false}
-                                  ghost={false}
-                                  shape="default"
-                                  danger={false}
-                                  onClick={function () {
-                                    return this.onRefresh.apply(
-                                      this,
-                                      Array.prototype.slice.call(arguments).concat([])
-                                    );
-                                  }.bind(this)}
-                                  disabled={false}
-                                  __component_name="Button"
-                                >
-                                  {this.i18n('i18n-jch93moe') /* 刷新 */}
-                                </Button>
-                                <Input.Search
-                                  value={__$$eval(() => this.state.keyword)}
-                                  onChange={function () {
-                                    return this.onChangeKeyword.apply(
-                                      this,
-                                      Array.prototype.slice.call(arguments).concat([])
-                                    );
-                                  }.bind(this)}
-                                  onSearch={function () {
-                                    return this.onSearch.apply(
-                                      this,
-                                      Array.prototype.slice.call(arguments).concat([])
-                                    );
-                                  }.bind(this)}
-                                  placeholder={
-                                    this.i18n('i18n-f591ezbf') /* 请输入模型服务名称搜索 */
-                                  }
-                                  __component_name="Input.Search"
-                                />
-                              </Space>
-                            </Col>
-                            <Col __component_name="Col">
-                              <Row wrap={false} justify="space-between" __component_name="Row">
-                                <Col __component_name="Col">
-                                  <Select
-                                    style={{ width: 200 }}
-                                    value={__$$eval(() => this.state.modelTypes)}
-                                    options={[
-                                      { label: '全部类型', value: '' },
-                                      { label: 'LLM', value: 'llm' },
-                                      { label: 'Embedding', value: 'embedding' },
-                                    ]}
-                                    disabled={false}
-                                    onChange={function () {
-                                      return this.onChangeModelTypes.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([])
-                                      );
-                                    }.bind(this)}
-                                    allowClear={true}
-                                    showSearch={true}
-                                    placeholder="请选择"
-                                    _sdkSwrGetFunc={{ func: __$$eval(() => this.state.modelTypes) }}
-                                    __component_name="Select"
-                                  />
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Col>
-                        <Col span={24} __component_name="Col">
-                          <List
-                            grid={{
-                              lg: 4,
-                              md: 4,
-                              sm: 4,
-                              xl: 4,
-                              xs: 4,
-                              xxl: 4,
-                              column: 4,
-                              gutter: 20,
-                            }}
-                            size="small"
-                            split={false}
-                            rowKey="id"
-                            bordered={false}
-                            dataSource={__$$eval(() => this.state.dataSource)}
-                            gridEnable={true}
-                            itemLayout="horizontal"
-                            pagination={{
-                              size: 'default',
-                              simple: false,
-                              position: 'bottom',
-                              pagination: { pageSize: 5 },
-                              showQuickJumper: false,
-                              showSizeChanger: false,
-                            }}
-                            renderItem={item =>
-                              (__$$context => (
-                                <List.Item>
-                                  <Card
-                                    size="default"
-                                    type="default"
-                                    style={{ border: '1px solid #E2E2E2' }}
-                                    actions={[]}
-                                    loading={false}
-                                    bordered={false}
-                                    hoverable={false}
-                                    __component_name="Card"
-                                  >
-                                    <Row wrap={true} gutter={[0, 0]} __component_name="Row">
-                                      <Col span={24} __component_name="Col">
-                                        <Row wrap={true} __component_name="Row">
-                                          <Col
-                                            span={24}
-                                            style={{
-                                              float: 'right',
-                                              right: '0px',
-                                              height: '0',
-                                              zIndex: '1',
-                                              display: 'flex',
-                                              position: 'relative',
-                                              justifyContent: 'flex-end',
-                                            }}
-                                            __component_name="Col"
-                                          >
-                                            <Dropdown
-                                              menu={{
-                                                items: [
-                                                  {
-                                                    key: 'edit',
-                                                    label: this.i18n('i18n-str3pnrc') /* 编辑 */,
-                                                  },
-                                                  {
-                                                    key: 'delete',
-                                                    label: this.i18n('i18n-z0idrepg') /* 删除 */,
-                                                  },
-                                                ],
-                                                onClick: function () {
-                                                  return this.localMenuOnClick.apply(
-                                                    this,
-                                                    Array.prototype.slice.call(arguments).concat([
-                                                      {
-                                                        ...item,
-                                                      },
-                                                    ])
-                                                  );
-                                                }.bind(__$$context),
-                                              }}
-                                              style={{ display: 'flex' }}
-                                              trigger={['hover']}
-                                              disabled={false}
-                                              placement="bottomLeft"
-                                              __component_name="Dropdown"
-                                              destroyPopupOnHide={true}
-                                            >
-                                              <Button
-                                                icon={
-                                                  <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
-                                                }
-                                                type="link"
-                                                block={false}
-                                                ghost={false}
-                                                shape="default"
-                                                style={{
-                                                  display: 'flex',
-                                                  justifyContent: 'flex-end',
-                                                }}
-                                                danger={false}
-                                                disabled={false}
-                                                __component_name="Button"
-                                              />
-                                            </Dropdown>
-                                          </Col>
-                                        </Row>
-                                        <Row
-                                          wrap={false}
-                                          style={{
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                          }}
-                                          onClick={function () {
-                                            return this.onClickToDetail.apply(
-                                              this,
-                                              Array.prototype.slice.call(arguments).concat([
-                                                {
-                                                  id: item?.id,
-                                                },
-                                              ])
-                                            );
-                                          }.bind(__$$context)}
-                                          __component_name="Row"
-                                        >
-                                          <Col
-                                            flex="40px"
-                                            style={{ display: 'flex', justifyContent: 'center' }}
-                                            __component_name="Col"
-                                          >
-                                            <TenxIconModelIcon
-                                              size={40}
-                                              __component_name="TenxIconModelIcon"
-                                            />
-                                          </Col>
-                                          <Col flex="auto" __component_name="Col">
-                                            <Row
-                                              wrap={true}
-                                              style={{ paddingLeft: '10px' }}
-                                              gutter={[0, 0]}
-                                              __component_name="Row"
-                                            >
-                                              <Col
-                                                span={24}
-                                                style={{ marginBottom: '10px' }}
-                                                __component_name="Col"
-                                              >
-                                                <Typography.Title
-                                                  bold={true}
-                                                  level={1}
-                                                  bordered={false}
-                                                  ellipsis={true}
-                                                  __component_name="Typography.Title"
-                                                >
-                                                  {__$$eval(() => item?.displayName || '-')}
-                                                </Typography.Title>
-                                              </Col>
-                                              <Col span={24} __component_name="Col">
-                                                <Typography.Paragraph
-                                                  code={false}
-                                                  mark={false}
-                                                  style={{ fontSize: '' }}
-                                                  delete={false}
-                                                  strong={false}
-                                                  disabled={false}
-                                                  editable={false}
-                                                  ellipsis={{ rows: 2 }}
-                                                  underline={false}
-                                                >
-                                                  {__$$eval(() => item.description || '-')}
-                                                </Typography.Paragraph>
-                                              </Col>
-                                            </Row>
-                                          </Col>
-                                        </Row>
-                                      </Col>
-                                      <Col span={24} __component_name="Col">
-                                        <Divider
-                                          mode="line"
-                                          style={{
-                                            width: 'calc(100% + 48px)',
-                                            marginLeft: '-24px',
-                                          }}
-                                          dashed={false}
-                                          defaultOpen={false}
-                                          __component_name="Divider"
-                                        />
-                                        <Row
-                                          wrap={false}
-                                          justify="space-between"
-                                          __component_name="Row"
-                                        >
-                                          <Col flex="3" __component_name="Col">
-                                            <Descriptions
-                                              id=""
-                                              size="default"
-                                              colon={false}
-                                              items={[
-                                                {
-                                                  key: 'rtilj4ro9ua',
-                                                  span: 1,
-                                                  label: this.i18n('i18n-p7mextst') /* 状态 */,
-                                                  children: (
-                                                    <Status
-                                                      id={__$$eval(() => item.status)}
-                                                      types={[
-                                                        {
-                                                          id: 'Running',
-                                                          type: 'success',
-                                                          children: '已发布',
-                                                        },
-                                                        {
-                                                          id: 'Pending',
-                                                          type: 'info',
-                                                          children: '发布中',
-                                                        },
-                                                        {
-                                                          id: 'Error',
-                                                          type: 'error',
-                                                          children: '异常',
-                                                        },
-                                                        {
-                                                          id: 'Unknown',
-                                                          type: 'disabled',
-                                                          children: '未知',
-                                                        },
-                                                      ]}
-                                                      __component_name="Status"
-                                                    />
-                                                  ),
-                                                },
-                                                {
-                                                  key: '2yzo8dyskna',
-                                                  span: 1,
-                                                  label: this.i18n('i18n-uag94ndq') /* 更新时间 */,
-                                                  children: (
-                                                    <Typography.Time
-                                                      time={__$$eval(() => item.updateTimestamp)}
-                                                      format=""
-                                                      relativeTime={false}
-                                                      __component_name="Typography.Time"
-                                                    />
-                                                  ),
-                                                },
-                                              ]}
-                                              title=""
-                                              column={1}
-                                              layout="horizontal"
-                                              bordered={false}
-                                              labelStyle={{ width: '90px' }}
-                                              contentStyle={{}}
-                                              borderedBottom={false}
-                                              __component_name="Descriptions"
-                                              borderedBottomDashed={false}
-                                            />
-                                          </Col>
-                                          <Col __component_name="Col">
-                                            {__$$evalArray(() => item.modelTypes.split(',')).map(
-                                              (item, index) =>
-                                                (__$$context => (
-                                                  <Tag
-                                                    color="processing"
-                                                    closable={false}
-                                                    __component_name="Tag"
-                                                  >
-                                                    {__$$eval(() => item)}
-                                                  </Tag>
-                                                ))(
-                                                  __$$createChildContext(__$$context, {
-                                                    item,
-                                                    index,
-                                                  })
-                                                )
-                                            )}
-                                          </Col>
-                                        </Row>
-                                      </Col>
-                                    </Row>
-                                  </Card>
-                                </List.Item>
-                              ))(__$$createChildContext(__$$context, { item }))
-                            }
-                            __component_name="List"
+              <Row wrap={true} __component_name="Row">
+                <Col span={24} __component_name="Col">
+                  <Row wrap={false} justify="space-between" __component_name="Row">
+                    <Col span={8} __component_name="Col">
+                      <Space align="center" direction="horizontal" __component_name="Space">
+                        <Button
+                          icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
+                          type="primary"
+                          block={false}
+                          ghost={false}
+                          shape="default"
+                          danger={false}
+                          onClick={function () {
+                            return this.onClickCreatModel.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          disabled={false}
+                          __component_name="Button"
+                        >
+                          {this.i18n('i18n-d43b7hfv') /* 新增模型服务 */}
+                        </Button>
+                        <Button
+                          icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
+                          block={false}
+                          ghost={false}
+                          shape="default"
+                          danger={false}
+                          onClick={function () {
+                            return this.onRefresh.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          disabled={false}
+                          __component_name="Button"
+                        >
+                          {this.i18n('i18n-jch93moe') /* 刷新 */}
+                        </Button>
+                        <Input.Search
+                          value={__$$eval(() => this.state.keyword)}
+                          onChange={function () {
+                            return this.onChangeKeyword.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          onSearch={function () {
+                            return this.onSearch.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          placeholder={this.i18n('i18n-f591ezbf') /* 请输入模型服务名称搜索 */}
+                          __component_name="Input.Search"
+                        />
+                      </Space>
+                    </Col>
+                    <Col __component_name="Col">
+                      <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Col __component_name="Col">
+                          <Select
+                            style={{ width: 200 }}
+                            value={__$$eval(() => this.state.modelTypes)}
+                            options={[
+                              { label: '全部类型', value: '' },
+                              { label: 'LLM', value: 'llm' },
+                              { label: 'Embedding', value: 'embedding' },
+                            ]}
+                            disabled={false}
+                            onChange={function () {
+                              return this.onChangeModelTypes.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            allowClear={true}
+                            showSearch={true}
+                            placeholder="请选择"
+                            _sdkSwrGetFunc={{ func: __$$eval(() => this.state.modelTypes) }}
+                            __component_name="Select"
                           />
                         </Col>
                       </Row>
-                    ),
-                  },
-                ]}
-                style={{}}
-                activeKey=""
-                tabPosition="top"
-                __component_name="Tabs"
-                defaultActiveKey="local-model"
-                destroyInactiveTabPane="true"
-              />
+                    </Col>
+                  </Row>
+                </Col>
+                <Col span={24} __component_name="Col">
+                  <List
+                    grid={{ lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4, column: 4, gutter: 20 }}
+                    size="small"
+                    split={false}
+                    rowKey="id"
+                    bordered={false}
+                    dataSource={__$$eval(() => this.state.dataSource)}
+                    gridEnable={true}
+                    itemLayout="horizontal"
+                    pagination={{
+                      size: 'default',
+                      simple: false,
+                      position: 'bottom',
+                      pagination: { pageSize: 5 },
+                      showQuickJumper: false,
+                      showSizeChanger: false,
+                    }}
+                    renderItem={item =>
+                      (__$$context => (
+                        <List.Item>
+                          <Card
+                            size="default"
+                            type="default"
+                            style={{ border: '1px solid #E2E2E2' }}
+                            actions={[]}
+                            loading={false}
+                            bordered={false}
+                            hoverable={false}
+                            __component_name="Card"
+                          >
+                            <Row wrap={true} gutter={[0, 0]} __component_name="Row">
+                              <Col span={24} __component_name="Col">
+                                <Row wrap={true} __component_name="Row">
+                                  <Col
+                                    span={24}
+                                    style={{
+                                      float: 'right',
+                                      right: '0px',
+                                      height: '0',
+                                      zIndex: '1',
+                                      display: 'flex',
+                                      position: 'relative',
+                                      justifyContent: 'flex-end',
+                                    }}
+                                    __component_name="Col"
+                                  >
+                                    <Dropdown
+                                      menu={{
+                                        items: [
+                                          {
+                                            key: 'edit',
+                                            label: this.i18n('i18n-str3pnrc') /* 编辑 */,
+                                          },
+                                          {
+                                            key: 'delete',
+                                            label: this.i18n('i18n-z0idrepg') /* 删除 */,
+                                          },
+                                        ],
+                                        onClick: function () {
+                                          return this.localMenuOnClick.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                ...item,
+                                              },
+                                            ])
+                                          );
+                                        }.bind(__$$context),
+                                      }}
+                                      style={{ display: 'flex' }}
+                                      trigger={['hover']}
+                                      disabled={false}
+                                      placement="bottomLeft"
+                                      __component_name="Dropdown"
+                                      destroyPopupOnHide={true}
+                                    >
+                                      <Button
+                                        icon={
+                                          <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
+                                        }
+                                        type="link"
+                                        block={false}
+                                        ghost={false}
+                                        shape="default"
+                                        style={{ display: 'flex', justifyContent: 'flex-end' }}
+                                        danger={false}
+                                        disabled={false}
+                                        __component_name="Button"
+                                      />
+                                    </Dropdown>
+                                  </Col>
+                                </Row>
+                                <Row
+                                  wrap={false}
+                                  style={{
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                  }}
+                                  onClick={function () {
+                                    return this.onClickToDetail.apply(
+                                      this,
+                                      Array.prototype.slice.call(arguments).concat([
+                                        {
+                                          id: item?.name,
+                                        },
+                                      ])
+                                    );
+                                  }.bind(__$$context)}
+                                  __component_name="Row"
+                                >
+                                  <Col
+                                    flex="40px"
+                                    style={{ display: 'flex', justifyContent: 'center' }}
+                                    __component_name="Col"
+                                  >
+                                    <TenxIconModelIcon
+                                      size={40}
+                                      __component_name="TenxIconModelIcon"
+                                    />
+                                  </Col>
+                                  <Col flex="auto" __component_name="Col">
+                                    <Row
+                                      wrap={true}
+                                      style={{ paddingLeft: '10px' }}
+                                      gutter={[0, 0]}
+                                      __component_name="Row"
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{ marginBottom: '10px' }}
+                                        __component_name="Col"
+                                      >
+                                        <Typography.Title
+                                          bold={true}
+                                          level={1}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          __component_name="Typography.Title"
+                                        >
+                                          {__$$eval(() => item?.displayName || '-')}
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24} __component_name="Col">
+                                        <Typography.Paragraph
+                                          code={false}
+                                          mark={false}
+                                          style={{ fontSize: '' }}
+                                          delete={false}
+                                          strong={false}
+                                          disabled={false}
+                                          editable={false}
+                                          ellipsis={{ rows: 2 }}
+                                          underline={false}
+                                        >
+                                          {__$$eval(() => item.description || '-')}
+                                        </Typography.Paragraph>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                </Row>
+                              </Col>
+                              <Col span={24} __component_name="Col">
+                                <Divider
+                                  mode="line"
+                                  style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
+                                  dashed={false}
+                                  defaultOpen={false}
+                                  __component_name="Divider"
+                                />
+                                <Row wrap={false} justify="space-between" __component_name="Row">
+                                  <Col flex="3" __component_name="Col">
+                                    <Descriptions
+                                      id=""
+                                      size="default"
+                                      colon={false}
+                                      items={[
+                                        {
+                                          key: 'rtilj4ro9ua',
+                                          span: 1,
+                                          label: this.i18n('i18n-p7mextst') /* 状态 */,
+                                          children: (
+                                            <Status
+                                              id={__$$eval(() => item.status)}
+                                              types={[
+                                                {
+                                                  id: 'Running',
+                                                  type: 'success',
+                                                  children: '已发布',
+                                                },
+                                                { id: 'Pending', type: 'info', children: '发布中' },
+                                                { id: 'Error', type: 'error', children: '异常' },
+                                                {
+                                                  id: 'Unknown',
+                                                  type: 'disabled',
+                                                  children: '未知',
+                                                },
+                                              ]}
+                                              __component_name="Status"
+                                            />
+                                          ),
+                                        },
+                                        {
+                                          key: '2yzo8dyskna',
+                                          span: 1,
+                                          label: this.i18n('i18n-uag94ndq') /* 更新时间 */,
+                                          children: (
+                                            <Typography.Time
+                                              time={__$$eval(() => item.updateTimestamp)}
+                                              format=""
+                                              relativeTime={false}
+                                              __component_name="Typography.Time"
+                                            />
+                                          ),
+                                        },
+                                      ]}
+                                      title=""
+                                      column={1}
+                                      layout="horizontal"
+                                      bordered={false}
+                                      labelStyle={{ width: '90px' }}
+                                      contentStyle={{}}
+                                      borderedBottom={false}
+                                      __component_name="Descriptions"
+                                      borderedBottomDashed={false}
+                                    />
+                                  </Col>
+                                  <Col __component_name="Col">
+                                    {__$$evalArray(() => item.modelTypes.split(',')).map(
+                                      (item, index) =>
+                                        (__$$context => (
+                                          <Tag
+                                            color="processing"
+                                            closable={false}
+                                            __component_name="Tag"
+                                          >
+                                            {__$$eval(() => item)}
+                                          </Tag>
+                                        ))(__$$createChildContext(__$$context, { item, index }))
+                                    )}
+                                  </Col>
+                                </Row>
+                              </Col>
+                            </Row>
+                          </Card>
+                        </List.Item>
+                      ))(__$$createChildContext(__$$context, { item }))
+                    }
+                    __component_name="List"
+                  />
+                </Col>
+              </Row>
             </Card>
           </Col>
         </Row>
