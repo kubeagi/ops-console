@@ -146,7 +146,7 @@ class ModelServiceDetail$$Page extends React.Component {
   getBaseInfo() {
     const name = this.match.params?.name;
     const type = this.history.query?.type;
-    const namespace = this.appHelper.utils.getAuthData().project || 'system-tce';
+    const namespace = this.appHelper.utils.getAuthData().project || 'abc';
     return {
       name,
       type,
@@ -189,6 +189,26 @@ class ModelServiceDetail$$Page extends React.Component {
 
   handleDelModalOkClick() {
     this.deleteModelServiceItemReq();
+  }
+
+  handleCpuData() {
+    const unit = '核';
+    let cpu = this.state.detail.resources?.cpu;
+    if (!cpu) {
+      cpu = '-';
+    }
+    if (typeof cpu === 'string') {
+      cpu = cpu.toLowerCase().includes('m') ? parseInt(cpu) / 1000 : cpu;
+    }
+    return `${cpu} ${unit}`;
+  }
+
+  handleMemoryData() {
+    const memory = this.state.detail.resources?.memory;
+    const reg = /m/i;
+    const val = isNaN(parseInt(memory)) ? '-' : parseInt(memory);
+    const unit = reg.test(memory) ? 'MiB' : 'GIB';
+    return memory ? `${val} ${unit}` : '- GiB';
   }
 
   testFunc() {
@@ -875,7 +895,7 @@ class ModelServiceDetail$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => `${this.state.detail.resources?.cpu || '-'} 颗`)}
+                                {__$$eval(() => this.handleCpuData())}
                               </Typography.Text>
                             </Col>
                           </Row>
@@ -904,9 +924,7 @@ class ModelServiceDetail$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(
-                                  () => `${this.state.detail.resources?.memory || '-'} GiB`
-                                )}
+                                {__$$eval(() => this.handleMemoryData())}
                               </Typography.Text>
                             </Col>
                           </Row>
