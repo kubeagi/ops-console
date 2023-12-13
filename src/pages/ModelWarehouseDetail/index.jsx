@@ -163,7 +163,8 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this.setState({
       loading: true,
     });
-    const project = this.utils.getAuthData()?.project;
+    console.log(this.history);
+    const project = this.history?.query.namespace || this.utils.getAuthData()?.project;
     const name = this.match.params.name;
     const params = {
       namespace: project,
@@ -485,8 +486,8 @@ class ModelWarehouseDetail$$Page extends React.Component {
                         <Status
                           id={__$$eval(() => this.state.data.status)}
                           types={[
-                            { id: 'False', type: 'error', children: '失败' },
-                            { id: 'True', type: 'success', children: '成功' },
+                            { id: 'False', type: 'error', children: '异常' },
+                            { id: 'True', type: 'success', children: '正常' },
                           ]}
                           __component_name="Status"
                         />
@@ -652,28 +653,30 @@ class ModelWarehouseDetail$$Page extends React.Component {
                       <Row wrap={false} justify="space-between" __component_name="Row">
                         <Col __component_name="Col">
                           <Space size={12} align="center" direction="horizontal">
-                            <Button
-                              href=""
-                              icon={
-                                <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
-                              }
-                              type="primary"
-                              block={false}
-                              ghost={false}
-                              shape="default"
-                              danger={false}
-                              target="_self"
-                              onClick={function () {
-                                return this.openUploadModal.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
-                              }.bind(this)}
-                              disabled={false}
-                              __component_name="Button"
-                            >
-                              上传模型文件
-                            </Button>
+                            {!!__$$eval(() => !this.state.data?.systemModel) && (
+                              <Button
+                                href=""
+                                icon={
+                                  <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
+                                }
+                                type="primary"
+                                block={false}
+                                ghost={false}
+                                shape="default"
+                                danger={false}
+                                target="_self"
+                                onClick={function () {
+                                  return this.openUploadModal.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                disabled={false}
+                                __component_name="Button"
+                              >
+                                上传模型文件
+                              </Button>
+                            )}
                             <Button
                               icon={
                                 <AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />
@@ -693,25 +696,27 @@ class ModelWarehouseDetail$$Page extends React.Component {
                             >
                               刷新
                             </Button>
-                            <Button
-                              icon={
-                                <AntdIconDeleteOutlined __component_name="AntdIconDeleteOutlined" />
-                              }
-                              block={false}
-                              ghost={false}
-                              shape="default"
-                              danger={false}
-                              onClick={function () {
-                                return this.onDeleteBatch.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
-                              }.bind(this)}
-                              disabled={false}
-                              __component_name="Button"
-                            >
-                              删除
-                            </Button>
+                            {!!__$$eval(() => !this.state.data?.systemModel) && (
+                              <Button
+                                icon={
+                                  <AntdIconDeleteOutlined __component_name="AntdIconDeleteOutlined" />
+                                }
+                                block={false}
+                                ghost={false}
+                                shape="default"
+                                danger={false}
+                                onClick={function () {
+                                  return this.onDeleteBatch.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                disabled={false}
+                                __component_name="Button"
+                              >
+                                删除
+                              </Button>
+                            )}
                             <Input.Search
                               style={{ width: '240px' }}
                               onSearch={function () {
@@ -753,17 +758,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                     ghost={false}
                                     shape="default"
                                     danger={false}
-                                    disabled={true}
-                                    __component_name="Button"
-                                  >
-                                    下载
-                                  </Button>
-                                  <Button
-                                    size="small"
-                                    block={false}
-                                    ghost={false}
-                                    shape="default"
-                                    danger={false}
                                     onClick={function () {
                                       return this.openDeleteFilesModal.apply(
                                         this,
@@ -774,7 +768,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                         ])
                                       );
                                     }.bind(__$$context)}
-                                    disabled={false}
+                                    disabled={__$$eval(() => __$$context.state.data?.systemModel)}
                                     __component_name="Button"
                                   >
                                     删除
