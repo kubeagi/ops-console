@@ -222,9 +222,6 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
       SelectCard:
         specifier: workspace:*
         version: link:../SelectCard
@@ -385,15 +382,12 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
       TEST:
         specifier: workspace:*
         version: link:../TEST
       antd:
         specifier: latest
-        version: 5.12.2(moment@2.29.4)(react-dom@17.0.2)(react@18.2.0)
+        version: 5.12.2(react-dom@17.0.2)(react@18.2.0)
       babel-runtime:
         specifier: ^6.26.0
         version: 6.26.0
@@ -428,9 +422,6 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
       babel-runtime:
         specifier: ^6.26.0
         version: 6.26.0
@@ -465,9 +456,6 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.28(classnames@2.3.2)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.17.0)(react@18.2.0)
       babel-runtime:
         specifier: ^6.26.0
         version: 6.26.0
@@ -3650,7 +3638,7 @@ packages:
       '@formily/shared': 2.2.30
       '@types/react': 18.2.30
       '@types/react-dom': 18.2.14
-      antd: 5.12.2(moment@2.29.4)(react-dom@17.0.2)(react@18.2.0)
+      antd: 5.12.2(react-dom@17.0.2)(react@18.2.0)
       classnames: 2.3.2
       react: 18.2.0
       react-dom: 17.0.2(react@18.2.0)
@@ -6510,7 +6498,7 @@ packages:
       scroll-into-view-if-needed: 2.2.31
     dev: false
 
-  /antd@5.12.2(moment@2.29.4)(react-dom@17.0.2)(react@18.2.0):
+  /antd@5.12.2(react-dom@17.0.2)(react@18.2.0):
     resolution: {integrity: sha512-lJ4pdBRboN2Tl5hXTqgxUjGIercB2YIK7Z8fVDushgrJ55RhywJjvcQVnBmuxcSPuWEF2Yu8SNBVAnaV4EqzWA==}
     peerDependencies:
       react: '>=16.9.0'
@@ -6545,7 +6533,7 @@ packages:
       rc-motion: 2.9.0(react-dom@17.0.2)(react@18.2.0)
       rc-notification: 5.3.0(react-dom@17.0.2)(react@18.2.0)
       rc-pagination: 4.0.3(react-dom@17.0.2)(react@18.2.0)
-      rc-picker: 3.14.6(dayjs@1.11.10)(moment@2.29.4)(react-dom@17.0.2)(react@18.2.0)
+      rc-picker: 3.14.6(dayjs@1.11.10)(react-dom@17.0.2)(react@18.2.0)
       rc-progress: 3.5.1(react-dom@17.0.2)(react@18.2.0)
       rc-rate: 2.12.0(react-dom@17.0.2)(react@18.2.0)
       rc-resize-observer: 1.4.0(react-dom@17.0.2)(react@18.2.0)
@@ -14043,7 +14031,7 @@ packages:
       shallowequal: 1.1.0
     dev: false
 
-  /rc-picker@3.14.6(dayjs@1.11.10)(moment@2.29.4)(react-dom@17.0.2)(react@18.2.0):
+  /rc-picker@3.14.6(dayjs@1.11.10)(react-dom@17.0.2)(react@18.2.0):
     resolution: {integrity: sha512-AdKKW0AqMwZsKvIpwUWDUnpuGKZVrbxVTZTNjcO+pViGkjC1EBcjMgxVe8tomOEaIHJL5Gd13vS8Rr3zzxWmag==}
     engines: {node: '>=8.x'}
     peerDependencies:
@@ -14067,7 +14055,6 @@ packages:
       '@rc-component/trigger': 1.18.2(react-dom@17.0.2)(react@18.2.0)
       classnames: 2.3.2
       dayjs: 1.11.10
-      moment: 2.29.4
       rc-util: 5.38.1(react-dom@17.0.2)(react@18.2.0)
       react: 18.2.0
       react-dom: 17.0.2(react@18.2.0)

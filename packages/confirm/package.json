@@ -23,7 +23,6 @@
     "@formily/react": "^2.1.4",
     "@tenx-ui/icon": "^2.4.17",
     "@tenx-ui/form-helper": "^0.0.2",
-    "@tenx-ui/utils": "^2.3.1",
     "babel-runtime": "^6.26.0",
     "react-sortable-hoc": "^2.0.0",
     "shared-components": "workspace:*",
