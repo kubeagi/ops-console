@@ -207,8 +207,21 @@ class ModelServiceDetail$$Page extends React.Component {
     const memory = this.state.detail.resources?.memory;
     const reg = /m/i;
     const val = isNaN(parseInt(memory)) ? '-' : parseInt(memory);
-    const unit = reg.test(memory) ? 'MiB' : 'GIB';
+    const unit = reg.test(memory) ? 'MiB' : 'GiB';
     return memory ? `${val} ${unit}` : '- GiB';
+  }
+
+  handleModelData() {
+    const model = this.state.detail.model;
+    if (typeof model === 'string') {
+      return model || '-';
+    }
+    if (typeof model === 'object') {
+      const { name, namespace } = model;
+      const result = name ? (namespace ? `${name}（${namespace}）` : name) : '-';
+      return result;
+    }
+    return '-';
   }
 
   testFunc() {
@@ -817,11 +830,7 @@ class ModelServiceDetail$$Page extends React.Component {
                         ellipsis={true}
                         __component_name="Typography.Text"
                       >
-                        {__$$eval(() =>
-                          this.getFullDescribe({
-                            key: 'model',
-                          })
-                        )}
+                        {__$$eval(() => this.handleModelData())}
                       </Typography.Text>
                     ),
                   },
