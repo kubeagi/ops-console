@@ -147,13 +147,16 @@ class CreateModelService$$Page extends React.Component {
     try {
       const res = await this.props.appHelper.utils.bff?.listModels({
         input: {
+          systemModel: true,
           namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
         },
       });
-      const _listModels = res.Model.listModels.nodes.map(v => ({
-        label: v.name,
-        value: v.name,
-      }));
+      const _listModels = res.Model.listModels.nodes
+        .filter(v => v.status === 'True')
+        .map(v => ({
+          label: `${v.name}${v.systemModel ? `（${v.namespace}）` : ''}`,
+          value: v.name,
+        }));
       this.form()?.setFieldState('model', {
         dataSource: _listModels,
       });
@@ -184,10 +187,15 @@ class CreateModelService$$Page extends React.Component {
       this.setState({
         createLoading: true,
       });
-      const { marks, gpuMarks } = this.state;
+      const { marks, gpuMarks, listModels } = this.state;
       const { resources = {} } = v;
       const params = {
         ...v,
+        model: {
+          name: v.model,
+          namespace: listModels.find(item => item.name === v.model)?.namespace,
+          kind: 'Model',
+        },
         namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
         resources: {
           cpu: resources.customCPU || marks[resources.cpu],

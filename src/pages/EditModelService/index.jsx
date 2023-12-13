@@ -159,7 +159,7 @@ class EditModelService$$Page extends React.Component {
       this.form().setValues({
         name: getWorker.name,
         displayName: getWorker.displayName,
-        model: getWorker.model,
+        model: getWorker.model.name,
         description: getWorker.description,
         modelTypes: getWorker.modelTypes,
         resources: {
@@ -168,8 +168,11 @@ class EditModelService$$Page extends React.Component {
             ? marks[Object.values(marks).findIndex(v => v === resources.memory?.split('Gi')[0])]
             : 0,
           nvidiaGPU: gpuMarks[resources.nvidiaGPU] || 1,
-          customCPU: !isMarksCpu ? resources.cpu : undefined,
-          customMemory: !isMarksMemory ? resources.memory?.split('Gi')[0] : undefined,
+          customCPU: !isMarksCpu && resources.cpu !== '500m' ? resources.cpu : undefined,
+          customMemory:
+            !isMarksMemory && resources.memory !== '512Mi'
+              ? resources.memory?.split('Gi')[0]
+              : undefined,
           customGPU: !gpuMarks[resources.nvidiaGPU] ? resources.nvidiaGPU : undefined,
         },
       });
@@ -182,13 +185,16 @@ class EditModelService$$Page extends React.Component {
     try {
       const res = await this.props.appHelper.utils.bff?.listModels({
         input: {
+          systemModel: true,
           namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
         },
       });
-      const _listModels = res.Model.listModels.nodes.map(v => ({
-        label: v.name,
-        value: v.name,
-      }));
+      const _listModels = res.Model.listModels.nodes
+        .filter(v => v.status === 'True')
+        .map(v => ({
+          label: `${v.name}${v.systemModel ? `（${v.namespace}）` : ''}`,
+          value: v.name,
+        }));
       this.form()?.setFieldState('model', {
         dataSource: _listModels,
       });
@@ -209,7 +215,7 @@ class EditModelService$$Page extends React.Component {
       this.setState({
         createLoading: true,
       });
-      const { marks, gpuMarks } = this.state;
+      const { marks, gpuMarks, listModels } = this.state;
       const { resources = {} } = v;
       const params = {
         ...v,
