@@ -7,16 +7,24 @@ import {
   Modal,
   FormilyForm,
   FormilyInput,
+  FormilyFormItem,
+  Typography,
+  FormilyTextArea,
+  FormilySwitch,
+  FormilySelect,
   Row,
   Col,
   Space,
   Button,
   Card,
   Image,
-  Typography,
   Tabs,
   Descriptions,
 } from '@tenx-ui/materials';
+
+import LccComponentSbva0 from 'confirm';
+
+import { AntdIconPlusOutlined, AntdIconReloadOutlined } from '@tenx-ui/icon-materials';
 
 import LccComponentNy419 from 'dataset-version-list';
 
@@ -62,7 +70,7 @@ class DatasetDetail$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { editVisible: false };
+    this.state = { editVisible: false, confirm: {}, addVersion: false };
   }
 
   $ = refName => {
@@ -78,6 +86,7 @@ class DatasetDetail$$Page extends React.Component {
   }
 
   data() {
+    console.log('uuuu',this.props.useGetDataset.data?.Dataset?.getDataset)
     return {
       ...this.props.useGetDataset,
       data: this.props.useGetDataset.data?.Dataset?.getDataset || {},
@@ -86,6 +95,57 @@ class DatasetDetail$$Page extends React.Component {
 
   form(name) {
     return this.$(name || 'edit-dataset')?.formRef?.current?.form;
+  }
+
+  getVersionsNumMax(versions) {
+    return Math.max(...versions.map(v => parseInt(v?.version?.match(/\d+/)?.[0] || '0')), 0);
+  }
+
+  onAddVersionOK() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.form('formily_create')
+      .validate()
+      .then(this.addVersionFetch.bind(this))
+      .catch(e => {
+        console.error('onAddVersion error:', e);
+      });
+  }
+
+  onAddVersionCancel() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.setState({
+      addVersion: {
+        visible: false,
+      },
+    });
+  }
+
+  async addVersionFetch() {
+    const _version = 'v' + (this.getVersionsNumMax(this.data().data?.versions?.nodes || []) + 1);
+    const payload = {
+      input: {
+        name: this.data().data?.name + '-' + _version,
+        namespace: this.data().data?.namespace,
+        datasetName: this.data().data?.name,
+        displayName: '',
+        description: this.form('formily_create').values.description,
+        inheritedFrom: this.form('formily_create').values.inheritedFrom,
+        version: _version,
+        released: 0,
+      },
+    };
+    const res = await this.utils.bff.createVersionedDataset(payload).catch(e => {
+      this.utils.notification.warn({
+        message: '新增数据集版本失败',
+      });
+    });
+    if (res?.VersionedDataset?.createVersionedDataset?.name) {
+      this.utils.notification.success({
+        message: '新增数据集版本成功',
+      });
+      this.onAddVersionCancel();
+      this.fetchData();
+    }
   }
 
   onEditBtnClick(event) {
@@ -110,8 +170,11 @@ class DatasetDetail$$Page extends React.Component {
         displayName: this.form().values.displayName,
       },
     };
-    const res = await this.utils.bff.updateDataset(payload);
-    console.log('rrr', res);
+    const res = await this.utils.bff.updateDataset(payload).catch(e => {
+      this.utils.notification.warn({
+        message: '编辑数据集失败',
+      });
+    });
     if (res?.VersionedDataset?.createVersionedDataset?.name) {
       this.utils.notification.success({
         message: '编辑数据集成功',
@@ -137,6 +200,60 @@ class DatasetDetail$$Page extends React.Component {
     console.log('onClick', params, extParams);
   }
 
+  async validatorName(v) {
+    if (v) {
+      try {
+        const res = await this.props?.appHelper?.utils?.bff?.getDataset({
+          name: v,
+          namespace: this.utils.getAuthData()?.project,
+          versionsInput: {
+            namespace: this.utils.getAuthData()?.project,
+          },
+        });
+        if (res?.Dataset?.getDataset?.name) {
+          return '数据集名称重复';
+        }
+      } catch (error) {}
+    }
+  }
+
+  onDel(event) {
+    // 点击按钮时的回调
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除数据集',
+        content: `确定删除数据集：${this.data().data?.name}？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .deleteDatasets({
+              input: {
+                namespace: this.data().data?.namespace,
+                name: this.data().data?.name,
+              },
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '删除数据集失败',
+              });
+            });
+          this.utils.notification.success({
+            message: '删除数据集成功',
+          });
+          this.appHelper.history.back();
+        },
+      },
+    });
+  }
+
+  addVersion(event) {
+    this.setState({
+      addVersion: {
+        visible: true,
+      },
+    });
+  }
+
   componentDidMount() {
     console.log('did mount1', this, this.utils, this.data());
   }
@@ -144,6 +261,7 @@ class DatasetDetail$$Page extends React.Component {
   render() {
     const __$$context = this._context || this;
     const { state } = __$$context;
+    console.log('this.data().data?.versions?.nodes', this.data().data?.versions?.nodes)
     return (
       <Page>
         {!!__$$eval(() => this.state.editVisible) && (
@@ -185,7 +303,28 @@ class DatasetDetail$$Page extends React.Component {
                   name: 'displayName',
                   title: '数据集名称',
                   required: true,
-                  'x-validator': [],
+                  'x-validator': [
+                    {
+                      id: 'disabled',
+                      type: 'disabled',
+                      message: '由小写字母、数字和中划线组成，以小写字母或数字开头和结尾',
+                      pattern: '^[a-z0-9]{1}[-a-z0-9]{1,61}[a-z0-9]{1}$',
+                      children: '未知',
+                      required: true,
+                      whitespace: true,
+                    },
+                    {
+                      id: 'disabled',
+                      type: 'disabled',
+                      children: '未知',
+                      validator: function () {
+                        return this.validatorName.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
+                    },
+                  ],
                 }}
                 componentProps={{
                   'x-component-props': { allowClear: true, placeholder: '请输入数据集名称' },
@@ -196,6 +335,128 @@ class DatasetDetail$$Page extends React.Component {
             </FormilyForm>
           </Modal>
         )}
+        {!!__$$eval(() => this.state.addVersion) && (
+          <Modal
+            mask={true}
+            open={true}
+            title={this.i18n('i18n-wgpt60zj') /* 新增版本 */}
+            centered={false}
+            keyboard={true}
+            forceRender={false}
+            maskClosable={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            __component_name="Modal"
+            onOk={function () {
+              return this.onAddVersionOK.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            onCancel={function () {
+              return this.onAddVersionCancel.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+          >
+            <FormilyForm
+              ref={this._refsManager.linkRef('formily_create')}
+              formHelper={{ autoFocus: true }}
+              componentProps={{
+                colon: false,
+                layout: 'horizontal',
+                labelCol: 5,
+                labelAlign: 'left',
+                wrapperCol: 19,
+              }}
+              createFormProps={{
+                initialValues: __$$eval(() => ({
+                  inheritedFromSwitch: !!this.state.addVersion.data?.versions.nodes.length,
+                })),
+              }}
+              __component_name="FormilyForm"
+            >
+              <FormilyFormItem
+                fieldProps={{
+                  name: 'FormilyFormItem',
+                  type: 'object',
+                  title: '数据集版本',
+                  'x-component': 'FormilyFormItem',
+                  'x-validator': [],
+                }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                __component_name="FormilyFormItem"
+              >
+                <Typography.Text
+                  style={{ fontSize: '' }}
+                  strong={false}
+                  disabled={false}
+                  ellipsis={true}
+                  __component_name="Typography.Text"
+                >
+                  {__$$eval(
+                    () => 'v' + (this.getVersionsNumMax(this.data().data?.versions.nodes) + 1)
+                  )}
+                </Typography.Text>
+              </FormilyFormItem>
+              <FormilyTextArea
+                fieldProps={{
+                  name: 'description',
+                  title: '版本描述',
+                  'x-component': 'Input.TextArea',
+                  'x-validator': [],
+                }}
+                componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                __component_name="FormilyTextArea"
+              />
+              <FormilySwitch
+                fieldProps={{
+                  name: 'inheritedFromSwitch',
+                  title: '继承历史版本',
+                  'x-display': 'visible',
+                  'x-pattern': 'editable',
+                  'x-validator': [],
+                }}
+                componentProps={{ 'x-component-props': { loading: false, disabled: false } }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                __component_name="FormilySwitch"
+              />
+              <FormilySelect
+                fieldProps={{
+                  enum: __$$eval(() =>
+                    this.data().data?.versions.nodes.map(v => ({
+                      label: v.version,
+                      value: v.version,
+                    }))
+                  ),
+                  name: 'inheritedFrom',
+                  title: '历史版本',
+                  required: true,
+                  'x-display': "{{ $form.values?.inheritedFromSwitch ? 'visible' : 'hidden' }}",
+                  'x-validator': [],
+                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                }}
+                componentProps={{
+                  'x-component-props': {
+                    disabled: false,
+                    allowClear: false,
+                    placeholder: '请选择历史版本',
+                    _sdkSwrGetFunc: {},
+                    _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                  },
+                }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                __component_name="FormilySelect"
+              />
+            </FormilyForm>
+          </Modal>
+        )}
+        <LccComponentSbva0
+          data={__$$eval(() => this.state.confirm)}
+          __component_name="LccComponentSbva0"
+        />
         <Row wrap={true} __component_name="Row">
           <Col span={24} style={{ marginBottom: '16px' }} __component_name="Col">
             <Space align="center" direction="horizontal" __component_name="Space">
@@ -238,7 +499,9 @@ class DatasetDetail$$Page extends React.Component {
                         ellipsis={true}
                         __component_name="Typography.Title"
                       >
-                        {__$$eval(() => this.data().data?.displayName || this.data().data?.name)}
+                        {__$$eval(
+                          () => this.data().data?.displayName || this.data().data?.name || '-'
+                        )}
                       </Typography.Title>
                     </Col>
                     <Col flex="" span={24} __component_name="Col">
@@ -295,10 +558,13 @@ class DatasetDetail$$Page extends React.Component {
                   ghost={false}
                   shape="default"
                   danger={false}
+                  onClick={function () {
+                    return this.onDel.apply(this, Array.prototype.slice.call(arguments).concat([]));
+                  }.bind(this)}
                   disabled={false}
                   __component_name="Button"
                 >
-                  {this.i18n('i18n-z0idrepg') /* - */}
+                  删除
                 </Button>
               </Space>
             </Col>
@@ -335,21 +601,21 @@ class DatasetDetail$$Page extends React.Component {
                         ),
                         _unsafe_MixedSetter_children_select: 'VariableSetter',
                       },
-                      { key: 'xvcp3obfu', span: 24, children: '文本', label: '数据类型' },
+                      { key: 'xvcp3obfu', span: 24, label: '数据类型', children: '文本' },
                       { key: 'er0ptk5lill', span: 24, label: '应用场景', children: '科技' },
                       {
                         key: 'ww04wf6evps',
                         span: 24,
                         label: this.i18n('i18n-qjodl1nn') /* 创建时间 */,
-                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                         children: (
                           <Typography.Time
-                            __component_name="Typography.Time"
                             time={__$$eval(() => this.data().data?.creationTimestamp)}
                             format=""
                             relativeTime={true}
+                            __component_name="Typography.Time"
                           />
                         ),
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                       },
                       {
                         key: 'ajc9nhn140i',
@@ -380,7 +646,43 @@ class DatasetDetail$$Page extends React.Component {
               {
                 key: 'tab-item-2',
                 label: '全部版本',
-                children: (
+                children: [
+                  <Space
+                    align="center"
+                    direction="horizontal"
+                    __component_name="Space"
+                    key="node_oclq0s51353"
+                  >
+                    <Button
+                      icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
+                      type="primary"
+                      block={false}
+                      ghost={false}
+                      shape="default"
+                      danger={false}
+                      onClick={function () {
+                        return this.addVersion.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
+                      disabled={false}
+                      __component_name="Button"
+                    >
+                      新增版本
+                    </Button>
+                    <Button
+                      icon={<AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />}
+                      block={false}
+                      ghost={false}
+                      shape="default"
+                      danger={false}
+                      disabled={false}
+                      __component_name="Button"
+                    >
+                      刷新
+                    </Button>
+                  </Space>,
                   <LccComponentNy419
                     isProd="false"
                     dataset={__$$eval(() => this.data()?.data)}
@@ -393,8 +695,9 @@ class DatasetDetail$$Page extends React.Component {
                     dataSource={__$$eval(() => [1, 2, 3])}
                     datasource={__$$eval(() => this.data().data?.versions?.nodes || [])}
                     __component_name="LccComponentNy419"
-                  />
-                ),
+                    key="node_oclpjicyqh1"
+                  />,
+                ],
               },
             ]}
             style={{ marginTop: '-20px' }}
