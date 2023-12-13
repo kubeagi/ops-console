@@ -2,7 +2,9 @@
 // 例外：react 框架的导出名和各种组件名除外。
 import React from 'react';
 
-import { Component, Table, Typography, Dropdown } from '@tenx-ui/materials';
+import { Component, Table, Status, Typography, Dropdown } from '@tenx-ui/materials';
+
+import LccComponentSbva0 from 'confirm';
 
 import { DataProvider } from 'shared-components';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
@@ -36,9 +38,11 @@ class DatasetVersionList$$Component extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = {
-      dataset: {},
-      datasource: [],
+    this.state = { confirm: {}, current: 1 };
+
+    this.mockData = {
+      data: {
+      },
     };
   }
 
@@ -50,47 +54,127 @@ class DatasetVersionList$$Component extends React.Component {
     console.log('will unmount');
   }
 
-  getProps() {
-    if (this.props.isProd) return this.props;
-    return {
-      dataset: this.state.dataset,
-      datasource: this.state.datasource,
-    };
-  }
-
-  delVersion(params) {
-    this.utils.Modal.confirm({
-      title: '删除数据集版本',
-      content: `确定删除数据集：${params.dataset.name} 下版本：${params.version.version}？`,
-      onOk: async () => {
-        const res = await this.utils.bff
-          .deleteVersionedDatasets({
-            input: {
-              namespace: params.dataset.namespace,
-              name: params.version.name,
-            },
-          })
-          .catch(e => {
-            this.utils.notification.warn({
-              message: '删除数据集版本失败',
+  release(params) {
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '发布数据集',
+        content: `数据发布后不可更改，确定发布：${params.dataset.name} - ${params.version.version}？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .updateVersionedDataset({
+              input: {
+                namespace: params.dataset.namespace,
+                name: params.version.name,
+                released: 1,
+              },
+            })
+            .then(res => {
+              this.utils.notification.success({
+                message: '发布数据集版本成功',
+              });
+              this.props.refresh?.(params);
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '发布数据集版本失败',
+              });
             });
-          });
-        this.utils.notification.success({
-          message: '删除数据集版本成功',
-        });
-        this.props.refresh?.(params);
+        },
       },
     });
   }
 
+  getProps() {
+    if (this.props.isProd) return this.props;
+    return {
+      dataset: this.mockData.data.Dataset.getDataset,
+      datasource: this.mockData.data.Dataset.getDataset.versions.nodes,
+    };
+  }
+
+  toDetail(event, params) {
+    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
+  }
+
+  delVersion(params) {
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除数据集版本',
+        content: `确定删除数据集：${params.dataset.name} - ${params.version.version}？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .deleteVersionedDatasets({
+              input: {
+                namespace: params.dataset.namespace,
+                name: params.version.name,
+              },
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '删除数据集版本失败',
+              });
+            });
+          this.utils.notification.success({
+            message: '删除数据集版本成功',
+          });
+          this.props.refresh?.(params);
+        },
+      },
+    });
+  }
+
+  dropdownList(record) {
+    const list = [
+      {
+        key: 'delete',
+        label: '删除',
+        index: 5,
+      },
+    ];
+    if (record.released) return list;
+    list.unshift({
+      key: 'import',
+      label: '导入数据',
+      index: 1,
+    });
+    if (record.syncStatus !== 'FileSyncSuccess') {
+      return list;
+    }
+    list.push(
+      {
+        key: 'dataProcess',
+        label: '数据处理',
+        index: 2,
+      },
+      {
+        key: 'release',
+        label: '发布',
+        index: 3,
+      }
+    );
+    return list.sort((a, b) => a.index - b.index);
+  }
+
   onDropdownClick(event, params) {
     if (event.key === 'delete') {
-      this.delVersion(params);
+      return this.delVersion(params);
+    }
+    if (event.key === 'release') {
+      return this.release(params);
     }
   }
 
+  onPaginationChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState({
+      current: page,
+    });
+  }
+
   componentDidMount() {
-    console.log('did mount');
+    console.log('did mount', this.getProps());
   }
 
   render() {
@@ -98,37 +182,53 @@ class DatasetVersionList$$Component extends React.Component {
     const { state } = __$$context;
     return (
       <Component>
+        <LccComponentSbva0
+          data={__$$eval(() => this.state.confirm)}
+          __component_name="LccComponentSbva0"
+        />
         <Table
           size="middle"
-          rowKey="id"
+          rowKey="version"
           scroll={{ scrollToFirstRowOnChange: true }}
           columns={[
             { key: 'version', title: '版本', dataIndex: 'version' },
             {
               key: 'syncStatus',
               title: '导入状态',
-              render: (text, record) =>
-                ({
-                  FileSyncing: '同步中',
-                  FileSyncFailed: '同步失败',
-                  FileSyncSuccess: '同步成功',
-                }[text] || '未知'),
+              render: (text, record, index) =>
+                (__$$context => (
+                  <Status
+                    id={__$$eval(() => record.syncStatus)}
+                    types={__$$eval(() => __$$context.constants.DATASET_DATA.syncStatus)}
+                    __component_name="Status"
+                  />
+                ))(__$$createChildContext(__$$context, { text, record, index })),
               dataIndex: 'syncStatus',
             },
             {
               key: 'dataProcessStatus',
               title: '数据处理状态',
-              render: (text, record) => text || '未开始',
+              render: (text, record, index) =>
+                (__$$context => (
+                  <Status
+                    id={__$$eval(() => record.dataProcessStatus)}
+                    types={__$$eval(() => __$$context.constants.DATASET_DATA.dataProcessStatus)}
+                    __component_name="Status"
+                  />
+                ))(__$$createChildContext(__$$context, { text, record, index })),
               dataIndex: 'dataProcessStatus',
             },
             {
               key: 'released',
               title: '发布状态',
-              render: (text, record) =>
-                ({
-                  0: '未发布',
-                  1: '已发布',
-                }[text] || '未知'),
+              render: (text, record, index) =>
+                (__$$context => (
+                  <Status
+                    id={__$$eval(() => record.released)}
+                    types={__$$eval(() => __$$context.constants.DATASET_DATA.released)}
+                    __component_name="Status"
+                  />
+                ))(__$$createChildContext(__$$context, { text, record, index })),
               dataIndex: 'released',
             },
             {
@@ -158,39 +258,7 @@ class DatasetVersionList$$Component extends React.Component {
                 (__$$context => (
                   <Dropdown.Button
                     menu={{
-                      items: __$$eval(() =>
-                        (() => {
-                          const list = [
-                            {
-                              key: 'delete',
-                              label: '删除',
-                              index: 5,
-                            },
-                          ];
-                          if (record.released) return list;
-                          list.unshift({
-                            key: 'import',
-                            label: '导入数据',
-                            index: 1,
-                          });
-                          if (record.syncStatus !== 'FileSyncSuccess') {
-                            return list;
-                          }
-                          list.push(
-                            {
-                              key: 'dataProcess',
-                              label: '数据处理',
-                              index: 2,
-                            },
-                            {
-                              key: 'release',
-                              label: '发布',
-                              index: 3,
-                            }
-                          );
-                          return list.sort((a, b) => a.index - b.index);
-                        })()
-                      ),
+                      items: __$$eval(() => __$$context.dropdownList(record)),
                       onClick: function () {
                         return this.onDropdownClick.apply(
                           this,
@@ -205,6 +273,17 @@ class DatasetVersionList$$Component extends React.Component {
                     }}
                     style={{}}
                     danger={false}
+                    onClick={function () {
+                      return this.toDetail.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([
+                          {
+                            versionName: record.name,
+                            datasetName: this.getProps().dataset.name,
+                          },
+                        ])
+                      );
+                    }.bind(__$$context)}
                     trigger={['hover']}
                     disabled={false}
                     placement="bottomRight"
@@ -225,14 +304,12 @@ class DatasetVersionList$$Component extends React.Component {
               dataIndex: 'action',
             },
           ]}
-          dataSource={__$$eval(() => this.getProps().datasource)}
+          dataSource={__$$eval(() => this.getProps().datasource || [])}
           pagination={{
             size: 'default',
-            total: 15,
             simple: false,
-            current: 1,
             pageSize: 10,
-            position: ['topRight'],
+            position: ['bottomRight'],
             pagination: { pageSize: 10 },
             showQuickJumper: false,
             showSizeChanger: false,
@@ -246,10 +323,11 @@ class DatasetVersionList$$Component extends React.Component {
   }
 }
 
-const ComponentWrapper = (props = {}) => {
+const ComponentWrapper = React.forwardRef((props = {}, ref) => {
   const history = getUnifiedHistory();
   const appHelper = {
     utils,
+    constants: __$$constants,
     history,
   };
   const self = {
@@ -261,12 +339,12 @@ const ComponentWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
       render={dataProps => (
         <DatasetVersionList$$Component
+          ref={ref}
           {...props}
           {...dataProps}
           self={self}
@@ -275,7 +353,7 @@ const ComponentWrapper = (props = {}) => {
       )}
     />
   );
-};
+});
 export default ComponentWrapper;
 
 function __$$eval(expr) {
