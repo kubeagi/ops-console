@@ -70,13 +70,13 @@ class ModelService$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      page: 1,
+      keyword: '',
+      pageSize: 12,
       dataSource: [],
       delVisible: false,
-      currentModel: {},
       modelTypes: '',
-      keyword: '',
-      page: 1,
-      pageSize: 12,
+      currentModel: {},
     };
   }
 
@@ -85,65 +85,6 @@ class ModelService$$Page extends React.Component {
   $$ = () => [];
 
   componentWillUnmount() {}
-
-  async getListWorkers() {
-    try {
-      const { keyword, pageSize, page, modelTypes } = this.state;
-      const namespace = this.utils.getAuthData().project || 'system-tce';
-      const input = {
-        modelTypes,
-        pageSize,
-        page,
-        namespace,
-      };
-      if (keyword) input.keyword = keyword;
-      const res = await this.props.appHelper.utils.bff?.listWorkers({
-        input,
-      });
-      this.setState({
-        dataSource: res.Worker?.listWorkers?.nodes,
-      });
-    } catch (error) {
-      console.log(error, '===> err');
-      this.utils.notification.warnings({
-        message: '获取服务失败',
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
-  onClickCreatModel(event) {
-    this.history.push('/model-service/createModelService');
-  }
-
-  localMenuOnClick(e, item) {
-    switch (e.key) {
-      case 'edit':
-        this.history.push(`/model-service/editModelService?name=${item.name}`);
-        break;
-      case 'delete':
-        this.setState({
-          currentModel: item,
-          delVisible: true,
-        });
-        break;
-    }
-  }
-
-  onClickCreatOutsideModel(event) {
-    this.history.push('/model-service/createOutsideModelService');
-  }
-
-  onClickToDetail(e, { id }) {
-    this.history.push(`/model-service/detail/${id}?type=local`);
-  }
-
-  onDelCancel() {
-    this.setState({
-      delVisible: false,
-      currentModel: {},
-    });
-  }
 
   async onDelOk() {
     try {
@@ -171,14 +112,72 @@ class ModelService$$Page extends React.Component {
     });
   }
 
+  onSearch(value, event) {
+    this.getListWorkers();
+  }
+
+  onRefresh(event) {
+    this.getListWorkers();
+  }
+
+  onDelCancel() {
+    this.setState({
+      delVisible: false,
+      currentModel: {},
+    });
+  }
+
+  async getListWorkers() {
+    try {
+      const { keyword, pageSize, page, modelTypes } = this.state;
+      const namespace = this.utils.getAuthData().project || 'system-tce';
+      const input = {
+        modelTypes,
+        pageSize,
+        page,
+        namespace,
+      };
+      if (keyword) input.keyword = keyword;
+      const res = await this.props.appHelper.utils.bff?.listWorkers({
+        input,
+      });
+      this.setState({
+        dataSource: res.Worker?.listWorkers?.nodes,
+      });
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: '获取服务失败',
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
   onChangeKeyword(event) {
     this.setState({
       keyword: event.target.value,
     });
   }
 
-  onSearch(value, event) {
-    this.getListWorkers();
+  onClickToDetail(e, { id }) {
+    this.history.push(`/model-service/detail/${id}?type=local`);
+  }
+
+  localMenuOnClick(e, item) {
+    switch (e.key) {
+      case 'edit':
+        this.history.push(`/model-service/editModelService?name=${item.name}`);
+        break;
+      case 'delete':
+        this.setState({
+          currentModel: item,
+          delVisible: true,
+        });
+        break;
+    }
+  }
+
+  onClickCreatModel(event) {
+    this.history.push('/model-service/createModelService');
   }
 
   onChangeModelTypes(e) {
@@ -190,8 +189,8 @@ class ModelService$$Page extends React.Component {
     );
   }
 
-  onRefresh(event) {
-    this.getListWorkers();
+  onClickCreatOutsideModel(event) {
+    this.history.push('/model-service/createOutsideModelService');
   }
 
   componentDidMount() {
@@ -315,7 +314,7 @@ class ModelService$$Page extends React.Component {
                 </Col>
                 <Col span={24} __component_name="Col">
                   <List
-                    grid={{ lg: 4, md: 4, sm: 4, xl: 4, xs: 4, xxl: 4, column: 4, gutter: 20 }}
+                    grid={{ lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 4, column: 3, gutter: 20 }}
                     size="small"
                     split={false}
                     rowKey="id"
@@ -454,7 +453,9 @@ class ModelService$$Page extends React.Component {
                                           ellipsis={true}
                                           __component_name="Typography.Title"
                                         >
-                                          {__$$eval(() => item?.displayName || '-')}
+                                          {__$$eval(
+                                            () => `${item?.displayName || '-'}（${item?.name}）`
+                                          )}
                                         </Typography.Title>
                                       </Col>
                                       <Col span={24} __component_name="Col">
@@ -484,80 +485,75 @@ class ModelService$$Page extends React.Component {
                                   defaultOpen={false}
                                   __component_name="Divider"
                                 />
-                                <Row wrap={false} justify="space-between" __component_name="Row">
-                                  <Col flex="3" __component_name="Col">
-                                    <Descriptions
-                                      id=""
-                                      size="default"
-                                      colon={false}
-                                      items={[
-                                        {
-                                          key: 'rtilj4ro9ua',
-                                          span: 1,
-                                          label: this.i18n('i18n-p7mextst') /* 状态 */,
-                                          children: (
-                                            <Status
-                                              id={__$$eval(() => item.status)}
-                                              types={[
-                                                {
-                                                  id: 'Running',
-                                                  type: 'success',
-                                                  children: '已发布',
-                                                },
-                                                { id: 'Pending', type: 'info', children: '发布中' },
-                                                { id: 'Error', type: 'error', children: '异常' },
-                                                {
-                                                  id: 'Unknown',
-                                                  type: 'disabled',
-                                                  children: '未知',
-                                                },
-                                              ]}
-                                              __component_name="Status"
-                                            />
-                                          ),
-                                        },
-                                        {
-                                          key: '2yzo8dyskna',
-                                          span: 1,
-                                          label: this.i18n('i18n-uag94ndq') /* 更新时间 */,
-                                          children: (
-                                            <Typography.Time
-                                              time={__$$eval(() => item.updateTimestamp)}
-                                              format=""
-                                              relativeTime={false}
-                                              __component_name="Typography.Time"
-                                            />
-                                          ),
-                                        },
-                                      ]}
-                                      title=""
-                                      column={1}
-                                      layout="horizontal"
-                                      bordered={false}
-                                      labelStyle={{ width: '90px' }}
-                                      contentStyle={{}}
-                                      borderedBottom={false}
-                                      __component_name="Descriptions"
-                                      borderedBottomDashed={false}
-                                    />
-                                  </Col>
-                                  <Col __component_name="Col">
-                                    {__$$evalArray(() => item.modelTypes.split(',')).map(
-                                      (item, index) =>
-                                        (__$$context => (
-                                          <Tag
-                                            color="processing"
-                                            closable={false}
-                                            __component_name="Tag"
-                                          >
-                                            {__$$eval(() => item)}
-                                          </Tag>
-                                        ))(__$$createChildContext(__$$context, { item, index }))
-                                    )}
-                                  </Col>
-                                </Row>
                               </Col>
                             </Row>
+                            <Descriptions
+                              id=""
+                              size="default"
+                              colon={false}
+                              items={[
+                                {
+                                  key: 'i69qjtdvnp',
+                                  span: 1,
+                                  label: '状态',
+                                  children: (
+                                    <Row wrap={false} gutter={[0, 0]} __component_name="Row">
+                                      <Col flex="60px" __component_name="Col">
+                                        <Status
+                                          id={__$$eval(() => item.status)}
+                                          types={[
+                                            { id: 'Running', type: 'success', children: '运行中' },
+                                            { id: 'Pending', type: 'info', children: '部署中' },
+                                            { id: 'Error', type: 'error', children: '异常' },
+                                            { id: 'Unknown', type: 'disabled', children: '未知' },
+                                          ]}
+                                          __component_name="Status"
+                                        />
+                                      </Col>
+                                      <Col
+                                        flex="auto"
+                                        style={{ display: 'flex', justifyContent: 'center' }}
+                                        __component_name="Col"
+                                      >
+                                        {__$$evalArray(() => item.modelTypes.split(',')).map(
+                                          (item, index) =>
+                                            (__$$context => (
+                                              <Tag
+                                                color="processing"
+                                                closable={false}
+                                                __component_name="Tag"
+                                              >
+                                                {__$$eval(() => item)}
+                                              </Tag>
+                                            ))(__$$createChildContext(__$$context, { item, index }))
+                                        )}
+                                      </Col>
+                                    </Row>
+                                  ),
+                                },
+                                {
+                                  key: 'u0ft3tcpl8a',
+                                  span: 1,
+                                  label: '更新时间',
+                                  children: (
+                                    <Typography.Time
+                                      time={__$$eval(() => item.updateTimestamp)}
+                                      format=""
+                                      relativeTime={false}
+                                      __component_name="Typography.Time"
+                                    />
+                                  ),
+                                },
+                              ]}
+                              title=""
+                              column={1}
+                              layout="horizontal"
+                              bordered={false}
+                              labelStyle={{ width: 100 }}
+                              borderedBottom={false}
+                              __component_name="Descriptions"
+                              borderedBottomDashed={false}
+                            />
                           </Card>
                         </List.Item>
                       ))(__$$createChildContext(__$$context, { item }))
