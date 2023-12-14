@@ -112,10 +112,10 @@ const routes = [
         path: '/model-app',
         component: '@/pages/ModelAppList',
       },
-      {
-        path: '/model-app/create',
-        component: '@/pages/ModelAppCreate',
-      },
+      // {
+      //   path: '/model-app/create',
+      //   component: '@/pages/ModelAppCreate',
+      // },
       {
         name: '对话管理',
         path: '/chat',
