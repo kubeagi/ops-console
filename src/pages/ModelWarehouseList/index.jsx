@@ -511,7 +511,7 @@ class ModelWarehouse$$Page extends React.Component {
                                       __component_name="AntdIconCodeSandboxCircleFilled"
                                     />
                                   </Col>
-                                  <Col flex="auto" span={20} __component_name="Col">
+                                  <Col flex="auto" span={19} __component_name="Col">
                                     <Row
                                       wrap={false}
                                       gutter={[0, 0]}
@@ -546,7 +546,7 @@ class ModelWarehouse$$Page extends React.Component {
                                           {__$$eval(() => item.description || '-')}
                                         </Typography.Paragraph>
                                       </Col>
-                                      <Col __component_name="Col">
+                                      <Col style={{ zIndex: 3 }} __component_name="Col">
                                         <Dropdown
                                           menu={{
                                             items: [
@@ -572,8 +572,15 @@ class ModelWarehouse$$Page extends React.Component {
                                           __component_name="Dropdown"
                                           destroyPopupOnHide={true}
                                         >
-                                          {!!__$$eval(() => !item.systemModel) && (
-                                            <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
+                                          {!!__$$eval(
+                                            () =>
+                                              item.namespace ===
+                                              __$$context.utils.getAuthData()?.project
+                                          ) && (
+                                            <AntdIconSettingOutlined
+                                              style={{}}
+                                              __component_name="AntdIconSettingOutlined"
+                                            />
                                           )}
                                         </Dropdown>
                                       </Col>
@@ -581,6 +588,11 @@ class ModelWarehouse$$Page extends React.Component {
                                   </Col>
                                 </Row>
                               </Col>
+                              <Col
+                                span={24}
+                                style={{ display: 'inline-block', textAlign: 'left' }}
+                                __component_name="Col"
+                              />
                               <Col flex="" span={24} __component_name="Col">
                                 <Divider
                                   mode="line"
@@ -601,14 +613,13 @@ class ModelWarehouse$$Page extends React.Component {
                                       label: '状态',
                                       children: (
                                         <Row
-                                          wrap={false}
-                                          justify="space-between"
                                           __component_name="Row"
+                                          justify="space-between"
+                                          wrap={false}
                                         >
                                           <Col
-                                            span={18}
-                                            style={{ paddingLeft: '16px' }}
                                             __component_name="Col"
+                                            style={{ marginRight: '40px' }}
                                           >
                                             <Status
                                               id={__$$eval(() => item.status)}
@@ -620,11 +631,7 @@ class ModelWarehouse$$Page extends React.Component {
                                               __component_name="Status"
                                             />
                                           </Col>
-                                          <Col
-                                            span={24}
-                                            style={{ display: 'inline-block', textAlign: 'left' }}
-                                            __component_name="Col"
-                                          >
+                                          <Col __component_name="Col">
                                             {__$$evalArray(() => item.types.split(',')).map(
                                               (item, index) =>
                                                 (__$$context => (

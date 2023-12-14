@@ -163,7 +163,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this.setState({
       loading: true,
     });
-    console.log(this.history);
     const project = this.history?.query.namespace || this.utils.getAuthData()?.project;
     const name = this.match.params.name;
     const params = {
@@ -653,7 +652,12 @@ class ModelWarehouseDetail$$Page extends React.Component {
                       <Row wrap={false} justify="space-between" __component_name="Row">
                         <Col __component_name="Col">
                           <Space size={12} align="center" direction="horizontal">
-                            {!!__$$eval(() => !this.state.data?.systemModel) && (
+                            {!!__$$eval(
+                              () =>
+                                !this.state.data?.systemModel ||
+                                (this.state.data?.systemModel &&
+                                  this.state.data?.namespace === this.utils.getAuthData()?.project)
+                            ) && (
                               <Button
                                 href=""
                                 icon={
@@ -696,7 +700,12 @@ class ModelWarehouseDetail$$Page extends React.Component {
                             >
                               刷新
                             </Button>
-                            {!!__$$eval(() => !this.state.data?.systemModel) && (
+                            {!!__$$eval(
+                              () =>
+                                !this.state.data?.systemModel ||
+                                (this.state.data?.systemModel &&
+                                  this.state.data?.namespace === this.utils.getAuthData()?.project)
+                            ) && (
                               <Button
                                 icon={
                                   <AntdIconDeleteOutlined __component_name="AntdIconDeleteOutlined" />
@@ -768,7 +777,12 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                         ])
                                       );
                                     }.bind(__$$context)}
-                                    disabled={__$$eval(() => __$$context.state.data?.systemModel)}
+                                    disabled={__$$eval(
+                                      () =>
+                                        __$$context.state.data?.systemModel &&
+                                        __$$context.state.data?.namespace !==
+                                          __$$context.utils.getAuthData()?.project
+                                    )}
                                     __component_name="Button"
                                   >
                                     删除

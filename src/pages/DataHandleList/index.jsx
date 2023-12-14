@@ -12,11 +12,11 @@ import {
   Space,
   Button,
   Input,
-  Pagination,
   Modal,
   Table,
   UnifiedLink,
   Status,
+  Pagination,
 } from '@tenx-ui/materials';
 
 import { AntdIconPlusOutlined, AntdIconReloadOutlined } from '@tenx-ui/icon-materials';
@@ -332,29 +332,6 @@ class DataHandleList$$Page extends React.Component {
                         />
                       </Space>
                     </Col>
-                    <Col __component_name="Col">
-                      <Space align="center" direction="horizontal">
-                        <Pagination
-                          total={__$$eval(() => this.state.totalCount)}
-                          simple={true}
-                          current={__$$eval(() => this.state.currentPage)}
-                          onChange={function () {
-                            return this.onCurrentPageChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          pageSize={__$$eval(() => this.state.pageSize)}
-                          showTotal={function () {
-                            return this.showTotal.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          __component_name="Pagination"
-                        />
-                      </Space>
-                    </Col>
                   </Row>
                   <Row wrap={true} gutter={[0, 0]} __component_name="Row">
                     <Col span={24} __component_name="Col">
@@ -612,6 +589,26 @@ class DataHandleList$$Page extends React.Component {
                       />
                     </Col>
                   </Row>
+                  <Pagination
+                    total={__$$eval(() => this.state.totalCount)}
+                    simple={false}
+                    current={__$$eval(() => this.state.currentPage)}
+                    onChange={function () {
+                      return this.onCurrentPageChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    pageSize={__$$eval(() => this.state.pageSize)}
+                    showTotal={function () {
+                      return this.showTotal.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    __component_name="Pagination"
+                    style={{ textAlign: 'right', marginTop: '12px' }}
+                  />
                 </Card>
               </Col>
             </Row>

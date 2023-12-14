@@ -10,6 +10,7 @@ import {
   Button,
   Typography,
   Steps,
+  Divider,
   Card,
   Switch,
   FormilyForm,
@@ -68,19 +69,24 @@ class $$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      numberInputStep: 0.1,
-      currentStep: 0,
-      step1FormData: {},
-      step2FormData: {},
-      dataSetFileSearchParams: {
-        keyword: '',
-        currentPage: 1,
+      configMap: {
+        qa_split: 'QAsplitChecked',
+        document_chunk: 'TextSegmentationChecked',
+        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
+        space_standardization: 'SpaceHandleChecked',
+        remove_garbled_text: 'RemoveGarbledCodeChecked',
+        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
+        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
+        remove_emojis: 'RemoveEmoteChecked',
+        simhash_operator: 'SimhashOperatorChecked',
+        remove_email: 'RemoveEmailChecked',
+        remove_ip_address: 'RemoveIPAddressChecked',
+        remove_number: 'RemoveNumberChecked',
+        character_duplication_rate: 'CharacterRepeatFilterChecked',
+        word_duplication_rate: 'WordRepeatFilterChecked',
+        special_character_rate: 'SpecialCharactersRateChecked',
+        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
       },
-      fileTableLoading: false,
-      dataSetFileList: [],
-      dataSetFileTotal: '0',
-      selectedFileList: [],
-      fileSelectCheckErrorFlag: false,
       step3Data: {
         QAsplitChecked: true,
         TextSegmentationChecked: false,
@@ -103,30 +109,20 @@ class $$Page extends React.Component {
         SimhashOperatorChecked: false,
         SimhashOperatorRate: 5,
         RemoveEmailChecked: false,
-        RemoveIPAddress: false,
-        RemoveNumber: false,
+        RemoveIPAddressChecked: false,
+        RemoveNumberChecked: false,
       },
-      configMap: {
-        qa_split: 'QAsplitChecked',
-        document_chunk: 'TextSegmentationChecked',
-        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
-        space_standardization: 'SpaceHandleChecked',
-        remove_garbled_text: 'RemoveGarbledCodeChecked',
-        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
-        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
-        remove_emojis: 'RemoveEmoteChecked',
-        simhash_operator: 'SimhashOperatorChecked',
-        remove_email: 'RemoveEmailChecked',
-        remove_ip_address: 'RemoveIPAddress',
-        remove_number: 'RemoveNumber',
-        character_duplication_rate: 'CharacterRepeatFilterChecked',
-        word_duplication_rate: 'WordRepeatFilterChecked',
-        special_character_rate: 'SpecialCharactersRateChecked',
-        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
-      },
-      configEnableMap: {},
       step4Data: [],
+      currentStep: 0,
+      step1FormData: {},
+      step2FormData: {},
+      configEnableMap: {},
       dataSetDataList: [],
+      dataSetFileList: [],
+      numberInputStep: 0.1,
+      dataSetFileTotal: '0',
+      fileTableLoading: false,
+      selectedFileList: [],
       afterTreatmentData: [
         {
           _type: 'qa_split',
@@ -184,7 +180,30 @@ class $$Page extends React.Component {
             '这个文档中的 Email 信息将会被去除，如：<span style="background-color:rgba(250, 205, 145, 0.4);">example@gmail.com</span>',
           after: '这个文档中的 IPv4 或 IPv6 地址信息将会被去除，如：',
         },
+        {
+          _type: 'remove_ip_address',
+          type: '去除IP地址',
+          before:
+            '这个文档中的 IPv4 或 IPv6 地址信息将会被去除，如：<span style="background-color:rgba(250, 205, 145, 0.4);">192.168.0.1</span>',
+          after: '这个文档中的 IPv4 或 IPv6 地址信息将会被去除，如：',
+        },
+        {
+          _type: 'remove_number',
+          type: '去除数字',
+          before: `这个文档中的电话、身份证号、银行卡号等信息将会被去除，如：手机号
+          <span style="background-color:rgba(250, 205, 145, 0.4);">12345678910</span>,
+          身份证号<span style="background-color:rgba(250, 205, 145, 0.4);">11020319850801342x</span>,
+          银行卡号<span style="background-color:rgba(250, 205, 145, 0.4);">1234 0982 1234 9876
+</span>`,
+          after:
+            '这个文档中的电话、身份证号、银行卡号等信息将会被去除，如：手机号 ，身份证号，银行卡号',
+        },
       ],
+      dataSetFileSearchParams: {
+        keyword: '',
+        currentPage: 1,
+      },
+      fileSelectCheckErrorFlag: false,
     };
   }
 
@@ -200,6 +219,27 @@ class $$Page extends React.Component {
     console.log('will unmount');
   }
 
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
+
+  onBack(event) {
+    // 点击按钮时的回调
+    this.history.push('/data-handle');
+  }
+
+  async onNext() {
+    if (this.state.currentStep === 0) {
+      this.getStep1Data();
+    } else if (this.state.currentStep === 1) {
+      this.getStep2Data();
+    } else if (this.state.currentStep === 2) {
+      this.onNextStep();
+    } else {
+      this.onNextStep();
+    }
+  }
+
   debounce(func, delay) {
     let timeoutId;
     return function (...args) {
@@ -210,121 +250,53 @@ class $$Page extends React.Component {
     };
   }
 
+  async onFinish() {
+    const list = this.convertStep3Data();
+    const files = this.state.selectedFileList.map(item => {
+      const _item = item.split('/');
+      return {
+        name: _item[_item.length - 1],
+      };
+    });
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
+    const data = {
+      ...this.state.step1FormData,
+      ...this.state.step2FormData,
+      version_data_set_name: versionName,
+      data_process_config_info: list,
+      file_names: files,
+      bucket_name: this.utils.getAuthData().project,
+      namespace: this.utils.getAuthData().project,
+      creator: this.utils.getAuthData().user?.name,
+    };
+    const res = await this.utils.bff.createDataProcessTask({
+      input: {
+        ...data,
+      },
+    });
+    if (res.dataProcess.createDataProcessTask.status === 200) {
+      this.utils.notification.success({
+        message: '成功',
+      });
+      this.history.push('/data-handle');
+    } else {
+      this.utils.notification.warn({
+        message: res.dataProcess?.createDataProcessTask?.message || '失败',
+      });
+    }
+  }
+
   onSearch(event) {
     this.debouncedFunction(event);
   }
 
-  updateStep3State(value, event, extraParams = {}) {
-    const fieldName = {
-      ...event,
-      ...extraParams,
-    }.fieldName;
-    const step3 = {
-      ...this.state.step3Data,
-      [fieldName]: value,
-    };
-    this.setState({
-      step3Data: step3,
-    });
-  }
-
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
-  getStep1Data() {
-    this.form('createDataHandleStep1')
-      .validate()
-      .then(res => {
-        const step1FormData = this.form('createDataHandleStep1').values;
-        this.setState({
-          step1FormData,
-        });
-        this.onNextStep();
-      });
-  }
-
-  getStep2Data() {
-    this.form('createDataHandleStep2')
-      ?.validate()
-      .then(res => {
-        const step2FormData = this.form('createDataHandleStep2').values;
-        this.setState({
-          step2FormData,
-        });
-        this.onNextStep();
-      });
-  }
-
-  onDataSetChange(v) {
-    this.setState({
-      dataSetFileList: [],
-      selectedFileList: [],
-      dataSetFileTotal: '0',
-    });
-    this.form('createDataHandleStep2').setValues({
-      pre_data_set_version: undefined,
-      post_data_set_version: undefined,
-      post_data_set_name: v,
-    });
-    this.setDataSetVersionsSource(v);
-  }
-
-  setDataSetVersionsSource(v) {
-    const obj = this.state.dataSetDataList.find(item => item.value === v);
-    const genOptionList = obj.versions;
-    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
-      dataSource: genOptionList,
-    });
-    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
-      dataSource: genOptionList,
-    });
-  }
-
-  onDataSetVersionChange(v) {
-    this.form('createDataHandleStep2').setValues({
-      post_data_set_version: v,
-    });
-    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
-    const name = this.getVersionName(pre_data_set_name, v);
-    this.getTableList(name);
-  }
-
-  onPageChange(page) {
-    this.setState(
-      {
-        dataSetFileSearchParams: {
-          ...this.state.dataSetFileSearchParams,
-          currentPage: page,
-        },
-      },
-      () => {
-        this.getDataSet();
-      }
-    );
-  }
-
-  onSelectFileChange(v) {
-    if (v.length) {
-      this.setState({
-        fileSelectCheckErrorFlag: false,
-      });
+  valToKey(obj) {
+    const _obj = {};
+    for (let key in obj) {
+      _obj[obj[key]] = key;
     }
-    this.setState({
-      selectedFileList: v,
-    });
-  }
-
-  backToStep2() {
-    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
-    if (!pre_data_set_name) return;
-    this.setDataSetVersionsSource(pre_data_set_name);
-    this.form('createDataHandleStep2').setValues({
-      pre_data_set_name,
-      pre_data_set_version,
-      post_data_set_version: pre_data_set_version,
-      post_data_set_name: pre_data_set_name,
-    });
+    return _obj;
   }
 
   async getDataSet() {
@@ -371,129 +343,6 @@ class $$Page extends React.Component {
     );
   }
 
-  getVersionName(dataset, version) {
-    console.log(dataset, this.state.dataSetDataList);
-    if (dataset && version) {
-      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
-      console.log(datasetObj);
-      const versionObj = datasetObj.versions.find(i => i.value === version);
-      return versionObj.name;
-    }
-    return;
-  }
-
-  async getTableList(name) {
-    if (!name) return;
-    this.setState({
-      fileTableLoading: true,
-    });
-    const res = await this.utils.bff.getVersionedDataset({
-      name: name,
-      namespace: this.utils.getAuthData().project,
-      fileInput: {
-        keyword: this.state.dataSetFileSearchParams.keyword,
-        pageSize: 10,
-        page: this.state.dataSetFileSearchParams.currentPage,
-      },
-    });
-    const data = res.VersionedDataset.getVersionedDataset.files;
-    this.setState({
-      fileTableLoading: false,
-      dataSetFileList:
-        (data.nodes || []).map(i => ({
-          ...i,
-          label: '普通文本',
-        })) || [],
-      dataSetFileTotal: data.totalCount || 0,
-    });
-  }
-
-  async onNext() {
-    if (this.state.currentStep === 0) {
-      this.getStep1Data();
-    } else if (this.state.currentStep === 1) {
-      this.getStep2Data();
-    } else if (this.state.currentStep === 2) {
-      this.onNextStep();
-    } else {
-      this.onNextStep();
-    }
-  }
-
-  valToKey(obj) {
-    const _obj = {};
-    for (let key in obj) {
-      _obj[obj[key]] = key;
-    }
-    return _obj;
-  }
-
-  convertStep3Data() {
-    const list = [];
-    const step3Data = this.state.step3Data;
-    const vTk = this.valToKey(this.state.configMap);
-    console.log(vTk);
-    for (let k in step3Data) {
-      if (k.endsWith('Checked')) {
-        if (step3Data[k]) {
-          list.push({
-            type: vTk[k],
-          });
-        }
-      }
-    }
-    return list;
-  }
-
-  getStep4TableData() {
-    const list = this.convertStep3Data();
-    const result = [];
-    list.forEach(item => {
-      const cur = this.state.afterTreatmentData.find(ele => ele._type === item.type);
-      if (cur) {
-        result.push(cur);
-      }
-    });
-    return result;
-  }
-
-  async onFinish() {
-    const list = this.convertStep3Data();
-    const files = this.state.selectedFileList.map(item => {
-      const _item = item.split('/');
-      return {
-        name: _item[_item.length - 1],
-      };
-    });
-    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
-    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
-    const data = {
-      ...this.state.step1FormData,
-      ...this.state.step2FormData,
-      version_data_set_name: versionName,
-      data_process_config_info: list,
-      file_names: files,
-      bucket_name: this.utils.getAuthData().project,
-      namespace: this.utils.getAuthData().project,
-      creator: this.utils.getAuthData().user?.name,
-    };
-    const res = await this.utils.bff.createDataProcessTask({
-      input: {
-        ...data,
-      },
-    });
-    if (res.dataProcess.createDataProcessTask.status === 200) {
-      this.utils.notification.success({
-        message: '成功',
-      });
-      this.history.push('/data-handle');
-    } else {
-      this.utils.notification.warn({
-        message: res.dataProcess?.createDataProcessTask?.message || '失败',
-      });
-    }
-  }
-
   onNextStep() {
     // step2 文件检查
     if (this.state.currentStep === 1) {
@@ -502,9 +351,10 @@ class $$Page extends React.Component {
           fileSelectCheckErrorFlag: true,
         });
         // 调试需要关闭此
-        return;
+        // return;
       }
     }
+
     if (this.state.currentStep === 2) {
       // 判断是否选了处理的选项。不选不行
       const list = this.convertStep3Data();
@@ -573,9 +423,203 @@ class $$Page extends React.Component {
     );
   }
 
-  onBack(event) {
-    // 点击按钮时的回调
-    this.history.push('/data-handle');
+  backToStep2() {
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    if (!pre_data_set_name) return;
+    this.setDataSetVersionsSource(pre_data_set_name);
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_name,
+      pre_data_set_version,
+      post_data_set_version: pre_data_set_version,
+      post_data_set_name: pre_data_set_name,
+    });
+  }
+
+  getStep1Data() {
+    this.form('createDataHandleStep1')
+      .validate()
+      .then(res => {
+        const step1FormData = this.form('createDataHandleStep1').values;
+        this.setState({
+          step1FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  getStep2Data() {
+    this.form('createDataHandleStep2')
+      ?.validate()
+      .then(res => {
+        const step2FormData = this.form('createDataHandleStep2').values;
+        this.setState({
+          step2FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  async getTableList(name) {
+    if (!name) return;
+    this.setState({
+      fileTableLoading: true,
+    });
+    const res = await this.utils.bff.getVersionedDataset({
+      name: name,
+      namespace: this.utils.getAuthData().project,
+      fileInput: {
+        keyword: this.state.dataSetFileSearchParams.keyword,
+        pageSize: 10,
+        page: this.state.dataSetFileSearchParams.currentPage,
+      },
+    });
+    const data = res.VersionedDataset.getVersionedDataset.files;
+    this.setState({
+      fileTableLoading: false,
+      dataSetFileList:
+        (data.nodes || []).map(i => ({
+          ...i,
+          label: '普通文本',
+        })) || [],
+      dataSetFileTotal: data.totalCount || 0,
+    });
+  }
+
+  onPageChange(page) {
+    this.setState(
+      {
+        dataSetFileSearchParams: {
+          ...this.state.dataSetFileSearchParams,
+          currentPage: page,
+        },
+      },
+      () => {
+        this.getDataSet();
+      }
+    );
+  }
+
+  async getListWorkers() {
+    try {
+      const namespace = this.utils.getAuthData().project || 'system-tce';
+      const input = {
+        modelTypes,
+        pageSize: 9999,
+        page: 1,
+        namespace,
+      };
+      if (keyword) input.keyword = keyword;
+      const res = await this.props.appHelper.utils.bff?.listWorkers({
+        input,
+      });
+      this.setState({
+        dataSource: res.Worker?.listWorkers?.nodes,
+      });
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: '获取服务失败',
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
+  getVersionName(dataset, version) {
+    console.log(dataset, this.state.dataSetDataList);
+    if (dataset && version) {
+      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
+      console.log(datasetObj);
+      const versionObj = datasetObj.versions.find(i => i.value === version);
+      return versionObj.name;
+    }
+    return;
+  }
+
+  onDataSetChange(v) {
+    this.setState({
+      dataSetFileList: [],
+      selectedFileList: [],
+      dataSetFileTotal: '0',
+    });
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_version: undefined,
+      post_data_set_version: undefined,
+      post_data_set_name: v,
+    });
+    this.setDataSetVersionsSource(v);
+  }
+
+  convertStep3Data() {
+    const list = [];
+    const step3Data = this.state.step3Data;
+    const vTk = this.valToKey(this.state.configMap);
+    console.log(vTk);
+    for (let k in step3Data) {
+      if (k.endsWith('Checked')) {
+        if (step3Data[k]) {
+          list.push({
+            type: vTk[k],
+          });
+        }
+      }
+    }
+    return list;
+  }
+
+  updateStep3State(value, event, extraParams = {}) {
+    const fieldName = {
+      ...event,
+      ...extraParams,
+    }.fieldName;
+    const step3 = {
+      ...this.state.step3Data,
+      [fieldName]: value,
+    };
+    this.setState({
+      step3Data: step3,
+    });
+  }
+
+  getStep4TableData() {
+    const list = this.convertStep3Data();
+    const result = [];
+    list.forEach(item => {
+      const cur = this.state.afterTreatmentData.find(ele => ele._type === item.type);
+      if (cur) {
+        result.push(cur);
+      }
+    });
+    return result;
+  }
+
+  onSelectFileChange(v) {
+    if (v.length) {
+      this.setState({
+        fileSelectCheckErrorFlag: false,
+      });
+    }
+    this.setState({
+      selectedFileList: v,
+    });
+  }
+
+  onDataSetVersionChange(v) {
+    this.form('createDataHandleStep2').setValues({
+      post_data_set_version: v,
+    });
+    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
+    const name = this.getVersionName(pre_data_set_name, v);
+    this.getTableList(name);
+  }
+
+  setDataSetVersionsSource(v) {
+    const obj = this.state.dataSetDataList.find(item => item.value === v);
+    const genOptionList = obj.versions;
+    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
+      dataSource: genOptionList,
+    });
+    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
+      dataSource: genOptionList,
+    });
   }
 
   componentDidMount() {
@@ -654,16 +698,21 @@ class $$Page extends React.Component {
               () => this.state.currentStep === 2 && this.state.step1FormData.file_type !== 'qa'
             ) && (
               <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                <Col span={24} style={{ paddingBottom: '8px' }} __component_name="Col">
-                  <Typography.Title
-                    bold={false}
-                    level={2}
-                    bordered={false}
-                    ellipsis={true}
-                    __component_name="Typography.Title"
+                <Col span={24} style={{ paddingBottom: '0px' }} __component_name="Col">
+                  <Divider
+                    __component_name="Divider"
+                    mode="default"
+                    orientation="left"
+                    orientationMargin={0}
+                    dashed={true}
+                    defaultOpen={false}
+                    content=""
+                    openIcon=""
+                    closeIcon=""
+                    style={{ fontWeight: 700 }}
                   >
                     分段处理
-                  </Typography.Title>
+                  </Divider>
                 </Col>
                 <Col span={24} __component_name="Col">
                   <Row wrap={true} __component_name="Row">
@@ -1043,27 +1092,25 @@ class $$Page extends React.Component {
                                       }}
                                       __component_name="FormilyForm"
                                     >
-                                      {!!false && (
-                                        <FormilySelect
-                                          fieldProps={{ name: 'Select', 'x-validator': [] }}
-                                          componentProps={{
-                                            'x-component-props': {
-                                              disabled: false,
-                                              allowClear: false,
-                                              placeholder: '请选择模型',
-                                              _sdkSwrGetFunc: {},
-                                            },
-                                          }}
-                                          decoratorProps={{
-                                            'x-decorator-props': {
-                                              style: { marginBottom: '0px' },
-                                              tooltip: '',
-                                              labelEllipsis: true,
-                                            },
-                                          }}
-                                          __component_name="FormilySelect"
-                                        />
-                                      )}
+                                      <FormilySelect
+                                        fieldProps={{ name: 'Select', 'x-validator': [] }}
+                                        componentProps={{
+                                          'x-component-props': {
+                                            disabled: false,
+                                            allowClear: false,
+                                            placeholder: '请选择模型',
+                                            _sdkSwrGetFunc: {},
+                                          },
+                                        }}
+                                        decoratorProps={{
+                                          'x-decorator-props': {
+                                            style: { marginBottom: '0px' },
+                                            tooltip: '',
+                                            labelEllipsis: true,
+                                          },
+                                        }}
+                                        __component_name="FormilySelect"
+                                      />
                                     </FormilyForm>
                                     <Row
                                       wrap={false}
@@ -1113,18 +1160,20 @@ class $$Page extends React.Component {
               <Row wrap={true} gutter={['', 0]} __component_name="Row">
                 <Col
                   span={24}
-                  style={{ paddingTop: '16px', paddingBottom: '8px' }}
+                  style={{ paddingTop: '0px', paddingBottom: '0px' }}
                   __component_name="Col"
                 >
-                  <Typography.Title
-                    bold={false}
-                    level={2}
-                    bordered={false}
-                    ellipsis={true}
-                    __component_name="Typography.Title"
+                  <Divider
+                    __component_name="Divider"
+                    mode="default"
+                    orientation="left"
+                    orientationMargin={0}
+                    dashed={true}
+                    defaultOpen={false}
+                    style={{ fontWeight: 700 }}
                   >
                     异常清洗配置
-                  </Typography.Title>
+                  </Divider>
                 </Col>
                 <Col span={24} __component_name="Col">
                   <Row wrap={true} __component_name="Row">
@@ -1669,18 +1718,20 @@ class $$Page extends React.Component {
               <Row wrap={true} gutter={['', 0]} __component_name="Row">
                 <Col
                   span={24}
-                  style={{ paddingTop: '16px', paddingBottom: '8px' }}
+                  style={{ paddingTop: '0px', paddingBottom: '0px' }}
                   __component_name="Col"
                 >
-                  <Typography.Title
-                    bold={false}
-                    level={2}
-                    bordered={false}
-                    ellipsis={true}
-                    __component_name="Typography.Title"
+                  <Divider
+                    __component_name="Divider"
+                    mode="default"
+                    orientation="left"
+                    orientationMargin={0}
+                    dashed={true}
+                    defaultOpen={false}
+                    style={{ fontWeight: 700 }}
                   >
                     数据过滤配置
-                  </Typography.Title>
+                  </Divider>
                 </Col>
                 <Col span={24} __component_name="Col">
                   <Row wrap={true} __component_name="Row">
@@ -2329,18 +2380,20 @@ class $$Page extends React.Component {
               <Row wrap={true} gutter={['', 0]} __component_name="Row">
                 <Col
                   span={24}
-                  style={{ paddingTop: '16px', paddingBottom: '8px' }}
+                  style={{ paddingTop: '0px', paddingBottom: '0px' }}
                   __component_name="Col"
                 >
-                  <Typography.Title
-                    bold={false}
-                    level={2}
-                    bordered={false}
-                    ellipsis={true}
-                    __component_name="Typography.Title"
+                  <Divider
+                    __component_name="Divider"
+                    mode="default"
+                    orientation="left"
+                    orientationMargin={0}
+                    dashed={true}
+                    defaultOpen={false}
+                    style={{ fontWeight: 700 }}
                   >
                     数据去重配置
-                  </Typography.Title>
+                  </Divider>
                 </Col>
                 <Col span={24} __component_name="Col">
                   <Row wrap={true} __component_name="Row">
@@ -2513,18 +2566,20 @@ class $$Page extends React.Component {
               <Row wrap={true} gutter={['', 0]} __component_name="Row">
                 <Col
                   span={24}
-                  style={{ paddingTop: '16px', paddingBottom: '8px' }}
+                  style={{ paddingTop: '0px', paddingBottom: '0px' }}
                   __component_name="Col"
                 >
-                  <Typography.Title
-                    bold={false}
-                    level={2}
-                    bordered={false}
-                    ellipsis={true}
-                    __component_name="Typography.Title"
+                  <Divider
+                    __component_name="Divider"
+                    mode="default"
+                    orientation="left"
+                    orientationMargin={0}
+                    dashed={true}
+                    defaultOpen={false}
+                    style={{ fontWeight: 700 }}
                   >
                     数据隐私处理
-                  </Typography.Title>
+                  </Divider>
                 </Col>
                 <Col span={24} __component_name="Col">
                   <Row wrap={true} __component_name="Row">
@@ -2625,7 +2680,6 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        className="step3_disabled_style"
                         hoverable={false}
                         __component_name="Card"
                       >
@@ -2665,15 +2719,17 @@ class $$Page extends React.Component {
                                   <Col __component_name="Col">
                                     <Switch
                                       size="small"
-                                      checked={__$$eval(() => this.state.step3Data.RemoveIPAddress)}
+                                      checked={__$$eval(
+                                        () => this.state.step3Data.RemoveIPAddressChecked
+                                      )}
                                       loading={false}
-                                      disabled={true}
+                                      disabled={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
                                           Array.prototype.slice.call(arguments).concat([
                                             {
-                                              fieldName: 'RemoveIPAddress',
+                                              fieldName: 'RemoveIPAddressChecked',
                                             },
                                           ])
                                         );
@@ -2713,7 +2769,6 @@ class $$Page extends React.Component {
                         actions={[]}
                         loading={false}
                         bordered={true}
-                        className="step3_disabled_style"
                         hoverable={false}
                         __component_name="Card"
                       >
@@ -2753,15 +2808,17 @@ class $$Page extends React.Component {
                                   <Col __component_name="Col">
                                     <Switch
                                       size="small"
-                                      checked={__$$eval(() => this.state.step3Data.RemoveNumber)}
+                                      checked={__$$eval(
+                                        () => this.state.step3Data.RemoveNumberChecked
+                                      )}
                                       loading={false}
-                                      disabled={true}
+                                      disabled={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
                                           Array.prototype.slice.call(arguments).concat([
                                             {
-                                              fieldName: 'RemoveNumber',
+                                              fieldName: 'RemoveNumberChecked',
                                             },
                                           ])
                                         );
