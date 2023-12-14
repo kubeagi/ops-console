@@ -583,7 +583,7 @@ class DataSource$$Page extends React.Component {
                             }.bind(__$$context)}
                             bordered={false}
                             bodyStyle={{ position: 'relative' }}
-                            hoverable={false}
+                            hoverable={true}
                           >
                             <Row wrap={true} gutter={[0, 0]} __component_name="Row">
                               <Col
@@ -753,6 +753,7 @@ class DataSource$$Page extends React.Component {
                                               style={{ display: 'flex' }}
                                               justify="space-between"
                                               __component_name="Row"
+                                              gutter={[0, 0]}
                                             >
                                               <Col __component_name="Col">
                                                 <Space
@@ -760,6 +761,7 @@ class DataSource$$Page extends React.Component {
                                                   style={{}}
                                                   direction="horizontal"
                                                   __component_name="Space"
+                                                  size={0}
                                                 >
                                                   <Status
                                                     id={__$$eval(() => record?.status)}
@@ -789,7 +791,10 @@ class DataSource$$Page extends React.Component {
                                                   )}
                                                 </Space>
                                               </Col>
-                                              <Col __component_name="Col">
+                                              <Col
+                                                __component_name="Col"
+                                                style={{ verticalAlign: 'baseline' }}
+                                              >
                                                 <Tag
                                                   color={__$$eval(
                                                     () =>
