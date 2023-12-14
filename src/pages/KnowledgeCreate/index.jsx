@@ -67,11 +67,6 @@ class KnowledgeCreate$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      currentStep: 0,
-      submited: false,
-      embedderList: [],
-      dataSetDataList: [],
-      dataSetFileList: [],
       form: {
         name: '',
         displayName: '',
@@ -84,9 +79,13 @@ class KnowledgeCreate$$Page extends React.Component {
       },
       dataSet: '',
       version: '',
+      submited: false,
+      currentStep: 0,
       selectFiles: [],
+      embedderList: [],
       nextFileList: [],
-      contentType: '',
+      dataSetDataList: [],
+      dataSetFileList: [],
     };
   }
 
@@ -98,138 +97,12 @@ class KnowledgeCreate$$Page extends React.Component {
     return this._refsManager.getAll(refName);
   };
 
-  getFormInstence() {
-    return this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-  }
-
-  initFormValue() {
-    try {
-      const form = this.getFormInstence();
-      const { name, displayName, dataSetContain, description, embedder } = this.state.form;
-      const { dataset, version } = dataSetContain;
-      form.setValues(
-        {
-          displayName,
-          dataSetContain: {
-            dataset,
-            version,
-          },
-          description,
-          embedder,
-        },
-        'deepMerge'
-      );
-      // dataSetDataList: datasetlist
-      const { dataSetDataList, embedderList } = this.state;
-      form.setFieldState('dataSetContain.dataset', state => {
-        state.dataSource = dataSetDataList;
-      });
-      form.setFieldState('embedder', state => {
-        state.dataSource = embedderList;
-      });
-      this.setDataSetAndDataSetVersionsSource(dataset);
-    } catch (error) {}
-  }
-
-  handleSave(v) {
-    // console.log(v, 'aaaaaaaaaaaaaaaaaaaa')
-  }
-
   getStatus() {
     return {
       type: 'success',
       id: 'success',
       children: ' ',
     };
-  }
-
-  onStepChange(value) {
-    this.setState({
-      currentStep: value,
-    });
-  }
-
-  handleStep(event, { action }) {
-    // console.log(this.state.currentStep, action)
-    if (action === 'next') {
-      this.checkFileds();
-    } else {
-      this.setState(
-        {
-          currentStep: this.state.currentStep - 1,
-        },
-        () => {
-          this.initFormValue();
-        }
-      );
-    }
-  }
-
-  checkFileds() {
-    try {
-      const form = this.getFormInstence();
-      form.submit(async values => {
-        const { name, displayName, dataSetContain, description, embedder } = values;
-        const { dataset, version } = dataSetContain;
-        if (this.state.currentStep === 0) {
-          if (this.state.selectFiles.length === 0) {
-            this.utils.message.info('请选择文件');
-            return;
-          }
-        }
-        this.setState({
-          currentStep: this.state.currentStep + 1,
-          form: {
-            name,
-            displayName,
-            dataSetContain,
-            description,
-            embedder,
-          },
-        });
-      });
-    } catch (error) {}
-  }
-
-  handleSubmit() {
-    this.setState(
-      {
-        submited: true,
-      },
-      async () => {
-        const { embedderList, selectFiles, dataSetFileList, form } = this.state;
-        const { name, displayName, dataSetContain, description, embedder } = form;
-        const { dataset, version } = dataSetContain;
-        const embedderItem = embedderList.find(item => item.value === embedder);
-        const fileGroups = [
-          {
-            source: {
-              kind: 'VersionedDataset',
-              name: version,
-              namespace: this.utils.getAuthData().project,
-            },
-            path: selectFiles,
-          },
-        ];
-        try {
-          await this.utils.bff.createKnowledgeBase({
-            input: {
-              name,
-              displayName,
-              // name: displayName,
-              description,
-              embedder: embedderItem.name,
-              fileGroups,
-              namespace: this.utils.getAuthData().project,
-            },
-          });
-          this.utils.message.success('新增知识库成功');
-        } catch (err) {
-          console.error('新增知识库失败', err);
-          this.utils.message.warning('新增知识库失败');
-        }
-      }
-    );
   }
 
   async getDataSet() {
@@ -278,65 +151,64 @@ class KnowledgeCreate$$Page extends React.Component {
     } catch (error) {}
   }
 
-  async getTableList(pre_data_set_name, pre_data_set_version) {
-    try {
-      const res = await this.utils.bff.getVersionedDataset({
-        name: pre_data_set_version,
-        namespace: this.utils.getAuthData().project,
-      });
-      const { getVersionedDataset } = res.VersionedDataset || {};
-      const { files } = getVersionedDataset;
+  handleSave(v) {
+    // console.log(v, 'aaaaaaaaaaaaaaaaaaaa')
+  }
+
+  handleStep(event, { action }) {
+    // console.log(this.state.currentStep, action)
+    if (action === 'next') {
+      this.checkFileds();
+    } else {
       this.setState(
         {
-          dataSetFileList: files.nodes || [],
+          currentStep: this.state.currentStep - 1,
         },
         () => {
-          // console.log(files,  this.state)
+          this.initFormValue();
         }
       );
-    } catch (error) {}
+    }
   }
 
-  onDataSetChange(v) {
+  checkFileds() {
     try {
       const form = this.getFormInstence();
-      this.setState({
-        dataSet: v,
-        dataSetFileList: [], // 清空表格
-      });
-
-      form.setValues({
-        dataSetContain: {
-          version: null,
-        },
-      });
-      this.setDataSetAndDataSetVersionsSource(v);
-    } catch (error) {}
-  }
-
-  setDataSetAndDataSetVersionsSource(v) {
-    try {
-      const form = this.getFormInstence();
-      const obj = this.state.dataSetDataList.find(item => item.value === v);
-      const genOptionList = obj.versions;
-      // form.setFieldState('version', { dataSource: genOptionList })
-      form.setFieldState('dataSetContain.version', state => {
-        state.dataSource = genOptionList;
-      });
-      this.setState({
-        contentType: obj.contentType,
+      form.submit(async values => {
+        const { name, displayName, dataSetContain, description, embedder } = values;
+        const { dataset, version } = dataSetContain;
+        if (this.state.currentStep === 0) {
+          if (this.state.selectFiles.length === 0) {
+            this.utils.message.info('请选择文件');
+            return;
+          }
+        }
+        this.setState({
+          currentStep: this.state.currentStep + 1,
+          form: {
+            name,
+            displayName,
+            dataSetContain,
+            description,
+            embedder,
+          },
+        });
       });
     } catch (error) {}
   }
 
-  onVersionChange(v) {
+  getCheckBox(rows) {
     try {
-      const form = this.getFormInstence();
-      // form.setFieldState('version', { dataSource: [{label: 'v2', value: 'v2'}] })
+      const { version } = this.state;
       this.setState({
-        version: v,
+        selectFiles: rows,
+        nextFileList: rows.map(item => {
+          return {
+            ...this.state.dataSetFileList.find(_item => _item.path === item),
+            version,
+          };
+        }),
       });
-      this.getTableList(this.state.dataSet, v);
     } catch (error) {}
   }
 
@@ -373,29 +245,143 @@ class KnowledgeCreate$$Page extends React.Component {
     } catch (error) {}
   }
 
-  getCheckBox(rows) {
+  async getTableList(pre_data_set_name, pre_data_set_version) {
     try {
-      const { version } = this.state;
-      this.setState({
-        selectFiles: rows,
-        nextFileList: rows.map(item => {
-          return {
-            ...this.state.dataSetFileList.find(_item => _item.path === item),
-            version,
-          };
-        }),
+      const res = await this.utils.bff.getVersionedDataset({
+        name: pre_data_set_version,
+        namespace: this.utils.getAuthData().project,
       });
+      const { getVersionedDataset } = res.VersionedDataset || {};
+      const { files } = getVersionedDataset;
+      this.setState(
+        {
+          // 过滤非 QA 文件
+          dataSetFileList: (files.nodes || []).filter(file => file.fileType === 'QA'),
+        },
+        () => {
+          // console.log(files,  this.state)
+        }
+      );
     } catch (error) {}
   }
 
-  getType() {
+  handleSubmit() {
+    this.setState(
+      {
+        submited: true,
+      },
+      async () => {
+        const { embedderList, selectFiles, dataSetFileList, form } = this.state;
+        const { name, displayName, dataSetContain, description, embedder } = form;
+        const { dataset, version } = dataSetContain;
+        const embedderItem = embedderList.find(item => item.value === embedder);
+        const fileGroups = [
+          {
+            source: {
+              kind: 'VersionedDataset',
+              name: version,
+              namespace: this.utils.getAuthData().project,
+            },
+            path: selectFiles,
+          },
+        ];
+        try {
+          await this.utils.bff.createKnowledgeBase({
+            input: {
+              name,
+              displayName,
+              // name: displayName,
+              description,
+              embedder: embedderItem.name,
+              fileGroups,
+              namespace: this.utils.getAuthData().project,
+            },
+          });
+          this.utils.message.success('新增知识库成功');
+        } catch (err) {
+          console.error('新增知识库失败', err);
+          this.utils.message.warning('新增知识库失败');
+        }
+      }
+    );
+  }
+
+  onStepChange(value) {
+    this.setState({
+      currentStep: value,
+    });
+  }
+
+  initFormValue() {
     try {
-      const contentTypeObj = {
-        text: '文本',
-        image: '图片',
-        video: '视频',
-      };
-      return contentTypeObj[this.state.contentType];
+      const form = this.getFormInstence();
+      const { name, displayName, dataSetContain, description, embedder } = this.state.form;
+      const { dataset, version } = dataSetContain;
+      form.setValues(
+        {
+          displayName,
+          dataSetContain: {
+            dataset,
+            version,
+          },
+          description,
+          embedder,
+        },
+        'deepMerge'
+      );
+      // dataSetDataList: datasetlist
+      const { dataSetDataList, embedderList } = this.state;
+      form.setFieldState('dataSetContain.dataset', state => {
+        state.dataSource = dataSetDataList;
+      });
+      form.setFieldState('embedder', state => {
+        state.dataSource = embedderList;
+      });
+      this.setDataSetAndDataSetVersionsSource(dataset);
+    } catch (error) {}
+  }
+
+  getFormInstence() {
+    return this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
+  }
+
+  onDataSetChange(v) {
+    try {
+      const form = this.getFormInstence();
+      this.setState({
+        dataSet: v,
+        dataSetFileList: [], // 清空表格
+      });
+
+      form.setValues({
+        dataSetContain: {
+          version: null,
+        },
+      });
+      this.setDataSetAndDataSetVersionsSource(v);
+    } catch (error) {}
+  }
+
+  onVersionChange(v) {
+    try {
+      const form = this.getFormInstence();
+      // form.setFieldState('version', { dataSource: [{label: 'v2', value: 'v2'}] })
+      this.setState({
+        version: v,
+      });
+      this.getTableList(this.state.dataSet, v);
+    } catch (error) {}
+  }
+
+  setDataSetAndDataSetVersionsSource(v) {
+    try {
+      const form = this.getFormInstence();
+      const obj = this.state.dataSetDataList.find(item => item.value === v);
+      const genOptionList = obj.versions;
+      // form.setFieldState('version', { dataSource: genOptionList })
+      form.setFieldState('dataSetContain.version', state => {
+        state.dataSource = genOptionList;
+      });
     } catch (error) {}
   }
 
@@ -663,7 +649,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 ellipsis={true}
                                 __component_name="Typography.Text"
                               >
-                                {__$$eval(() => __$$context.getType())}
+                                {__$$eval(() => text || '-')}
                               </Typography.Text>
                             ))(__$$createChildContext(__$$context, { text, record, index })),
                           dataIndex: 'fileType',
