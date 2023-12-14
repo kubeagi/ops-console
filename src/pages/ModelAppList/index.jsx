@@ -19,6 +19,11 @@ import {
   Status,
   Pagination,
   Modal,
+  FormilyForm,
+  FormilyInput,
+  FormilyUpload,
+  Image,
+  FormilyTextArea,
 } from '@tenx-ui/materials';
 
 import {
@@ -33,7 +38,7 @@ import { DataProvider } from 'shared-components';
 import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
-import utils from '../../utils/__utils';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
@@ -65,6 +70,8 @@ class ModelAppList$$Page extends React.Component {
     super(props);
 
     this.utils = utils;
+
+    this._refsManager = new RefsManager();
 
     __$$i18n._inject2(this);
 
@@ -108,13 +115,18 @@ class ModelAppList$$Page extends React.Component {
       currentRecord: null,
       deleteLoading: false,
       deleteBtnLoading: false,
+      createModalVisible: false,
       deleteModalVisible: false,
     };
   }
 
-  $ = () => null;
+  $ = refName => {
+    return this._refsManager.get(refName);
+  };
 
-  $$ = () => [];
+  $$ = refName => {
+    return this._refsManager.getAll(refName);
+  };
 
   componentWillUnmount() {
     console.log('will unmount');
@@ -263,6 +275,18 @@ class ModelAppList$$Page extends React.Component {
     });
   }
 
+  onOpenCreateModel() {
+    this.setState({
+      createModalVisible: true,
+    });
+  }
+
+  onCloseCreateModel() {
+    this.setState({
+      createModalVisible: false,
+    });
+  }
+
   onCloseDeleteModal(e, isNeedLoad) {
     console.log('isNeedLoad', isNeedLoad);
     this.setState({
@@ -344,7 +368,7 @@ class ModelAppList$$Page extends React.Component {
                           danger={false}
                           target="_self"
                           onClick={function () {
-                            return this.onCreateClick.apply(
+                            return this.onOpenCreateModel.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
@@ -623,6 +647,90 @@ class ModelAppList$$Page extends React.Component {
             __component_name="Alert"
           />
         </Modal>
+        <Modal
+          mask={true}
+          open={__$$eval(() => this.state.createModalVisible)}
+          title="新增应用"
+          centered={false}
+          keyboard={true}
+          onCancel={function () {
+            return this.onCloseCreateModel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          forceRender={false}
+          maskClosable={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          __component_name="Modal"
+        >
+          <FormilyForm
+            ref={this._refsManager.linkRef('create_form')}
+            formHelper={{ autoFocus: true }}
+            componentProps={{
+              colon: false,
+              layout: 'horizontal',
+              labelCol: 6,
+              labelAlign: 'left',
+              wrapperCol: 18,
+            }}
+            __component_name="FormilyForm"
+          >
+            <FormilyInput
+              fieldProps={{
+                name: 'name',
+                title: '模型应用名称',
+                required: true,
+                'x-validator': [],
+              }}
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              __component_name="FormilyInput"
+            />
+            <FormilyInput
+              fieldProps={{
+                name: 'displayName',
+                title: '模型应用别名',
+                required: true,
+                'x-validator': [],
+              }}
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              __component_name="FormilyInput"
+            />
+            <FormilyUpload
+              fieldProps={{
+                name: 'Upload',
+                title: '上传',
+                'x-component': 'FormilyUpload',
+                'x-validator': [],
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              __component_name="FormilyUpload"
+            >
+              <Image
+                src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                width={40}
+                height={40}
+                preview={false}
+                fallback=""
+                __component_name="Image"
+              />
+            </FormilyUpload>
+            <FormilyTextArea
+              fieldProps={{
+                name: 'desc',
+                title: '描述',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              __component_name="FormilyTextArea"
+            />
+          </FormilyForm>
+        </Modal>
       </Page>
     );
   }
@@ -636,6 +744,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -649,7 +758,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
