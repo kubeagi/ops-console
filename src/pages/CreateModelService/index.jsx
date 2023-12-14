@@ -100,6 +100,7 @@ class CreateModelService$$Page extends React.Component {
         6: '6',
       },
       listModels: [],
+      modelTypes: '',
     };
   }
 
@@ -199,12 +200,18 @@ class CreateModelService$$Page extends React.Component {
         namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
         resources: {
           cpu: resources.customCPU || marks[resources.cpu],
-          memory: `${resources.customMemory || marks[resources.memory]}Gi`,
-          nvidiaGPU: resources.customGPU || gpuMarks[resources.nvidiaGPU],
+          memory: `${
+            resources.customMemory || resources.customMemory === 0
+              ? resources.customMemory
+              : marks[resources.memory]
+          }Gi`,
+          nvidiaGPU:
+            resources.customGPU || resources.customGPU === 0
+              ? resources.customGPU
+              : gpuMarks[resources.nvidiaGPU],
         },
       };
       delete params.modelSource;
-      delete params.modelTypes;
       try {
         const res = await this.props.appHelper.utils.bff?.createWorker({
           input: params,
@@ -231,7 +238,7 @@ class CreateModelService$$Page extends React.Component {
 
   onChangeModel(e) {
     const { listModels } = this.state;
-    this.form()?.setValues({
+    this.setState({
       modelTypes: listModels.find(v => v.name === e)?.types,
     });
   }
@@ -430,19 +437,35 @@ class CreateModelService$$Page extends React.Component {
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   __component_name="FormilySelect"
                 />
-                <FormilyInput
-                  fieldProps={{
-                    name: 'modelTypes',
-                    title: '模型类型',
-                    'x-pattern': 'readOnly',
-                    'x-validator': [],
-                  }}
-                  componentProps={{
-                    'x-component-props': { allowClear: false, placeholder: '请输入模型类型' },
-                  }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilyInput"
-                />
+                <Row
+                  __component_name="Row"
+                  wrap={false}
+                  gutter={[0, 0]}
+                  style={{ marginBottom: '24px' }}
+                >
+                  <Col __component_name="Col" flex="" span={4} style={{ paddingLeft: '10px' }}>
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      ellipsis={true}
+                      style={{ fontSize: '' }}
+                      disabled={false}
+                      strong={false}
+                    >
+                      模型类型
+                    </Typography.Text>
+                  </Col>
+                  <Col __component_name="Col" flex="auto">
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      ellipsis={true}
+                      style={{ fontSize: '', height: '16px' }}
+                      disabled={false}
+                      strong={false}
+                    >
+                      {__$$eval(() => this.state.modelTypes)}
+                    </Typography.Text>
+                  </Col>
+                </Row>
                 <FormilyFormItem
                   fieldProps={{
                     name: 'resources',
@@ -724,7 +747,7 @@ class CreateModelService$$Page extends React.Component {
                                 componentProps={{
                                   'x-component-props': {
                                     max: 10,
-                                    min: 1,
+                                    min: 0,
                                     step: 1,
                                     precision: 0,
                                     placeholder: '请输入',

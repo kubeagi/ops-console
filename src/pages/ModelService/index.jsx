@@ -16,6 +16,7 @@ import {
   Dropdown,
   Divider,
   Descriptions,
+  Tooltip,
   Status,
   Tag,
   Modal,
@@ -70,13 +71,13 @@ class ModelService$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      page: 1,
-      keyword: '',
-      pageSize: 12,
       dataSource: [],
       delVisible: false,
-      modelTypes: '',
       currentModel: {},
+      modelTypes: '',
+      keyword: '',
+      page: 1,
+      pageSize: 12,
     };
   }
 
@@ -85,6 +86,65 @@ class ModelService$$Page extends React.Component {
   $$ = () => [];
 
   componentWillUnmount() {}
+
+  async getListWorkers() {
+    try {
+      const { keyword, pageSize, page, modelTypes } = this.state;
+      const namespace = this.utils.getAuthData().project || 'system-tce';
+      const input = {
+        modelTypes,
+        pageSize,
+        page,
+        namespace,
+      };
+      if (keyword) input.keyword = keyword;
+      const res = await this.props.appHelper.utils.bff?.listWorkers({
+        input,
+      });
+      this.setState({
+        dataSource: res.Worker?.listWorkers?.nodes,
+      });
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: '获取服务失败',
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
+  onClickCreatModel(event) {
+    this.history.push('/model-service/createModelService');
+  }
+
+  localMenuOnClick(e, item) {
+    e.domEvent.stopPropagation();
+    switch (e.key) {
+      case 'edit':
+        this.history.push(`/model-service/editModelService?name=${item.name}`);
+        break;
+      case 'delete':
+        this.setState({
+          currentModel: item,
+          delVisible: true,
+        });
+        break;
+    }
+  }
+
+  onClickCreatOutsideModel(event) {
+    this.history.push('/model-service/createOutsideModelService');
+  }
+
+  onClickToDetail(e, { id }) {
+    this.history.push(`/model-service/detail/${id}?type=local`);
+  }
+
+  onDelCancel() {
+    this.setState({
+      delVisible: false,
+      currentModel: {},
+    });
+  }
 
   async onDelOk() {
     try {
@@ -112,72 +172,14 @@ class ModelService$$Page extends React.Component {
     });
   }
 
-  onSearch(value, event) {
-    this.getListWorkers();
-  }
-
-  onRefresh(event) {
-    this.getListWorkers();
-  }
-
-  onDelCancel() {
-    this.setState({
-      delVisible: false,
-      currentModel: {},
-    });
-  }
-
-  async getListWorkers() {
-    try {
-      const { keyword, pageSize, page, modelTypes } = this.state;
-      const namespace = this.utils.getAuthData().project || 'system-tce';
-      const input = {
-        modelTypes,
-        pageSize,
-        page,
-        namespace,
-      };
-      if (keyword) input.keyword = keyword;
-      const res = await this.props.appHelper.utils.bff?.listWorkers({
-        input,
-      });
-      this.setState({
-        dataSource: res.Worker?.listWorkers?.nodes,
-      });
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: '获取服务失败',
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
   onChangeKeyword(event) {
     this.setState({
       keyword: event.target.value,
     });
   }
 
-  onClickToDetail(e, { id }) {
-    this.history.push(`/model-service/detail/${id}?type=local`);
-  }
-
-  localMenuOnClick(e, item) {
-    switch (e.key) {
-      case 'edit':
-        this.history.push(`/model-service/editModelService?name=${item.name}`);
-        break;
-      case 'delete':
-        this.setState({
-          currentModel: item,
-          delVisible: true,
-        });
-        break;
-    }
-  }
-
-  onClickCreatModel(event) {
-    this.history.push('/model-service/createModelService');
+  onSearch(value, event) {
+    this.getListWorkers();
   }
 
   onChangeModelTypes(e) {
@@ -189,8 +191,8 @@ class ModelService$$Page extends React.Component {
     );
   }
 
-  onClickCreatOutsideModel(event) {
-    this.history.push('/model-service/createOutsideModelService');
+  onRefresh(event) {
+    this.getListWorkers();
   }
 
   componentDidMount() {
@@ -340,8 +342,18 @@ class ModelService$$Page extends React.Component {
                             actions={[]}
                             loading={false}
                             bordered={false}
-                            hoverable={false}
+                            hoverable={true}
                             __component_name="Card"
+                            onClick={function () {
+                              return this.onClickToDetail.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([
+                                  {
+                                    id: item?.name,
+                                  },
+                                ])
+                              );
+                            }.bind(__$$context)}
                           >
                             <Row wrap={true} gutter={[0, 0]} __component_name="Row">
                               <Col span={24} __component_name="Col">
@@ -391,7 +403,10 @@ class ModelService$$Page extends React.Component {
                                     >
                                       <Button
                                         icon={
-                                          <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
+                                          <AntdIconSettingOutlined
+                                            __component_name="AntdIconSettingOutlined"
+                                            style={{ color: '#000' }}
+                                          />
                                         }
                                         type="link"
                                         block={false}
@@ -401,27 +416,14 @@ class ModelService$$Page extends React.Component {
                                         danger={false}
                                         disabled={false}
                                         __component_name="Button"
+                                        hoverColor="default"
                                       />
                                     </Dropdown>
                                   </Col>
                                 </Row>
                                 <Row
                                   wrap={false}
-                                  style={{
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                  }}
-                                  onClick={function () {
-                                    return this.onClickToDetail.apply(
-                                      this,
-                                      Array.prototype.slice.call(arguments).concat([
-                                        {
-                                          id: item?.name,
-                                        },
-                                      ])
-                                    );
-                                  }.bind(__$$context)}
+                                  style={{ display: 'flex', alignItems: 'center' }}
                                   __component_name="Row"
                                 >
                                   <Col
@@ -499,16 +501,32 @@ class ModelService$$Page extends React.Component {
                                   children: (
                                     <Row wrap={false} gutter={[0, 0]} __component_name="Row">
                                       <Col flex="60px" __component_name="Col">
-                                        <Status
-                                          id={__$$eval(() => item.status)}
-                                          types={[
-                                            { id: 'Running', type: 'success', children: '运行中' },
-                                            { id: 'Pending', type: 'info', children: '部署中' },
-                                            { id: 'Error', type: 'error', children: '异常' },
-                                            { id: 'Unknown', type: 'disabled', children: '未知' },
-                                          ]}
-                                          __component_name="Status"
-                                        />
+                                        <Tooltip
+                                          __component_name="Tooltip"
+                                          title={__$$eval(() =>
+                                            item.status === 'Error' ? item.message : ''
+                                          )}
+                                        >
+                                          <Status
+                                            id={__$$eval(() => item.status)}
+                                            types={[
+                                              {
+                                                id: 'Running',
+                                                type: 'success',
+                                                children: '运行中',
+                                              },
+                                              { id: 'Pending', type: 'info', children: '部署中' },
+                                              { id: 'Error', type: 'error', children: '异常' },
+                                              { id: 'Unknown', type: 'disabled', children: '未知' },
+                                              {
+                                                id: 'Deleting',
+                                                children: '删除中',
+                                                type: 'warning',
+                                              },
+                                            ]}
+                                            __component_name="Status"
+                                          />
+                                        </Tooltip>
                                       </Col>
                                       <Col
                                         flex="auto"
