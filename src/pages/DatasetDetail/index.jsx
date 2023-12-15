@@ -6,12 +6,12 @@ import {
   Page,
   Modal,
   FormilyForm,
-  FormilyInput,
   FormilyFormItem,
   Typography,
   FormilyTextArea,
   FormilySwitch,
   FormilySelect,
+  FormilyInput,
   Row,
   Col,
   Space,
@@ -86,7 +86,6 @@ class DatasetDetail$$Page extends React.Component {
   }
 
   data() {
-    console.log('uuuu',this.props.useGetDataset.data?.Dataset?.getDataset)
     return {
       ...this.props.useGetDataset,
       data: this.props.useGetDataset.data?.Dataset?.getDataset || {},
@@ -114,9 +113,7 @@ class DatasetDetail$$Page extends React.Component {
   onAddVersionCancel() {
     // 点击遮罩层或右上角叉或取消按钮的回调
     this.setState({
-      addVersion: {
-        visible: false,
-      },
+      addVersion: false,
     });
   }
 
@@ -144,7 +141,7 @@ class DatasetDetail$$Page extends React.Component {
         message: '新增数据集版本成功',
       });
       this.onAddVersionCancel();
-      this.fetchData();
+      this.refresh();
     }
   }
 
@@ -195,9 +192,22 @@ class DatasetDetail$$Page extends React.Component {
       .catch(e => {});
   }
 
-  refresh(params) {
-    // 刷新数据回调
-    console.log('onClick', params, extParams);
+  refresh() {
+    this.utils?.changeLocationQuery(this, 'useGetDataset', {
+      _: new Date().getTime(),
+      name: this.match?.params?.id,
+      namespace: this.utils.getAuthData?.()?.project,
+      versionsInput: {
+        namespace: this.utils.getAuthData?.()?.project,
+        pageSize: 1000,
+        page: 1,
+      },
+      filesInput: {
+        keyword: '',
+        pageSize: 1,
+        page: 1,
+      },
+    });
   }
 
   async validatorName(v) {
@@ -240,7 +250,7 @@ class DatasetDetail$$Page extends React.Component {
           this.utils.notification.success({
             message: '删除数据集成功',
           });
-          this.appHelper.history.back();
+          this.refresh();
         },
       },
     });
@@ -261,104 +271,32 @@ class DatasetDetail$$Page extends React.Component {
   render() {
     const __$$context = this._context || this;
     const { state } = __$$context;
-    console.log('this.data().data?.versions?.nodes', this.data().data?.versions?.nodes)
     return (
       <Page>
-        {!!__$$eval(() => this.state.editVisible) && (
-          <Modal
-            mask={true}
-            onOk={function () {
-              return this.onEditOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
-            }.bind(this)}
-            open={true}
-            title="编辑数据集"
-            centered={false}
-            keyboard={true}
-            onCancel={function () {
-              return this.onEditCancel.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            forceRender={false}
-            maskClosable={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            __component_name="Modal"
-          >
-            <FormilyForm
-              ref={this._refsManager.linkRef('edit-dataset')}
-              formHelper={{ id: 'displayName', autoFocus: true }}
-              componentProps={{
-                colon: false,
-                layout: 'horizontal',
-                labelCol: 4,
-                labelAlign: 'left',
-                wrapperCol: 20,
-              }}
-              __component_name="FormilyForm"
-            >
-              <FormilyInput
-                fieldProps={{
-                  name: 'displayName',
-                  title: '数据集名称',
-                  required: true,
-                  'x-validator': [
-                    {
-                      id: 'disabled',
-                      type: 'disabled',
-                      message: '由小写字母、数字和中划线组成，以小写字母或数字开头和结尾',
-                      pattern: '^[a-z0-9]{1}[-a-z0-9]{1,61}[a-z0-9]{1}$',
-                      children: '未知',
-                      required: true,
-                      whitespace: true,
-                    },
-                    {
-                      id: 'disabled',
-                      type: 'disabled',
-                      children: '未知',
-                      validator: function () {
-                        return this.validatorName.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
-                      }.bind(this),
-                    },
-                  ],
-                }}
-                componentProps={{
-                  'x-component-props': { allowClear: true, placeholder: '请输入数据集名称' },
-                }}
-                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                __component_name="FormilyInput"
-              />
-            </FormilyForm>
-          </Modal>
-        )}
         {!!__$$eval(() => this.state.addVersion) && (
           <Modal
             mask={true}
-            open={true}
-            title={this.i18n('i18n-wgpt60zj') /* 新增版本 */}
-            centered={false}
-            keyboard={true}
-            forceRender={false}
-            maskClosable={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            __component_name="Modal"
             onOk={function () {
               return this.onAddVersionOK.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
             }.bind(this)}
+            open={true}
+            title={this.i18n('i18n-wgpt60zj') /* 新增版本 */}
+            centered={false}
+            keyboard={true}
             onCancel={function () {
               return this.onAddVersionCancel.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
             }.bind(this)}
+            forceRender={false}
+            maskClosable={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            __component_name="Modal"
           >
             <FormilyForm
               ref={this._refsManager.linkRef('formily_create')}
@@ -372,7 +310,7 @@ class DatasetDetail$$Page extends React.Component {
               }}
               createFormProps={{
                 initialValues: __$$eval(() => ({
-                  inheritedFromSwitch: !!this.state.addVersion.data?.versions.nodes.length,
+                  inheritedFromSwitch: !!this.data().data?.versions.nodes.length,
                 })),
               }}
               __component_name="FormilyForm"
@@ -449,6 +387,77 @@ class DatasetDetail$$Page extends React.Component {
                 }}
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 __component_name="FormilySelect"
+              />
+            </FormilyForm>
+          </Modal>
+        )}
+        {!!__$$eval(() => this.state.editVisible) && (
+          <Modal
+            mask={true}
+            onOk={function () {
+              return this.onEditOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            open={true}
+            title="编辑数据集"
+            centered={false}
+            keyboard={true}
+            onCancel={function () {
+              return this.onEditCancel.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            forceRender={false}
+            maskClosable={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            __component_name="Modal"
+          >
+            <FormilyForm
+              ref={this._refsManager.linkRef('edit-dataset')}
+              formHelper={{ id: 'displayName', autoFocus: true }}
+              componentProps={{
+                colon: false,
+                layout: 'horizontal',
+                labelCol: 4,
+                labelAlign: 'left',
+                wrapperCol: 20,
+              }}
+              __component_name="FormilyForm"
+            >
+              <FormilyInput
+                fieldProps={{
+                  name: 'displayName',
+                  title: '数据集名称',
+                  required: true,
+                  'x-validator': [
+                    {
+                      id: 'disabled',
+                      type: 'disabled',
+                      message: '由小写字母、数字和中划线组成，以小写字母或数字开头和结尾',
+                      pattern: '^[a-z0-9]{1}[-a-z0-9]{1,61}[a-z0-9]{1}$',
+                      children: '未知',
+                      required: true,
+                      whitespace: true,
+                    },
+                    {
+                      id: 'disabled',
+                      type: 'disabled',
+                      children: '未知',
+                      validator: function () {
+                        return this.validatorName.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
+                    },
+                  ],
+                }}
+                componentProps={{
+                  'x-component-props': { allowClear: true, placeholder: '请输入数据集名称' },
+                }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                __component_name="FormilyInput"
               />
             </FormilyForm>
           </Modal>
@@ -679,6 +688,12 @@ class DatasetDetail$$Page extends React.Component {
                       danger={false}
                       disabled={false}
                       __component_name="Button"
+                      onClick={function () {
+                        return this.refresh.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
                     >
                       刷新
                     </Button>
@@ -755,7 +770,9 @@ const PageWrapper = (props = {}) => {
               },
             };
           }.apply(self),
-          enableLocationSearch: undefined,
+          enableLocationSearch: function applyThis() {
+            return true;
+          }.apply(self),
         },
       ]}
       render={dataProps => (

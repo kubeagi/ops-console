@@ -96,7 +96,7 @@ constants.DATASET_DATA = function applyThis() {
       {
         children: '未发布',
         id: 0,
-        type: 'error',
+        type: 'info',
       },
       {
         children: '已发布',
@@ -104,7 +104,28 @@ constants.DATASET_DATA = function applyThis() {
         type: 'success',
       },
     ],
-    dataProcessStatus: [],
+    dataProcessStatus: [
+      {
+        children: '处理完成',
+        id: 'process_complete',
+        type: 'success',
+      },
+      {
+        children: '处理失败',
+        id: 'process_fail',
+        type: 'error',
+      },
+      {
+        children: '处理中',
+        id: 'processing',
+        type: 'info',
+      },
+      {
+        children: '未处理',
+        id: 'no',
+        type: 'info',
+      },
+    ],
   };
 }.apply(constants);
 export const DATASET_DATA = constants.DATASET_DATA;

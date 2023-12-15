@@ -25,9 +25,6 @@ import {
   UnifiedLink,
   Tag,
   Divider,
-  Table,
-  Status,
-  Dropdown,
 } from '@tenx-ui/materials';
 
 import LccComponentSbva0 from 'confirm';
@@ -37,6 +34,8 @@ import {
   TenxIconRefresh,
   AntdIconDeleteOutlined,
 } from '@tenx-ui/icon-materials';
+
+import LccComponentNy419 from 'dataset-version-list';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -81,19 +80,19 @@ class Dataset$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      search: undefined,
-      type: undefined,
-      field: undefined,
-      page: 1,
-      pageSize: 10,
-      totalCount: 0,
-      loading: false,
-      data: [],
       addVersion: {
         visible: false,
         data: {},
       },
       confirm: {},
+      data: [],
+      field: undefined,
+      loading: false,
+      page: 1,
+      pageSize: 10,
+      search: undefined,
+      totalCount: 0,
+      type: undefined,
     };
 
     // 代码中有些 Ds 是 Dataset的简写
@@ -110,6 +109,45 @@ class Dataset$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  addVersion(event, params) {
+    event.stopPropagation();
+    this.setState({
+      addVersion: {
+        visible: true,
+        data: params.data,
+      },
+    });
+  }
+
+  async addVersionFetch() {
+    const _version =
+      'v' + (this.getVersionsNumMax(this.state.addVersion.data?.versions?.nodes || []) + 1);
+    const payload = {
+      input: {
+        name: this.state.addVersion.data?.name + '-' + _version,
+        namespace: this.state.addVersion.data?.namespace,
+        datasetName: this.state.addVersion.data?.name,
+        displayName: '',
+        description: this.form().values.description,
+        inheritedFrom: this.form().values.inheritedFrom,
+        version: _version,
+        released: 0,
+      },
+    };
+    const res = await this.utils.bff.createVersionedDataset(payload).catch(e => {
+      this.utils.notification.warn({
+        message: '新增数据集版本失败',
+      });
+    });
+    if (res?.VersionedDataset?.createVersionedDataset?.name) {
+      this.utils.notification.success({
+        message: '新增数据集版本成功',
+      });
+      this.onAddVersionCancel();
+      this.fetchData();
+    }
+  }
+
   async asyncFunc(error) {
     const res = await new Promise((res, rej) => {
       setTimeout(() => {
@@ -119,8 +157,32 @@ class Dataset$$Page extends React.Component {
     return res;
   }
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  delVersion(params) {
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除数据集版本',
+        content: `确定删除数据集：${params.dataset.name}-${params.version.version}？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .deleteVersionedDatasets({
+              input: {
+                namespace: params.dataset.namespace,
+                name: params.version.name,
+              },
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '删除数据集版本失败',
+              });
+            });
+          this.utils.notification.success({
+            message: '删除数据集版本成功',
+          });
+          this.fetchData();
+        },
+      },
+    });
   }
 
   async fetchData() {
@@ -160,115 +222,16 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  async addVersionFetch() {
-    const _version =
-      'v' + (this.getVersionsNumMax(this.state.addVersion.data?.versions?.nodes || []) + 1);
-    const payload = {
-      input: {
-        name: this.state.addVersion.data?.name + '-' + _version,
-        namespace: this.state.addVersion.data?.namespace,
-        datasetName: this.state.addVersion.data?.name,
-        displayName: '',
-        description: this.form().values.description,
-        inheritedFrom: this.form().values.inheritedFrom,
-        version: _version,
-        released: 0,
-      },
-    };
-    const res = await this.utils.bff.createVersionedDataset(payload).catch(e => {
-      this.utils.notification.warn({
-        message: '新增数据集版本失败',
-      });
-    });
-    if (res?.VersionedDataset?.createVersionedDataset?.name) {
-      this.utils.notification.success({
-        message: '新增数据集版本成功',
-      });
-      this.onAddVersionCancel();
-      this.fetchData();
-    }
-  }
-
-  testFunc() {
-    return <div className="test-aliLowcode-func">{this.state.test}</div>;
-  }
-
-  addVersion(event, params) {
-    event.stopPropagation();
-    this.setState({
-      addVersion: {
-        visible: true,
-        data: params.data,
-      },
-    });
-  }
-
-  refresh(event) {
-    event.stopPropagation();
-    this.fetchData();
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
   getVersionsNumMax(versions) {
     return Math.max(...versions.map(v => parseInt(v?.version?.match(/\d+/)?.[0] || '0')), 0);
   }
 
-  onClick(event) {
-    // 点击按钮时的回调
-  }
-
   linkClick(event) {
     event.stopPropagation();
-  }
-
-  onSearchChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        search: event.target.value,
-      },
-      this._fetchData
-    );
-  }
-
-  onTypeChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        type: event,
-      },
-      this.fetchData
-    );
-  }
-
-  onFieldChange(event) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        field: event,
-      },
-      this.fetchData
-    );
-  }
-
-  onPageChange(page, pageSize) {
-    // 页码或 pageSize 改变的回调
-    this.setState(
-      {
-        page,
-        pageSize,
-      },
-      this.fetchData
-    );
-  }
-
-  onAddVersionOK() {
-    // 点击遮罩层或右上角叉或取消按钮的回调
-    this.form()
-      .validate()
-      .then(this.addVersionFetch.bind(this))
-      .catch(e => {
-        console.error('onAddVersion error:', e);
-      });
   }
 
   onAddVersionCancel() {
@@ -281,13 +244,18 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  toDetail(event, params) {
-    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
+  onAddVersionOK() {
+    // 点击遮罩层或右上角叉或取消按钮的回调
+    this.form()
+      .validate()
+      .then(this.addVersionFetch.bind(this))
+      .catch(e => {
+        console.error('onAddVersion error:', e);
+      });
   }
 
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
+  onClick(event) {
+    // 点击按钮时的回调
   }
 
   onDelDataset(event, params) {
@@ -319,36 +287,62 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  delVersion(params) {
-    this.setState({
-      confirm: {
-        id: new Date().getTime(),
-        title: '删除数据集版本',
-        content: `确定删除数据集：${params.dataset.name}-${params.version.version}？`,
-        onOk: async () => {
-          const res = await this.utils.bff
-            .deleteVersionedDatasets({
-              input: {
-                namespace: params.dataset.namespace,
-                name: params.version.name,
-              },
-            })
-            .catch(e => {
-              this.utils.notification.warn({
-                message: '删除数据集版本失败',
-              });
-            });
-          this.utils.notification.success({
-            message: '删除数据集版本成功',
-          });
-          this.fetchData();
-        },
+  onDropdownClick(event, params) {
+    if (event.key === 'delete') {
+      return this.delVersion(params);
+    }
+    if (event.key === 'release') {
+      return this.release(params);
+    }
+  }
+
+  onFieldChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        field: event,
       },
-    });
+      this.fetchData
+    );
+  }
+
+  onPageChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState(
+      {
+        page,
+        pageSize,
+      },
+      this.fetchData
+    );
+  }
+
+  onSearchChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        search: event.target.value,
+      },
+      this._fetchData
+    );
+  }
+
+  onTypeChange(event) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        type: event,
+      },
+      this.fetchData
+    );
+  }
+
+  refresh(event) {
+    event.stopPropagation();
+    this.fetchData();
   }
 
   release(params) {
-    console.log('hhhhh');
     this.setState({
       confirm: {
         id: new Date().getTime(),
@@ -379,13 +373,17 @@ class Dataset$$Page extends React.Component {
     });
   }
 
-  onDropdownClick(event, params) {
-    if (event.key === 'delete') {
-      return this.delVersion(params);
-    }
-    if (event.key === 'release') {
-      return this.release(params);
-    }
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }
+
+  testFunc() {
+    return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  }
+
+  toDetail(event, params) {
+    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
   }
 
   componentDidMount() {
@@ -400,7 +398,20 @@ class Dataset$$Page extends React.Component {
       <Page>
         {!!__$$eval(() => this.state.addVersion.visible) && (
           <Modal
+            __component_name="Modal"
+            centered={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            forceRender={false}
+            keyboard={true}
             mask={true}
+            maskClosable={false}
+            onCancel={function () {
+              return this.onAddVersionCancel.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
             onOk={function () {
               return this.onAddVersionOK.apply(
                 this,
@@ -409,28 +420,14 @@ class Dataset$$Page extends React.Component {
             }.bind(this)}
             open={true}
             title={this.i18n('i18n-wgpt60zj') /* 新增版本 */}
-            centered={false}
-            keyboard={true}
-            onCancel={function () {
-              return this.onAddVersionCancel.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            forceRender={false}
-            maskClosable={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            __component_name="Modal"
           >
             <FormilyForm
-              ref={this._refsManager.linkRef('formily_create')}
-              formHelper={{ autoFocus: true }}
+              __component_name="FormilyForm"
               componentProps={{
                 colon: false,
-                layout: 'horizontal',
-                labelCol: 5,
                 labelAlign: 'left',
+                labelCol: 5,
+                layout: 'horizontal',
                 wrapperCol: 19,
               }}
               createFormProps={{
@@ -438,24 +435,26 @@ class Dataset$$Page extends React.Component {
                   inheritedFromSwitch: !!this.state.addVersion.data?.versions.nodes.length,
                 })),
               }}
-              __component_name="FormilyForm"
+              formHelper={{ autoFocus: true }}
+              ref={this._refsManager.linkRef('formily_create')}
             >
               <FormilyFormItem
+                __component_name="FormilyFormItem"
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
                   name: 'FormilyFormItem',
                   title: '数据集版本',
+                  type: 'object',
                   'x-component': 'FormilyFormItem',
                   'x-validator': [],
                 }}
-                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                __component_name="FormilyFormItem"
               >
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 >
                   {__$$eval(
                     () =>
@@ -464,28 +463,40 @@ class Dataset$$Page extends React.Component {
                 </Typography.Text>
               </FormilyFormItem>
               <FormilyTextArea
+                __component_name="FormilyTextArea"
+                componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
                   name: 'description',
                   title: '版本描述',
                   'x-component': 'Input.TextArea',
                   'x-validator': [],
                 }}
-                componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
-                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                __component_name="FormilyTextArea"
               />
               <FormilySwitch
+                __component_name="FormilySwitch"
+                componentProps={{ 'x-component-props': { disabled: false, loading: false } }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
                   name: 'inheritedFromSwitch',
                   title: '继承历史版本',
                   'x-validator': [],
                 }}
-                componentProps={{ 'x-component-props': { loading: false, disabled: false } }}
-                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                __component_name="FormilySwitch"
               />
               <FormilySelect
+                __component_name="FormilySelect"
+                componentProps={{
+                  'x-component-props': {
+                    _sdkSwrGetFunc: {},
+                    _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                    allowClear: false,
+                    disabled: false,
+                    placeholder: '请选择历史版本',
+                  },
+                }}
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
+                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
                   enum: __$$eval(() =>
                     this.state.addVersion.data?.versions.nodes.map(v => ({
                       label: v.version,
@@ -493,98 +504,85 @@ class Dataset$$Page extends React.Component {
                     }))
                   ),
                   name: 'inheritedFrom',
-                  title: '历史版本',
                   required: true,
+                  title: '历史版本',
                   'x-display': "{{ $form.values?.inheritedFromSwitch ? 'visible' : 'hidden' }}",
                   'x-validator': [],
-                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
                 }}
-                componentProps={{
-                  'x-component-props': {
-                    disabled: false,
-                    allowClear: false,
-                    placeholder: '请选择历史版本',
-                    _sdkSwrGetFunc: {},
-                    _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
-                  },
-                }}
-                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                __component_name="FormilySelect"
               />
             </FormilyForm>
           </Modal>
         )}
-        <LccComponentSbva0
-          data={__$$eval(() => this.state.confirm)}
-          __component_name="LccComponentSbva0"
-        />
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
             <Typography.Title
+              __component_name="Typography.Title"
               bold={true}
-              level={1}
               bordered={false}
               ellipsis={true}
-              __component_name="Typography.Title"
+              level={1}
             >
               {this.i18n('i18n-5djmpfvu') /* 数据集管理 */}
             </Typography.Title>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Alert
-              type="info"
-              style={{ marginBottom: '8px' }}
+              __component_name="Alert"
               message="可用数据统一纳管，包含训练数据集、知识库数据集等。支持自主版本迭代、数据查看和数据更新等操作。"
               showIcon={true}
-              __component_name="Alert"
+              style={{ marginBottom: '8px' }}
+              type="info"
             />
           </Col>
         </Row>
+        <LccComponentSbva0
+          __component_name="LccComponentSbva0"
+          data={__$$eval(() => this.state.confirm)}
+        />
         <Card
-          size="default"
-          type="default"
+          __component_name="Card"
           actions={[]}
-          loading={false}
           bordered={false}
           hoverable={false}
-          __component_name="Card"
+          loading={false}
+          size="default"
+          type="default"
         >
-          <Row wrap={false} __component_name="Row">
-            <Col flex="auto" span={16} style={{ display: 'flex' }} __component_name="Col">
-              <Space align="center" direction="horizontal" __component_name="Space">
+          <Row __component_name="Row" wrap={false}>
+            <Col __component_name="Col" flex="auto" span={16} style={{ display: 'flex' }}>
+              <Space __component_name="Space" align="center" direction="horizontal">
                 <Button
-                  href="/dataset/create"
-                  icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
-                  type="primary"
+                  __component_name="Button"
                   block={false}
-                  ghost={false}
-                  shape="default"
                   danger={false}
                   disabled={false}
-                  __component_name="Button"
+                  ghost={false}
+                  href="/dataset/create"
+                  icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
+                  shape="default"
+                  type="primary"
                 >
                   {this.i18n('i18n-2ejg9q5l') /* 新增数据集 */}
                 </Button>
                 <Button
-                  icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
+                  __component_name="Button"
                   block={false}
-                  ghost={false}
-                  shape="default"
                   danger={false}
+                  disabled={false}
+                  ghost={false}
+                  icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
                   onClick={function () {
                     return this.fetchData.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  disabled={false}
-                  __component_name="Button"
+                  shape="default"
                 >
                   刷新
                 </Button>
                 <Input.Search
-                  style={{ width: '200px' }}
-                  value={__$$eval(() => this.state.search)}
+                  __component_name="Input.Search"
                   onChange={function () {
                     return this.onSearchChange.apply(
                       this,
@@ -592,38 +590,40 @@ class Dataset$$Page extends React.Component {
                     );
                   }.bind(this)}
                   placeholder={this.i18n('i18n-vce3sfm7') /* 请输入数据集名称搜索 */}
-                  __component_name="Input.Search"
+                  style={{ width: '200px' }}
+                  value={__$$eval(() => this.state.search)}
                 />
               </Space>
             </Col>
             <Col
+              __component_name="Col"
               flex="auto"
               style={{ display: 'flex', justifyContent: 'flex-end' }}
-              __component_name="Col"
             >
-              <Space align="center" direction="horizontal" __component_name="Space">
+              <Space __component_name="Space" align="center" direction="horizontal">
                 <Select
-                  mode="single"
-                  style={{ width: 200 }}
-                  value={__$$eval(() => this.state.type)}
-                  options={__$$eval(() => this.constants.DATASET_DATA.type)}
+                  __component_name="Select"
+                  _sdkSwrGetFunc={{ label: '', params: [], value: '' }}
+                  allowClear={true}
                   disabled={false}
+                  mode="single"
+                  notFoundContent=""
                   onChange={function () {
                     return this.onTypeChange.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  allowClear={true}
-                  showSearch={true}
+                  options={__$$eval(() => this.constants.DATASET_DATA.type)}
                   placeholder={this.i18n('i18n-af4xea8m') /* 请选择类型 */}
-                  _sdkSwrGetFunc={{ label: '', value: '', params: [] }}
-                  notFoundContent=""
-                  __component_name="Select"
+                  showSearch={true}
+                  style={{ width: 200 }}
+                  value={__$$eval(() => this.state.type)}
                 />
                 <Select
-                  style={{ width: 200 }}
-                  options={__$$eval(() => this.constants.DATASET_DATA.fields)}
+                  __component_name="Select"
+                  _sdkSwrGetFunc={{ params: [''] }}
+                  allowClear={true}
                   disabled={false}
                   onChange={function () {
                     return this.onFieldChange.apply(
@@ -631,30 +631,23 @@ class Dataset$$Page extends React.Component {
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  allowClear={true}
-                  showSearch={true}
+                  options={__$$eval(() => this.constants.DATASET_DATA.fields)}
                   placeholder="请选择应用场景"
-                  _sdkSwrGetFunc={{ params: [''] }}
-                  __component_name="Select"
+                  showSearch={true}
+                  style={{ width: 200 }}
                 />
               </Space>
             </Col>
           </Row>
           <List
-            grid={false}
-            size="small"
-            split={false}
-            style={{ marginTop: '16px' }}
-            rowKey="name"
-            loading={__$$eval(() => this.state.loading)}
+            __component_name="List"
             bordered={false}
             dataSource={__$$eval(() => this.state.data)}
+            grid={false}
             gridEnable={false}
             itemLayout="vertical"
+            loading={__$$eval(() => this.state.loading)}
             pagination={{
-              size: 'default',
-              total: __$$eval(() => this.state.totalCount),
-              simple: false,
               current: __$$eval(() => this.state.page),
               onChange: function () {
                 return this.onPageChange.apply(
@@ -663,37 +656,57 @@ class Dataset$$Page extends React.Component {
                 );
               }.bind(this),
               pageSize: __$$eval(() => this.state.pageSize),
+              pagination: { pageSize: 5 },
               position: 'bottom',
+              showQuickJumper: false,
+              showSizeChanger: false,
               showTotal: function () {
                 return this.showTotal.apply(this, Array.prototype.slice.call(arguments).concat([]));
               }.bind(this),
-              pagination: { pageSize: 5 },
-              showQuickJumper: false,
-              showSizeChanger: false,
+              simple: false,
+              size: 'default',
+              total: __$$eval(() => this.state.totalCount),
             }}
             renderItem={item =>
               (__$$context => (
                 <List.Item style={{ marginBottom: '16px' }}>
-                  <Row wrap={true} __component_name="Row">
-                    <Col span={24} __component_name="Col">
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={24}>
                       <Collapse
-                        size="large"
+                        __component_name="Collapse"
+                        accordion={true}
+                        bordered={true}
+                        destroyInactivePanel={true}
+                        expandIconPosition="right"
                         ghost={false}
                         items={[
                           {
+                            _unsafe_MixedSetter_children_select: 'SlotSetter',
+                            _unsafe_MixedSetter_label_select: 'SlotSetter',
+                            children: (
+                              <LccComponentNy419
+                                __component_name="LccComponentNy419"
+                                dataset={__$$eval(() => item)}
+                                datasource={__$$eval(() => item.versions?.nodes || [])}
+                              />
+                            ),
                             key: __$$eval(() => item.name),
                             label: (
                               <Row
-                                wrap={true}
-                                style={{ display: 'flex', justifyContent: 'space-between' }}
                                 __component_name="Row"
+                                style={{ display: 'flex', justifyContent: 'space-between' }}
+                                wrap={true}
                               >
                                 <Col
-                                  span={11}
-                                  style={{ display: 'flex', alignItems: 'center' }}
                                   __component_name="Col"
+                                  span={11}
+                                  style={{ alignItems: 'center', display: 'flex' }}
                                 >
                                   <Image
+                                    __component_name="Image"
+                                    fallback=""
+                                    height={32}
+                                    preview={false}
                                     src={__$$eval(
                                       () =>
                                         __$$context.constants.DATASET_DATA?.typeIcons?.[
@@ -701,31 +714,28 @@ class Dataset$$Page extends React.Component {
                                           ]
                                     )}
                                     width={32}
-                                    height={32}
-                                    preview={false}
-                                    fallback=""
-                                    __component_name="Image"
                                   />
                                   <UnifiedLink
-                                    to={__$$eval(() => `/dataset/detail/${item.name}`)}
+                                    __component_name="UnifiedLink"
+                                    inQianKun={false}
                                     style={{ fontSize: '18px', marginLeft: '16px' }}
                                     target="_self"
-                                    __component_name="UnifiedLink"
+                                    to={__$$eval(() => `/dataset/detail/${item.name}`)}
                                   >
                                     {__$$eval(() => __$$context.utils.getFullName(item))}
                                   </UnifiedLink>
                                 </Col>
                                 <Col
+                                  __component_name="Col"
                                   flex="200px"
                                   span={4}
                                   style={{
-                                    display: 'flex',
                                     alignItems: 'center',
+                                    display: 'flex',
                                     justifyContent: 'flex-end',
                                   }}
-                                  __component_name="Col"
                                 >
-                                  <Tag color="warning" closable={false} __component_name="Tag">
+                                  <Tag __component_name="Tag" closable={false} color="warning">
                                     {__$$eval(
                                       () =>
                                         __$$context.utils._.find(
@@ -736,7 +746,7 @@ class Dataset$$Page extends React.Component {
                                         )?.label || '未知'
                                     )}
                                   </Tag>
-                                  <Tag color="processing" closable={false} __component_name="Tag">
+                                  <Tag __component_name="Tag" closable={false} color="processing">
                                     {__$$eval(
                                       () =>
                                         __$$context.utils._.find(
@@ -749,44 +759,44 @@ class Dataset$$Page extends React.Component {
                                   </Tag>
                                 </Col>
                                 <Col
+                                  __component_name="Col"
                                   flex="150px"
                                   span={4}
                                   style={{
-                                    display: 'flex',
                                     alignItems: 'center',
-                                    paddingLeft: '30px',
+                                    display: 'flex',
                                     justifyContent: 'flex-start',
+                                    paddingLeft: '30px',
                                   }}
-                                  __component_name="Col"
                                 >
                                   <Typography.Text
-                                    style={{ fontSize: '' }}
-                                    strong={false}
+                                    __component_name="Typography.Text"
                                     disabled={false}
                                     ellipsis={true}
-                                    __component_name="Typography.Text"
+                                    strong={false}
+                                    style={{ fontSize: '' }}
                                   >
                                     {__$$eval(() => `版本数：${item.versions.totalCount}`)}
                                   </Typography.Text>
                                 </Col>
                                 <Col
+                                  __component_name="Col"
                                   span={4}
                                   style={{
-                                    display: 'flex',
                                     alignItems: 'center',
+                                    display: 'flex',
                                     justifyContent: 'flex-end',
                                   }}
-                                  __component_name="Col"
                                 >
                                   <Button
+                                    __component_name="Button"
+                                    block={false}
+                                    danger={false}
+                                    disabled={false}
+                                    ghost={false}
                                     icon={
                                       <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
                                     }
-                                    type="text"
-                                    block={false}
-                                    ghost={false}
-                                    shape="default"
-                                    danger={false}
                                     onClick={function () {
                                       return this.addVersion.apply(
                                         this,
@@ -798,27 +808,27 @@ class Dataset$$Page extends React.Component {
                                         ])
                                       );
                                     }.bind(__$$context)}
-                                    disabled={false}
-                                    __component_name="Button"
+                                    shape="default"
+                                    type="text"
                                   >
                                     {this.i18n('i18n-wgpt60zj') /* 新增版本 */}
                                   </Button>
                                   <Divider
-                                    mode="default"
-                                    type="vertical"
+                                    __component_name="Divider"
                                     dashed={false}
                                     defaultOpen={false}
-                                    __component_name="Divider"
+                                    mode="default"
+                                    type="vertical"
                                   />
                                   <Button
+                                    __component_name="Button"
+                                    block={false}
+                                    danger={false}
+                                    disabled={false}
+                                    ghost={false}
                                     icon={
                                       <AntdIconDeleteOutlined __component_name="AntdIconDeleteOutlined" />
                                     }
-                                    type="text"
-                                    block={false}
-                                    ghost={false}
-                                    shape="default"
-                                    danger={false}
                                     onClick={function () {
                                       return this.onDelDataset.apply(
                                         this,
@@ -829,223 +839,29 @@ class Dataset$$Page extends React.Component {
                                         ])
                                       );
                                     }.bind(__$$context)}
-                                    disabled={false}
-                                    __component_name="Button"
+                                    shape="default"
+                                    type="text"
                                   >
                                     {this.i18n('i18n-z0idrepg') /* - */}
                                   </Button>
                                 </Col>
                               </Row>
                             ),
-                            children: (
-                              <Table
-                                size="middle"
-                                rowKey="id"
-                                scroll={{ scrollToFirstRowOnChange: true }}
-                                columns={[
-                                  {
-                                    key: 'version',
-                                    title: '版本',
-                                    ellipsis: { showTitle: true },
-                                    dataIndex: 'version',
-                                  },
-                                  {
-                                    key: 'syncStatus',
-                                    title: '导入状态',
-                                    render: (text, record, index) =>
-                                      (__$$context => (
-                                        <Status
-                                          id={__$$eval(() => record.syncStatus)}
-                                          types={__$$eval(
-                                            () => __$$context.constants.DATASET_DATA.syncStatus
-                                          )}
-                                          __component_name="Status"
-                                        />
-                                      ))(
-                                        __$$createChildContext(__$$context, { text, record, index })
-                                      ),
-                                    dataIndex: 'syncStatus',
-                                  },
-                                  {
-                                    key: 'dataProcessStatus',
-                                    title: '数据处理状态',
-                                    render: (text, record, index) =>
-                                      (__$$context => (
-                                        <Status
-                                          __component_name="Status"
-                                          id="this.record. dataProcessStatus"
-                                          types={__$$eval(
-                                            () =>
-                                              __$$context.constants.DATASET_DATA.dataProcessStatus
-                                          )}
-                                        />
-                                      ))(
-                                        __$$createChildContext(__$$context, { text, record, index })
-                                      ),
-                                    dataIndex: 'dataProcessStatus',
-                                  },
-                                  {
-                                    key: 'released',
-                                    title: '发布状态',
-                                    render: (text, record, index) =>
-                                      (__$$context => (
-                                        <Status
-                                          id={__$$eval(() => record.released)}
-                                          types={__$$eval(
-                                            () => __$$context.constants.DATASET_DATA.released
-                                          )}
-                                          __component_name="Status"
-                                        />
-                                      ))(
-                                        __$$createChildContext(__$$context, { text, record, index })
-                                      ),
-                                    dataIndex: 'released',
-                                  },
-                                  {
-                                    key: 'files',
-                                    title: '数据量',
-                                    render: (text, record) => text.totalCount,
-                                    dataIndex: 'files',
-                                  },
-                                  {
-                                    key: 'updateTimestamp',
-                                    title: '最后更新时间',
-                                    render: (text, record, index) =>
-                                      (__$$context => (
-                                        <Typography.Time
-                                          time={__$$eval(() => text)}
-                                          format=""
-                                          relativeTime={true}
-                                          __component_name="Typography.Time"
-                                        />
-                                      ))(
-                                        __$$createChildContext(__$$context, { text, record, index })
-                                      ),
-                                    dataIndex: 'updateTimestamp',
-                                  },
-                                  {
-                                    key: 'action',
-                                    title: '操作',
-                                    render: (text, record, index) =>
-                                      (__$$context => (
-                                        <Dropdown.Button
-                                          menu={{
-                                            items: __$$eval(() =>
-                                              (() => {
-                                                const list = [
-                                                  {
-                                                    key: 'delete',
-                                                    label: '删除',
-                                                    index: 5,
-                                                  },
-                                                ];
-                                                if (record.released) return list;
-                                                list.unshift({
-                                                  key: 'import',
-                                                  label: '导入数据',
-                                                  index: 1,
-                                                });
-                                                if (record.syncStatus !== 'FileSyncSuccess') {
-                                                  return list;
-                                                }
-                                                list.push(
-                                                  {
-                                                    key: 'dataProcess',
-                                                    label: '数据处理',
-                                                    index: 2,
-                                                  },
-                                                  {
-                                                    key: 'release',
-                                                    label: '发布',
-                                                    index: 3,
-                                                  }
-                                                );
-                                                return list.sort((a, b) => a.index - b.index);
-                                              })()
-                                            ),
-                                            onClick: function () {
-                                              return this.onDropdownClick.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    version: record,
-                                                    dataset: item,
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(__$$context),
-                                          }}
-                                          type="default"
-                                          danger={false}
-                                          onClick={function () {
-                                            return this.toDetail.apply(
-                                              this,
-                                              Array.prototype.slice.call(arguments).concat([
-                                                {
-                                                  versionName: record.name,
-                                                  datasetName: item.name,
-                                                },
-                                              ])
-                                            );
-                                          }.bind(__$$context)}
-                                          trigger={['hover']}
-                                          disabled={false}
-                                          placement="bottomRight"
-                                          overlayStyle={{}}
-                                          __component_name="Dropdown.Button"
-                                          destroyPopupOnHide={true}
-                                        >
-                                          <Typography.Text
-                                            style={{ fontSize: '' }}
-                                            strong={false}
-                                            disabled={false}
-                                            ellipsis={true}
-                                            __component_name="Typography.Text"
-                                          >
-                                            查看详情
-                                          </Typography.Text>
-                                        </Dropdown.Button>
-                                      ))(
-                                        __$$createChildContext(__$$context, { text, record, index })
-                                      ),
-                                    dataIndex: 'action',
-                                  },
-                                ]}
-                                dataSource={__$$eval(() =>
-                                  (function () {
-                                    return item.versions?.nodes || [];
-                                  })()
-                                )}
-                                pagination={{
-                                  size: 'default',
-                                  simple: false,
-                                  pageSize: 5,
-                                  pagination: { pageSize: 10 },
-                                  showQuickJumper: false,
-                                  showSizeChanger: false,
-                                }}
-                                showHeader={true}
-                                __component_name="Table"
-                              />
-                            ),
                             showArrow: true,
-                            _unsafe_MixedSetter_label_select: 'SlotSetter',
-                            _unsafe_MixedSetter_children_select: 'SlotSetter',
                           },
                         ]}
+                        size="large"
                         style={{}}
-                        bordered={true}
-                        accordion={true}
-                        __component_name="Collapse"
-                        expandIconPosition="right"
-                        destroyInactivePanel={true}
                       />
                     </Col>
                   </Row>
                 </List.Item>
               ))(__$$createChildContext(__$$context, { item }))
             }
-            __component_name="List"
+            rowKey="name"
+            size="small"
+            split={false}
+            style={{ marginTop: '16px' }}
           />
         </Card>
       </Page>

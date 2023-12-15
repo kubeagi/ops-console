@@ -4,6 +4,8 @@ import React from 'react';
 
 import {
   Page,
+  Drawer,
+  Table,
   Modal,
   Alert,
   FormilyForm,
@@ -18,11 +20,12 @@ import {
   Divider,
   Tabs,
   Descriptions,
-  Pagination,
-  Table,
+  UnifiedLink,
 } from '@tenx-ui/materials';
 
 import LccComponentQlsmm from 'KubeAGIUpload';
+
+import LccComponentSbva0 from 'confirm';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -67,11 +70,15 @@ class DatasetVersionDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      delVersionVisible: false,
       addFileVisible: false,
-      delFileVisible: false,
-      delFileData: {},
       upload: {},
+      confirm: {},
+      openFile: false,
+      fileData: {},
+      cvsData: {
+        current: 1,
+        list: [],
+      },
     };
   }
 
@@ -106,30 +113,30 @@ class DatasetVersionDetail$$Page extends React.Component {
 
   delVerClick(event) {
     this.setState({
-      delVersionVisible: true,
-    });
-  }
-
-  delVersionCancle() {
-    this.setState({
-      delVersionVisible: false,
-    });
-  }
-
-  async delVersionOk() {
-    const res = await this.utils.bff.deleteVersionedDatasets({
-      input: {
-        name: this.data().data.name,
-        namespace: this.utils.getAuthData?.()?.project,
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除数据集版本',
+        content: `确定删除数据集版本：${this.data().data?.version} ？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .deleteVersionedDatasets({
+              input: {
+                name: this.data().data.name,
+                namespace: this.utils.getAuthData?.()?.project,
+              },
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '删除数据集版本失败',
+              });
+            });
+          this.utils.notification.success({
+            message: '删除数据集版本成功',
+          });
+          this.appHelper.history.back();
+        },
       },
     });
-    if (res.VersionedDataset) {
-      this.utils.notification.success({
-        message: '删除数据集版本成功',
-      });
-      this.delVersionCancle();
-      this.appHelper.history.back();
-    }
   }
 
   setUploadState(state) {
@@ -190,46 +197,85 @@ class DatasetVersionDetail$$Page extends React.Component {
     console.log('handleUploadFinished,', file, res);
   }
 
-  delFileClick(event, params) {
+  delFileClick(event, { data }) {
     // 点击按钮时的回调
     this.setState({
-      delFileData: params.data,
-      delFileVisible: true,
-    });
-  }
-
-  delFileCancle() {
-    // 点击遮罩层或右上角叉或取消按钮的回调
-    this.setState({
-      delFileData: {},
-      delFileVisible: false,
-    });
-  }
-
-  delFileOk() {
-    this.utils.axios
-      .delete(`${window.location.origin}/kubeagi-apis/minio/versioneddataset/files/delete_files`, {
-        data: {
-          files: [this.state.delFileData.path],
-          bucket: this.utils.getAuthData?.()?.project,
-          bucket_path: this.getBucketPath(),
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除文件',
+        content: `确定删除文件：${data?.path} ？`,
+        onOk: async () => {
+          await this.utils.axios
+            .delete(`${window.location.origin}/kubeagi-apis/bff/versioneddataset/files`, {
+              data: {
+                files: [data.path],
+                bucket: this.utils.getAuthData?.()?.project,
+                bucketPath: this.getBucketPath(),
+              },
+              headers: {
+                Authorization: this.utils.getAuthorization(),
+              },
+            })
+            .then(res => {
+              if (res?.data === 'success') {
+                this.utils.notification.success({
+                  message: '删除文件成功',
+                });
+                this.refresh();
+              }
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '删除文件失败',
+              });
+            });
         },
+      },
+    });
+  }
+
+  openFileDetail(e, { data }) {
+    // 事件的 handler
+    console.log('onClick!!!data:', data);
+    this.setState(
+      {
+        openFile: true,
+        fileData: data,
+      },
+      this.getFile.bind(this)
+    );
+  }
+
+  onFileClose(event) {
+    this.setState({
+      openFile: false,
+      fileData: {},
+    });
+  }
+
+  async getFile() {
+    const res = await this.utils.axios.get(
+      `${
+        window.location.origin
+      }/kubeagi-apis/bff/versioneddataset/files/csv?page=1&size=10&bucket=${
+        this.utils.getAuthData?.()?.project
+      }&bucketPath=${this.getBucketPath()}&fileName=${this.state.fileData?.path}`,
+      {
         headers: {
           Authorization: this.utils.getAuthorization(),
         },
-      })
-      .then(res => {
-        if (res?.data === 'success') {
-          this.utils.notification.success({
-            message: '删除文件成功',
-          });
-          this.refresh();
-          this.setState({
-            delFileVisible: false,
-            delFileData: {},
-          });
-        }
-      });
+      }
+    );
+    this.setState({
+      cvsData: {
+        ...this.state.cvsData,
+        list: res?.data?.rows?.map(row => ({
+          q: row?.[0],
+          a: row?.[1],
+        })),
+        total: res?.data?.total,
+      },
+    });
   }
 
   componentDidMount() {}
@@ -239,6 +285,56 @@ class DatasetVersionDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        <Drawer
+          mask={true}
+          open={__$$eval(() => this.state.openFile)}
+          extra=""
+          title={__$$eval(() => this.state.fileData.path)}
+          width="70%"
+          footer=""
+          onClose={function () {
+            return this.onFileClose.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          placement="right"
+          maskClosable={true}
+          destroyOnClose={true}
+          __component_name="Drawer"
+        >
+          <Table
+            __component_name="Table"
+            rowKey="id"
+            dataSource={__$$eval(() => this.state.cvsData?.list || [])}
+            columns={[
+              {
+                title: 'Q',
+                dataIndex: 'q',
+                key: 'q',
+                _unsafe_MixedSetter_width_select: 'StringSetter',
+                width: '50%',
+              },
+              {
+                title: 'A',
+                dataIndex: 'a',
+                key: 'a',
+                _unsafe_MixedSetter_width_select: 'StringSetter',
+                width: '50%',
+              },
+            ]}
+            pagination={{
+              pageSize: 10,
+              total: __$$eval(() => this.state.cvsData?.total || 0),
+              current: __$$eval(() => this.state.cvsData?.current || 1),
+              showSizeChanger: false,
+              showQuickJumper: false,
+              simple: false,
+              size: 'default',
+              pagination: { pageSize: 10 },
+            }}
+            showHeader={true}
+            size="middle"
+            scroll={{ scrollToFirstRowOnChange: true }}
+          />
+        </Drawer>
         {!!__$$eval(() => this.state.delFileVisible) && (
           <Modal
             mask={true}
@@ -269,117 +365,80 @@ class DatasetVersionDetail$$Page extends React.Component {
             />
           </Modal>
         )}
-        {!!__$$eval(() => this.state.addFileVisible) && (
-          <Modal
-            mask={true}
-            onOk={function () {
-              return this.addFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
-            }.bind(this)}
-            open={true}
-            title="新增文件"
-            width="650px"
-            centered={false}
-            keyboard={true}
-            onCancel={function () {
-              return this.handleCancle.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            forceRender={false}
-            maskClosable={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            __component_name="Modal"
+        <Modal
+          mask={true}
+          onOk={function () {
+            return this.addFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          open={__$$eval(() => this.state.addFileVisible)}
+          title="新增文件"
+          width="650px"
+          centered={false}
+          keyboard={true}
+          onCancel={function () {
+            return this.handleCancle.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          forceRender={false}
+          maskClosable={false}
+          confirmLoading={false}
+          destroyOnClose={false}
+          __component_name="Modal"
+        >
+          <FormilyForm
+            ref={this._refsManager.linkRef('add_file')}
+            formHelper={{ autoFocus: true }}
+            componentProps={{
+              colon: false,
+              layout: 'horizontal',
+              labelCol: 4,
+              labelAlign: 'left',
+              wrapperCol: 20,
+            }}
+            __component_name="FormilyForm"
           >
-            <FormilyForm
-              ref={this._refsManager.linkRef('add_file')}
-              formHelper={{ autoFocus: true }}
-              componentProps={{
-                colon: false,
-                layout: 'horizontal',
-                labelCol: 4,
-                labelAlign: 'left',
-                wrapperCol: 20,
-              }}
-              __component_name="FormilyForm"
-            >
-              <LccComponentQlsmm
-                accept=".txt,.doc,.docx,.pdf,.md"
-                bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-                setState={function () {
-                  return this.setUploadState.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                contentWidth="520px"
-                Authorization={__$$eval(() => this.utils.getAuthorization())}
-                getBucketPath={function () {
-                  return this.getBucketPath.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleSuccess={function () {
-                  return this.handleUploadSuccess.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleFinished={function () {
-                  return this.handleUploadFinished.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleReUpload={function () {
-                  return this.handleReUpload.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                __component_name="LccComponentQlsmm"
-              />
-            </FormilyForm>
-          </Modal>
-        )}
-        {!!__$$eval(() => this.state.delVersionVisible) && (
-          <Modal
-            mask={true}
-            onOk={function () {
-              return this.delVersionOk.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            open={true}
-            title="删除数据集版本"
-            centered={false}
-            keyboard={true}
-            onCancel={function () {
-              return this.delVersionCancle.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            forceRender={false}
-            maskClosable={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            __component_name="Modal"
-          >
-            <Alert
-              icon=""
-              type="warning"
-              message={null}
-              bordered="dashed"
-              showIcon={true}
-              description={__$$eval(() => `确定删除数据集版本：${this.data().data?.version} ？`)}
-              __component_name="Alert"
+            <LccComponentQlsmm
+              accept=".txt,.doc,.docx,.pdf,.md"
+              bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+              setState={function () {
+                return this.setUploadState.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              contentWidth="520px"
+              Authorization={__$$eval(() => this.utils.getAuthorization())}
+              getBucketPath={function () {
+                return this.getBucketPath.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              handleSuccess={function () {
+                return this.handleUploadSuccess.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              handleFinished={function () {
+                return this.handleUploadFinished.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              handleReUpload={function () {
+                return this.handleReUpload.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              __component_name="LccComponentQlsmm"
             />
-          </Modal>
-        )}
+          </FormilyForm>
+        </Modal>
+        <LccComponentSbva0
+          data={__$$eval(() => this.state.confirm)}
+          __component_name="LccComponentSbva0"
+        />
         <Row wrap={true} __component_name="Row">
           <Col span={24} style={{ marginBottom: '16px' }} __component_name="Col">
             <Space align="center" direction="horizontal" __component_name="Space">
@@ -533,40 +592,27 @@ class DatasetVersionDetail$$Page extends React.Component {
                         key: 'xvcp3obfu',
                         span: 24,
                         label: '同步状态',
-                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                         children: (
                           <Status
-                            __component_name="Status"
                             id={__$$eval(() => this.data().data?.syncStatus)}
                             types={__$$eval(() => this.constants.DATASET_DATA.syncStatus)}
+                            __component_name="Status"
                           />
                         ),
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                       },
                       {
                         key: 'er0ptk5lill',
                         span: 24,
                         label: this.i18n('i18n-p5qipded') /* 数据处理状态 */,
-                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                         children: (
                           <Status
-                            __component_name="Status"
-                            id={__$$eval(() => this.data().data?.dataProcessStatus)}
+                            id={__$$eval(() => this.data().data?.dataProcessStatus || 'no')}
                             types={__$$eval(() => this.constants.DATASET_DATA.dataProcessStatus)}
-                          />
-                        ),
-                      },
-                      {
-                        key: 'vu3tjo4pcas',
-                        span: 24,
-                        label: '发布状态',
-                        _unsafe_MixedSetter_children_select: 'SlotSetter',
-                        children: (
-                          <Status
                             __component_name="Status"
-                            id={__$$eval(() => this.data().data?.released)}
-                            types={__$$eval(() => this.constants.DATASET_DATA.released)}
                           />
                         ),
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                       },
                       {
                         key: 'ww04wf6evps',
@@ -656,19 +702,6 @@ class DatasetVersionDetail$$Page extends React.Component {
                         </Button>
                       </Space>
                     </Col>
-                    <Col
-                      flex="auto"
-                      style={{ display: 'flex', justifyContent: 'flex-end' }}
-                      __component_name="Col"
-                    >
-                      <Pagination
-                        total={__$$eval(() => this.data().data?.files.totalCount)}
-                        simple={false}
-                        current={1}
-                        pageSize={10}
-                        __component_name="Pagination"
-                      />
-                    </Col>
                   </Row>,
                   <Table
                     size="middle"
@@ -679,14 +712,56 @@ class DatasetVersionDetail$$Page extends React.Component {
                       {
                         key: 'path',
                         title: '文件',
+                        render: (text, record, index) =>
+                          (__$$context => (
+                            <Row
+                              wrap={true}
+                              onClick={function () {
+                                return this.openFileDetail.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      data: record,
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
+                              __component_name="Row"
+                            >
+                              <Col span={24} __component_name="Col">
+                                <UnifiedLink
+                                  to=""
+                                  target="_self"
+                                  inQianKun={false}
+                                  __component_name="UnifiedLink"
+                                >
+                                  {__$$eval(() => record.path || '-')}
+                                </UnifiedLink>
+                              </Col>
+                            </Row>
+                          ))(__$$createChildContext(__$$context, { text, record, index })),
                         ellipsis: { showTitle: true },
                         dataIndex: 'path',
                       },
-                      { key: 'fileType', title: '标签', dataIndex: 'fileType' },
-                      { key: 'size', title: '文件大小', dataIndex: 'size' },
+                      {
+                        key: 'fileType',
+                        title: '标签',
+                        width: 150,
+                        render: (text, record) => record.fileType || '-',
+                        dataIndex: 'fileType',
+                      },
+                      { key: 'size', title: '文件大小', width: 150, dataIndex: 'size' },
+                      {
+                        key: 'count',
+                        title: '数据量',
+                        width: 150,
+                        render: (text, record) => record.count || 0,
+                        dataIndex: 'count',
+                      },
                       {
                         key: 'time',
                         title: '创建时间',
+                        width: 100,
                         render: (text, record, index) =>
                           (__$$context => (
                             <Typography.Time
@@ -701,6 +776,7 @@ class DatasetVersionDetail$$Page extends React.Component {
                       {
                         key: 'action',
                         title: '操作',
+                        width: 150,
                         render: (text, record, index) =>
                           (__$$context => (
                             <Button
@@ -729,7 +805,14 @@ class DatasetVersionDetail$$Page extends React.Component {
                       },
                     ]}
                     dataSource={__$$eval(() => this.data().data?.files?.nodes || [])}
-                    pagination={false}
+                    pagination={{
+                      size: 'default',
+                      simple: false,
+                      pageSize: 10,
+                      pagination: { pageSize: 10 },
+                      showQuickJumper: false,
+                      showSizeChanger: false,
+                    }}
                     showHeader={true}
                     __component_name="Table"
                     key="node_oclpktaw526"
@@ -823,6 +906,9 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    get state() {
+      return oldContext.state
+    }
   };
   childContext.__proto__ = oldContext;
   return childContext;
