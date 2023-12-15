@@ -78,6 +78,8 @@ class DatasetVersionDetail$$Page extends React.Component {
       cvsData: {
         current: 1,
         list: [],
+        total: 0,
+        loading: false,
       },
     };
   }
@@ -235,8 +237,6 @@ class DatasetVersionDetail$$Page extends React.Component {
   }
 
   openFileDetail(e, { data }) {
-    // 事件的 handler
-    console.log('onClick!!!data:', data);
     this.setState(
       {
         openFile: true,
@@ -250,14 +250,26 @@ class DatasetVersionDetail$$Page extends React.Component {
     this.setState({
       openFile: false,
       fileData: {},
+      cvsData: {
+        current: 1,
+        loading: false,
+        list: [],
+        total: 0,
+      },
     });
   }
 
   async getFile() {
+    this.setState({
+      cvsData: {
+        ...this.state.cvsData,
+        loading: true,
+      },
+    });
     const res = await this.utils.axios.get(
-      `${
-        window.location.origin
-      }/kubeagi-apis/bff/versioneddataset/files/csv?page=1&size=10&bucket=${
+      `${window.location.origin}/kubeagi-apis/bff/versioneddataset/files/csv?page=${
+        this.state.cvsData?.current
+      }&size=10&bucket=${
         this.utils.getAuthData?.()?.project
       }&bucketPath=${this.getBucketPath()}&fileName=${this.state.fileData?.path}`,
       {
@@ -274,8 +286,23 @@ class DatasetVersionDetail$$Page extends React.Component {
           a: row?.[1],
         })),
         total: res?.data?.total,
+        loading: false,
       },
     });
+  }
+
+  onFilePageChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    console.log('onPaginationChange', page, pageSize);
+    this.setState(
+      {
+        cvsData: {
+          ...this.state.cvsData,
+          current: page,
+        },
+      },
+      this.getFile.bind(this)
+    );
   }
 
   componentDidMount() {}
@@ -303,7 +330,12 @@ class DatasetVersionDetail$$Page extends React.Component {
           <Table
             __component_name="Table"
             rowKey="id"
-            dataSource={__$$eval(() => this.state.cvsData?.list || [])}
+            dataSource={__$$eval(() =>
+              (() => {
+                console.log(this.state.cvsData?.list || []);
+                return this.state.cvsData?.list || [];
+              })()
+            )}
             columns={[
               {
                 title: 'Q',
@@ -329,10 +361,17 @@ class DatasetVersionDetail$$Page extends React.Component {
               simple: false,
               size: 'default',
               pagination: { pageSize: 10 },
+              onChange: function () {
+                return this.onFilePageChange.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this),
             }}
             showHeader={true}
             size="middle"
             scroll={{ scrollToFirstRowOnChange: true }}
+            loading={__$$eval(() => this.state.cvsData.loading)}
           />
         </Drawer>
         {!!__$$eval(() => this.state.delFileVisible) && (
@@ -729,14 +768,9 @@ class DatasetVersionDetail$$Page extends React.Component {
                               __component_name="Row"
                             >
                               <Col span={24} __component_name="Col">
-                                <UnifiedLink
-                                  to=""
-                                  target="_self"
-                                  inQianKun={false}
-                                  __component_name="UnifiedLink"
-                                >
+                                <span style={{  cursor: 'pointer', color: '#4461eb' }}>
                                   {__$$eval(() => record.path || '-')}
-                                </UnifiedLink>
+                                </span>
                               </Col>
                             </Row>
                           ))(__$$createChildContext(__$$context, { text, record, index })),
