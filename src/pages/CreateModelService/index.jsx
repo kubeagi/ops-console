@@ -83,15 +83,8 @@ class CreateModelService$$Page extends React.Component {
 
     this.state = {
       createLoading: true,
-      marks: {
-        0: '0.5',
-        1: '1',
-        2: '2',
-        3: '4',
-        4: '8',
-        5: '16',
-      },
       gpuMarks: {
+        0: '0',
         1: '1',
         2: '2',
         3: '3',
@@ -100,7 +93,15 @@ class CreateModelService$$Page extends React.Component {
         6: '6',
       },
       listModels: [],
-      modelTypes: '',
+      marks: {
+        0: '0.5',
+        1: '1',
+        2: '2',
+        3: '4',
+        4: '8',
+        5: '16',
+      },
+      modelTypes: '-',
     };
   }
 
@@ -118,31 +119,35 @@ class CreateModelService$$Page extends React.Component {
       list: [
         {
           id: 'get_chunks',
-          type: 'axios',
           isInit: function () {
             return false;
           },
           options: function () {
             return {
-              uri: 'https://portal.172.22.96.136.nip.io/kubeagi-apis/minio/get_chunks',
+              headers: {
+                Authorization:
+                  'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImExNDU0Y2VmNjNmNmM1ZTNhODYxYzY3YmVlZTZkYTgxYjc1ZTExMzQifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwNzIxOTYzLCJpYXQiOjE3MDA2MzU1NjMsImF0X2hhc2giOiJIbGNhalBBUDVjemNOZlI1UjBIMFl3IiwiY19oYXNoIjoiSXoyOUYtb1FTNGYyQnowX3JtUUVEdyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.t3jrC7A5d1dd8TfSTvYxoKFPAOOFM6YjmOzF_fiPgGJgUVgo575HeNKykAMOvDBRH40jnp-B6Gxg5xgtLQ5DqQSfEQNaTwsUOoMfV2Y6fP7wlV9IaSOcf-ePcQE3nT-CeeqjllucVX1hcb4PDWohh8mCJvUV30MNwnZoRNfXCWSw7JzyJ2CbsGSq1PQuXcsgQfzf_Up-28GJOgY06IZ1Y0IYxiOYPTC89mTI3uK6MvKAEKuDb8_kcfFKtTKqgK-XDOxazhfXDJkF9Mf1EdaKl0rwtMIsI2ULvJJ-3xAaH3QOrhCFQr861ioZfwk3Zm_q9akS8PuuBnN97Ew7-3h0Vg',
+              },
               isCors: true,
               method: 'GET',
               params: {
                 md5: 'test',
               },
-              headers: {
-                Authorization:
-                  'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImExNDU0Y2VmNjNmNmM1ZTNhODYxYzY3YmVlZTZkYTgxYjc1ZTExMzQifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwNzIxOTYzLCJpYXQiOjE3MDA2MzU1NjMsImF0X2hhc2giOiJIbGNhalBBUDVjemNOZlI1UjBIMFl3IiwiY19oYXNoIjoiSXoyOUYtb1FTNGYyQnowX3JtUUVEdyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.t3jrC7A5d1dd8TfSTvYxoKFPAOOFM6YjmOzF_fiPgGJgUVgo575HeNKykAMOvDBRH40jnp-B6Gxg5xgtLQ5DqQSfEQNaTwsUOoMfV2Y6fP7wlV9IaSOcf-ePcQE3nT-CeeqjllucVX1hcb4PDWohh8mCJvUV30MNwnZoRNfXCWSw7JzyJ2CbsGSq1PQuXcsgQfzf_Up-28GJOgY06IZ1Y0IYxiOYPTC89mTI3uK6MvKAEKuDb8_kcfFKtTKqgK-XDOxazhfXDJkF9Mf1EdaKl0rwtMIsI2ULvJJ-3xAaH3QOrhCFQr861ioZfwk3Zm_q9akS8PuuBnN97Ew7-3h0Vg',
-              },
               timeout: 5000,
+              uri: 'https://portal.172.22.96.136.nip.io/kubeagi-apis/minio/get_chunks',
             };
           },
+          type: 'axios',
         },
       ],
     };
   }
 
   componentWillUnmount() {}
+
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  }
 
   async getListModels() {
     try {
@@ -232,10 +237,6 @@ class CreateModelService$$Page extends React.Component {
     });
   }
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
-  }
-
   onChangeModel(e) {
     const { listModels } = this.state;
     this.setState({
@@ -254,100 +255,111 @@ class CreateModelService$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
-            <Space align="center" direction="horizontal" __component_name="Space">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
+            <Space __component_name="Space" align="center" direction="horizontal">
               <Button.Back
-                name={this.i18n('i18n-wourf2xg') /* 返回 */}
-                type="primary"
-                title="新增本地模型服务"
                 __component_name="Button.Back"
+                name={this.i18n('i18n-wourf2xg') /* 返回 */}
+                title="新增本地模型服务"
+                type="primary"
               />
             </Space>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="default"
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              type="default"
             >
               <FormilyForm
-                ref={this._refsManager.linkRef('formily_create')}
-                formHelper={{ autoFocus: true }}
+                __component_name="FormilyForm"
                 componentProps={{
                   colon: false,
-                  layout: 'horizontal',
-                  labelCol: 4,
                   labelAlign: 'left',
+                  labelCol: 4,
+                  layout: 'horizontal',
                   wrapperCol: 20,
                 }}
                 createFormProps={{
                   initialValues: {
-                    resources: { cpu: 0, memory: 0, nvidiaGPU: 1 },
                     modelSource: 'worker',
+                    resources: { cpu: 0, memory: 0, nvidiaGPU: 0 },
                   },
                 }}
-                __component_name="FormilyForm"
+                formHelper={{ autoFocus: true }}
+                ref={this._refsManager.linkRef('formily_create')}
               >
                 <Divider
-                  mode="default"
-                  dashed={true}
-                  content={[null]}
-                  defaultOpen={true}
-                  orientation="left"
                   __component_name="Divider"
+                  content={[null]}
+                  dashed={true}
+                  defaultOpen={true}
+                  mode="default"
+                  orientation="left"
                   orientationMargin={0}
                 >
                   <Typography.Text
-                    style={{ fontSize: '14px' }}
-                    strong={true}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={true}
+                    style={{ fontSize: '14px' }}
                   >
                     基本信息
                   </Typography.Text>
                 </Divider>
                 <FormilyInput
-                  fieldProps={{
-                    name: 'name',
-                    title: this.i18n('i18n-cqapbnun') /* 模型服务名称 */,
-                    required: true,
-                    'x-pattern': '',
-                    'x-validator': [
-                      {
-                        id: 'disabled',
-                        type: 'disabled',
-                        message: this.i18n('i18n-585k83dk') /* 数据集名称由 0 ~ 50 字符组成 */,
-                        pattern: '^.{0,50}$',
-                        children: '未知',
-                      },
-                    ],
-                  }}
+                  __component_name="FormilyInput"
                   componentProps={{
                     'x-component-props': {
                       placeholder: this.i18n('i18n-guknewzm') /* 请输入模型服务名称 */,
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilyInput"
+                  fieldProps={{
+                    name: 'name',
+                    required: true,
+                    title: this.i18n('i18n-cqapbnun') /* 模型服务名称 */,
+                    'x-pattern': '',
+                    'x-validator': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message: this.i18n('i18n-585k83dk') /* 模型服务名称由 0 ~ 50 字符组成 */,
+                        pattern: '',
+                        triggerType: 'onInput',
+                        type: 'disabled',
+                      },
+                    ],
+                  }}
                 />
                 <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{ 'x-component-props': { placeholder: '请输入模型类型' } }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
                     name: 'displayName',
                     title: '模型服务别名',
                     'x-pattern': 'editable',
                     'x-validator': [],
                   }}
-                  componentProps={{ 'x-component-props': { placeholder: '请输入模型类型' } }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilyInput"
                 />
                 <FormilyRadio
+                  __component_name="FormilyRadio"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: {},
+                      buttonStyle: 'outline',
+                      disabled: false,
+                      size: 'middle',
+                    },
+                  }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
                     enum: [
                       { label: '本地模型', value: 'worker' },
@@ -357,99 +369,89 @@ class CreateModelService$$Page extends React.Component {
                     title: '模型来源',
                     'x-validator': [],
                   }}
-                  componentProps={{
-                    'x-component-props': {
-                      size: 'middle',
-                      disabled: false,
-                      buttonStyle: 'outline',
-                      _sdkSwrGetFunc: {},
-                    },
-                  }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilyRadio"
                 />
                 <FormilyTextArea
-                  fieldProps={{
-                    name: 'description',
-                    title: this.i18n('i18n-il4b7wme') /* 描述 */,
-                    'x-component': 'Input.TextArea',
-                    'x-validator': [
-                      {
-                        id: 'disabled',
-                        type: 'disabled',
-                        message: this.i18n('i18n-idhz6qcw') /* 版本描述由 0 ~ 200 字符组成 */,
-                        pattern: __$$eval(() => this.constants.DESCRIPTION_LENGTH_REG),
-                        children: '未知',
-                      },
-                    ],
-                  }}
+                  __component_name="FormilyTextArea"
                   componentProps={{
                     'x-component-props': {
                       placeholder: this.i18n('i18n-cd20aykf') /* 请输入描述 */,
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilyTextArea"
+                  fieldProps={{
+                    name: 'description',
+                    title: this.i18n('i18n-il4b7wme') /* 描述 */,
+                    'x-component': 'Input.TextArea',
+                    'x-validator': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message: this.i18n('i18n-idhz6qcw') /* 版本描述由 0 ~ 200 字符组成 */,
+                        pattern: __$$eval(() => this.constants.DESCRIPTION_LENGTH_REG),
+                        type: 'disabled',
+                      },
+                    ],
+                  }}
                 />
                 <Divider
-                  mode="default"
-                  dashed={true}
-                  content={[null]}
-                  defaultOpen={true}
-                  orientation="left"
                   __component_name="Divider"
+                  content={[null]}
+                  dashed={true}
+                  defaultOpen={true}
+                  mode="default"
+                  orientation="left"
                   orientationMargin={0}
                 >
                   <Typography.Text
-                    style={{ fontSize: '14px' }}
-                    strong={true}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={true}
+                    style={{ fontSize: '14px' }}
                   >
                     模型服务配置
                   </Typography.Text>
                 </Divider>
                 <FormilySelect
-                  fieldProps={{
-                    enum: [],
-                    name: 'model',
-                    title: '模型',
-                    required: true,
-                    'x-validator': [],
-                    _unsafe_MixedSetter_enum_select: 'ArraySetter',
-                  }}
+                  __component_name="FormilySelect"
                   componentProps={{
                     'x-component-props': {
-                      mode: 'single',
+                      _sdkSwrGetFunc: { label: '', params: [], value: '' },
+                      allowClear: false,
                       disabled: false,
+                      mode: 'single',
                       onChange: function () {
                         return this.onChangeModel.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this),
-                      allowClear: false,
                       placeholder: '请选择模型',
-                      _sdkSwrGetFunc: { label: '', value: '', params: [] },
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilySelect"
+                  fieldProps={{
+                    _unsafe_MixedSetter_enum_select: 'ArraySetter',
+                    enum: [],
+                    name: 'model',
+                    required: true,
+                    title: '模型',
+                    'x-validator': [],
+                  }}
                 />
                 <Row
                   __component_name="Row"
-                  wrap={false}
                   gutter={[0, 0]}
                   style={{ marginBottom: '24px' }}
+                  wrap={false}
                 >
                   <Col __component_name="Col" flex="" span={4} style={{ paddingLeft: '10px' }}>
                     <Typography.Text
                       __component_name="Typography.Text"
-                      ellipsis={true}
-                      style={{ fontSize: '' }}
                       disabled={false}
+                      ellipsis={true}
                       strong={false}
+                      style={{ fontSize: '' }}
                     >
                       模型类型
                     </Typography.Text>
@@ -457,120 +459,120 @@ class CreateModelService$$Page extends React.Component {
                   <Col __component_name="Col" flex="auto">
                     <Typography.Text
                       __component_name="Typography.Text"
-                      ellipsis={true}
-                      style={{ fontSize: '', height: '16px' }}
                       disabled={false}
+                      ellipsis={true}
                       strong={false}
+                      style={{ fontSize: '', height: '16px' }}
                     >
                       {__$$eval(() => this.state.modelTypes)}
                     </Typography.Text>
                   </Col>
                 </Row>
                 <FormilyFormItem
+                  __component_name="FormilyFormItem"
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
                     name: 'resources',
                     title: this.i18n('i18n-n55cj6ks') /* 服务规格 */,
                     'x-component': 'FormilyFormItem',
                     'x-validator': [],
                   }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilyFormItem"
                 >
-                  <Row wrap={true} gutter={[0, 0]} __component_name="Row">
-                    <Col span={24} __component_name="Col">
-                      <Row wrap={true} gutter={[0, 0]} __component_name="Row">
-                        <Col span={24} __component_name="Col">
+                  <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                    <Col __component_name="Col" span={24}>
+                      <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                        <Col __component_name="Col" span={24}>
                           <Typography.Title
+                            __component_name="Typography.Title"
                             bold={true}
-                            level={1}
                             bordered={false}
                             ellipsis={true}
-                            __component_name="Typography.Title"
+                            level={1}
                           >
                             {this.i18n('i18n-u0etzjrs') /* - */}
                           </Typography.Title>
                           <Typography.Title
+                            __component_name="Typography.Title"
                             bold={false}
-                            level={2}
                             bordered={false}
                             ellipsis={true}
-                            __component_name="Typography.Title"
+                            level={2}
                           >
                             CPU
                           </Typography.Title>
                         </Col>
-                        <Col span={24} __component_name="Col">
-                          <Row wrap={true} gutter={[10, 0]} __component_name="Row">
-                            <Col span={10} __component_name="Col">
+                        <Col __component_name="Col" span={24}>
+                          <Row __component_name="Row" gutter={[10, 0]} wrap={true}>
+                            <Col __component_name="Col" span={10}>
                               <FormilySlider
-                                style={{ marginBottom: '0' }}
+                                __component_name="FormilySlider"
+                                componentProps={{
+                                  'x-component-props': {
+                                    _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
+                                    defaultValue: 0,
+                                    marks: __$$eval(() => this.state.marks),
+                                    max: 5,
+                                    min: 0,
+                                    step: 1,
+                                  },
+                                }}
+                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                                 fieldProps={{
                                   name: 'cpu',
                                   title: '',
                                   'x-component': 'FormilySlider',
                                   'x-validator': [],
                                 }}
-                                componentProps={{
-                                  'x-component-props': {
-                                    max: 5,
-                                    min: 0,
-                                    step: 1,
-                                    marks: __$$eval(() => this.state.marks),
-                                    defaultValue: 0,
-                                    _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                  },
-                                }}
-                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                __component_name="FormilySlider"
+                                style={{ marginBottom: '0' }}
                               />
                             </Col>
                             <Col
+                              __component_name="Col"
                               span={1}
                               style={{ display: 'flex', justifyContent: 'center' }}
-                              __component_name="Col"
                             >
                               <Typography.Text
-                                style={{ display: 'flex', fontSize: '', alignItems: 'center' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ alignItems: 'center', display: 'flex', fontSize: '' }}
                               >
                                 {this.i18n('i18n-k56nh13q') /* 其他 */}
                               </Typography.Text>
                             </Col>
                             <Col
+                              __component_name="Col"
                               span={2}
                               style={{ display: 'block', marginTop: '0px' }}
-                              __component_name="Col"
                             >
                               <FormilyNumberPicker
-                                style={{}}
-                                fieldProps={{ name: 'customCPU', title: '', 'x-validator': [] }}
+                                __component_name="FormilyNumberPicker"
                                 componentProps={{
                                   'x-component-props': {
                                     max: 64,
                                     min: 1,
-                                    step: 1,
-                                    precision: 0,
                                     placeholder: '请输入',
+                                    precision: 0,
+                                    step: 1,
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                __component_name="FormilyNumberPicker"
+                                fieldProps={{ name: 'customCPU', title: '', 'x-validator': [] }}
+                                style={{}}
                               />
                             </Col>
                             <Col
-                              span={1}
-                              style={{ display: 'flex', alignItems: 'center' }}
                               __component_name="Col"
+                              span={1}
+                              style={{ alignItems: 'center', display: 'flex' }}
                             >
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 核
                               </Typography.Text>
@@ -578,93 +580,93 @@ class CreateModelService$$Page extends React.Component {
                           </Row>
                         </Col>
                       </Row>
-                      <Row wrap={true} gutter={[0, 0]} __component_name="Row">
-                        <Col span={24} __component_name="Col">
+                      <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                        <Col __component_name="Col" span={24}>
                           <Typography.Title
+                            __component_name="Typography.Title"
                             bold={true}
-                            level={1}
                             bordered={false}
                             ellipsis={true}
-                            __component_name="Typography.Title"
+                            level={1}
                           >
                             {this.i18n('i18n-u0etzjrs') /* - */}
                           </Typography.Title>
                           <Typography.Title
+                            __component_name="Typography.Title"
                             bold={false}
-                            level={2}
                             bordered={false}
                             ellipsis={true}
-                            __component_name="Typography.Title"
+                            level={2}
                           >
                             内存
                           </Typography.Title>
                         </Col>
-                        <Col span={24} __component_name="Col">
-                          <Row wrap={true} gutter={[10, 0]} __component_name="Row">
-                            <Col span={10} __component_name="Col">
+                        <Col __component_name="Col" span={24}>
+                          <Row __component_name="Row" gutter={[10, 0]} wrap={true}>
+                            <Col __component_name="Col" span={10}>
                               <FormilySlider
-                                style={{ marginBottom: '0' }}
+                                __component_name="FormilySlider"
+                                componentProps={{
+                                  'x-component-props': {
+                                    _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
+                                    defaultValue: 0,
+                                    marks: __$$eval(() => this.state.marks),
+                                    max: 5,
+                                    min: 0,
+                                    step: 1,
+                                  },
+                                }}
+                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                                 fieldProps={{
                                   name: 'memory',
                                   title: '',
                                   'x-component': 'FormilySlider',
                                   'x-validator': [],
                                 }}
-                                componentProps={{
-                                  'x-component-props': {
-                                    max: 5,
-                                    min: 0,
-                                    step: 1,
-                                    marks: __$$eval(() => this.state.marks),
-                                    defaultValue: 0,
-                                    _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                  },
-                                }}
-                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                __component_name="FormilySlider"
+                                style={{ marginBottom: '0' }}
                               />
                             </Col>
                             <Col
+                              __component_name="Col"
                               span={1}
                               style={{ display: 'flex', justifyContent: 'center' }}
-                              __component_name="Col"
                             >
                               <Typography.Text
-                                style={{ display: 'flex', fontSize: '', alignItems: 'center' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ alignItems: 'center', display: 'flex', fontSize: '' }}
                               >
                                 {this.i18n('i18n-k56nh13q') /* 其他 */}
                               </Typography.Text>
                             </Col>
-                            <Col span={2} __component_name="Col">
+                            <Col __component_name="Col" span={2}>
                               <FormilyNumberPicker
-                                fieldProps={{ name: 'customMemory', title: '', 'x-validator': [] }}
+                                __component_name="FormilyNumberPicker"
                                 componentProps={{
                                   'x-component-props': {
                                     max: 256,
                                     min: 0,
-                                    precision: 2,
                                     placeholder: '请输入',
+                                    precision: 2,
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                __component_name="FormilyNumberPicker"
+                                fieldProps={{ name: 'customMemory', title: '', 'x-validator': [] }}
                               />
                             </Col>
                             <Col
-                              span={1}
-                              style={{ display: 'flex', alignItems: 'center' }}
                               __component_name="Col"
+                              span={1}
+                              style={{ alignItems: 'center', display: 'flex' }}
                             >
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 GiB
                               </Typography.Text>
@@ -672,106 +674,106 @@ class CreateModelService$$Page extends React.Component {
                           </Row>
                         </Col>
                       </Row>
-                      <Row wrap={true} gutter={[0, 0]} __component_name="Row">
-                        <Col span={24} __component_name="Col">
+                      <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                        <Col __component_name="Col" span={24}>
                           <Typography.Title
+                            __component_name="Typography.Title"
                             bold={true}
-                            level={1}
                             bordered={false}
                             ellipsis={true}
-                            __component_name="Typography.Title"
+                            level={1}
                           >
                             {this.i18n('i18n-u0etzjrs') /* - */}
                           </Typography.Title>
                           <Typography.Title
+                            __component_name="Typography.Title"
                             bold={false}
-                            level={2}
                             bordered={false}
                             ellipsis={true}
-                            __component_name="Typography.Title"
+                            level={2}
                           >
                             GPU
                           </Typography.Title>
                         </Col>
-                        <Col span={24} __component_name="Col">
-                          <Row wrap={true} gutter={[10, 0]} __component_name="Row">
-                            <Col span={10} style={{ marginBottom: '0px' }} __component_name="Col">
+                        <Col __component_name="Col" span={24}>
+                          <Row __component_name="Row" gutter={[10, 0]} wrap={true}>
+                            <Col __component_name="Col" span={10} style={{ marginBottom: '0px' }}>
                               <FormilySlider
+                                __component_name="FormilySlider"
+                                componentProps={{
+                                  'x-component-props': {
+                                    _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
+                                    defaultValue: 0,
+                                    marks: __$$eval(() => this.state.gpuMarks),
+                                    max: 6,
+                                    min: 0,
+                                    step: 1,
+                                  },
+                                }}
+                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                                 fieldProps={{
                                   name: 'nvidiaGPU',
                                   title: '',
                                   'x-component': 'FormilySlider',
                                   'x-validator': [],
                                 }}
-                                componentProps={{
-                                  'x-component-props': {
-                                    max: 6,
-                                    min: 1,
-                                    step: 1,
-                                    marks: __$$eval(() => this.state.gpuMarks),
-                                    defaultValue: 1,
-                                    _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                  },
-                                }}
-                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                __component_name="FormilySlider"
                               />
                             </Col>
                             <Col
+                              __component_name="Col"
                               span={1}
                               style={{
-                                display: 'flex',
                                 alignItems: 'center',
-                                paddingBottom: '24px',
+                                display: 'flex',
                                 justifyContent: 'center',
+                                paddingBottom: '24px',
                               }}
-                              __component_name="Col"
                             >
                               <Typography.Text
-                                style={{ display: 'flex', fontSize: '', alignItems: 'center' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ alignItems: 'center', display: 'flex', fontSize: '' }}
                               >
                                 {this.i18n('i18n-k56nh13q') /* 其他 */}
                               </Typography.Text>
                             </Col>
                             <Col
+                              __component_name="Col"
                               span={2}
                               style={{ display: 'block', marginTop: '0px', paddingTop: '8px' }}
-                              __component_name="Col"
                             >
                               <FormilyNumberPicker
-                                fieldProps={{ name: 'customGPU', title: '', 'x-validator': [] }}
+                                __component_name="FormilyNumberPicker"
                                 componentProps={{
                                   'x-component-props': {
                                     max: 10,
                                     min: 0,
-                                    step: 1,
-                                    precision: 0,
                                     placeholder: '请输入',
+                                    precision: 0,
+                                    step: 1,
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                __component_name="FormilyNumberPicker"
+                                fieldProps={{ name: 'customGPU', title: '', 'x-validator': [] }}
                               />
                             </Col>
                             <Col
+                              __component_name="Col"
                               span={1}
                               style={{
-                                display: 'flex',
                                 alignItems: 'center',
+                                display: 'flex',
                                 paddingBottom: '24px',
                               }}
-                              __component_name="Col"
                             >
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 颗
                               </Typography.Text>
@@ -784,46 +786,46 @@ class CreateModelService$$Page extends React.Component {
                 </FormilyFormItem>
               </FormilyForm>
               <Divider
-                mode="line"
-                style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
+                __component_name="Divider"
                 dashed={false}
                 defaultOpen={false}
-                __component_name="Divider"
+                mode="line"
+                style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
               />
-              <Row wrap={true} __component_name="Row">
-                <Col span={4} __component_name="Col" />
-                <Col span={20} __component_name="Col">
-                  <Space align="center" direction="horizontal" __component_name="Space">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={4} />
+                <Col __component_name="Col" span={20}>
+                  <Space __component_name="Space" align="center" direction="horizontal">
                     <Button
+                      __component_name="Button"
                       block={false}
-                      ghost={false}
-                      shape="default"
                       danger={false}
+                      disabled={false}
+                      ghost={false}
                       onClick={function () {
                         return this.handleCancle.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      disabled={false}
-                      __component_name="Button"
+                      shape="default"
                     >
                       {this.i18n('i18n-tg2scz4v') /* 取消 */}
                     </Button>
                     <Button
-                      type="primary"
+                      __component_name="Button"
                       block={false}
-                      ghost={false}
-                      shape="default"
                       danger={false}
+                      disabled={false}
+                      ghost={false}
                       onClick={function () {
                         return this.handleConfirm.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      disabled={false}
-                      __component_name="Button"
+                      shape="default"
+                      type="primary"
                     >
                       {this.i18n('i18n-mq4to9og') /* 确定 */}
                     </Button>
