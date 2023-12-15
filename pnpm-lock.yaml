@@ -63,8 +63,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.0.27
-        version: 1.0.27(@tenx-ui/materials@1.5.27)(antd@5.12.2)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.0.32
+        version: 1.0.32(@tenx-ui/materials@1.5.27)(antd@5.12.2)(react@18.2.0)(swr@2.2.4)
       KubeAGIUpload:
         specifier: workspace:*
         version: link:packages/KubeAGIUpload
@@ -6280,8 +6280,8 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.0.27(@tenx-ui/materials@1.5.27)(antd@5.12.2)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-2dFf4ldac9qhmqSuNykrvnhp7sg94l2HHGjA8abHjHC0qxK7Ox3oh5uOp5afky3S/fUwTHUKshzzp/jkCykOXw==}
+  /@yuntijs/arcadia-bff-sdk@1.0.32(@tenx-ui/materials@1.5.27)(antd@5.12.2)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-qqrAJ/XloR4jyp0dp2lEz7+xVL3cLmA+y32HRsfTvuA0BBr91MjtgQVzkeC4kB9Vc3PiDyvFzlorp/28t13xow==}
     peerDependencies:
       '@tenx-ui/materials': '>=1.5.8'
       antd: '>=5.4.0'
