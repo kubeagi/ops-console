@@ -7,6 +7,7 @@ import {
   Row,
   Col,
   Typography,
+  Alert,
   Card,
   Space,
   Button,
@@ -20,7 +21,6 @@ import {
   Status,
   Tag,
   Modal,
-  Alert,
 } from '@tenx-ui/materials';
 
 import {
@@ -71,11 +71,11 @@ class ModelService$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      currentModel: {},
       dataSource: [],
       delVisible: false,
-      currentModel: {},
-      modelTypes: '',
       keyword: '',
+      modelTypes: '',
       page: 1,
       pageSize: 12,
     };
@@ -112,10 +112,6 @@ class ModelService$$Page extends React.Component {
     }
   }
 
-  onClickCreatModel(event) {
-    this.history.push('/model-service/createModelService');
-  }
-
   localMenuOnClick(e, item) {
     e.domEvent.stopPropagation();
     switch (e.key) {
@@ -129,6 +125,25 @@ class ModelService$$Page extends React.Component {
         });
         break;
     }
+  }
+
+  onChangeKeyword(event) {
+    this.setState({
+      keyword: event.target.value,
+    });
+  }
+
+  onChangeModelTypes(e) {
+    this.setState(
+      {
+        modelTypes: e,
+      },
+      this.getListWorkers
+    );
+  }
+
+  onClickCreatModel(event) {
+    this.history.push('/model-service/createModelService');
   }
 
   onClickCreatOutsideModel(event) {
@@ -172,26 +187,11 @@ class ModelService$$Page extends React.Component {
     });
   }
 
-  onChangeKeyword(event) {
-    this.setState({
-      keyword: event.target.value,
-    });
-  }
-
-  onSearch(value, event) {
+  onRefresh(event) {
     this.getListWorkers();
   }
 
-  onChangeModelTypes(e) {
-    this.setState(
-      {
-        modelTypes: e,
-      },
-      this.getListWorkers
-    );
-  }
-
-  onRefresh(event) {
+  onSearch(value, event) {
     this.getListWorkers();
   }
 
@@ -204,70 +204,81 @@ class ModelService$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
             <Typography.Title
+              __component_name="Typography.Title"
               bold={true}
-              level={1}
               bordered={false}
               ellipsis={true}
-              __component_name="Typography.Title"
+              level={1}
             >
               {this.i18n('i18n-t06rg1nj') /* 模型服务 */}
             </Typography.Title>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
+            <Alert
+              __component_name="Alert"
+              message="集中管理模型服务，包含本地部署模型服务与第三方供应商模型服务，支持模型服务监控。"
+              showIcon={true}
+              style={{ marginBottom: '16px' }}
+              type="info"
+            />
+          </Col>
+        </Row>
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="default"
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              type="default"
             >
-              <Row wrap={true} __component_name="Row">
-                <Col span={24} __component_name="Col">
-                  <Row wrap={false} justify="space-between" __component_name="Row">
-                    <Col span={8} __component_name="Col">
-                      <Space align="center" direction="horizontal" __component_name="Space">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={24}>
+                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                    <Col __component_name="Col" span={8}>
+                      <Space __component_name="Space" align="center" direction="horizontal">
                         <Button
-                          icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
-                          type="primary"
+                          __component_name="Button"
                           block={false}
-                          ghost={false}
-                          shape="default"
                           danger={false}
+                          disabled={false}
+                          ghost={false}
+                          icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
                           onClick={function () {
                             return this.onClickCreatModel.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          disabled={false}
-                          __component_name="Button"
+                          shape="default"
+                          type="primary"
                         >
                           {this.i18n('i18n-d43b7hfv') /* 新增模型服务 */}
                         </Button>
                         <Button
-                          icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
+                          __component_name="Button"
                           block={false}
-                          ghost={false}
-                          shape="default"
                           danger={false}
+                          disabled={false}
+                          ghost={false}
+                          icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
                           onClick={function () {
                             return this.onRefresh.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          disabled={false}
-                          __component_name="Button"
+                          shape="default"
                         >
                           {this.i18n('i18n-jch93moe') /* 刷新 */}
                         </Button>
                         <Input.Search
-                          value={__$$eval(() => this.state.keyword)}
+                          __component_name="Input.Search"
                           onChange={function () {
                             return this.onChangeKeyword.apply(
                               this,
@@ -281,21 +292,17 @@ class ModelService$$Page extends React.Component {
                             );
                           }.bind(this)}
                           placeholder={this.i18n('i18n-f591ezbf') /* 请输入模型服务名称搜索 */}
-                          __component_name="Input.Search"
+                          value={__$$eval(() => this.state.keyword)}
                         />
                       </Space>
                     </Col>
                     <Col __component_name="Col">
-                      <Row wrap={false} justify="space-between" __component_name="Row">
+                      <Row __component_name="Row" justify="space-between" wrap={false}>
                         <Col __component_name="Col">
                           <Select
-                            style={{ width: 200 }}
-                            value={__$$eval(() => this.state.modelTypes)}
-                            options={[
-                              { label: '全部类型', value: '' },
-                              { label: 'LLM', value: 'llm' },
-                              { label: 'Embedding', value: 'embedding' },
-                            ]}
+                            __component_name="Select"
+                            _sdkSwrGetFunc={{ func: __$$eval(() => this.state.modelTypes) }}
+                            allowClear={true}
                             disabled={false}
                             onChange={function () {
                               return this.onChangeModelTypes.apply(
@@ -303,47 +310,46 @@ class ModelService$$Page extends React.Component {
                                 Array.prototype.slice.call(arguments).concat([])
                               );
                             }.bind(this)}
-                            allowClear={true}
-                            showSearch={true}
+                            options={[
+                              { label: '全部类型', value: '' },
+                              { label: 'LLM', value: 'llm' },
+                              { label: 'Embedding', value: 'embedding' },
+                            ]}
                             placeholder="请选择"
-                            _sdkSwrGetFunc={{ func: __$$eval(() => this.state.modelTypes) }}
-                            __component_name="Select"
+                            showSearch={true}
+                            style={{ width: 200 }}
+                            value={__$$eval(() => this.state.modelTypes)}
                           />
                         </Col>
                       </Row>
                     </Col>
                   </Row>
                 </Col>
-                <Col span={24} __component_name="Col">
+                <Col __component_name="Col" span={24}>
                   <List
-                    grid={{ lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 4, column: 3, gutter: 20 }}
-                    size="small"
-                    split={false}
-                    rowKey="id"
+                    __component_name="List"
                     bordered={false}
                     dataSource={__$$eval(() => this.state.dataSource)}
+                    grid={{ column: 3, gutter: 20, lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 4 }}
                     gridEnable={true}
                     itemLayout="horizontal"
                     pagination={{
-                      size: 'default',
-                      simple: false,
-                      position: 'bottom',
                       pagination: { pageSize: 5 },
+                      position: 'bottom',
                       showQuickJumper: false,
                       showSizeChanger: false,
+                      simple: false,
+                      size: 'default',
                     }}
                     renderItem={item =>
                       (__$$context => (
                         <List.Item>
                           <Card
-                            size="default"
-                            type="default"
-                            style={{ border: '1px solid #E2E2E2' }}
+                            __component_name="Card"
                             actions={[]}
-                            loading={false}
                             bordered={false}
                             hoverable={true}
-                            __component_name="Card"
+                            loading={false}
                             onClick={function () {
                               return this.onClickToDetail.apply(
                                 this,
@@ -354,24 +360,30 @@ class ModelService$$Page extends React.Component {
                                 ])
                               );
                             }.bind(__$$context)}
+                            size="default"
+                            style={{ border: '1px solid #E2E2E2' }}
+                            type="default"
                           >
-                            <Row wrap={true} gutter={[0, 0]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={true} __component_name="Row">
+                            <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" wrap={true}>
                                   <Col
+                                    __component_name="Col"
                                     span={24}
                                     style={{
-                                      float: 'right',
-                                      right: '0px',
-                                      height: '0',
-                                      zIndex: '1',
                                       display: 'flex',
-                                      position: 'relative',
+                                      float: 'right',
+                                      height: '0',
                                       justifyContent: 'flex-end',
+                                      position: 'relative',
+                                      right: '0px',
+                                      zIndex: '1',
                                     }}
-                                    __component_name="Col"
                                   >
                                     <Dropdown
+                                      __component_name="Dropdown"
+                                      destroyPopupOnHide={true}
+                                      disabled={false}
                                       menu={{
                                         items: [
                                           {
@@ -394,82 +406,79 @@ class ModelService$$Page extends React.Component {
                                           );
                                         }.bind(__$$context),
                                       }}
+                                      placement="bottomLeft"
                                       style={{ display: 'flex' }}
                                       trigger={['hover']}
-                                      disabled={false}
-                                      placement="bottomLeft"
-                                      __component_name="Dropdown"
-                                      destroyPopupOnHide={true}
                                     >
                                       <Button
+                                        __component_name="Button"
+                                        block={false}
+                                        danger={false}
+                                        disabled={false}
+                                        ghost={false}
+                                        hoverColor="default"
                                         icon={
                                           <AntdIconSettingOutlined
                                             __component_name="AntdIconSettingOutlined"
                                             style={{ color: '#000' }}
                                           />
                                         }
-                                        type="link"
-                                        block={false}
-                                        ghost={false}
                                         shape="default"
                                         style={{ display: 'flex', justifyContent: 'flex-end' }}
-                                        danger={false}
-                                        disabled={false}
-                                        __component_name="Button"
-                                        hoverColor="default"
+                                        type="link"
                                       />
                                     </Dropdown>
                                   </Col>
                                 </Row>
                                 <Row
-                                  wrap={false}
-                                  style={{ display: 'flex', alignItems: 'center' }}
                                   __component_name="Row"
+                                  style={{ alignItems: 'center', display: 'flex' }}
+                                  wrap={false}
                                 >
                                   <Col
+                                    __component_name="Col"
                                     flex="40px"
                                     style={{ display: 'flex', justifyContent: 'center' }}
-                                    __component_name="Col"
                                   >
                                     <TenxIconModelIcon
-                                      size={40}
                                       __component_name="TenxIconModelIcon"
+                                      size={40}
                                     />
                                   </Col>
-                                  <Col flex="auto" __component_name="Col">
+                                  <Col __component_name="Col" flex="auto">
                                     <Row
-                                      wrap={true}
-                                      style={{ paddingLeft: '10px' }}
-                                      gutter={[0, 0]}
                                       __component_name="Row"
+                                      gutter={[0, 0]}
+                                      style={{ paddingLeft: '10px' }}
+                                      wrap={true}
                                     >
                                       <Col
+                                        __component_name="Col"
                                         span={24}
                                         style={{ marginBottom: '10px' }}
-                                        __component_name="Col"
                                       >
                                         <Typography.Title
+                                          __component_name="Typography.Title"
                                           bold={true}
-                                          level={1}
                                           bordered={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Title"
+                                          level={1}
                                         >
                                           {__$$eval(
                                             () => `${item?.displayName || '-'}（${item?.name}）`
                                           )}
                                         </Typography.Title>
                                       </Col>
-                                      <Col span={24} __component_name="Col">
+                                      <Col __component_name="Col" span={24}>
                                         <Typography.Paragraph
                                           code={false}
-                                          mark={false}
-                                          style={{ fontSize: '' }}
                                           delete={false}
-                                          strong={false}
                                           disabled={false}
                                           editable={false}
                                           ellipsis={{ rows: 2 }}
+                                          mark={false}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
                                           underline={false}
                                         >
                                           {__$$eval(() => item.description || '-')}
@@ -479,28 +488,29 @@ class ModelService$$Page extends React.Component {
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Divider
-                                  mode="line"
-                                  style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
+                                  __component_name="Divider"
                                   dashed={false}
                                   defaultOpen={false}
-                                  __component_name="Divider"
+                                  mode="line"
+                                  style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
                                 />
                               </Col>
                             </Row>
                             <Descriptions
-                              id=""
-                              size="default"
+                              __component_name="Descriptions"
+                              bordered={false}
+                              borderedBottom={false}
+                              borderedBottomDashed={false}
                               colon={false}
+                              column={1}
+                              id=""
                               items={[
                                 {
-                                  key: 'i69qjtdvnp',
-                                  span: 1,
-                                  label: '状态',
                                   children: (
-                                    <Row wrap={false} gutter={[0, 0]} __component_name="Row">
-                                      <Col flex="60px" __component_name="Col">
+                                    <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
+                                      <Col __component_name="Col" flex="60px">
                                         <Tooltip
                                           __component_name="Tooltip"
                                           title={__$$eval(() =>
@@ -508,38 +518,38 @@ class ModelService$$Page extends React.Component {
                                           )}
                                         >
                                           <Status
+                                            __component_name="Status"
                                             id={__$$eval(() => item.status)}
                                             types={[
                                               {
+                                                children: '运行中',
                                                 id: 'Running',
                                                 type: 'success',
-                                                children: '运行中',
                                               },
-                                              { id: 'Pending', type: 'info', children: '部署中' },
-                                              { id: 'Error', type: 'error', children: '异常' },
-                                              { id: 'Unknown', type: 'disabled', children: '未知' },
+                                              { children: '部署中', id: 'Pending', type: 'info' },
+                                              { children: '异常', id: 'Error', type: 'error' },
+                                              { children: '未知', id: 'Unknown', type: 'disabled' },
                                               {
-                                                id: 'Deleting',
                                                 children: '删除中',
+                                                id: 'Deleting',
                                                 type: 'warning',
                                               },
                                             ]}
-                                            __component_name="Status"
                                           />
                                         </Tooltip>
                                       </Col>
                                       <Col
+                                        __component_name="Col"
                                         flex="auto"
                                         style={{ display: 'flex', justifyContent: 'center' }}
-                                        __component_name="Col"
                                       >
                                         {__$$evalArray(() => item.modelTypes.split(',')).map(
                                           (item, index) =>
                                             (__$$context => (
                                               <Tag
-                                                color="processing"
-                                                closable={false}
                                                 __component_name="Tag"
+                                                closable={false}
+                                                color="processing"
                                               >
                                                 {__$$eval(() => item)}
                                               </Tag>
@@ -548,35 +558,36 @@ class ModelService$$Page extends React.Component {
                                       </Col>
                                     </Row>
                                   ),
+                                  key: 'i69qjtdvnp',
+                                  label: '状态',
+                                  span: 1,
                                 },
                                 {
-                                  key: 'u0ft3tcpl8a',
-                                  span: 1,
-                                  label: '更新时间',
                                   children: (
                                     <Typography.Time
-                                      time={__$$eval(() => item.updateTimestamp)}
+                                      __component_name="Typography.Time"
                                       format=""
                                       relativeTime={false}
-                                      __component_name="Typography.Time"
+                                      time={__$$eval(() => item.updateTimestamp)}
                                     />
                                   ),
+                                  key: 'u0ft3tcpl8a',
+                                  label: '更新时间',
+                                  span: 1,
                                 },
                               ]}
-                              title=""
-                              column={1}
-                              layout="horizontal"
-                              bordered={false}
                               labelStyle={{ width: 100 }}
-                              borderedBottom={false}
-                              __component_name="Descriptions"
-                              borderedBottomDashed={false}
+                              layout="horizontal"
+                              size="default"
+                              title=""
                             />
                           </Card>
                         </List.Item>
                       ))(__$$createChildContext(__$$context, { item }))
                     }
-                    __component_name="List"
+                    rowKey="id"
+                    size="small"
+                    split={false}
                   />
                 </Col>
               </Row>
@@ -584,30 +595,30 @@ class ModelService$$Page extends React.Component {
           </Col>
         </Row>
         <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
           mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.onDelCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
           onOk={function () {
             return this.onDelOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           open={__$$eval(() => this.state.delVisible)}
           style={{}}
           title="删除"
-          centered={false}
-          keyboard={true}
-          onCancel={function () {
-            return this.onDelCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={false}
-          destroyOnClose={true}
-          __component_name="Modal"
         >
           <Alert
-            type="warning"
-            message={__$$eval(() => `确定删除${this.state.currentModel.displayName || ''}吗？`)}
-            bordered="dashed"
-            showIcon={true}
             __component_name="Alert"
+            bordered="dashed"
+            message={__$$eval(() => `确定删除${this.state.currentModel.displayName || ''}吗？`)}
+            showIcon={true}
+            type="warning"
           />
         </Modal>
       </Page>
