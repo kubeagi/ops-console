@@ -42,6 +42,9 @@ class DatasetVersionList$$Component extends React.Component {
 
     this.mockData = {
       data: {
+        Dataset: {
+          getDataset: {},
+        },
       },
     };
   }
@@ -86,10 +89,10 @@ class DatasetVersionList$$Component extends React.Component {
   }
 
   getProps() {
-    if (this.props.isProd) return this.props;
+    if (this.props.dataset) return this.props;
     return {
-      dataset: this.mockData.data.Dataset.getDataset,
-      datasource: this.mockData.data.Dataset.getDataset.versions.nodes,
+      dataset: this.mockData.data?.Dataset?.getDataset || {},
+      datasource: this.mockData.data?.Dataset?.getDataset?.versions?.nodes || [],
     };
   }
 
@@ -147,13 +150,14 @@ class DatasetVersionList$$Component extends React.Component {
         key: 'dataProcess',
         label: '数据处理',
         index: 2,
-      },
-      {
-        key: 'release',
-        label: '发布',
-        index: 3,
       }
+      // , {
+      //   key: 'release',
+      //   label: '发布',
+      //   index: 3
+      // }
     );
+
     return list.sort((a, b) => a.index - b.index);
   }
 
@@ -173,9 +177,7 @@ class DatasetVersionList$$Component extends React.Component {
     });
   }
 
-  componentDidMount() {
-    console.log('did mount', this.getProps());
-  }
+  componentDidMount() {}
 
   render() {
     const __$$context = this._context || this;
@@ -211,25 +213,12 @@ class DatasetVersionList$$Component extends React.Component {
               render: (text, record, index) =>
                 (__$$context => (
                   <Status
-                    id={__$$eval(() => record.dataProcessStatus)}
+                    id={__$$eval(() => record.dataProcessStatus || 'no')}
                     types={__$$eval(() => __$$context.constants.DATASET_DATA.dataProcessStatus)}
                     __component_name="Status"
                   />
                 ))(__$$createChildContext(__$$context, { text, record, index })),
               dataIndex: 'dataProcessStatus',
-            },
-            {
-              key: 'released',
-              title: '发布状态',
-              render: (text, record, index) =>
-                (__$$context => (
-                  <Status
-                    id={__$$eval(() => record.released)}
-                    types={__$$eval(() => __$$context.constants.DATASET_DATA.released)}
-                    __component_name="Status"
-                  />
-                ))(__$$createChildContext(__$$context, { text, record, index })),
-              dataIndex: 'released',
             },
             {
               key: 'files',
