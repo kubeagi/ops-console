@@ -55,7 +55,7 @@
     "@tenx-ui/auth-utils": "0.0.1",
     "@tenx-ui/charts": "1.1.2",
     "@tenx-ui/form-helper": "^0.0.2",
-    "@tenx-ui/icon": "^2.4.31",
+    "@tenx-ui/icon": "^2.4.32",
     "@tenx-ui/icon-materials": "^0.1.5",
     "@tenx-ui/logs": "^3.0.5",
     "@tenx-ui/materials": "1.5.27",
@@ -83,7 +83,8 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "shared-components": "workspace:*",
-    "swr": "^2.0.0"
+    "swr": "^2.0.0",
+    "@lobehub/tts":"^1.23.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",

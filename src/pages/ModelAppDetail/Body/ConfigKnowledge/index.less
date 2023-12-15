@@ -1,0 +1,27 @@
+@import '@/assets/style/index.less';
+
+.KnowledgeItem {
+  width: 176px;
+  border: 1px solid @border-color-base;
+  height: 50px;
+  border-radius: 4px;
+  padding: 0 16px;
+  .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+  .delete {
+    color: @font-color-3;
+    cursor: pointer;
+  }
+}
+.KnowledgeItemSelected {
+  border: 1px solid @primary-color;
+}
+.KnowledgeItemCanSelect {
+  cursor: pointer;
+}
+.KnowledgeItemCanSelect:hover{
+  border: 1px solid @a-hover-color;
+}
