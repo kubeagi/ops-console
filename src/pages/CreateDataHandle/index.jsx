@@ -69,60 +69,6 @@ class $$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      configMap: {
-        qa_split: 'QAsplitChecked',
-        document_chunk: 'TextSegmentationChecked',
-        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
-        space_standardization: 'SpaceHandleChecked',
-        remove_garbled_text: 'RemoveGarbledCodeChecked',
-        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
-        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
-        remove_emojis: 'RemoveEmoteChecked',
-        simhash_operator: 'SimhashOperatorChecked',
-        remove_email: 'RemoveEmailChecked',
-        remove_ip_address: 'RemoveIPAddressChecked',
-        remove_number: 'RemoveNumberChecked',
-        character_duplication_rate: 'CharacterRepeatFilterChecked',
-        word_duplication_rate: 'WordRepeatFilterChecked',
-        special_character_rate: 'SpecialCharactersRateChecked',
-        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
-      },
-      step3Data: {
-        QAsplitChecked: true,
-        TextSegmentationChecked: false,
-        TextSegmentationSegmentationLen: undefined,
-        TextSegmentationSegmentationRepeatLen: undefined,
-        RemoveInvisibleCharactersChecked: false,
-        SpaceHandleChecked: false,
-        RemoveGarbledCodeChecked: false,
-        ConvertComplexityToSimplicityChecked: false,
-        RemoveHtmlIdentifyingChecked: false,
-        RemoveEmoteChecked: false,
-        CharacterRepeatFilterChecked: false,
-        CharacterRepeatFilterRate: 0.5,
-        WordRepeatFilterChecked: false,
-        WordRepeatFilterRate: 0.5,
-        SpecialCharactersRateChecked: false,
-        SpecialCharactersRateRate: 0.5,
-        PornographicViolenceRateChecked: false,
-        PornographicViolenceRateRate: 0.5,
-        SimhashOperatorChecked: false,
-        SimhashOperatorRate: 5,
-        RemoveEmailChecked: false,
-        RemoveIPAddressChecked: false,
-        RemoveNumberChecked: false,
-      },
-      step4Data: [],
-      currentStep: 0,
-      step1FormData: {},
-      step2FormData: {},
-      configEnableMap: {},
-      dataSetDataList: [],
-      dataSetFileList: [],
-      numberInputStep: 0.1,
-      dataSetFileTotal: '0',
-      fileTableLoading: false,
-      selectedFileList: [],
       afterTreatmentData: [
         {
           _type: 'qa_split',
@@ -199,11 +145,71 @@ class $$Page extends React.Component {
             '这个文档中的电话、身份证号、银行卡号等信息将会被去除，如：手机号 ，身份证号，银行卡号',
         },
       ],
+      configEnableMap: {},
+      configMap: {
+        qa_split: 'QAsplitChecked',
+        document_chunk: 'TextSegmentationChecked',
+        remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
+        space_standardization: 'SpaceHandleChecked',
+        remove_garbled_text: 'RemoveGarbledCodeChecked',
+        traditional_to_simplified: 'ConvertComplexityToSimplicityChecked',
+        remove_html_tag: 'RemoveHtmlIdentifyingChecked',
+        remove_emojis: 'RemoveEmoteChecked',
+        simhash_operator: 'SimhashOperatorChecked',
+        remove_email: 'RemoveEmailChecked',
+        remove_ip_address: 'RemoveIPAddressChecked',
+        remove_number: 'RemoveNumberChecked',
+        character_duplication_rate: 'CharacterRepeatFilterChecked',
+        word_duplication_rate: 'WordRepeatFilterChecked',
+        special_character_rate: 'SpecialCharactersRateChecked',
+        pornography_violence_word_rate: 'PornographicViolenceRateChecked',
+      },
+      currentStep: 0,
+      dataSetDataList: [],
+      dataSetFileList: [],
       dataSetFileSearchParams: {
         keyword: '',
         currentPage: 1,
       },
+      dataSetFileTotal: '0',
       fileSelectCheckErrorFlag: false,
+      fileTableLoading: false,
+      llmList: [],
+      numberInputStep: 0.1,
+      selectedFileList: [],
+      showLlmModel: true,
+      step1FormData: {},
+      step2FormData: {},
+      step3Data: {
+        QAsplitChecked: true,
+        QAsplitForm: {
+          type: undefined,
+          model: undefined,
+        },
+        TextSegmentationChecked: false,
+        TextSegmentationSegmentationLen: undefined,
+        TextSegmentationSegmentationRepeatLen: undefined,
+        RemoveInvisibleCharactersChecked: false,
+        SpaceHandleChecked: false,
+        RemoveGarbledCodeChecked: false,
+        ConvertComplexityToSimplicityChecked: false,
+        RemoveHtmlIdentifyingChecked: false,
+        RemoveEmoteChecked: false,
+        CharacterRepeatFilterChecked: false,
+        CharacterRepeatFilterRate: 0.5,
+        WordRepeatFilterChecked: false,
+        WordRepeatFilterRate: 0.5,
+        SpecialCharactersRateChecked: false,
+        SpecialCharactersRateRate: 0.5,
+        PornographicViolenceRateChecked: false,
+        PornographicViolenceRateRate: 0.5,
+        SimhashOperatorChecked: false,
+        SimhashOperatorRate: 5,
+        RemoveEmailChecked: false,
+        RemoveIPAddressChecked: false,
+        RemoveNumberChecked: false,
+      },
+      step4Data: [],
     };
   }
 
@@ -219,25 +225,62 @@ class $$Page extends React.Component {
     console.log('will unmount');
   }
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  backToStep2() {
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    if (!pre_data_set_name) return;
+    this.setDataSetVersionsSource(pre_data_set_name);
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_name,
+      pre_data_set_version,
+      post_data_set_version: pre_data_set_version,
+      post_data_set_name: pre_data_set_name,
+    });
   }
 
-  onBack(event) {
-    // 点击按钮时的回调
-    this.history.push('/data-handle');
-  }
-
-  async onNext() {
-    if (this.state.currentStep === 0) {
-      this.getStep1Data();
-    } else if (this.state.currentStep === 1) {
-      this.getStep2Data();
-    } else if (this.state.currentStep === 2) {
-      this.onNextStep();
-    } else {
-      this.onNextStep();
+  backToStep3Form() {
+    if (this.state.step3Data.QAsplitChecked) {
+      const { type, model } = this.state.step3Data.QAsplitForm;
+      this.form('qa_split').setValues({
+        type,
+        model,
+      });
     }
+  }
+
+  convertStep3Data() {
+    const list = [];
+    const step3Data = this.state.step3Data;
+    const vTk = this.valToKey(this.state.configMap);
+    for (let k in step3Data) {
+      if (k.endsWith('Checked')) {
+        const extra =
+          k === 'QAsplitChecked' && step3Data.QAsplitChecked
+            ? {
+                llm_config: {
+                  name: this.state.step3Data.QAsplitForm.type,
+                  namespace: this.state.llmList.find(
+                    item => item.value === this.state.step3Data.QAsplitForm.type
+                  ).namespace,
+                  model:
+                    this.state.llmList.find(
+                      item => item.value === this.state.step3Data.QAsplitForm.type
+                    ).provider === 'worker'
+                      ? this.state.llmList.find(
+                          item => item.value === this.state.step3Data.QAsplitForm.type
+                        )._models[0]
+                      : this.state.step3Data.QAsplitForm.model,
+                },
+              }
+            : {};
+        if (step3Data[k]) {
+          list.push({
+            type: vTk[k],
+            ...extra,
+          });
+        }
+      }
+    }
+    return list;
   }
 
   debounce(func, delay) {
@@ -250,53 +293,8 @@ class $$Page extends React.Component {
     };
   }
 
-  async onFinish() {
-    const list = this.convertStep3Data();
-    const files = this.state.selectedFileList.map(item => {
-      const _item = item.split('/');
-      return {
-        name: _item[_item.length - 1],
-      };
-    });
-    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
-    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
-    const data = {
-      ...this.state.step1FormData,
-      ...this.state.step2FormData,
-      version_data_set_name: versionName,
-      data_process_config_info: list,
-      file_names: files,
-      bucket_name: this.utils.getAuthData().project,
-      namespace: this.utils.getAuthData().project,
-      creator: this.utils.getAuthData().user?.name,
-    };
-    const res = await this.utils.bff.createDataProcessTask({
-      input: {
-        ...data,
-      },
-    });
-    if (res.dataProcess.createDataProcessTask.status === 200) {
-      this.utils.notification.success({
-        message: '成功',
-      });
-      this.history.push('/data-handle');
-    } else {
-      this.utils.notification.warn({
-        message: res.dataProcess?.createDataProcessTask?.message || '失败',
-      });
-    }
-  }
-
-  onSearch(event) {
-    this.debouncedFunction(event);
-  }
-
-  valToKey(obj) {
-    const _obj = {};
-    for (let key in obj) {
-      _obj[obj[key]] = key;
-    }
-    return _obj;
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
   async getDataSet() {
@@ -343,6 +341,262 @@ class $$Page extends React.Component {
     );
   }
 
+  getListWorkers() {
+    const namespace = this.utils.getAuthData().project || 'system-tce';
+    const input = {
+      pageSize: 9999,
+      page: 1,
+      namespace,
+    };
+    this.utils.bff
+      ?.listLLMs({
+        input,
+      })
+      .then(res => {
+        const nodes = res.LLM.listLLMs?.nodes || [];
+        const _list = nodes.map(item => {
+          return {
+            models: item.models?.map(i => ({
+              label: i,
+              value: i,
+            })),
+            _models: item.models,
+            label: this.utils.getFullName(item),
+            value: item.name,
+            provider: item.provider,
+            baseUrl: item.baseUrl,
+            namespace: item.namespace,
+          };
+        });
+        this.setState({
+          llmList: _list,
+        });
+        this.form('qa_split').setFieldState('type', {
+          dataSource: _list,
+        });
+      })
+      .catch(err => [
+        this.utils.notification.warn({
+          message: '获取模型服务失败',
+          errors: err?.response?.errors,
+        }),
+      ]);
+  }
+
+  getStep1Data() {
+    this.form('createDataHandleStep1')
+      .validate()
+      .then(res => {
+        const step1FormData = this.form('createDataHandleStep1').values;
+        this.setState({
+          step1FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  getStep2Data() {
+    this.form('createDataHandleStep2')
+      ?.validate()
+      .then(res => {
+        const step2FormData = this.form('createDataHandleStep2').values;
+        this.setState({
+          step2FormData,
+        });
+        this.onNextStep();
+      });
+  }
+
+  getStep3FormData() {
+    const promiseList = [];
+    // 如果选择了QA拆分
+    if (this.state.step3Data.QAsplitChecked) {
+      const qaPromise = this.form('qa_split')
+        ?.validate()
+        .then(res => {
+          const values = this.form('qa_split').values;
+          this.setState({
+            step3Data: {
+              ...this.state.step3Data,
+              QAsplitForm: {
+                ...values,
+              },
+            },
+          });
+        });
+      promiseList.push(qaPromise);
+    }
+    Promise.all(promiseList).then(() => {
+      this.onNextStep();
+    });
+  }
+
+  getStep4TableData() {
+    const list = this.convertStep3Data();
+    const result = [];
+    list.forEach(item => {
+      const cur = this.state.afterTreatmentData.find(ele => ele._type === item.type);
+      if (cur) {
+        result.push(cur);
+      }
+    });
+    return result;
+  }
+
+  async getTableList(name) {
+    if (!name) return;
+    this.setState({
+      fileTableLoading: true,
+    });
+    const res = await this.utils.bff.getVersionedDataset({
+      name: name,
+      namespace: this.utils.getAuthData().project,
+      fileInput: {
+        keyword: this.state.dataSetFileSearchParams.keyword,
+        pageSize: 10,
+        page: this.state.dataSetFileSearchParams.currentPage,
+      },
+    });
+    const data = res.VersionedDataset.getVersionedDataset.files;
+    this.setState({
+      fileTableLoading: false,
+      dataSetFileList:
+        (data.nodes || []).map(i => ({
+          ...i,
+          label: '普通文本',
+        })) || [],
+      dataSetFileTotal: data.totalCount || 0,
+    });
+  }
+
+  getVersionName(dataset, version) {
+    if (dataset && version) {
+      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
+      const versionObj = datasetObj.versions.find(i => i.value === version);
+      return versionObj.name;
+    }
+    return;
+  }
+
+  onBack(event) {
+    // 点击按钮时的回调
+    this.history.push('/data-handle');
+  }
+
+  onDataSetChange(v) {
+    this.setState({
+      dataSetFileList: [],
+      selectedFileList: [],
+      dataSetFileTotal: '0',
+    });
+    this.form('createDataHandleStep2').setValues({
+      pre_data_set_version: undefined,
+      post_data_set_version: undefined,
+      post_data_set_name: v,
+    });
+    this.setDataSetVersionsSource(v);
+  }
+
+  onDataSetVersionChange(v) {
+    this.form('createDataHandleStep2').setValues({
+      post_data_set_version: v,
+    });
+    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
+    const name = this.getVersionName(pre_data_set_name, v);
+    this.getTableList(name);
+  }
+
+  onFinish() {
+    const list = this.convertStep3Data();
+    const files = this.state.selectedFileList.map(item => {
+      const _item = item.split('/');
+      return {
+        name: _item[_item.length - 1],
+      };
+    });
+    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
+    const versionName = this.getVersionName(pre_data_set_name, pre_data_set_version);
+    const data = {
+      ...this.state.step1FormData,
+      ...this.state.step2FormData,
+      version_data_set_name: versionName,
+      data_process_config_info: list,
+      file_names: files,
+      bucket_name: this.utils.getAuthData().project,
+      namespace: this.utils.getAuthData().project,
+      creator: this.utils.getAuthData().user?.name,
+    };
+    this.utils.bff
+      .createDataProcessTask({
+        input: {
+          ...data,
+        },
+      })
+      .then(res => {
+        if (res.dataProcess.createDataProcessTask.status === 200) {
+          this.utils.notification.success({
+            message: '创建成功',
+          });
+          this.history.push('/data-handle');
+        } else {
+          this.utils.notification.warn({
+            message: res.dataProcess?.createDataProcessTask?.message || '失败',
+          });
+        }
+      })
+      .catch(err => [
+        this.utils.notification.warn({
+          message: '创建数据处理失败',
+          errors: err?.response?.errors,
+        }),
+      ]);
+  }
+
+  onLLmChange(value) {
+    if (value) {
+      const cur = this.state.llmList.find(i => i.value === value);
+
+      // 如果是自己的模型服务，不需要传model
+      if (cur.provider === 'worker') {
+        if (this.form('qa_split').fields?.model?.required) {
+          this.form('qa_split').fields.model.required = false;
+        }
+        this.setState({
+          showLlmModel: false,
+        });
+      } else {
+        if (this.form('qa_split').fields?.model?.required) {
+          this.form('qa_split').fields.model.required = true;
+        }
+        this.form('qa_split').setValues({
+          model: undefined,
+        });
+        this.setState(
+          {
+            showLlmModel: true,
+          },
+          () => {
+            this.form('qa_split').setFieldState('model', {
+              dataSource: cur.models,
+            });
+          }
+        );
+      }
+    }
+  }
+
+  async onNext() {
+    if (this.state.currentStep === 0) {
+      this.getStep1Data();
+    } else if (this.state.currentStep === 1) {
+      this.getStep2Data();
+    } else if (this.state.currentStep === 2) {
+      this.getStep3FormData();
+    } else {
+      this.onNextStep();
+    }
+  }
+
   onNextStep() {
     // step2 文件检查
     if (this.state.currentStep === 1) {
@@ -386,6 +640,8 @@ class $$Page extends React.Component {
           // this.setState({
           //   configEnableMap: enableObj
           // })
+          this.backToStep3Form();
+          this.getListWorkers();
         }
         if (this.state.currentStep === 3) {
           const list = this.getStep4TableData();
@@ -393,6 +649,20 @@ class $$Page extends React.Component {
             step4Data: list,
           });
         }
+      }
+    );
+  }
+
+  onPageChange(page) {
+    this.setState(
+      {
+        dataSetFileSearchParams: {
+          ...this.state.dataSetFileSearchParams,
+          currentPage: page,
+        },
+      },
+      () => {
+        this.getDataSet();
       }
     );
   }
@@ -418,151 +688,38 @@ class $$Page extends React.Component {
             dataSource: this.state.dataSetDataList,
           });
           this.backToStep2();
+        } else if (this.state.currentStep === 2) {
+          this.backToStep3Form();
+          this.getListWorkers();
         }
       }
     );
   }
 
-  backToStep2() {
-    const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
-    if (!pre_data_set_name) return;
-    this.setDataSetVersionsSource(pre_data_set_name);
-    this.form('createDataHandleStep2').setValues({
-      pre_data_set_name,
-      pre_data_set_version,
-      post_data_set_version: pre_data_set_version,
-      post_data_set_name: pre_data_set_name,
-    });
+  onSearch(event) {
+    this.debouncedFunction(event);
   }
 
-  getStep1Data() {
-    this.form('createDataHandleStep1')
-      .validate()
-      .then(res => {
-        const step1FormData = this.form('createDataHandleStep1').values;
-        this.setState({
-          step1FormData,
-        });
-        this.onNextStep();
-      });
-  }
-
-  getStep2Data() {
-    this.form('createDataHandleStep2')
-      ?.validate()
-      .then(res => {
-        const step2FormData = this.form('createDataHandleStep2').values;
-        this.setState({
-          step2FormData,
-        });
-        this.onNextStep();
-      });
-  }
-
-  async getTableList(name) {
-    if (!name) return;
-    this.setState({
-      fileTableLoading: true,
-    });
-    const res = await this.utils.bff.getVersionedDataset({
-      name: name,
-      namespace: this.utils.getAuthData().project,
-      fileInput: {
-        keyword: this.state.dataSetFileSearchParams.keyword,
-        pageSize: 10,
-        page: this.state.dataSetFileSearchParams.currentPage,
-      },
-    });
-    const data = res.VersionedDataset.getVersionedDataset.files;
-    this.setState({
-      fileTableLoading: false,
-      dataSetFileList:
-        (data.nodes || []).map(i => ({
-          ...i,
-          label: '普通文本',
-        })) || [],
-      dataSetFileTotal: data.totalCount || 0,
-    });
-  }
-
-  onPageChange(page) {
-    this.setState(
-      {
-        dataSetFileSearchParams: {
-          ...this.state.dataSetFileSearchParams,
-          currentPage: page,
-        },
-      },
-      () => {
-        this.getDataSet();
-      }
-    );
-  }
-
-  async getListWorkers() {
-    try {
-      const namespace = this.utils.getAuthData().project || 'system-tce';
-      const input = {
-        modelTypes,
-        pageSize: 9999,
-        page: 1,
-        namespace,
-      };
-      if (keyword) input.keyword = keyword;
-      const res = await this.props.appHelper.utils.bff?.listWorkers({
-        input,
-      });
+  onSelectFileChange(v) {
+    if (v.length) {
       this.setState({
-        dataSource: res.Worker?.listWorkers?.nodes,
-      });
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: '获取服务失败',
-        errors: error?.response?.errors,
+        fileSelectCheckErrorFlag: false,
       });
     }
-  }
-
-  getVersionName(dataset, version) {
-    console.log(dataset, this.state.dataSetDataList);
-    if (dataset && version) {
-      const datasetObj = this.state.dataSetDataList.find(i => i.value === dataset);
-      console.log(datasetObj);
-      const versionObj = datasetObj.versions.find(i => i.value === version);
-      return versionObj.name;
-    }
-    return;
-  }
-
-  onDataSetChange(v) {
     this.setState({
-      dataSetFileList: [],
-      selectedFileList: [],
-      dataSetFileTotal: '0',
+      selectedFileList: v,
     });
-    this.form('createDataHandleStep2').setValues({
-      pre_data_set_version: undefined,
-      post_data_set_version: undefined,
-      post_data_set_name: v,
-    });
-    this.setDataSetVersionsSource(v);
   }
 
-  convertStep3Data() {
-    const list = [];
-    const step3Data = this.state.step3Data;
-    const vTk = this.valToKey(this.state.configMap);
-    console.log(vTk);
-    for (let k in step3Data) {
-      if (k.endsWith('Checked')) {
-        if (step3Data[k]) {
-          list.push({
-            type: vTk[k],
-          });
-        }
-      }
-    }
-    return list;
+  setDataSetVersionsSource(v) {
+    const obj = this.state.dataSetDataList.find(item => item.value === v);
+    const genOptionList = obj.versions;
+    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
+      dataSource: genOptionList,
+    });
+    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
+      dataSource: genOptionList,
+    });
   }
 
   updateStep3State(value, event, extraParams = {}) {
@@ -579,47 +736,12 @@ class $$Page extends React.Component {
     });
   }
 
-  getStep4TableData() {
-    const list = this.convertStep3Data();
-    const result = [];
-    list.forEach(item => {
-      const cur = this.state.afterTreatmentData.find(ele => ele._type === item.type);
-      if (cur) {
-        result.push(cur);
-      }
-    });
-    return result;
-  }
-
-  onSelectFileChange(v) {
-    if (v.length) {
-      this.setState({
-        fileSelectCheckErrorFlag: false,
-      });
+  valToKey(obj) {
+    const _obj = {};
+    for (let key in obj) {
+      _obj[obj[key]] = key;
     }
-    this.setState({
-      selectedFileList: v,
-    });
-  }
-
-  onDataSetVersionChange(v) {
-    this.form('createDataHandleStep2').setValues({
-      post_data_set_version: v,
-    });
-    const { pre_data_set_name } = this.form('createDataHandleStep2').values;
-    const name = this.getVersionName(pre_data_set_name, v);
-    this.getTableList(name);
-  }
-
-  setDataSetVersionsSource(v) {
-    const obj = this.state.dataSetDataList.find(item => item.value === v);
-    const genOptionList = obj.versions;
-    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
-      dataSource: genOptionList,
-    });
-    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
-      dataSource: genOptionList,
-    });
+    return _obj;
   }
 
   componentDidMount() {
@@ -647,37 +769,39 @@ class $$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page style={{ marginBottom: '0px', paddingBottom: '0px' }}>
-        <Row wrap={true} style={{ marginBottom: '16px' }} __component_name="Row">
-          <Col span={24} __component_name="Col">
-            <Space align="center" direction="horizontal" __component_name="Space">
-              <Button.Back type="primary" title="" __component_name="Button.Back" />
+        <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
+          <Col __component_name="Col" span={24}>
+            <Space __component_name="Space" align="center" direction="horizontal">
+              <Button.Back __component_name="Button.Back" title="" type="primary" />
             </Space>
             <Typography.Title
+              __component_name="Typography.Title"
               bold={true}
-              level={2}
               bordered={false}
               ellipsis={true}
-              __component_name="Typography.Title"
+              level={2}
             >
               创建任务
             </Typography.Title>
           </Col>
         </Row>
         <Row
-          wrap={true}
+          __component_name="Row"
           align="top"
+          gutter={['', '']}
           style={{
-            paddingTop: '24px',
+            backgroundColor: '#ffffff',
+            paddingBottom: '24px',
             paddingLeft: '24px',
             paddingRight: '24px',
-            paddingBottom: '24px',
-            backgroundColor: '#ffffff',
+            paddingTop: '24px',
           }}
-          gutter={['', '']}
-          __component_name="Row"
+          wrap={true}
         >
-          <Col span={24} style={{ backgroundColor: '#ffffff' }} __component_name="Col">
+          <Col __component_name="Col" span={24} style={{ backgroundColor: '#ffffff' }}>
             <Steps
+              __component_name="Steps"
+              current={__$$eval(() => this.state.currentStep)}
               items={[
                 { title: '基本信息' },
                 { title: '选择文件' },
@@ -685,76 +809,74 @@ class $$Page extends React.Component {
                 { title: '处理样例' },
               ]}
               style={{
+                alignItems: 'center',
                 display: 'flex',
                 marginTop: '16px',
-                alignItems: 'center',
-                paddingTop: '24px',
                 paddingBottom: '24px',
+                paddingTop: '24px',
               }}
-              current={__$$eval(() => this.state.currentStep)}
-              __component_name="Steps"
             />
             {!!__$$eval(
               () => this.state.currentStep === 2 && this.state.step1FormData.file_type !== 'qa'
             ) && (
-              <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                <Col span={24} style={{ paddingBottom: '0px' }} __component_name="Col">
+              <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                <Col __component_name="Col" span={24} style={{ paddingBottom: '0px' }}>
                   <Divider
                     __component_name="Divider"
-                    mode="default"
-                    orientation="left"
-                    orientationMargin={0}
+                    closeIcon=""
+                    content=""
                     dashed={true}
                     defaultOpen={false}
-                    content=""
+                    mode="default"
                     openIcon=""
-                    closeIcon=""
+                    orientation="left"
+                    orientationMargin={0}
                     style={{ fontWeight: 700 }}
                   >
                     分段处理
                   </Divider>
                 </Col>
-                <Col span={24} __component_name="Col">
-                  <Row wrap={true} __component_name="Row">
-                    <Col span={6} __component_name="Col">
+                <Col __component_name="Col" span={24}>
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '182px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         className="step3_disabled_style"
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '200px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           文本分段
                                         </Typography.Text>
@@ -763,12 +885,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.TextSegmentationChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={true}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -779,77 +902,76 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       />
                                     </Row>
                                   </Col>
                                 </Row>
                               </Col>
                             </Row>
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
                               <Col
+                                __component_name="Col"
                                 span={24}
                                 style={{ marginBottom: '0px', paddingBottom: '0px' }}
-                                __component_name="Col"
                               >
                                 <FormilyForm
-                                  ref={this._refsManager.linkRef('formily_ob8rkd34dcj')}
-                                  formHelper={{ autoFocus: true }}
+                                  __component_name="FormilyForm"
                                   componentProps={{
                                     colon: false,
-                                    layout: 'horizontal',
-                                    labelCol: 4,
                                     labelAlign: 'left',
+                                    labelCol: 4,
+                                    layout: 'horizontal',
                                     wrapperCol: 20,
                                   }}
-                                  __component_name="FormilyForm"
+                                  formHelper={{ autoFocus: true }}
+                                  ref={this._refsManager.linkRef('formily_ob8rkd34dcj')}
                                 >
                                   {!!false && (
                                     <FormilySelect
-                                      fieldProps={{ name: 'Select', 'x-validator': [] }}
+                                      __component_name="FormilySelect"
                                       componentProps={{
                                         'x-component-props': {
-                                          disabled: false,
-                                          allowClear: false,
-                                          placeholder: '请选择模型',
                                           _sdkSwrGetFunc: {},
+                                          allowClear: false,
+                                          disabled: false,
+                                          placeholder: '请选择模型',
                                         },
                                       }}
                                       decoratorProps={{
                                         'x-decorator-props': {
+                                          labelEllipsis: true,
                                           style: { marginBottom: '0px' },
                                           tooltip: '',
-                                          labelEllipsis: true,
                                         },
                                       }}
-                                      __component_name="FormilySelect"
+                                      fieldProps={{ name: 'Select', 'x-validator': [] }}
                                     />
                                   )}
                                 </FormilyForm>
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       />
                                     </Row>
                                   </Col>
@@ -858,37 +980,27 @@ class $$Page extends React.Component {
                             </Row>
                           </Col>
                         </Row>
-                        <Row wrap={true} style={{ marginTop: '8px' }} __component_name="Row">
-                          <Col span={17} style={{}} __component_name="Col">
+                        <Row __component_name="Row" style={{ marginTop: '8px' }} wrap={true}>
+                          <Col __component_name="Col" span={17} style={{}}>
                             <FormilyForm
-                              ref={this._refsManager.linkRef('formily_xv445n80qw')}
-                              formHelper={{ style: { textAlign: 'right' }, autoFocus: false }}
-                              componentProps={{
-                                size: 'small',
-                                colon: true,
-                                layout: 'horizontal',
-                                labelCol: 4,
-                                labelAlign: 'left',
-                                wrapperCol: 20,
-                                wrapperAlign: '',
-                              }}
                               __component_name="FormilyForm"
+                              componentProps={{
+                                colon: true,
+                                labelAlign: 'left',
+                                labelCol: 4,
+                                layout: 'horizontal',
+                                size: 'small',
+                                wrapperAlign: '',
+                                wrapperCol: 20,
+                              }}
+                              formHelper={{ autoFocus: false, style: { textAlign: 'right' } }}
+                              ref={this._refsManager.linkRef('formily_xv445n80qw')}
                             >
                               <FormilyNumberPicker
-                                style={{ width: '80px', marginBottom: '0px', paddingBottom: '0px' }}
-                                fieldProps={{
-                                  name: null,
-                                  title: '分段长度',
-                                  default: __$$eval(
-                                    () => this.state.step3Data.TextSegmentationSegmentationLen
-                                  ),
-                                  required: true,
-                                  'x-validator': [],
-                                  _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                }}
+                                __component_name="FormilyNumberPicker"
                                 componentProps={{
                                   'x-component-props': {
-                                    suffix: '',
+                                    addonAfter: '',
                                     onChange: function () {
                                       return this.updateStep3State.apply(
                                         this,
@@ -899,42 +1011,42 @@ class $$Page extends React.Component {
                                         ])
                                       );
                                     }.bind(this),
-                                    addonAfter: '',
+                                    suffix: '',
                                   },
                                 }}
                                 decoratorProps={{
                                   'x-decorator-props': {
-                                    size: 'small',
-                                    inset: false,
-                                    style: { marginBottom: '0px' },
-                                    layout: 'horizontal',
-                                    fullness: false,
-                                    labelCol: 100,
-                                    labelWrap: false,
                                     addonAfter: '',
+                                    fullness: false,
+                                    inset: false,
                                     labelAlign: 'left',
+                                    labelCol: 100,
+                                    labelEllipsis: true,
                                     labelWidth: '100',
-                                    wrapperWrap: false,
+                                    labelWrap: false,
+                                    layout: 'horizontal',
+                                    size: 'small',
+                                    style: { marginBottom: '0px' },
+                                    tooltipLayout: 'text',
                                     wrapperAlign: 'left',
                                     wrapperWidth: '',
-                                    labelEllipsis: true,
-                                    tooltipLayout: 'text',
+                                    wrapperWrap: false,
                                   },
                                 }}
-                                __component_name="FormilyNumberPicker"
+                                fieldProps={{
+                                  _unsafe_MixedSetter_default_select: 'VariableSetter',
+                                  default: __$$eval(
+                                    () => this.state.step3Data.TextSegmentationSegmentationLen
+                                  ),
+                                  name: null,
+                                  required: true,
+                                  title: '分段长度',
+                                  'x-validator': [],
+                                }}
+                                style={{ marginBottom: '0px', paddingBottom: '0px', width: '80px' }}
                               />
                               <FormilyNumberPicker
-                                style={{ width: '80px' }}
-                                fieldProps={{
-                                  name: null,
-                                  title: '分段重叠长度',
-                                  default: __$$eval(
-                                    () => this.state.step3Data.TextSegmentationSegmentationRepeatLen
-                                  ),
-                                  required: true,
-                                  'x-validator': [],
-                                  _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                }}
+                                __component_name="FormilyNumberPicker"
                                 componentProps={{
                                   'x-component-props': {
                                     onChange: function () {
@@ -952,52 +1064,62 @@ class $$Page extends React.Component {
                                 }}
                                 decoratorProps={{
                                   'x-decorator-props': {
+                                    addonAfter: '',
+                                    labelCol: 100,
+                                    labelEllipsis: true,
+                                    labelWidth: '100',
+                                    layout: 'horizontal',
                                     size: 'small',
                                     style: { marginBottom: '0px' },
-                                    layout: 'horizontal',
-                                    labelCol: 100,
-                                    addonAfter: '',
-                                    labelWidth: '100',
-                                    labelEllipsis: true,
                                   },
                                 }}
-                                __component_name="FormilyNumberPicker"
+                                fieldProps={{
+                                  _unsafe_MixedSetter_default_select: 'VariableSetter',
+                                  default: __$$eval(
+                                    () => this.state.step3Data.TextSegmentationSegmentationRepeatLen
+                                  ),
+                                  name: null,
+                                  required: true,
+                                  title: '分段重叠长度',
+                                  'x-validator': [],
+                                }}
+                                style={{ width: '80px' }}
                               />
                             </FormilyForm>
                           </Col>
-                          <Col span={4} style={{ height: '32px' }} __component_name="Col">
+                          <Col __component_name="Col" span={4} style={{ height: '32px' }}>
                             <Row
-                              wrap={true}
-                              style={{ textAlign: 'center' }}
-                              gutter={[0, 0]}
                               __component_name="Row"
+                              gutter={[0, 0]}
+                              style={{ textAlign: 'center' }}
+                              wrap={true}
                             >
                               <Col
+                                __component_name="Col"
                                 span={24}
                                 style={{ height: '32px', lineHeight: '26px' }}
-                                __component_name="Col"
                               >
                                 <Typography.Text
-                                  style={{ fontSize: '12px' }}
-                                  strong={false}
+                                  __component_name="Typography.Text"
                                   disabled={false}
                                   ellipsis={true}
-                                  __component_name="Typography.Text"
+                                  strong={false}
+                                  style={{ fontSize: '12px' }}
                                 >
                                   字符
                                 </Typography.Text>
                               </Col>
                               <Col
+                                __component_name="Col"
                                 span={24}
                                 style={{ height: '32px', lineHeight: '26px' }}
-                                __component_name="Col"
                               >
                                 <Typography.Text
-                                  style={{ fontSize: '12px' }}
-                                  strong={false}
+                                  __component_name="Typography.Text"
                                   disabled={false}
                                   ellipsis={true}
-                                  __component_name="Typography.Text"
+                                  strong={false}
+                                  style={{ fontSize: '12px' }}
                                 >
                                   字符
                                 </Typography.Text>
@@ -1007,44 +1129,44 @@ class $$Page extends React.Component {
                         </Row>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '182px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={true}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '200px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           QA 拆分
                                         </Typography.Text>
@@ -1053,10 +1175,11 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(() => this.state.step3Data.QAsplitChecked)}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1067,65 +1190,111 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={true} gutter={['', 8]} __component_name="Row">
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" gutter={['', 8]} wrap={true}>
                                   <Col
+                                    __component_name="Col"
                                     span={24}
                                     style={{ marginBottom: '0px', paddingBottom: '0px' }}
-                                    __component_name="Col"
                                   >
                                     <FormilyForm
-                                      ref={this._refsManager.linkRef('formilyform-04uiotn')}
-                                      formHelper={{ autoFocus: true }}
+                                      __component_name="FormilyForm"
                                       componentProps={{
                                         colon: false,
-                                        layout: 'horizontal',
-                                        labelCol: 4,
                                         labelAlign: 'left',
+                                        labelCol: 4,
+                                        layout: 'horizontal',
                                         wrapperCol: 20,
                                       }}
-                                      __component_name="FormilyForm"
+                                      formHelper={{ autoFocus: true }}
+                                      ref={this._refsManager.linkRef('qa_split')}
                                     >
                                       <FormilySelect
-                                        fieldProps={{ name: 'Select', 'x-validator': [] }}
+                                        __component_name="FormilySelect"
                                         componentProps={{
                                           'x-component-props': {
-                                            disabled: false,
-                                            allowClear: false,
-                                            placeholder: '请选择模型',
                                             _sdkSwrGetFunc: {},
+                                            allowClear: false,
+                                            disabled: false,
+                                            onChange: function () {
+                                              return this.onLLmChange.apply(
+                                                this,
+                                                Array.prototype.slice.call(arguments).concat([])
+                                              );
+                                            }.bind(this),
+                                            placeholder: '请选择模型',
                                           },
                                         }}
                                         decoratorProps={{
                                           'x-decorator-props': {
+                                            labelCol: 8,
+                                            labelEllipsis: true,
+                                            size: 'default',
                                             style: { marginBottom: '0px' },
                                             tooltip: '',
-                                            labelEllipsis: true,
                                           },
                                         }}
-                                        __component_name="FormilySelect"
+                                        fieldProps={{
+                                          _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                                          '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
+                                          name: 'type',
+                                          required: true,
+                                          title: '模型服务',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ marginBottom: '8px' }}
                                       />
+                                      {!!__$$eval(() => this.state.showLlmModel) && (
+                                        <FormilySelect
+                                          __component_name="FormilySelect"
+                                          componentProps={{
+                                            'x-component-props': {
+                                              _sdkSwrGetFunc: {},
+                                              allowClear: false,
+                                              disabled: false,
+                                              placeholder: '请选择模型',
+                                            },
+                                          }}
+                                          decoratorProps={{
+                                            'x-decorator-props': {
+                                              labelCol: 8,
+                                              labelEllipsis: true,
+                                              style: { marginBottom: '0px' },
+                                              tooltip: '',
+                                            },
+                                          }}
+                                          fieldProps={{
+                                            '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
+                                            name: 'model',
+                                            required: __$$eval(
+                                              () => this.state.showLlmModel === true
+                                            ),
+                                            title: '模型版本',
+                                            'x-display': 'visible',
+                                            'x-validator': [],
+                                          }}
+                                        />
+                                      )}
                                     </FormilyForm>
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
                                       <Col __component_name="Col">
                                         <Row
-                                          wrap={false}
-                                          justify="space-between"
                                           __component_name="Row"
+                                          justify="space-between"
+                                          wrap={false}
                                         >
                                           <Col
-                                            style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                             __component_name="Col"
+                                            style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                           />
                                         </Row>
                                       </Col>
@@ -1134,14 +1303,14 @@ class $$Page extends React.Component {
                                 </Row>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '', paddingTop: '10px' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={{ rows: 2 }}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '', paddingTop: '10px' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   根据文件中的文章与图表标题，自动将文件做 QA 拆分处理。
@@ -1157,63 +1326,63 @@ class $$Page extends React.Component {
               </Row>
             )}
             {!!__$$eval(() => this.state.currentStep === 2) && (
-              <Row wrap={true} gutter={['', 0]} __component_name="Row">
+              <Row __component_name="Row" gutter={['', 0]} wrap={true}>
                 <Col
-                  span={24}
-                  style={{ paddingTop: '0px', paddingBottom: '0px' }}
                   __component_name="Col"
+                  span={24}
+                  style={{ paddingBottom: '0px', paddingTop: '0px' }}
                 >
                   <Divider
                     __component_name="Divider"
+                    dashed={true}
+                    defaultOpen={false}
                     mode="default"
                     orientation="left"
                     orientationMargin={0}
-                    dashed={true}
-                    defaultOpen={false}
                     style={{ fontWeight: 700 }}
                   >
                     异常清洗配置
                   </Divider>
                 </Col>
-                <Col span={24} __component_name="Col">
-                  <Row wrap={true} __component_name="Row">
-                    <Col span={6} __component_name="Col">
+                <Col __component_name="Col" span={24}>
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={true}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           移除不可见字符
                                         </Typography.Text>
@@ -1222,12 +1391,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.RemoveInvisibleCharactersChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1238,23 +1408,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={{ rows: 2 }}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   移除ASCII中的一些不可见字符, 如0-32 和127-160这两个范围
@@ -1265,43 +1434,43 @@ class $$Page extends React.Component {
                         </Row>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={true}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           空格处理
                                         </Typography.Text>
@@ -1310,12 +1479,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.SpaceHandleChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1326,23 +1496,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={{ rows: 2 }}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   移 除文档中的开头和结尾的空格tab等，如‘\n’, ‘\r’,
@@ -1354,44 +1523,44 @@ class $$Page extends React.Component {
                         </Row>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '118px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '118px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           去除乱码
                                         </Typography.Text>
@@ -1400,12 +1569,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.RemoveGarbledCodeChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1416,23 +1586,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={true}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   去除乱码和无意义的unicode
@@ -1443,43 +1612,43 @@ class $$Page extends React.Component {
                         </Row>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           繁转简
                                         </Typography.Text>
@@ -1488,13 +1657,14 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () =>
                                           this.state.step3Data.ConvertComplexityToSimplicityChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1505,23 +1675,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={{ rows: 2 }}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   繁体转简体，如“不經意，妳的笑容”清洗成“不经意，你的笑容”
@@ -1532,44 +1701,44 @@ class $$Page extends React.Component {
                         </Row>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '118px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '118px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           去除网页标识符
                                         </Typography.Text>
@@ -1578,12 +1747,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.RemoveHtmlIdentifyingChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1594,23 +1764,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={{ rows: 2 }}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   移除文档中的html标签，如&#60;html&#62;,&#60;dev&#62;,&#60;p&#62;等
@@ -1621,44 +1790,44 @@ class $$Page extends React.Component {
                         </Row>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '118px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '118px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           去除表情
                                         </Typography.Text>
@@ -1667,12 +1836,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.RemoveEmoteChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1683,23 +1853,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={true}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   去除文 档中的表情，如‘🐰’, ‘🧑🏼’等
@@ -1715,64 +1884,64 @@ class $$Page extends React.Component {
               </Row>
             )}
             {!!__$$eval(() => this.state.currentStep === 2) && (
-              <Row wrap={true} gutter={['', 0]} __component_name="Row">
+              <Row __component_name="Row" gutter={['', 0]} wrap={true}>
                 <Col
-                  span={24}
-                  style={{ paddingTop: '0px', paddingBottom: '0px' }}
                   __component_name="Col"
+                  span={24}
+                  style={{ paddingBottom: '0px', paddingTop: '0px' }}
                 >
                   <Divider
                     __component_name="Divider"
+                    dashed={true}
+                    defaultOpen={false}
                     mode="default"
                     orientation="left"
                     orientationMargin={0}
-                    dashed={true}
-                    defaultOpen={false}
                     style={{ fontWeight: 700 }}
                   >
                     数据过滤配置
                   </Divider>
                 </Col>
-                <Col span={24} __component_name="Col">
-                  <Row wrap={true} __component_name="Row">
-                    <Col span={6} __component_name="Col">
+                <Col __component_name="Col" span={24}>
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         className="step3_disabled_style"
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           字重复率过滤
                                         </Typography.Text>
@@ -1781,12 +1950,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.CharacterRepeatFilterChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={true}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1797,60 +1967,49 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={true} __component_name="Row">
-                                  <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" wrap={true}>
+                                  <Col __component_name="Col" span={24}>
                                     <Row
-                                      wrap={false}
-                                      style={{ height: '40px' }}
+                                      __component_name="Row"
                                       gutter={[0, 0]}
                                       justify="space-between"
-                                      __component_name="Row"
+                                      style={{ height: '40px' }}
+                                      wrap={false}
                                     >
-                                      <Col span={16} __component_name="Col">
+                                      <Col __component_name="Col" span={16}>
                                         <Progress
+                                          __component_name="Progress"
                                           percent={__$$eval(
                                             () =>
                                               this.state.step3Data.CharacterRepeatFilterRate * 100
                                           )}
-                                          __component_name="Progress"
                                         />
                                       </Col>
                                       <Col __component_name="Col">
                                         <FormilyForm
-                                          ref={this._refsManager.linkRef('formily_bu33ve7fnv')}
-                                          formHelper={{ autoFocus: false }}
+                                          __component_name="FormilyForm"
                                           componentProps={{
                                             colon: false,
-                                            layout: 'horizontal',
-                                            labelCol: 4,
                                             labelAlign: 'left',
+                                            labelCol: 4,
+                                            layout: 'horizontal',
                                             wrapperCol: 20,
                                           }}
-                                          __component_name="FormilyForm"
+                                          formHelper={{ autoFocus: false }}
+                                          ref={this._refsManager.linkRef('formily_bu33ve7fnv')}
                                         >
                                           <FormilyNumberPicker
-                                            style={{ width: '60px' }}
-                                            fieldProps={{
-                                              name: null,
-                                              title: '',
-                                              default: __$$eval(
-                                                () => this.state.step3Data.CharacterRepeatFilterRate
-                                              ),
-                                              'x-validator': [],
-                                              _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                            }}
+                                            __component_name="FormilyNumberPicker"
                                             componentProps={{
                                               'x-component-props': {
                                                 max: 1,
                                                 min: 0,
-                                                step: __$$eval(() => this.state.numberInputStep),
                                                 onChange: function () {
                                                   return this.updateStep3State.apply(
                                                     this,
@@ -1861,17 +2020,27 @@ class $$Page extends React.Component {
                                                     ])
                                                   );
                                                 }.bind(this),
-                                                precision: 1,
                                                 placeholder: '',
+                                                precision: 1,
+                                                step: __$$eval(() => this.state.numberInputStep),
                                               },
                                             }}
                                             decoratorProps={{
                                               'x-decorator-props': {
-                                                size: 'small',
                                                 labelEllipsis: true,
+                                                size: 'small',
                                               },
                                             }}
-                                            __component_name="FormilyNumberPicker"
+                                            fieldProps={{
+                                              _unsafe_MixedSetter_default_select: 'VariableSetter',
+                                              default: __$$eval(
+                                                () => this.state.step3Data.CharacterRepeatFilterRate
+                                              ),
+                                              name: null,
+                                              title: '',
+                                              'x-validator': [],
+                                            }}
+                                            style={{ width: '60px' }}
                                           />
                                         </FormilyForm>
                                       </Col>
@@ -1884,58 +2053,58 @@ class $$Page extends React.Component {
                         </Row>
                         <Typography.Paragraph
                           code={false}
-                          mark={false}
-                          type="secondary"
-                          style={{ fontSize: '' }}
                           delete={false}
-                          strong={false}
                           disabled={false}
                           editable={false}
                           ellipsis={{ rows: 2 }}
+                          mark={false}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                          type="secondary"
                           underline={false}
                         >
                           如果字重复率太高，意味着文档中重复的字太多，文档会被过滤掉
                         </Typography.Paragraph>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         className="step3_disabled_style"
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           {' '}
                                           词重复率过滤
@@ -1945,12 +2114,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.WordRepeatFilterChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={true}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -1961,57 +2131,46 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Row
-                                  wrap={false}
-                                  style={{ height: '40px' }}
+                                  __component_name="Row"
                                   gutter={[0, 0]}
                                   justify="space-between"
-                                  __component_name="Row"
+                                  style={{ height: '40px' }}
+                                  wrap={false}
                                 >
-                                  <Col span={16} __component_name="Col">
+                                  <Col __component_name="Col" span={16}>
                                     <Progress
+                                      __component_name="Progress"
                                       percent={__$$eval(
                                         () => this.state.step3Data.WordRepeatFilterRate * 100
                                       )}
-                                      __component_name="Progress"
                                     />
                                   </Col>
                                   <Col __component_name="Col">
                                     <FormilyForm
-                                      ref={this._refsManager.linkRef('formilyform-h5d0b6o')}
-                                      formHelper={{ autoFocus: false }}
+                                      __component_name="FormilyForm"
                                       componentProps={{
                                         colon: false,
-                                        layout: 'horizontal',
-                                        labelCol: 4,
                                         labelAlign: 'left',
+                                        labelCol: 4,
+                                        layout: 'horizontal',
                                         wrapperCol: 20,
                                       }}
-                                      __component_name="FormilyForm"
+                                      formHelper={{ autoFocus: false }}
+                                      ref={this._refsManager.linkRef('formilyform-h5d0b6o')}
                                     >
                                       <FormilyNumberPicker
-                                        style={{ width: '60px' }}
-                                        fieldProps={{
-                                          name: null,
-                                          title: '',
-                                          default: __$$eval(
-                                            () => this.state.step3Data.WordRepeatFilterRate
-                                          ),
-                                          'x-validator': [],
-                                          _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                        }}
+                                        __component_name="FormilyNumberPicker"
                                         componentProps={{
                                           'x-component-props': {
                                             max: 1,
                                             min: 0,
-                                            step: __$$eval(() => this.state.numberInputStep),
                                             onChange: function () {
                                               return this.updateStep3State.apply(
                                                 this,
@@ -2023,15 +2182,25 @@ class $$Page extends React.Component {
                                               );
                                             }.bind(this),
                                             placeholder: '',
+                                            step: __$$eval(() => this.state.numberInputStep),
                                           },
                                         }}
                                         decoratorProps={{
                                           'x-decorator-props': {
-                                            size: 'small',
                                             labelEllipsis: true,
+                                            size: 'small',
                                           },
                                         }}
-                                        __component_name="FormilyNumberPicker"
+                                        fieldProps={{
+                                          _unsafe_MixedSetter_default_select: 'VariableSetter',
+                                          default: __$$eval(
+                                            () => this.state.step3Data.WordRepeatFilterRate
+                                          ),
+                                          name: null,
+                                          title: '',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ width: '60px' }}
                                       />
                                     </FormilyForm>
                                   </Col>
@@ -2042,58 +2211,58 @@ class $$Page extends React.Component {
                         </Row>
                         <Typography.Paragraph
                           code={false}
-                          mark={false}
-                          type="secondary"
-                          style={{ fontSize: '' }}
                           delete={false}
-                          strong={false}
                           disabled={false}
                           editable={false}
                           ellipsis={{ rows: 2 }}
+                          mark={false}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                          type="secondary"
                           underline={false}
                         >
                           如果词重复率太高，意味着文档中重复的词太多，文档会被过滤掉
                         </Typography.Paragraph>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         className="step3_disabled_style"
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           特殊字符串率
                                         </Typography.Text>
@@ -2102,12 +2271,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.SpecialCharactersRateChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={true}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2118,57 +2288,46 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Row
-                                  wrap={false}
-                                  style={{ height: '40px' }}
+                                  __component_name="Row"
                                   gutter={[0, 0]}
                                   justify="space-between"
-                                  __component_name="Row"
+                                  style={{ height: '40px' }}
+                                  wrap={false}
                                 >
-                                  <Col span={17} __component_name="Col">
+                                  <Col __component_name="Col" span={17}>
                                     <Progress
+                                      __component_name="Progress"
                                       percent={__$$eval(
                                         () => this.state.step3Data.SpecialCharactersRateRate * 100
                                       )}
-                                      __component_name="Progress"
                                     />
                                   </Col>
                                   <Col __component_name="Col">
                                     <FormilyForm
-                                      ref={this._refsManager.linkRef('formilyform-kwftate')}
-                                      formHelper={{ autoFocus: false }}
+                                      __component_name="FormilyForm"
                                       componentProps={{
                                         colon: false,
-                                        layout: 'horizontal',
-                                        labelCol: 4,
                                         labelAlign: 'left',
+                                        labelCol: 4,
+                                        layout: 'horizontal',
                                         wrapperCol: 20,
                                       }}
-                                      __component_name="FormilyForm"
+                                      formHelper={{ autoFocus: false }}
+                                      ref={this._refsManager.linkRef('formilyform-kwftate')}
                                     >
                                       <FormilyNumberPicker
-                                        style={{ width: '60px' }}
-                                        fieldProps={{
-                                          name: null,
-                                          title: '',
-                                          default: __$$eval(
-                                            () => this.state.step3Data.SpecialCharactersRateRate
-                                          ),
-                                          'x-validator': [],
-                                          _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                        }}
+                                        __component_name="FormilyNumberPicker"
                                         componentProps={{
                                           'x-component-props': {
                                             max: 1,
                                             min: 0,
-                                            step: __$$eval(() => this.state.numberInputStep),
                                             onChange: function () {
                                               return this.updateStep3State.apply(
                                                 this,
@@ -2180,15 +2339,25 @@ class $$Page extends React.Component {
                                               );
                                             }.bind(this),
                                             placeholder: '',
+                                            step: __$$eval(() => this.state.numberInputStep),
                                           },
                                         }}
                                         decoratorProps={{
                                           'x-decorator-props': {
-                                            size: 'small',
                                             labelEllipsis: true,
+                                            size: 'small',
                                           },
                                         }}
-                                        __component_name="FormilyNumberPicker"
+                                        fieldProps={{
+                                          _unsafe_MixedSetter_default_select: 'VariableSetter',
+                                          default: __$$eval(
+                                            () => this.state.step3Data.SpecialCharactersRateRate
+                                          ),
+                                          name: null,
+                                          title: '',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ width: '60px' }}
                                       />
                                     </FormilyForm>
                                   </Col>
@@ -2199,59 +2368,59 @@ class $$Page extends React.Component {
                         </Row>
                         <Typography.Paragraph
                           code={false}
-                          mark={false}
-                          type="secondary"
-                          style={{ fontSize: '' }}
                           delete={false}
-                          strong={false}
                           disabled={false}
                           editable={false}
                           ellipsis={{ rows: 2 }}
+                          mark={false}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                          type="secondary"
                           underline={false}
                         >
                           如果特殊字符率太高，意味着文档中特殊字符太多，文档会被过滤掉
                         </Typography.Paragraph>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '158px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         className="step3_disabled_style"
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '158px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           色情暴力词率
                                         </Typography.Text>
@@ -2260,12 +2429,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.PornographicViolenceRateChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={true}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2276,58 +2446,47 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Row
-                                  wrap={false}
-                                  style={{ height: '40px' }}
+                                  __component_name="Row"
                                   gutter={[0, 0]}
                                   justify="space-between"
-                                  __component_name="Row"
+                                  style={{ height: '40px' }}
+                                  wrap={false}
                                 >
-                                  <Col span={17} __component_name="Col">
+                                  <Col __component_name="Col" span={17}>
                                     <Progress
+                                      __component_name="Progress"
                                       percent={__$$eval(
                                         () =>
                                           this.state.step3Data.PornographicViolenceRateRate * 100
                                       )}
-                                      __component_name="Progress"
                                     />
                                   </Col>
                                   <Col __component_name="Col">
                                     <FormilyForm
-                                      ref={this._refsManager.linkRef('formilyform-q8tkxw3')}
-                                      formHelper={{ autoFocus: false }}
+                                      __component_name="FormilyForm"
                                       componentProps={{
                                         colon: false,
-                                        layout: 'horizontal',
-                                        labelCol: 4,
                                         labelAlign: 'left',
+                                        labelCol: 4,
+                                        layout: 'horizontal',
                                         wrapperCol: 20,
                                       }}
-                                      __component_name="FormilyForm"
+                                      formHelper={{ autoFocus: false }}
+                                      ref={this._refsManager.linkRef('formilyform-q8tkxw3')}
                                     >
                                       <FormilyNumberPicker
-                                        style={{ width: '60px' }}
-                                        fieldProps={{
-                                          name: null,
-                                          title: '',
-                                          default: __$$eval(
-                                            () => this.state.step3Data.PornographicViolenceRateRate
-                                          ),
-                                          'x-validator': [],
-                                          _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                        }}
+                                        __component_name="FormilyNumberPicker"
                                         componentProps={{
                                           'x-component-props': {
                                             max: 1,
                                             min: 0,
-                                            step: __$$eval(() => this.state.numberInputStep),
                                             onChange: function () {
                                               return this.updateStep3State.apply(
                                                 this,
@@ -2339,15 +2498,25 @@ class $$Page extends React.Component {
                                               );
                                             }.bind(this),
                                             placeholder: '',
+                                            step: __$$eval(() => this.state.numberInputStep),
                                           },
                                         }}
                                         decoratorProps={{
                                           'x-decorator-props': {
-                                            size: 'small',
                                             labelEllipsis: true,
+                                            size: 'small',
                                           },
                                         }}
-                                        __component_name="FormilyNumberPicker"
+                                        fieldProps={{
+                                          _unsafe_MixedSetter_default_select: 'VariableSetter',
+                                          default: __$$eval(
+                                            () => this.state.step3Data.PornographicViolenceRateRate
+                                          ),
+                                          name: null,
+                                          title: '',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ width: '60px' }}
                                       />
                                     </FormilyForm>
                                   </Col>
@@ -2358,14 +2527,14 @@ class $$Page extends React.Component {
                         </Row>
                         <Typography.Paragraph
                           code={false}
-                          mark={false}
-                          type="secondary"
-                          style={{ fontSize: '' }}
                           delete={false}
-                          strong={false}
                           disabled={false}
                           editable={false}
                           ellipsis={{ rows: 2 }}
+                          mark={false}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                          type="secondary"
                           underline={false}
                         >
                           如果色情暴力词率太高，文档会被过滤掉
@@ -2377,64 +2546,64 @@ class $$Page extends React.Component {
               </Row>
             )}
             {!!__$$eval(() => this.state.currentStep === 2) && (
-              <Row wrap={true} gutter={['', 0]} __component_name="Row">
+              <Row __component_name="Row" gutter={['', 0]} wrap={true}>
                 <Col
-                  span={24}
-                  style={{ paddingTop: '0px', paddingBottom: '0px' }}
                   __component_name="Col"
+                  span={24}
+                  style={{ paddingBottom: '0px', paddingTop: '0px' }}
                 >
                   <Divider
                     __component_name="Divider"
+                    dashed={true}
+                    defaultOpen={false}
                     mode="default"
                     orientation="left"
                     orientationMargin={0}
-                    dashed={true}
-                    defaultOpen={false}
                     style={{ fontWeight: 700 }}
                   >
                     数据去重配置
                   </Divider>
                 </Col>
-                <Col span={24} __component_name="Col">
-                  <Row wrap={true} __component_name="Row">
-                    <Col span={6} __component_name="Col">
+                <Col __component_name="Col" span={24}>
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         className="step3_disabled_style"
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           Simhash
                                         </Typography.Text>
@@ -2443,12 +2612,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.SimhashOperatorChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={true}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2459,22 +2629,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Row
-                                  wrap={false}
-                                  style={{ height: '40px' }}
+                                  __component_name="Row"
                                   gutter={[0, 0]}
                                   justify="space-between"
-                                  __component_name="Row"
+                                  style={{ height: '40px' }}
+                                  wrap={false}
                                 >
-                                  <Col span={16} __component_name="Col">
+                                  <Col __component_name="Col" span={16}>
                                     <Progress
+                                      __component_name="Progress"
                                       percent={__$$eval(() =>
                                         this.state.step3Data.SimhashOperatorRate === 4
                                           ? 0
@@ -2482,33 +2652,23 @@ class $$Page extends React.Component {
                                           ? 50
                                           : 100
                                       )}
-                                      __component_name="Progress"
                                     />
                                   </Col>
                                   <Col __component_name="Col">
                                     <FormilyForm
-                                      ref={this._refsManager.linkRef('formilyform-zjbf6fy')}
-                                      formHelper={{ autoFocus: false }}
+                                      __component_name="FormilyForm"
                                       componentProps={{
                                         colon: false,
-                                        layout: 'horizontal',
-                                        labelCol: 4,
                                         labelAlign: 'left',
+                                        labelCol: 4,
+                                        layout: 'horizontal',
                                         wrapperCol: 20,
                                       }}
-                                      __component_name="FormilyForm"
+                                      formHelper={{ autoFocus: false }}
+                                      ref={this._refsManager.linkRef('formilyform-zjbf6fy')}
                                     >
                                       <FormilyNumberPicker
-                                        style={{ width: '60px' }}
-                                        fieldProps={{
-                                          name: null,
-                                          title: '',
-                                          default: __$$eval(
-                                            () => this.state.step3Data.SimhashOperatorRate
-                                          ),
-                                          'x-validator': [],
-                                          _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                        }}
+                                        __component_name="FormilyNumberPicker"
                                         componentProps={{
                                           'x-component-props': {
                                             max: 6,
@@ -2528,11 +2688,20 @@ class $$Page extends React.Component {
                                         }}
                                         decoratorProps={{
                                           'x-decorator-props': {
-                                            size: 'small',
                                             labelEllipsis: true,
+                                            size: 'small',
                                           },
                                         }}
-                                        __component_name="FormilyNumberPicker"
+                                        fieldProps={{
+                                          _unsafe_MixedSetter_default_select: 'VariableSetter',
+                                          default: __$$eval(
+                                            () => this.state.step3Data.SimhashOperatorRate
+                                          ),
+                                          name: null,
+                                          title: '',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ width: '60px' }}
                                       />
                                     </FormilyForm>
                                   </Col>
@@ -2543,14 +2712,14 @@ class $$Page extends React.Component {
                         </Row>
                         <Typography.Paragraph
                           code={false}
-                          mark={false}
-                          type="secondary"
-                          style={{ fontSize: '' }}
                           delete={false}
-                          strong={false}
                           disabled={false}
                           editable={false}
                           ellipsis={{ rows: 2 }}
+                          mark={false}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                          type="secondary"
                           underline={false}
                         >
                           根据 Hamming 距离计算文档相似度,
@@ -2563,64 +2732,64 @@ class $$Page extends React.Component {
               </Row>
             )}
             {!!__$$eval(() => this.state.currentStep === 2) && (
-              <Row wrap={true} gutter={['', 0]} __component_name="Row">
+              <Row __component_name="Row" gutter={['', 0]} wrap={true}>
                 <Col
-                  span={24}
-                  style={{ paddingTop: '0px', paddingBottom: '0px' }}
                   __component_name="Col"
+                  span={24}
+                  style={{ paddingBottom: '0px', paddingTop: '0px' }}
                 >
                   <Divider
                     __component_name="Divider"
+                    dashed={true}
+                    defaultOpen={false}
                     mode="default"
                     orientation="left"
                     orientationMargin={0}
-                    dashed={true}
-                    defaultOpen={false}
                     style={{ fontWeight: 700 }}
                   >
                     数据隐私处理
                   </Divider>
                 </Col>
-                <Col span={24} __component_name="Col">
-                  <Row wrap={true} __component_name="Row">
-                    <Col span={6} __component_name="Col">
+                <Col __component_name="Col" span={24}>
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '118px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={true}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '118px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           去除Email
                                         </Typography.Text>
@@ -2629,12 +2798,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.RemoveEmailChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2645,23 +2815,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={true}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   去除email地址
@@ -2672,44 +2841,44 @@ class $$Page extends React.Component {
                         </Row>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '118px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '118px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           去除IP地址
                                         </Typography.Text>
@@ -2718,12 +2887,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.RemoveIPAddressChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2734,23 +2904,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={{ rows: 2 }}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   去除IPv4 或者 IPv6 地址
@@ -2761,44 +2930,44 @@ class $$Page extends React.Component {
                         </Row>
                       </Card>
                     </Col>
-                    <Col span={6} __component_name="Col">
+                    <Col __component_name="Col" span={6}>
                       <Card
-                        size="default"
-                        type="default"
-                        style={{ height: '118px' }}
+                        __component_name="Card"
                         actions={[]}
-                        loading={false}
                         bordered={true}
                         hoverable={false}
-                        __component_name="Card"
+                        loading={false}
+                        size="default"
+                        style={{ height: '118px' }}
+                        type="default"
                       >
-                        <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                          <Col span={22} __component_name="Col">
-                            <Row wrap={true} gutter={['', 8]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                          <Col __component_name="Col" span={22}>
+                            <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
                                   <Col __component_name="Col">
                                     <Row
-                                      wrap={false}
-                                      justify="space-between"
                                       __component_name="Row"
+                                      justify="space-between"
+                                      wrap={false}
                                     >
-                                      <Col span="" __component_name="Col">
+                                      <Col __component_name="Col" span="">
                                         <AntdIconEyeInvisibleFilled
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                           __component_name="AntdIconEyeInvisibleFilled"
+                                          style={{ fontSize: 16, marginLeft: '8px' }}
                                         />
                                       </Col>
                                       <Col
-                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                         __component_name="Col"
+                                        style={{ marginLeft: '0px', paddingLeft: '8px' }}
                                       >
                                         <Typography.Text
-                                          style={{ fontSize: '16' }}
-                                          strong={true}
+                                          __component_name="Typography.Text"
                                           disabled={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Text"
+                                          strong={true}
+                                          style={{ fontSize: '16' }}
                                         >
                                           去除数字
                                         </Typography.Text>
@@ -2807,12 +2976,13 @@ class $$Page extends React.Component {
                                   </Col>
                                   <Col __component_name="Col">
                                     <Switch
-                                      size="small"
+                                      __component_name="Switch"
                                       checked={__$$eval(
                                         () => this.state.step3Data.RemoveNumberChecked
                                       )}
-                                      loading={false}
+                                      defaultChecked={false}
                                       disabled={false}
+                                      loading={false}
                                       onChange={function () {
                                         return this.updateStep3State.apply(
                                           this,
@@ -2823,23 +2993,22 @@ class $$Page extends React.Component {
                                           ])
                                         );
                                       }.bind(this)}
-                                      defaultChecked={false}
-                                      __component_name="Switch"
+                                      size="small"
                                     />
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Typography.Paragraph
                                   code={false}
-                                  mark={false}
-                                  type="secondary"
-                                  style={{ fontSize: '' }}
                                   delete={false}
-                                  strong={false}
                                   disabled={false}
                                   editable={false}
                                   ellipsis={{ rows: 2 }}
+                                  mark={false}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                  type="secondary"
                                   underline={false}
                                 >
                                   去除数字和字母数字标识符，如电话号码、信用卡号、十六进制散列等，同时跳过年份和简单数字的实例
@@ -2858,142 +3027,142 @@ class $$Page extends React.Component {
         </Row>
         {!!__$$eval(() => this.state.currentStep === 3) && (
           <Row
-            wrap={true}
+            __component_name="Row"
+            gutter={[0]}
             style={{
+              backgroundColor: '#ffffff',
+              paddingBottom: '24px',
               paddingLeft: '24px',
               paddingRight: '24px',
-              paddingBottom: '24px',
-              backgroundColor: '#ffffff',
             }}
-            gutter={[0]}
-            __component_name="Row"
+            wrap={true}
           >
-            <Col span={24} __component_name="Col">
+            <Col __component_name="Col" span={24}>
               <Typography.Text
-                style={{ fontSize: '14px' }}
-                strong={false}
+                __component_name="Typography.Text"
                 disabled={false}
                 ellipsis={true}
-                __component_name="Typography.Text"
+                strong={false}
+                style={{ fontSize: '14px' }}
               >
                 数据处理样例
               </Typography.Text>
             </Col>
-            <Col span={24} __component_name="Col">
+            <Col __component_name="Col" span={24}>
               <Table
-                size="middle"
-                rowKey="id"
-                scroll={{ scrollToFirstRowOnChange: true }}
+                __component_name="Table"
                 columns={[
-                  { key: 'name', title: '配置内容', dataIndex: 'type' },
+                  { dataIndex: 'type', key: 'name', title: '配置内容' },
                   {
+                    dataIndex: 'before',
                     key: 'age',
-                    title: '处理前',
                     render: (text, record, index) =>
                       (__$$context => (
                         <InnerHtmlContainer __component_name="InnerHtmlContainer">
                           {__$$eval(() => decodeURIComponent(text))}
                         </InnerHtmlContainer>
                       ))(__$$createChildContext(__$$context, { text, record, index })),
-                    dataIndex: 'before',
+                    title: '处理前',
                   },
                   {
-                    title: '处理后',
+                    dataIndex: 'after',
                     render: (text, record, index) =>
                       (__$$context => (
                         <InnerHtmlContainer __component_name="InnerHtmlContainer">
                           {__$$eval(() => text)}
                         </InnerHtmlContainer>
                       ))(__$$createChildContext(__$$context, { text, record, index })),
-                    dataIndex: 'after',
+                    title: '处理后',
                   },
                 ]}
                 dataSource={__$$eval(() => this.state.step4Data)}
                 pagination={false}
+                rowKey="id"
+                scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
-                __component_name="Table"
+                size="middle"
               />
             </Col>
           </Row>
         )}
         {!!__$$eval(() => this.state.currentStep === 0) && (
-          <Row wrap={true} style={{ marginLeft: '0px', marginRight: '0px' }} __component_name="Row">
+          <Row __component_name="Row" style={{ marginLeft: '0px', marginRight: '0px' }} wrap={true}>
             <Col
-              span={24}
-              style={{ height: '130px', backgroundColor: '#ffffff' }}
               __component_name="Col"
+              span={24}
+              style={{ backgroundColor: '#ffffff', height: '130px' }}
             >
               <FormilyForm
-                ref={this._refsManager.linkRef('createDataHandleStep1')}
-                formHelper={{ autoFocus: true }}
+                __component_name="FormilyForm"
                 componentProps={{
                   colon: false,
-                  layout: 'horizontal',
-                  labelCol: 4,
                   labelAlign: 'left',
+                  labelCol: 4,
+                  layout: 'horizontal',
                   wrapperCol: 20,
                 }}
-                __component_name="FormilyForm"
+                formHelper={{ autoFocus: true }}
+                ref={this._refsManager.linkRef('createDataHandleStep1')}
               >
                 <Row
-                  wrap={true}
-                  style={{ marginLeft: '0px', marginRight: '0px', backgroundColor: '#ffffff' }}
                   __component_name="Row"
+                  style={{ backgroundColor: '#ffffff', marginLeft: '0px', marginRight: '0px' }}
+                  wrap={true}
                 >
-                  <Col span={24} style={{ height: '40px' }} __component_name="Col">
+                  <Col __component_name="Col" span={24} style={{ height: '40px' }}>
                     <FormilyInput
-                      style={{ width: '500px' }}
+                      __component_name="FormilyInput"
+                      componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+                      decoratorProps={{
+                        'x-decorator-props': { labelCol: 3, labelEllipsis: true, wrapperCol: 12 },
+                      }}
                       fieldProps={{
                         name: 'name',
                         title: '任务名称',
                         'x-validator': [
-                          { id: 'disabled', type: 'disabled', children: '未知', required: true },
+                          { children: '未知', id: 'disabled', required: true, type: 'disabled' },
                         ],
                       }}
-                      componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-                      decoratorProps={{
-                        'x-decorator-props': { labelCol: 3, wrapperCol: 12, labelEllipsis: true },
-                      }}
-                      __component_name="FormilyInput"
+                      style={{ width: '500px' }}
                     />
                   </Col>
-                  <Col span={24} style={{ height: '40px' }} __component_name="Col">
+                  <Col __component_name="Col" span={24} style={{ height: '40px' }}>
                     <FormilySelect
-                      style={{ width: '500px' }}
-                      fieldProps={{
-                        enum: [
-                          {
-                            id: 'disabled',
-                            type: 'disabled',
-                            label: '普通文本',
-                            value: 'text',
-                            children: '',
-                          },
-                          {
-                            id: 'disabled',
-                            type: 'disabled',
-                            label: 'QA文本',
-                            value: 'qa',
-                            children: '',
-                          },
-                        ],
-                        name: 'file_type',
-                        title: '文件类型',
-                        required: true,
-                        'x-validator': [
-                          { id: 'disabled', type: 'disabled', children: '未知', required: true },
-                        ],
-                      }}
+                      __component_name="FormilySelect"
                       componentProps={{
                         'x-component-props': {
-                          disabled: false,
-                          allowClear: false,
-                          placeholder: '请选择',
                           _sdkSwrGetFunc: {},
+                          allowClear: false,
+                          disabled: false,
+                          placeholder: '请选择',
                         },
                       }}
                       decoratorProps={{ 'x-decorator-props': { labelCol: 3, labelEllipsis: true } }}
-                      __component_name="FormilySelect"
+                      fieldProps={{
+                        enum: [
+                          {
+                            children: '',
+                            id: 'disabled',
+                            label: '普通文本',
+                            type: 'disabled',
+                            value: 'text',
+                          },
+                          {
+                            children: '',
+                            id: 'disabled',
+                            label: 'QA文本',
+                            type: 'disabled',
+                            value: 'qa',
+                          },
+                        ],
+                        name: 'file_type',
+                        required: true,
+                        title: '文件类型',
+                        'x-validator': [
+                          { children: '未知', id: 'disabled', required: true, type: 'disabled' },
+                        ],
+                      }}
+                      style={{ width: '500px' }}
                     />
                   </Col>
                 </Row>
@@ -3003,45 +3172,40 @@ class $$Page extends React.Component {
         )}
         {!!__$$eval(() => this.state.currentStep === 1) && (
           <Row
-            wrap={true}
+            __component_name="Row"
             style={{
+              backgroundColor: '#ffffff',
               marginLeft: '0px',
-              paddingTop: '0px',
               marginRight: '0px',
+              paddingBottom: '24px',
               paddingLeft: '24px',
               paddingRight: '24px',
-              paddingBottom: '24px',
-              backgroundColor: '#ffffff',
+              paddingTop: '0px',
             }}
-            __component_name="Row"
+            wrap={true}
           >
-            <Col span={24} style={{ color: '#ffffff !important' }} __component_name="Col">
+            <Col __component_name="Col" span={24} style={{ color: '#ffffff !important' }}>
               <FormilyForm
-                ref={this._refsManager.linkRef('createDataHandleStep2')}
-                formHelper={{ autoFocus: false }}
+                __component_name="FormilyForm"
                 componentProps={{
                   colon: false,
-                  layout: 'horizontal',
-                  labelCol: 4,
                   labelAlign: 'left',
+                  labelCol: 4,
+                  layout: 'horizontal',
                   wrapperCol: 20,
                 }}
-                __component_name="FormilyForm"
+                formHelper={{ autoFocus: false }}
+                ref={this._refsManager.linkRef('createDataHandleStep2')}
               >
-                <Row wrap={true} __component_name="Row">
-                  <Col span={12} __component_name="Col">
+                <Row __component_name="Row" wrap={true}>
+                  <Col __component_name="Col" span={12}>
                     <FormilySelect
-                      style={{}}
-                      fieldProps={{
-                        enum: null,
-                        name: 'pre_data_set_name',
-                        title: '处理前数据集',
-                        required: true,
-                        'x-validator': [],
-                        _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                      }}
+                      __component_name="FormilySelect"
                       componentProps={{
                         'x-component-props': {
+                          _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
+                          _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
+                          allowClear: false,
                           disabled: false,
                           onChange: function () {
                             return this.onDataSetChange.apply(
@@ -3049,36 +3213,37 @@ class $$Page extends React.Component {
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this),
-                          allowClear: false,
-                          showSearch: true,
                           placeholder: '请选择数据集',
-                          _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
-                          _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
+                          showSearch: true,
                         },
                       }}
                       decoratorProps={{
                         'x-decorator-props': {
                           labelCol: 6,
+                          labelEllipsis: true,
                           wrapperCol: 18,
                           wrapperWidth: '',
-                          labelEllipsis: true,
                         },
                       }}
-                      __component_name="FormilySelect"
+                      fieldProps={{
+                        _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                        enum: null,
+                        name: 'pre_data_set_name',
+                        required: true,
+                        title: '处理前数据集',
+                        'x-validator': [],
+                      }}
+                      style={{}}
                     />
                   </Col>
-                  <Col span={12} __component_name="Col">
+                  <Col __component_name="Col" span={12}>
                     <FormilySelect
-                      fieldProps={{
-                        enum: null,
-                        name: 'pre_data_set_version',
-                        title: '',
-                        required: true,
-                        'x-validator': [],
-                        _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                      }}
+                      __component_name="FormilySelect"
                       componentProps={{
                         'x-component-props': {
+                          _sdkSwrGetFunc: {},
+                          _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                          allowClear: false,
                           disabled: false,
                           onChange: function () {
                             return this.onDataSetVersionChange.apply(
@@ -3086,117 +3251,119 @@ class $$Page extends React.Component {
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this),
-                          allowClear: false,
-                          showSearch: true,
                           placeholder: '请选择数据集版本',
-                          _sdkSwrGetFunc: {},
-                          _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                          showSearch: true,
                         },
                       }}
                       decoratorProps={{
-                        'x-decorator-props': { wrapperWidth: '75%', labelEllipsis: true },
+                        'x-decorator-props': { labelEllipsis: true, wrapperWidth: '75%' },
                       }}
-                      __component_name="FormilySelect"
+                      fieldProps={{
+                        _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                        enum: null,
+                        name: 'pre_data_set_version',
+                        required: true,
+                        title: '',
+                        'x-validator': [],
+                      }}
                     />
                   </Col>
                 </Row>
                 <Row
-                  wrap={true}
-                  style={{ marginBottom: '0px', paddingBottom: '0px' }}
                   __component_name="Row"
+                  style={{ marginBottom: '0px', paddingBottom: '0px' }}
+                  wrap={true}
                 >
-                  <Col span={3} __component_name="Col">
+                  <Col __component_name="Col" span={3}>
                     <FormilyFormItem
-                      style={{}}
+                      __component_name="FormilyFormItem"
+                      decoratorProps={{
+                        'x-decorator-props': {
+                          asterisk: true,
+                          labelCol: 6,
+                          labelEllipsis: true,
+                          wrapperWidth: '0',
+                        },
+                      }}
                       fieldProps={{
                         name: 'FormilyFormItem',
                         title: '选择文件',
                         'x-component': 'FormilyFormItem',
                         'x-validator': [],
                       }}
-                      decoratorProps={{
-                        'x-decorator-props': {
-                          asterisk: true,
-                          labelCol: 6,
-                          wrapperWidth: '0',
-                          labelEllipsis: true,
-                        },
-                      }}
-                      __component_name="FormilyFormItem"
+                      style={{}}
                     />
                   </Col>
                   <Col
+                    __component_name="Col"
                     span={19}
                     style={{
-                      paddingTop: '24px',
                       borderColor: '#9b9b9b',
                       borderStyle: 'dashed',
                       borderWidth: '1px',
                       marginBottom: '0px',
                       paddingBottom: '24px',
+                      paddingTop: '24px',
                     }}
-                    __component_name="Col"
                   >
-                    <Row wrap={true} __component_name="Row">
-                      <Col span={24} __component_name="Col">
-                        <Row wrap={false} justify="space-between" __component_name="Row">
+                    <Row __component_name="Row" wrap={true}>
+                      <Col __component_name="Col" span={24}>
+                        <Row __component_name="Row" justify="space-between" wrap={false}>
                           <Col __component_name="Col">
                             <FormilyInput
-                              style={{ width: '400px' }}
-                              fieldProps={{ name: 'Input', title: '', 'x-validator': [] }}
+                              __component_name="FormilyInput"
                               componentProps={{
                                 'x-component-props': {
+                                  allowClear: true,
                                   onChange: function () {
                                     return this.onSearch.apply(
                                       this,
                                       Array.prototype.slice.call(arguments).concat([])
                                     );
                                   }.bind(this),
-                                  allowClear: true,
                                   placeholder: '请输入',
                                 },
                               }}
                               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                              __component_name="FormilyInput"
+                              fieldProps={{ name: 'Input', title: '', 'x-validator': [] }}
+                              style={{ width: '400px' }}
                             />
                           </Col>
                           <Col __component_name="Col">
-                            <Space align="center" direction="horizontal" __component_name="Space">
-                              <Row wrap={false} justify="space-between" __component_name="Row">
-                                <Col style={{ paddingTop: '6px' }} __component_name="Col">
+                            <Space __component_name="Space" align="center" direction="horizontal">
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col" style={{ paddingTop: '6px' }}>
                                   <Typography.Text
-                                    style={{ fontSize: '' }}
-                                    strong={false}
+                                    __component_name="Typography.Text"
                                     disabled={false}
                                     ellipsis={true}
-                                    __component_name="Typography.Text"
+                                    strong={false}
+                                    style={{ fontSize: '' }}
                                   >
                                     共
                                   </Typography.Text>
                                   <Typography.Text
-                                    style={{ fontSize: '' }}
-                                    strong={false}
+                                    __component_name="Typography.Text"
                                     disabled={false}
                                     ellipsis={true}
-                                    __component_name="Typography.Text"
+                                    strong={false}
+                                    style={{ fontSize: '' }}
                                   >
                                     {__$$eval(() => this.state.dataSetFileTotal)}
                                   </Typography.Text>
                                   <Typography.Text
-                                    style={{ fontSize: '' }}
-                                    strong={false}
+                                    __component_name="Typography.Text"
                                     disabled={false}
                                     ellipsis={true}
-                                    __component_name="Typography.Text"
+                                    strong={false}
+                                    style={{ fontSize: '' }}
                                   >
                                     条数据
                                   </Typography.Text>
                                 </Col>
                                 <Col __component_name="Col">
                                   <Pagination
-                                    style={{ textAlign: 'right' }}
-                                    total={__$$eval(() => this.state.dataSetFileTotal)}
-                                    simple={false}
+                                    __component_name="Pagination"
                                     current={__$$eval(
                                       () => this.state.dataSetFileSearchParams.currentPage
                                     )}
@@ -3207,7 +3374,9 @@ class $$Page extends React.Component {
                                       );
                                     }.bind(this)}
                                     pageSize={10}
-                                    __component_name="Pagination"
+                                    simple={false}
+                                    style={{ textAlign: 'right' }}
+                                    total={__$$eval(() => this.state.dataSetFileTotal)}
                                   />
                                 </Col>
                               </Row>
@@ -3217,24 +3386,20 @@ class $$Page extends React.Component {
                       </Col>
                     </Row>
                     <Table
-                      size="default"
-                      style={{ width: '800px' }}
-                      rowKey="path"
-                      scroll={{ scrollToFirstRowOnChange: true }}
-                      columns={[
-                        { key: 'name', title: '文件名称', dataIndex: 'path' },
-                        { title: '标签', width: 120, dataIndex: 'label' },
-                        { key: 'size', title: '文件大小', width: 100, dataIndex: 'size' },
-                        { title: '数据量', dataIndex: 'count' },
-                      ]}
-                      loading={__$$eval(() => this.state.fileTableLoading)}
+                      __component_name="Table"
                       bordered={false}
+                      columns={[
+                        { dataIndex: 'path', key: 'name', title: '文件名称' },
+                        { dataIndex: 'label', title: '标签', width: 120 },
+                        { dataIndex: 'size', key: 'size', title: '文件大小', width: 100 },
+                        { dataIndex: 'count', title: '数据量' },
+                      ]}
                       dataSource={__$$eval(() => this.state.dataSetFileList)}
                       expandable={{ expandedRowRender: '' }}
+                      loading={__$$eval(() => this.state.fileTableLoading)}
                       pagination={false}
-                      showHeader={true}
+                      rowKey="path"
                       rowSelection={{
-                        type: 'checkbox',
                         onChange: function () {
                           return this.onSelectFileChange.apply(
                             this,
@@ -3242,66 +3407,70 @@ class $$Page extends React.Component {
                           );
                         }.bind(this),
                         selectedRowKeys: __$$eval(() => this.state.selectedFileList),
+                        type: 'checkbox',
                       }}
-                      __component_name="Table"
+                      scroll={{ scrollToFirstRowOnChange: true }}
+                      showHeader={true}
+                      size="default"
+                      style={{ width: '800px' }}
                     />
                   </Col>
                 </Row>
-                <Row wrap={true} __component_name="Row">
-                  <Col span={19} style={{ marginBottom: '16px' }} __component_name="Col">
+                <Row __component_name="Row" wrap={true}>
+                  <Col __component_name="Col" span={19} style={{ marginBottom: '16px' }}>
                     {!!__$$eval(() => this.state.fileSelectCheckErrorFlag) && (
                       <Typography.Text
-                        style={{ color: '#f85a5a', fontSize: '' }}
-                        strong={false}
+                        __component_name="Typography.Text"
                         disabled={false}
                         ellipsis={true}
-                        __component_name="Typography.Text"
+                        strong={false}
+                        style={{ color: '#f85a5a', fontSize: '' }}
                       >
                         请选择文件
                       </Typography.Text>
                     )}
                   </Col>
                 </Row>
-                <Row wrap={true} __component_name="Row">
-                  <Col span={12} __component_name="Col">
+                <Row __component_name="Row" wrap={true}>
+                  <Col __component_name="Col" span={12}>
                     <FormilySelect
-                      fieldProps={{
-                        enum: null,
-                        name: 'post_data_set_name',
-                        title: '处理后数据集',
-                        required: false,
-                        'x-validator': [],
-                        _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                      }}
+                      __component_name="FormilySelect"
                       componentProps={{
                         'x-component-props': {
-                          disabled: true,
-                          allowClear: false,
-                          placeholder: '请选择数据集',
                           _sdkSwrGetFunc: { func: __$$eval(() => this.state.dataSetDataList) },
+                          allowClear: false,
+                          disabled: true,
+                          placeholder: '请选择数据集',
                         },
                       }}
                       decoratorProps={{
                         'x-decorator-props': { asterisk: true, labelCol: 6, labelEllipsis: true },
                       }}
-                      __component_name="FormilySelect"
+                      fieldProps={{
+                        _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                        enum: null,
+                        name: 'post_data_set_name',
+                        required: false,
+                        title: '处理后数据集',
+                        'x-validator': [],
+                      }}
                     />
                   </Col>
-                  <Col span={12} __component_name="Col">
+                  <Col __component_name="Col" span={12}>
                     <FormilySelect
-                      fieldProps={{ name: 'post_data_set_version', title: '', 'x-validator': [] }}
+                      __component_name="FormilySelect"
                       componentProps={{
                         'x-component-props': {
-                          disabled: true,
-                          allowClear: false,
-                          placeholder: '请选择数据集版本',
                           _sdkSwrGetFunc: {},
+                          allowClear: false,
+                          disabled: true,
+                          placeholder: '请选择数据集版本',
                         },
                       }}
                       decoratorProps={{
-                        'x-decorator-props': { wrapperWidth: '75%', labelEllipsis: true },
+                        'x-decorator-props': { labelEllipsis: true, wrapperWidth: '75%' },
                       }}
-                      __component_name="FormilySelect"
+                      fieldProps={{ name: 'post_data_set_version', title: '', 'x-validator': [] }}
                     />
                   </Col>
                 </Row>
@@ -3311,68 +3480,68 @@ class $$Page extends React.Component {
         )}
         {!!__$$eval(() => this.state.currentStep === 1) && (
           <Row
-            wrap={true}
-            style={{ marginLeft: '0px', marginRight: '0px', backgroundColor: '#ffffff' }}
             __component_name="Row"
+            style={{ backgroundColor: '#ffffff', marginLeft: '0px', marginRight: '0px' }}
+            wrap={true}
           >
             <Col
+              __component_name="Col"
               span={24}
               style={{ marginLeft: '0px', marginRight: '0px' }}
-              __component_name="Col"
             />
           </Row>
         )}
-        <Row wrap={true} style={{ marginLeft: '0px', marginRight: '0px' }} __component_name="Row">
+        <Row __component_name="Row" style={{ marginLeft: '0px', marginRight: '0px' }} wrap={true}>
           <Col
+            __component_name="Col"
             span={24}
             style={{
-              height: '100px',
-              display: 'inline',
-              textAlign: 'center',
-              marginLeft: '0px',
-              paddingTop: '16px',
-              marginRight: '0px',
               backgroundColor: '#ffffff',
+              display: 'inline',
+              height: '100px',
+              marginLeft: '0px',
+              marginRight: '0px',
+              paddingTop: '16px',
+              textAlign: 'center',
             }}
-            __component_name="Col"
           >
             <Space
-              align="center"
-              style={{ marginRight: '8px' }}
-              direction="horizontal"
               __component_name="Space"
+              align="center"
+              direction="horizontal"
+              style={{ marginRight: '8px' }}
             >
               <Button
-                icon=""
+                __component_name="Button"
                 block={false}
-                ghost={false}
-                shape="default"
-                style={{ marginRight: '12px' }}
                 danger={false}
+                disabled={false}
+                ghost={false}
+                icon=""
                 onClick={function () {
                   return this.onBack.apply(this, Array.prototype.slice.call(arguments).concat([]));
                 }.bind(this)}
-                disabled={false}
-                __component_name="Button"
+                shape="default"
+                style={{ marginRight: '12px' }}
               >
                 取消
               </Button>
               {!!__$$eval(() => this.state.currentStep !== 0) && (
                 <Button
-                  icon=""
+                  __component_name="Button"
                   block={false}
-                  ghost={false}
-                  shape="default"
-                  style={{ marginRight: '12px' }}
                   danger={false}
+                  disabled={false}
+                  ghost={false}
+                  icon=""
                   onClick={function () {
                     return this.onPrevious.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  disabled={false}
-                  __component_name="Button"
+                  shape="default"
+                  style={{ marginRight: '12px' }}
                 >
                   上一步
                 </Button>
@@ -3380,39 +3549,39 @@ class $$Page extends React.Component {
             </Space>
             {!!__$$eval(() => this.state.currentStep !== 3) && (
               <Button
-                icon=""
-                type="primary"
+                __component_name="Button"
                 block={false}
-                ghost={false}
-                shape="default"
-                style={{ marginRight: '20px' }}
                 danger={false}
+                disabled={false}
+                ghost={false}
+                icon=""
                 onClick={function () {
                   return this.onNext.apply(this, Array.prototype.slice.call(arguments).concat([]));
                 }.bind(this)}
-                disabled={false}
-                __component_name="Button"
+                shape="default"
+                style={{ marginRight: '20px' }}
+                type="primary"
               >
                 下一步
               </Button>
             )}
             {!!__$$eval(() => this.state.currentStep === 3) && (
               <Button
-                icon=""
-                type="primary"
+                __component_name="Button"
                 block={false}
-                ghost={false}
-                shape="default"
-                style={{ marginRight: '12px' }}
                 danger={false}
+                disabled={false}
+                ghost={false}
+                icon=""
                 onClick={function () {
                   return this.onFinish.apply(
                     this,
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this)}
-                disabled={false}
-                __component_name="Button"
+                shape="default"
+                style={{ marginRight: '12px' }}
+                type="primary"
               >
                 完成
               </Button>

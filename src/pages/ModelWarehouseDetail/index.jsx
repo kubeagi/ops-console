@@ -11,6 +11,7 @@ import {
   Col,
   Typography,
   Status,
+  Tooltip,
   Tabs,
   Modal,
   Descriptions,
@@ -24,6 +25,7 @@ import {
 
 import {
   AntdIconCodeSandboxCircleFilled,
+  AntdIconInfoCircleOutlined,
   AntdIconPlusOutlined,
   AntdIconReloadOutlined,
   AntdIconDeleteOutlined,
@@ -90,21 +92,21 @@ class ModelWarehouseDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      uploadModalVisible: false,
-      loading: false,
-      name: this.match.params.name,
-      data: {},
-      submitLoading: false,
-      uploadedFileCount: 0,
-      deleteFilesVisible: false,
-      selectedFileList: [],
       currentFile: '',
-      deleteType: 'single',
+      data: {},
+      deleteFilesVisible: false,
       deleteLoading: false,
+      deleteType: 'single',
       fileSearchParams: {
         keyword: '',
         currentPage: 1,
       },
+      loading: false,
+      name: this.match.params.name,
+      selectedFileList: [],
+      submitLoading: false,
+      uploadedFileCount: 0,
+      uploadModalVisible: false,
     };
   }
 
@@ -118,22 +120,22 @@ class ModelWarehouseDetail$$Page extends React.Component {
       list: [
         {
           id: 'delete_files',
-          type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/model/files`,
-              isCors: true,
-              method: 'DELETE',
-              params: {},
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
               },
+              isCors: true,
+              method: 'DELETE',
+              params: {},
               timeout: 5000,
+              uri: `${this.getUrlPrex()}/model/files`,
             };
           }.bind(_this),
+          type: 'axios',
         },
       ],
     };
@@ -143,13 +145,32 @@ class ModelWarehouseDetail$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  getDataSourceMap() {
-    return this.dataSourceMap;
+  calcUploadedFile(file) {
+    console.log(file);
+    const count = this.state.uploadedFileCount + 1;
+    this.setState(
+      {
+        uploadedFileCount: count,
+      },
+      () => {
+        // 都曾经上传过
+        if (this.state.uploadThis?.state?.fileList?.length === this.state.uploadedFileCount) {
+          this.handleCancle();
+          this.setState({
+            uploadedFileCount: 0,
+          });
+          this.state.uploadThis.setState({
+            fileList: [],
+          });
+        }
+      }
+    );
   }
 
-  openUploadModal() {
+  closeDeleteFilesModal() {
     this.setState({
-      uploadModalVisible: true,
+      deleteFilesVisible: false,
+      currentFile: '',
     });
   }
 
@@ -157,6 +178,15 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this.setState({
       uploadModalVisible: false,
     });
+  }
+
+  getBucket() {
+    // namespace
+    return this.utils.getAuthData()?.project;
+  }
+
+  getBucketPath() {
+    return `model/${this.state.name}`;
   }
 
   getData() {
@@ -194,105 +224,22 @@ class ModelWarehouseDetail$$Page extends React.Component {
       });
   }
 
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
-  }
-
-  onPageChange(page) {
-    this.setState(
-      {
-        fileSearchParams: {
-          ...this.state.fileSearchParams,
-          currentPage: page,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
-  }
-
-  onSearch(value) {
-    // 输入框内容变化时的回调
-    this.setState(
-      {
-        fileSearchParams: {
-          ...this.state.fileSearchParams,
-          currentPage: 1,
-          keyword: value,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
-  }
-
-  onSubmitUpload() {
-    this.setState({
-      submitLoading: true,
-    });
-    this.handleReUpload();
-  }
-
-  handleReUpload() {
-    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
-      this.handleCancle();
-      this.state.uploadThis.setState({
-        fileList: [],
-      });
-      return;
-    }
-    console.log(this.state.uploadThis);
-    this.state.uploadThis?.state?.fileList?.forEach(file => {
-      this.state.uploadThis?.computeMD5(file);
-    });
-  }
-
-  getBucketPath() {
-    return `model/${this.state.name}`;
+  getDataSourceMap() {
+    return this.dataSourceMap;
   }
 
   getUrlPrex() {
     return `${window.location.origin}/kubeagi-apis/bff`;
   }
 
-  getBucket() {
-    // namespace
-    return this.utils.getAuthData()?.project;
-  }
-
-  setUploadState(state) {
-    this.setState(state);
-  }
-
-  calcUploadedFile(file) {
-    console.log(file);
-    const count = this.state.uploadedFileCount + 1;
-    this.setState(
-      {
-        uploadedFileCount: count,
-      },
-      () => {
-        // 都曾经上传过
-        if (this.state.uploadThis?.state?.fileList?.length === this.state.uploadedFileCount) {
-          this.handleCancle();
-          this.setState({
-            uploadedFileCount: 0,
-          });
-          this.state.uploadThis.setState({
-            fileList: [],
-          });
-        }
-      }
-    );
+  handleBackFunc(event) {
+    // 点击按钮时的回调
+    this.history.push('/model-warehouse');
+    console.log('onClick', history);
   }
 
   handleCancle() {
-    this.utils.notification.success({
-      message: '上传成功',
-    });
+    // this.utils.notification.success({ message: '上传成功,请刷新列表查看'})
     this.setState(
       {
         submitLoading: false,
@@ -304,43 +251,30 @@ class ModelWarehouseDetail$$Page extends React.Component {
     );
   }
 
-  openDeleteFilesModal(e, { record }) {
-    this.setState({
-      deleteFilesVisible: true,
-      currentFile: record?.path,
-      deleteType: 'single',
-    });
-  }
-
-  onDeleteBatch() {
-    if (!this.state.selectedFileList.length) {
-      this.utils.notification.warn({
-        message: '请选择要删除的文件！',
+  handleReUpload() {
+    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
+      this.handleCancle();
+      this.state.uploadThis.setState({
+        fileList: [],
       });
       return;
     }
-    this.setState({
-      deleteFilesVisible: true,
-      deleteType: 'batch',
+    // console.log(this.state.uploadThis)
+    this.state.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.uploadThis?.computeMD5(file);
     });
   }
 
-  onRowSelectedChange(keys) {
-    console.log(keys);
-    this.setState({
-      selectedFileList: keys,
-    });
+  onChangeSwitch(checked, event) {
+    // 变化时回调函数
+    this.state.switchState = checked;
+    console.log('onChange', checked, event, this.state);
   }
 
-  onSubmitDel() {
-    console.log(files);
-    const files = [];
-    if (this.state.deleteType === 'batch') {
-      this.onDelete(this.state.selectedFileList);
-    }
-    if (this.state.deleteType === 'single') {
-      this.onDelete([this.state.currentFile]);
-    }
+  onClick(event) {
+    // 点击按钮时的回调
+
+    console.log('onClick', event);
   }
 
   onDelete(selectedDeleteFileList) {
@@ -383,29 +317,95 @@ class ModelWarehouseDetail$$Page extends React.Component {
     });
   }
 
-  closeDeleteFilesModal() {
+  onDeleteBatch() {
+    if (!this.state.selectedFileList.length) {
+      this.utils.notification.warn({
+        message: '请选择要删除的文件！',
+      });
+      return;
+    }
     this.setState({
-      deleteFilesVisible: false,
-      currentFile: '',
+      deleteFilesVisible: true,
+      deleteType: 'batch',
     });
   }
 
-  onClick(event) {
-    // 点击按钮时的回调
-
-    console.log('onClick', event);
+  onPageChange(page) {
+    this.setState(
+      {
+        fileSearchParams: {
+          ...this.state.fileSearchParams,
+          currentPage: page,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
   }
 
-  handleBackFunc(event) {
-    // 点击按钮时的回调
-    this.history.push('/model-warehouse');
-    console.log('onClick', history);
+  onRowSelectedChange(keys) {
+    console.log(keys);
+    this.setState({
+      selectedFileList: keys,
+    });
   }
 
-  onChangeSwitch(checked, event) {
-    // 变化时回调函数
-    this.state.switchState = checked;
-    console.log('onChange', checked, event, this.state);
+  onSearch(value) {
+    // 输入框内容变化时的回调
+    this.setState(
+      {
+        fileSearchParams: {
+          ...this.state.fileSearchParams,
+          currentPage: 1,
+          keyword: value,
+        },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  onSubmitDel() {
+    console.log(files);
+    const files = [];
+    if (this.state.deleteType === 'batch') {
+      this.onDelete(this.state.selectedFileList);
+    }
+    if (this.state.deleteType === 'single') {
+      this.onDelete([this.state.currentFile]);
+    }
+  }
+
+  onSubmitUpload() {
+    this.setState({
+      submitLoading: true,
+    });
+    this.handleReUpload();
+  }
+
+  openDeleteFilesModal(e, { record }) {
+    this.setState({
+      deleteFilesVisible: true,
+      currentFile: record?.path,
+      deleteType: 'single',
+    });
+  }
+
+  openUploadModal() {
+    this.setState({
+      uploadModalVisible: true,
+    });
+  }
+
+  setUploadState(state) {
+    this.setState(state);
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   componentDidMount() {
@@ -421,89 +421,101 @@ class ModelWarehouseDetail$$Page extends React.Component {
     return (
       <Page style={{}}>
         <Button.Back
-          path=""
-          type="ghost"
-          style={{ opacity: '0' }}
-          title="模型仓库详情"
+          __component_name="Button.Back"
           onClick={function () {
             return this.handleBackFunc.apply(
               this,
               Array.prototype.slice.call(arguments).concat([])
             );
           }.bind(this)}
-          __component_name="Button.Back"
+          path=""
+          style={{ opacity: '0' }}
+          title="模型仓库详情"
+          type="ghost"
         />
-        <Spin spinning={__$$eval(() => this.state.loading)} __component_name="Spin">
+        <Spin __component_name="Spin" spinning={__$$eval(() => this.state.loading)}>
           <Card
-            size="default"
-            type="default"
-            style={{ marginTop: '16px' }}
+            __component_name="Card"
             actions={[]}
-            loading={false}
             bordered={false}
             hoverable={false}
-            __component_name="Card"
+            loading={false}
+            size="default"
+            style={{ marginTop: '16px' }}
+            type="default"
           >
-            <Row wrap={false} style={{ height: '56px' }} __component_name="Row">
+            <Row __component_name="Row" style={{ height: '56px' }} wrap={false}>
               <Col
+                __component_name="Col"
                 flex="56px"
                 span={1}
-                style={{ width: '56px', height: '56px' }}
-                __component_name="Col"
+                style={{ height: '56px', width: '56px' }}
               >
                 <AntdIconCodeSandboxCircleFilled
-                  style={{ color: '#4a90e2', fontSize: 56, lineHeight: '0px' }}
                   __component_name="AntdIconCodeSandboxCircleFilled"
+                  style={{ color: '#4a90e2', fontSize: 56, lineHeight: '0px' }}
                 />
               </Col>
               <Col
+                __component_name="Col"
                 flex="auto"
                 span={20}
-                style={{ height: '56px', display: 'flex', alignItems: 'center' }}
-                __component_name="Col"
+                style={{ alignItems: 'center', display: 'flex', height: '56px' }}
               >
                 <Row
-                  wrap={true}
-                  style={{ paddingLeft: '20px' }}
-                  gutter={['', '']}
                   __component_name="Row"
+                  gutter={['', '']}
+                  style={{ paddingLeft: '20px' }}
+                  wrap={true}
                 >
-                  <Col span={24} __component_name="Col">
-                    <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                      <Col span={24} __component_name="Col">
+                  <Col __component_name="Col" span={24}>
+                    <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                      <Col __component_name="Col" span={24}>
                         <Typography.Title
+                          __component_name="Typography.Title"
                           bold={true}
-                          level={1}
                           bordered={false}
                           ellipsis={true}
-                          __component_name="Typography.Title"
+                          level={1}
                         >
                           {__$$eval(() => this.utils.getFullName(this.state.data))}
                         </Typography.Title>
                       </Col>
-                      <Col span={24} __component_name="Col">
+                      <Col __component_name="Col" span={24}>
                         <Status
+                          __component_name="Status"
                           id={__$$eval(() => this.state.data.status)}
                           types={[
-                            { id: 'False', type: 'error', children: '异常' },
-                            { id: 'True', type: 'success', children: '正常' },
+                            { children: '异常', id: 'False', type: 'error' },
+                            { children: '正常', id: 'True', type: 'success' },
                           ]}
-                          __component_name="Status"
                         />
+                        {!!__$$eval(() => this.state.data.status === 'False') && (
+                          <Tooltip
+                            __component_name="Tooltip"
+                            style={{}}
+                            title={__$$eval(() => this.state.data.message || '-')}
+                          >
+                            <AntdIconInfoCircleOutlined
+                              __component_name="AntdIconInfoCircleOutlined"
+                              style={{ marginLeft: '5px' }}
+                            />
+                          </Tooltip>
+                        )}
                         <Typography.Text
-                          style={{ fontSize: '', paddingLeft: '12px' }}
-                          strong={false}
+                          __component_name="Typography.Text"
                           disabled={false}
                           ellipsis={true}
-                          __component_name="Typography.Text"
+                          strong={false}
+                          style={{ fontSize: '', paddingLeft: '12px' }}
                         >
                           更新时间：
                         </Typography.Text>
                         <Typography.Time
-                          time={__$$eval(() => this.state.data?.updateTimestamp)}
+                          __component_name="Typography.Time"
                           format="YYYY-MM-DD HH:mm:ss"
                           relativeTime={false}
-                          __component_name="Typography.Time"
+                          time={__$$eval(() => this.state.data?.updateTimestamp)}
                         />
                       </Col>
                     </Row>
@@ -514,144 +526,143 @@ class ModelWarehouseDetail$$Page extends React.Component {
           </Card>
         </Spin>
         <Card
-          size="default"
-          type="default"
-          style={{ marginTop: '16px' }}
+          __component_name="Card"
           actions={[]}
-          loading={false}
           bordered={false}
           hoverable={false}
-          __component_name="Card"
+          loading={false}
+          size="default"
+          style={{ marginTop: '16px' }}
+          type="default"
         >
           <Tabs
-            size="large"
-            type="line"
+            __component_name="Tabs"
+            activeKey=""
+            destroyInactiveTabPane="true"
             items={[
               {
-                key: 'tab-item-1',
-                label: '详细信息',
                 children: (
                   <Descriptions
-                    id=""
-                    size="default"
+                    __component_name="Descriptions"
+                    bordered={false}
+                    borderedBottom={false}
+                    borderedBottomDashed={false}
                     colon={false}
+                    column={1}
+                    id=""
                     items={[
                       {
-                        key: 'xhiw4rl3fr8',
-                        span: 1,
-                        label: 'ID',
                         children: (
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             {__$$eval(() => this.state.data?.id)}
                           </Typography.Text>
                         ),
+                        key: 'xhiw4rl3fr8',
+                        label: 'ID',
+                        span: 1,
                       },
                       {
-                        key: 'hdx1if55is',
-                        span: 1,
-                        label: '模型类型',
                         children: __$$evalArray(() => this.state.data?.types?.split(',')).map(
                           (item, index) =>
                             (__$$context => (
-                              <Tag color="success" closable={false} __component_name="Tag">
+                              <Tag __component_name="Tag" closable={false} color="success">
                                 {__$$eval(() =>
                                   item === 'llm' ? 'LLM' : item === 'embedding' ? 'Embedding' : item
                                 )}
                               </Tag>
                             ))(__$$createChildContext(__$$context, { item, index }))
                         ),
+                        key: 'hdx1if55is',
+                        label: '模型类型',
+                        span: 1,
                       },
                       {
-                        key: 'ik4agaf7r1d',
-                        span: 1,
-                        label: '创建时间',
                         children: (
                           <Typography.Time
-                            time={__$$eval(() => this.state.data?.creationTimestamp)}
+                            __component_name="Typography.Time"
                             format=""
                             relativeTime={false}
-                            __component_name="Typography.Time"
+                            time={__$$eval(() => this.state.data?.creationTimestamp)}
                           />
                         ),
+                        key: 'ik4agaf7r1d',
+                        label: '创建时间',
+                        span: 1,
                       },
                       {
-                        key: '5c0mxhs31zb',
-                        span: 1,
-                        label: '创建者',
                         children: (
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             {__$$eval(() => this.state.data?.creator || '-')}
                           </Typography.Text>
                         ),
+                        key: '5c0mxhs31zb',
+                        label: '创建者',
+                        span: 1,
                       },
                       {
-                        key: 'ys4jchfegg',
-                        span: 1,
-                        label: '描述',
                         children: (
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={false}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             {__$$eval(() => this.state.data?.description)}
                           </Typography.Text>
                         ),
+                        key: 'ys4jchfegg',
+                        label: '描述',
+                        span: 1,
                       },
                     ]}
-                    title=""
-                    column={1}
-                    layout="horizontal"
-                    bordered={false}
                     labelStyle={{ width: 100 }}
-                    borderedBottom={false}
-                    __component_name="Descriptions"
-                    borderedBottomDashed={false}
+                    layout="horizontal"
+                    size="default"
+                    title=""
                   >
-                    <Descriptions.Item key="xhiw4rl3fr8" span={1} label="ID">
+                    <Descriptions.Item key="xhiw4rl3fr8" label="ID" span={1}>
                       {null}
                     </Descriptions.Item>
-                    <Descriptions.Item key="hdx1if55is" span={1} label="任务类型">
+                    <Descriptions.Item key="hdx1if55is" label="任务类型" span={1}>
                       {null}
                     </Descriptions.Item>
-                    <Descriptions.Item key="7vo7r2wbqev" span={1} label="处理前数据集">
+                    <Descriptions.Item key="7vo7r2wbqev" label="处理前数据集" span={1}>
                       {null}
                     </Descriptions.Item>
-                    <Descriptions.Item key="ik4agaf7r1d" span={1} label="处理后数据集">
+                    <Descriptions.Item key="ik4agaf7r1d" label="处理后数据集" span={1}>
                       {null}
                     </Descriptions.Item>
-                    <Descriptions.Item key="5c0mxhs31zb" span={1} label="创建时间">
+                    <Descriptions.Item key="5c0mxhs31zb" label="创建时间" span={1}>
                       {null}
                     </Descriptions.Item>
-                    <Descriptions.Item key="ys4jchfegg" span={1} label="创建者">
+                    <Descriptions.Item key="ys4jchfegg" label="创建者" span={1}>
                       {null}
                     </Descriptions.Item>
                   </Descriptions>
                 ),
+                key: 'tab-item-1',
+                label: '详细信息',
               },
               {
-                key: 'tab-item-2',
-                label: '模型文件',
                 children: (
-                  <Row wrap={true} gutter={['', 12]} __component_name="Row">
-                    <Col span={24} __component_name="Col">
-                      <Row wrap={false} justify="space-between" __component_name="Row">
+                  <Row __component_name="Row" gutter={['', 12]} wrap={true}>
+                    <Col __component_name="Col" span={24}>
+                      <Row __component_name="Row" justify="space-between" wrap={false}>
                         <Col __component_name="Col">
-                          <Space size={12} align="center" direction="horizontal">
+                          <Space align="center" direction="horizontal" size={12}>
                             {!!__$$eval(
                               () =>
                                 !this.state.data?.systemModel ||
@@ -659,44 +670,44 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                   this.state.data?.namespace === this.utils.getAuthData()?.project)
                             ) && (
                               <Button
+                                __component_name="Button"
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
                                 href=""
                                 icon={
                                   <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
                                 }
-                                type="primary"
-                                block={false}
-                                ghost={false}
-                                shape="default"
-                                danger={false}
-                                target="_self"
                                 onClick={function () {
                                   return this.openUploadModal.apply(
                                     this,
                                     Array.prototype.slice.call(arguments).concat([])
                                   );
                                 }.bind(this)}
-                                disabled={false}
-                                __component_name="Button"
+                                shape="default"
+                                target="_self"
+                                type="primary"
                               >
                                 上传模型文件
                               </Button>
                             )}
                             <Button
+                              __component_name="Button"
+                              block={false}
+                              danger={false}
+                              disabled={false}
+                              ghost={false}
                               icon={
                                 <AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />
                               }
-                              block={false}
-                              ghost={false}
-                              shape="default"
-                              danger={false}
                               onClick={function () {
                                 return this.getData.apply(
                                   this,
                                   Array.prototype.slice.call(arguments).concat([])
                                 );
                               }.bind(this)}
-                              disabled={false}
-                              __component_name="Button"
+                              shape="default"
                             >
                               刷新
                             </Button>
@@ -707,27 +718,27 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                   this.state.data?.namespace === this.utils.getAuthData()?.project)
                             ) && (
                               <Button
+                                __component_name="Button"
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
                                 icon={
                                   <AntdIconDeleteOutlined __component_name="AntdIconDeleteOutlined" />
                                 }
-                                block={false}
-                                ghost={false}
-                                shape="default"
-                                danger={false}
                                 onClick={function () {
                                   return this.onDeleteBatch.apply(
                                     this,
                                     Array.prototype.slice.call(arguments).concat([])
                                   );
                                 }.bind(this)}
-                                disabled={false}
-                                __component_name="Button"
+                                shape="default"
                               >
                                 删除
                               </Button>
                             )}
                             <Input.Search
-                              style={{ width: '240px' }}
+                              __component_name="Input.Search"
                               onSearch={function () {
                                 return this.onSearch.apply(
                                   this,
@@ -735,38 +746,40 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                 );
                               }.bind(this)}
                               placeholder="请输入文件名称搜索"
-                              __component_name="Input.Search"
+                              style={{ width: '240px' }}
                             />
                           </Space>
                         </Col>
                       </Row>
                     </Col>
-                    <Col span={24} __component_name="Col">
+                    <Col __component_name="Col" span={24}>
                       <Table
-                        size="middle"
-                        rowKey="path"
-                        scroll={{ scrollToFirstRowOnChange: true }}
+                        __component_name="Table"
                         columns={[
-                          { key: 'name', title: '名称', dataIndex: 'path' },
-                          { key: 'status', title: '状态', dataIndex: 'status' },
-                          { key: 'size', title: '文件大小', dataIndex: 'size' },
+                          { dataIndex: 'path', key: 'name', title: '名称' },
+                          { dataIndex: 'status', key: 'status', title: '状态' },
+                          { dataIndex: 'size', key: 'size', title: '文件大小' },
                           {
+                            dataIndex: 'op',
                             key: 'op',
-                            title: '操作',
-                            width: 160,
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Space
+                                  __component_name="Space"
                                   align="center"
                                   direction="horizontal"
-                                  __component_name="Space"
                                 >
                                   <Button
-                                    size="small"
+                                    __component_name="Button"
                                     block={false}
-                                    ghost={false}
-                                    shape="default"
                                     danger={false}
+                                    disabled={__$$eval(
+                                      () =>
+                                        __$$context.state.data?.systemModel &&
+                                        __$$context.state.data?.namespace !==
+                                          __$$context.utils.getAuthData()?.project
+                                    )}
+                                    ghost={false}
                                     onClick={function () {
                                       return this.openDeleteFilesModal.apply(
                                         this,
@@ -777,41 +790,37 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                         ])
                                       );
                                     }.bind(__$$context)}
-                                    disabled={__$$eval(
-                                      () =>
-                                        __$$context.state.data?.systemModel &&
-                                        __$$context.state.data?.namespace !==
-                                          __$$context.utils.getAuthData()?.project
-                                    )}
-                                    __component_name="Button"
+                                    shape="default"
+                                    size="small"
                                   >
                                     删除
                                   </Button>
                                 </Space>
                               ))(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'op',
+                            title: '操作',
+                            width: 160,
                           },
                         ]}
                         dataSource={__$$eval(() => this.state.data?.files?.nodes || [])}
                         pagination={false}
-                        showHeader={true}
+                        rowKey="path"
                         rowSelection={{
-                          type: 'checkbox',
                           onChange: function () {
                             return this.onRowSelectedChange.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this),
+                          type: 'checkbox',
                         }}
-                        __component_name="Table"
+                        scroll={{ scrollToFirstRowOnChange: true }}
+                        showHeader={true}
+                        size="middle"
                       />
-                      <Row wrap={true} gutter={['', '']} __component_name="Row">
-                        <Col span={24} __component_name="Col">
+                      <Row __component_name="Row" gutter={['', '']} wrap={true}>
+                        <Col __component_name="Col" span={24}>
                           <Pagination
-                            style={{ marginTop: '16px', textAlign: 'right', marginBottom: '24px' }}
-                            total={__$$eval(() => this.state.data?.files?.totalCount || 0)}
-                            simple={false}
+                            __component_name="Pagination"
                             current={__$$eval(() => this.state.fileSearchParams.currentPage)}
                             onChange={function () {
                               return this.onPageChange.apply(
@@ -826,38 +835,54 @@ class ModelWarehouseDetail$$Page extends React.Component {
                                 Array.prototype.slice.call(arguments).concat([])
                               );
                             }.bind(this)}
-                            __component_name="Pagination"
+                            simple={false}
+                            style={{ marginBottom: '24px', marginTop: '16px', textAlign: 'right' }}
+                            total={__$$eval(() => this.state.data?.files?.totalCount || 0)}
                           />
                         </Col>
                       </Row>
                     </Col>
                   </Row>
                 ),
+                key: 'tab-item-2',
+                label: '模型文件',
               },
             ]}
+            size="large"
             style={{ marginTop: '-24px' }}
-            activeKey=""
-            tabPosition="top"
             tabBarGutter={24}
-            __component_name="Tabs"
-            destroyInactiveTabPane="true"
+            tabPosition="top"
+            type="line"
           >
             <Modal
-              mask={true}
-              open={true}
-              title="弹框标题"
+              __component_name="Modal"
               centered={false}
-              keyboard={true}
-              forceRender={false}
-              maskClosable={false}
               confirmLoading={false}
               destroyOnClose={true}
-              __component_name="Modal"
+              forceRender={false}
+              keyboard={true}
+              mask={true}
+              maskClosable={false}
+              open={true}
+              title="弹框标题"
             />
           </Tabs>
         </Card>
         <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.deleteLoading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
           mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeDeleteFilesModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
           onOk={function () {
             return this.onSubmitDel.apply(
               this,
@@ -870,24 +895,24 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(this)}
           open={__$$eval(() => this.state.deleteFilesVisible)}
           title="删除文件"
+        >
+          <Alert __component_name="Alert" message="确认删除文件？" showIcon={true} type="warning" />
+        </Modal>
+        <Modal
+          __component_name="Modal"
           centered={false}
+          confirmLoading={__$$eval(() => this.state.submitLoading)}
+          destroyOnClose={true}
+          forceRender={false}
           keyboard={true}
+          mask={true}
+          maskClosable={false}
           onCancel={function () {
-            return this.closeDeleteFilesModal.apply(
+            return this.closeUploadModal.apply(
               this,
               Array.prototype.slice.call(arguments).concat([])
             );
           }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={__$$eval(() => this.state.deleteLoading)}
-          destroyOnClose={true}
-          __component_name="Modal"
-        >
-          <Alert type="warning" message="确认删除文件？" showIcon={true} __component_name="Alert" />
-        </Modal>
-        <Modal
-          mask={true}
           onOk={function () {
             return this.onSubmitUpload.apply(
               this,
@@ -897,39 +922,20 @@ class ModelWarehouseDetail$$Page extends React.Component {
           open={__$$eval(() => this.state.uploadModalVisible)}
           title="文件上传"
           width="700px"
-          centered={false}
-          keyboard={true}
-          onCancel={function () {
-            return this.closeUploadModal.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
-          }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={__$$eval(() => this.state.submitLoading)}
-          destroyOnClose={true}
-          __component_name="Modal"
         >
           <LccComponentQlsmm
-            label="上传"
+            __component_name="LccComponentQlsmm"
             accept=""
+            Authorization={__$$eval(() => this.utils.getAuthorization())}
             bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-            setState={function () {
-              return this.setUploadState.apply(
+            calcUploadedFile={function () {
+              return this.calcUploadedFile.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
             }.bind(this)}
-            Authorization={__$$eval(() => this.utils.getAuthorization())}
             getBucketPath={function () {
               return this.getBucketPath.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            handleSuccess={function () {
-              return this.handleCancle.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
@@ -940,10 +946,16 @@ class ModelWarehouseDetail$$Page extends React.Component {
                 Array.prototype.slice.call(arguments).concat([])
               );
             }.bind(this)}
+            handleSuccess={function () {
+              return this.handleCancle.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
             isSupportFolder={true}
-            __component_name="LccComponentQlsmm"
-            calcUploadedFile={function () {
-              return this.calcUploadedFile.apply(
+            label="上传"
+            setState={function () {
+              return this.setUploadState.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );

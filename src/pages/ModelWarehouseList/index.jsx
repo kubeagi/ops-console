@@ -18,6 +18,7 @@ import {
   Divider,
   Descriptions,
   Status,
+  Tooltip,
   Tag,
   Container,
   Pagination,
@@ -29,6 +30,7 @@ import {
   AntdIconReloadOutlined,
   AntdIconCodeSandboxCircleFilled,
   AntdIconSettingOutlined,
+  AntdIconInfoCircleOutlined,
 } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -72,21 +74,21 @@ class ModelWarehouse$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      currentRecord: null,
+      deleteBtnLoading: false,
+      deleteLoading: false,
+      deleteModalVisible: false,
+      keyword: '',
+      loading: false,
+      modelList: [],
+      pageRange: [],
       pages: {
         currentPage: 1,
         pageSize: 10,
         total: 0,
       },
-      types: '',
-      keyword: '',
-      loading: false,
-      modelList: [],
-      pageRange: [],
       systemModel: true,
-      currentRecord: null,
-      deleteLoading: false,
-      deleteBtnLoading: false,
-      deleteModalVisible: false,
+      types: '',
     };
   }
 
@@ -96,10 +98,6 @@ class ModelWarehouse$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
-  }
-
-  onEdit(item) {
-    this.history.push(`/model-warehouse/edit/${item.name}`);
   }
 
   getData() {
@@ -143,6 +141,15 @@ class ModelWarehouse$$Page extends React.Component {
       });
   }
 
+  handlePageSizeChange(size) {
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
+  }
+
   onChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -157,6 +164,21 @@ class ModelWarehouse$$Page extends React.Component {
         this.getData();
       }
     );
+  }
+
+  onCloseDeleteModal(e, isNeedLoad) {
+    console.log('isNeedLoad', isNeedLoad);
+    this.setState({
+      deleteModalVisible: false,
+      currentRecord: null,
+    });
+    if (isNeedLoad) {
+      this.getData();
+    }
+  }
+
+  onCreateClick(event) {
+    this.history.push(`/model-warehouse/create`);
   }
 
   onDelete() {
@@ -193,6 +215,34 @@ class ModelWarehouse$$Page extends React.Component {
       });
   }
 
+  onDeployment(e, extParams) {
+    // 事件的 handler
+    e.stopPropagation();
+    console.log(extParams);
+  }
+
+  onDetailClick(e, extParams) {
+    // 事件的 handler
+
+    this.history.push(
+      `/model-warehouse/detail/${extParams.data.name}?namespace=${extParams.data.namespace}`
+    );
+  }
+
+  onEdit(item) {
+    this.history.push(`/model-warehouse/edit/${item.name}`);
+  }
+
+  onMenuClick(opItem, record) {
+    const { key, domEvent } = opItem;
+    domEvent.stopPropagation();
+    if (key === 'delete') {
+      this.openDeleteModal(record.item);
+    } else if (key === 'edit') {
+      this.onEdit(record.item);
+    }
+  }
+
   onSearch(name) {
     this.setState(
       {
@@ -209,36 +259,31 @@ class ModelWarehouse$$Page extends React.Component {
     );
   }
 
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
+  onShowSizeChange(current, size) {
+    // pageSize 变化的回调
+    this.setState({
+      pages: {
+        ...this.state.pages,
+        pageSize: size,
+      },
+    });
   }
 
-  onMenuClick(opItem, record) {
-    const { key, domEvent } = opItem;
-    domEvent.stopPropagation();
-    if (key === 'delete') {
-      this.openDeleteModal(record.item);
-    } else if (key === 'edit') {
-      this.onEdit(record.item);
-    }
-  }
-
-  onDeployment(e, extParams) {
-    // 事件的 handler
-    e.stopPropagation();
-    console.log(extParams);
-  }
-
-  onCreateClick(event) {
-    this.history.push(`/model-warehouse/create`);
-  }
-
-  onDetailClick(e, extParams) {
-    // 事件的 handler
-
-    this.history.push(
-      `/model-warehouse/detail/${extParams.data.name}?namespace=${extParams.data.namespace}`
+  onSystemModelChange(source) {
+    console.log(source);
+    this.setState(
+      {
+        keyword: this.state.keyword,
+        types: this.state.types,
+        systemModel: source === 'false' ? false : true,
+        pages: {
+          ...this.state.pages,
+          currentPage: 1,
+        },
+      },
+      () => {
+        this.getData();
+      }
     );
   }
 
@@ -266,52 +311,9 @@ class ModelWarehouse$$Page extends React.Component {
     });
   }
 
-  onShowSizeChange(current, size) {
-    // pageSize 变化的回调
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
-  }
-
-  onCloseDeleteModal(e, isNeedLoad) {
-    console.log('isNeedLoad', isNeedLoad);
-    this.setState({
-      deleteModalVisible: false,
-      currentRecord: null,
-    });
-    if (isNeedLoad) {
-      this.getData();
-    }
-  }
-
-  onSystemModelChange(source) {
-    console.log(source);
-    this.setState(
-      {
-        keyword: this.state.keyword,
-        types: this.state.types,
-        systemModel: source === 'false' ? false : true,
-        pages: {
-          ...this.state.pages,
-          currentPage: 1,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
-  }
-
-  handlePageSizeChange(size) {
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   componentDidMount() {
@@ -324,88 +326,88 @@ class ModelWarehouse$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
             <Typography.Title
+              __component_name="Typography.Title"
               bold={true}
-              level={1}
               bordered={false}
               ellipsis={true}
-              __component_name="Typography.Title"
+              level={1}
             >
               模型仓库
             </Typography.Title>
           </Col>
-          <Col span={24} style={{}} __component_name="Col">
+          <Col __component_name="Col" span={24} style={{}}>
             <Alert
-              type="info"
+              __component_name="Alert"
               message="模型托管模块，集中管理通过平台训练或手动导入的大模型，支持对模型进行评估及部署。"
               showIcon={true}
-              __component_name="Alert"
+              type="info"
             />
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="inner"
-              style={{ paddingTop: '4px', paddingBottom: '16px' }}
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              style={{ paddingBottom: '16px', paddingTop: '4px' }}
+              type="inner"
             >
-              <Row wrap={true} gutter={[0, 0]} __component_name="Row">
-                <Col span={24} __component_name="Col">
+              <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                <Col __component_name="Col" span={24}>
                   <Row
-                    wrap={false}
-                    style={{ marginBottom: '16px' }}
-                    justify="space-between"
                     __component_name="Row"
+                    justify="space-between"
+                    style={{ marginBottom: '16px' }}
+                    wrap={false}
                   >
                     <Col __component_name="Col">
-                      <Space size={12} align="center" direction="horizontal">
+                      <Space align="center" direction="horizontal" size={12}>
                         <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
                           href=""
                           icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
-                          type="primary"
-                          block={false}
-                          ghost={false}
-                          shape="default"
-                          danger={false}
-                          target="_self"
                           onClick={function () {
                             return this.onCreateClick.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          disabled={false}
-                          __component_name="Button"
+                          shape="default"
+                          target="_self"
+                          type="primary"
                         >
                           新增模型
                         </Button>
                         <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
                           icon={
                             <AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />
                           }
-                          block={false}
-                          ghost={false}
-                          shape="default"
-                          danger={false}
                           onClick={function () {
                             return this.getData.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          disabled={false}
-                          __component_name="Button"
+                          shape="default"
                         >
                           刷新
                         </Button>
                         <Input.Search
-                          style={{ width: '240px' }}
+                          __component_name="Input.Search"
                           onSearch={function () {
                             return this.onSearch.apply(
                               this,
@@ -413,21 +415,18 @@ class ModelWarehouse$$Page extends React.Component {
                             );
                           }.bind(this)}
                           placeholder="请输入模型名称搜索"
-                          __component_name="Input.Search"
+                          style={{ width: '240px' }}
                         />
                       </Space>
                     </Col>
                     <Col __component_name="Col">
-                      <Space align="center" direction="horizontal" __component_name="Space">
-                        <Row wrap={false} justify="space-between" __component_name="Row">
+                      <Space __component_name="Space" align="center" direction="horizontal">
+                        <Row __component_name="Row" justify="space-between" wrap={false}>
                           <Col __component_name="Col">
                             <Select
-                              style={{ width: '150px', marginRight: '12px' }}
-                              options={[
-                                { label: '全部类型', value: 'all', disabled: false },
-                                { label: '系统内置模型', value: 'true' },
-                                { label: '我的', value: 'false' },
-                              ]}
+                              __component_name="Select"
+                              _sdkSwrGetFunc={{}}
+                              allowClear={true}
                               disabled={false}
                               onChange={function () {
                                 return this.onSystemModelChange.apply(
@@ -435,21 +434,21 @@ class ModelWarehouse$$Page extends React.Component {
                                   Array.prototype.slice.call(arguments).concat([])
                                 );
                               }.bind(this)}
-                              allowClear={true}
-                              showSearch={true}
+                              options={[
+                                { disabled: false, label: '全部模型', value: 'all' },
+                                { label: '系统内置模型', value: 'true' },
+                                { label: '我的模型', value: 'false' },
+                              ]}
                               placeholder="全部来源"
-                              _sdkSwrGetFunc={{}}
-                              __component_name="Select"
+                              showSearch={true}
+                              style={{ marginRight: '12px', width: '150px' }}
                             />
                           </Col>
                           <Col __component_name="Col">
                             <Select
-                              style={{ width: '150px' }}
-                              options={[
-                                { label: '全部类型', value: 'all', disabled: false },
-                                { label: 'LLM', value: 'llm' },
-                                { label: 'Embedding', value: 'embedding' },
-                              ]}
+                              __component_name="Select"
+                              _sdkSwrGetFunc={{}}
+                              allowClear={true}
                               disabled={false}
                               onChange={function () {
                                 return this.onTypesChange.apply(
@@ -457,11 +456,14 @@ class ModelWarehouse$$Page extends React.Component {
                                   Array.prototype.slice.call(arguments).concat([])
                                 );
                               }.bind(this)}
-                              allowClear={true}
-                              showSearch={true}
+                              options={[
+                                { disabled: false, label: '全部类型', value: 'all' },
+                                { label: 'LLM', value: 'llm' },
+                                { label: 'Embedding', value: 'embedding' },
+                              ]}
                               placeholder="全部类型"
-                              _sdkSwrGetFunc={{}}
-                              __component_name="Select"
+                              showSearch={true}
+                              style={{ width: '150px' }}
                             />
                           </Col>
                         </Row>
@@ -469,25 +471,23 @@ class ModelWarehouse$$Page extends React.Component {
                     </Col>
                   </Row>
                 </Col>
-                <Col span={24} __component_name="Col">
+                <Col __component_name="Col" span={24}>
                   <List
-                    grid={{ lg: 2, md: 2, sm: 2, xl: 3, xs: 2, xxl: 4, column: 3, gutter: 20 }}
-                    size="small"
-                    split={false}
-                    rowKey="id"
-                    loading={__$$eval(() => this.state.loading)}
+                    __component_name="List"
                     bordered={false}
                     dataSource={__$$eval(() => this.state.modelList)}
+                    grid={{ column: 3, gutter: 20, lg: 2, md: 2, sm: 2, xl: 3, xs: 2, xxl: 4 }}
                     gridEnable={true}
                     itemLayout="horizontal"
+                    loading={__$$eval(() => this.state.loading)}
                     pagination={false}
                     renderItem={item =>
                       (__$$context => (
                         <List.Item extra="" style={{ marginTop: '16px' }}>
                           <Card
-                            size="default"
-                            type="default"
                             actions={[]}
+                            bordered={true}
+                            hoverable={true}
                             loading={false}
                             onClick={function () {
                               return this.onDetailClick.apply(
@@ -499,55 +499,58 @@ class ModelWarehouse$$Page extends React.Component {
                                 ])
                               );
                             }.bind(__$$context)}
-                            bordered={true}
-                            hoverable={true}
+                            size="default"
+                            type="default"
                           >
-                            <Row wrap={true} gutter={['', 0]} __component_name="Row">
-                              <Col span={24} __component_name="Col">
-                                <Row wrap={false} gutter={[0, 0]} __component_name="Row">
-                                  <Col flex="56px" __component_name="Col">
+                            <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                              <Col __component_name="Col" span={24}>
+                                <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
+                                  <Col __component_name="Col" flex="56px">
                                     <AntdIconCodeSandboxCircleFilled
-                                      style={{ color: '#4a90e2', fontSize: 56 }}
                                       __component_name="AntdIconCodeSandboxCircleFilled"
+                                      style={{ color: '#4a90e2', fontSize: 56 }}
                                     />
                                   </Col>
-                                  <Col flex="auto" span={19} __component_name="Col">
+                                  <Col __component_name="Col" flex="auto" span={19}>
                                     <Row
-                                      wrap={false}
+                                      __component_name="Row"
                                       gutter={[0, 0]}
                                       justify="space-between"
-                                      __component_name="Row"
+                                      wrap={false}
                                     >
-                                      <Col style={{ paddingLeft: '20px' }} __component_name="Col">
+                                      <Col __component_name="Col" style={{ paddingLeft: '20px' }}>
                                         <Typography.Title
+                                          __component_name="Typography.Title"
                                           bold={true}
-                                          level={1}
                                           bordered={false}
                                           ellipsis={true}
-                                          __component_name="Typography.Title"
+                                          level={1}
                                         >
                                           {__$$eval(() => __$$context.utils.getFullName(item))}
                                         </Typography.Title>
                                         <Typography.Paragraph
                                           code={false}
-                                          mark={false}
-                                          style={{ fontSize: '12', marginTop: '8px' }}
                                           delete={false}
-                                          strong={false}
                                           disabled={false}
                                           editable={false}
                                           ellipsis={{
+                                            _unsafe_MixedSetter_tooltip_select: 'BoolSetter',
                                             rows: 2,
                                             tooltip: false,
-                                            _unsafe_MixedSetter_tooltip_select: 'BoolSetter',
                                           }}
+                                          mark={false}
+                                          strong={false}
+                                          style={{ fontSize: '12', marginTop: '8px' }}
                                           underline={false}
                                         >
                                           {__$$eval(() => item.description || '-')}
                                         </Typography.Paragraph>
                                       </Col>
-                                      <Col style={{ zIndex: 3 }} __component_name="Col">
+                                      <Col __component_name="Col" style={{ zIndex: 3 }}>
                                         <Dropdown
+                                          __component_name="Dropdown"
+                                          destroyPopupOnHide={true}
+                                          disabled={false}
                                           menu={{
                                             items: [
                                               { key: 'edit', label: '编辑' },
@@ -564,13 +567,10 @@ class ModelWarehouse$$Page extends React.Component {
                                               );
                                             }.bind(__$$context),
                                           }}
+                                          overlayStyle={{}}
+                                          placement="bottomLeft"
                                           style={{}}
                                           trigger={['hover']}
-                                          disabled={false}
-                                          placement="bottomLeft"
-                                          overlayStyle={{}}
-                                          __component_name="Dropdown"
-                                          destroyPopupOnHide={true}
                                         >
                                           {!!__$$eval(
                                             () =>
@@ -578,8 +578,8 @@ class ModelWarehouse$$Page extends React.Component {
                                               __$$context.utils.getAuthData()?.project
                                           ) && (
                                             <AntdIconSettingOutlined
-                                              style={{}}
                                               __component_name="AntdIconSettingOutlined"
+                                              style={{}}
                                             />
                                           )}
                                         </Dropdown>
@@ -589,28 +589,30 @@ class ModelWarehouse$$Page extends React.Component {
                                 </Row>
                               </Col>
                               <Col
+                                __component_name="Col"
                                 span={24}
                                 style={{ display: 'inline-block', textAlign: 'left' }}
-                                __component_name="Col"
                               />
-                              <Col flex="" span={24} __component_name="Col">
+                              <Col __component_name="Col" flex="" span={24}>
                                 <Divider
-                                  mode="line"
-                                  style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
+                                  __component_name="Divider"
                                   dashed={false}
                                   defaultOpen={false}
-                                  __component_name="Divider"
+                                  mode="line"
                                   orientationMargin=""
+                                  style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
                                 />
                                 <Descriptions
-                                  id=""
-                                  size="small"
+                                  __component_name="Descriptions"
+                                  bordered={false}
+                                  borderedBottom={false}
+                                  borderedBottomDashed={true}
                                   colon={false}
+                                  column={1}
+                                  contentStyle={{ padding: '12px 0 0 0' }}
+                                  id=""
                                   items={[
                                     {
-                                      key: '1efg6rtctqk',
-                                      span: 1,
-                                      label: '状态',
                                       children: (
                                         <Row
                                           __component_name="Row"
@@ -622,25 +624,36 @@ class ModelWarehouse$$Page extends React.Component {
                                             style={{ marginRight: '40px' }}
                                           >
                                             <Status
+                                              __component_name="Status"
                                               id={__$$eval(() => item.status)}
                                               style={{}}
                                               types={[
-                                                { id: 'False', type: 'error', children: '异常' },
-                                                { id: 'True', type: 'success', children: '正常' },
+                                                { children: '异常', id: 'False', type: 'error' },
+                                                { children: '正常', id: 'True', type: 'success' },
                                               ]}
-                                              __component_name="Status"
                                             />
+                                            <Tooltip
+                                              __component_name="Tooltip"
+                                              title={__$$eval(() => item.message || '-')}
+                                            >
+                                              {!!__$$eval(() => item.status === 'False') && (
+                                                <AntdIconInfoCircleOutlined
+                                                  __component_name="AntdIconInfoCircleOutlined"
+                                                  style={{ marginLeft: '5px' }}
+                                                />
+                                              )}
+                                            </Tooltip>
                                           </Col>
                                           <Col __component_name="Col">
                                             {__$$evalArray(() => item.types.split(',')).map(
                                               (item, index) =>
                                                 (__$$context => (
                                                   <Tag
-                                                    key="item"
-                                                    color="success"
-                                                    style={{}}
-                                                    closable={false}
                                                     __component_name="Tag"
+                                                    closable={false}
+                                                    color="success"
+                                                    key="item"
+                                                    style={{}}
                                                   >
                                                     {__$$eval(() =>
                                                       item === 'llm'
@@ -660,66 +673,63 @@ class ModelWarehouse$$Page extends React.Component {
                                           </Col>
                                         </Row>
                                       ),
+                                      key: '1efg6rtctqk',
+                                      label: '状态',
+                                      span: 1,
                                     },
                                     {
-                                      key: 'jclso8ts01b',
-                                      span: 1,
-                                      label: '更新时间',
                                       children: (
-                                        <Row wrap={true} __component_name="Row">
-                                          <Col span={24} __component_name="Col">
+                                        <Row __component_name="Row" wrap={true}>
+                                          <Col __component_name="Col" span={24}>
                                             <Row
-                                              wrap={false}
-                                              justify="space-between"
                                               __component_name="Row"
+                                              justify="space-between"
+                                              wrap={false}
                                             >
                                               <Col __component_name="Col">
                                                 <Typography.Time
-                                                  time={__$$eval(() => item.updateTimestamp)}
+                                                  __component_name="Typography.Time"
                                                   format=""
                                                   relativeTime={false}
-                                                  __component_name="Typography.Time"
+                                                  time={__$$eval(() => item.updateTimestamp)}
                                                 />
                                               </Col>
                                             </Row>
                                           </Col>
                                         </Row>
                                       ),
+                                      key: 'jclso8ts01b',
+                                      label: '更新时间',
                                       labelStyle: { marginTop: '0px' },
+                                      span: 1,
                                     },
                                   ]}
+                                  labelStyle={{ padding: '12px 0 0 0', width: '76' }}
+                                  layout="horizontal"
+                                  size="small"
                                   style={{ marginTop: '-16px' }}
                                   title=""
-                                  column={1}
-                                  layout="horizontal"
-                                  bordered={false}
-                                  labelStyle={{ width: '76', padding: '12px 0 0 0' }}
-                                  contentStyle={{ padding: '12px 0 0 0' }}
-                                  borderedBottom={false}
-                                  __component_name="Descriptions"
-                                  borderedBottomDashed={true}
                                 >
-                                  <Descriptions.Item key="1efg6rtctqk" span={1} label="状态">
+                                  <Descriptions.Item key="1efg6rtctqk" label="状态" span={1}>
                                     {null}
                                   </Descriptions.Item>
-                                  <Descriptions.Item key="jclso8ts01b" span={1} label="更新时间">
+                                  <Descriptions.Item key="jclso8ts01b" label="更新时间" span={1}>
                                     {null}
                                   </Descriptions.Item>
                                 </Descriptions>
                               </Col>
-                              <Col flex="" span={24} __component_name="Col">
+                              <Col __component_name="Col" flex="" span={24}>
                                 <Button
+                                  __component_name="Button"
+                                  block={true}
+                                  danger={false}
+                                  disabled={false}
+                                  ghost={true}
+                                  hoverColor="primary"
                                   href={__$$eval(
                                     () => '/model-service/createModelService?name=' + item.name
                                   )}
                                   icon=""
-                                  size="small"
-                                  type="primary"
-                                  block={true}
-                                  ghost={true}
-                                  shape="default"
-                                  danger={false}
-                                  target="_self"
                                   onClick={function () {
                                     return this.onDeployment.apply(
                                       this,
@@ -730,9 +740,10 @@ class ModelWarehouse$$Page extends React.Component {
                                       ])
                                     );
                                   }.bind(__$$context)}
-                                  disabled={false}
-                                  hoverColor="primary"
-                                  __component_name="Button"
+                                  shape="default"
+                                  size="small"
+                                  target="_self"
+                                  type="primary"
                                 >
                                   部署
                                 </Button>
@@ -740,33 +751,33 @@ class ModelWarehouse$$Page extends React.Component {
                             </Row>
                             {!!__$$eval(() => item?.systemModel) && (
                               <Container
+                                __component_name="Container"
                                 defaultStyle={{
-                                  top: '0',
-                                  right: '0',
-                                  position: 'absolute',
                                   borderLeft: '40px solid transparent',
+                                  borderLeftStyle: 'solid',
                                   borderTopColor: 'rgba(92,184,92,0.9)',
                                   borderTopStyle: 'solid',
                                   borderTopWidth: '40px',
-                                  borderLeftStyle: 'solid',
+                                  position: 'absolute',
+                                  right: '0',
+                                  top: '0',
                                 }}
-                                __component_name="Container"
                               />
                             )}
                             {!!__$$eval(() => item?.systemModel) && (
                               <Typography.Text
-                                style={{
-                                  top: '6px',
-                                  color: '#fff',
-                                  right: '2px',
-                                  fontSize: '',
-                                  position: 'absolute',
-                                  transform: 'rotate(45deg)',
-                                }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{
+                                  color: '#fff',
+                                  fontSize: '',
+                                  position: 'absolute',
+                                  right: '2px',
+                                  top: '6px',
+                                  transform: 'rotate(45deg)',
+                                }}
                               >
                                 内置
                               </Typography.Text>
@@ -775,16 +786,16 @@ class ModelWarehouse$$Page extends React.Component {
                         </List.Item>
                       ))(__$$createChildContext(__$$context, { item }))
                     }
-                    __component_name="List"
+                    rowKey="id"
+                    size="small"
+                    split={false}
                   />
                 </Col>
               </Row>
-              <Row wrap={true} __component_name="Row">
-                <Col span={24} __component_name="Col">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={24}>
                   <Pagination
-                    style={{ textAlign: 'right' }}
-                    total={__$$eval(() => this.state.pages.total)}
-                    simple={false}
+                    __component_name="Pagination"
                     current={__$$eval(() => this.state.pages.currentPage)}
                     onChange={function () {
                       return this.onChange.apply(
@@ -799,7 +810,9 @@ class ModelWarehouse$$Page extends React.Component {
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    __component_name="Pagination"
+                    simple={false}
+                    style={{ textAlign: 'right' }}
+                    total={__$$eval(() => this.state.pages.total)}
                   />
                 </Col>
               </Row>
@@ -807,33 +820,33 @@ class ModelWarehouse$$Page extends React.Component {
           </Col>
         </Row>
         <Modal
-          mask={true}
-          onOk={function () {
-            return this.onDelete.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          open={__$$eval(() => this.state.deleteModalVisible)}
-          title="删除模型"
+          __component_name="Modal"
+          cancelButtonProps={{ disabled: false }}
           centered={false}
+          confirmLoading={__$$eval(() => this.state.deleteLoading)}
+          destroyOnClose={true}
+          forceRender={false}
           keyboard={true}
+          mask={true}
+          maskClosable={false}
+          okButtonProps={{ disabled: false }}
           onCancel={function () {
             return this.onCloseDeleteModal.apply(
               this,
               Array.prototype.slice.call(arguments).concat([])
             );
           }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          okButtonProps={{ disabled: false }}
-          confirmLoading={__$$eval(() => this.state.deleteLoading)}
-          destroyOnClose={true}
-          __component_name="Modal"
-          cancelButtonProps={{ disabled: false }}
+          onOk={function () {
+            return this.onDelete.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          open={__$$eval(() => this.state.deleteModalVisible)}
+          title="删除模型"
         >
           <Alert
-            type="warning"
+            __component_name="Alert"
             message="确认删除此模型？"
             showIcon={true}
-            __component_name="Alert"
+            type="warning"
           />
         </Modal>
       </Page>
