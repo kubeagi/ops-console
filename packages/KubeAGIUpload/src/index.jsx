@@ -70,7 +70,12 @@ class KubeAgiUpload$$Component extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      Authorization:
+        'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImI1MmViYzk1NWRiYjYyNzBiN2YyZDZiNzQ5YWQ0M2RlNmExNTg0MjYifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwODEwNDY0LCJpYXQiOjE3MDA3MjQwNjQsImF0X2hhc2giOiJNWFpoRGhrVGVNOGg2OVYyT193Vl93IiwiY19oYXNoIjoiWHFfQXFKSllsN3VrQ1ZRWVFqak5IZyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.p5r2XN0Jl19FsHv85meDrFExu-TneS7i5_ENsWMMa5ziAxJjC_mLjgeN-4CzdM9flN3U931mSO29H-b2lifLdf7bYwtSOuIMiwoBkklOEa2MQVGDybkgH4QTlaClYYNSVYL4o4ZLmt5CFL7t0cf8UTapeUZTynL1ZPPgLMepPoqvteuNx4rsXXPjmywMK_o8jMRVxPLSdpxAV0e75lEW6wjq-0kqg8j2BFXbIeiftKzlRwAUa6NYAQZxsQGhS7_C3zIymyndoqzK5rAflwiHOZRX_CgQS0MIym1uNkauuH7MekRB2y5h0PMwGZ6tVwvF_h8by8RgjS7lVOb8rxMDcg',
+      bucket: 'xxyy',
+      bucket_path: 'dataset/test/v1',
       ids: [],
+      modalVisible: false,
       progress: {
         // 文件上传进度： 0
       },
@@ -78,11 +83,6 @@ class KubeAgiUpload$$Component extends React.Component {
         // 文件处理状态： '初始状态'
       },
       urlPrex: 'http://172.22.96.17/kubeagi-apis/minio',
-      Authorization:
-        'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImI1MmViYzk1NWRiYjYyNzBiN2YyZDZiNzQ5YWQ0M2RlNmExNTg0MjYifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwODEwNDY0LCJpYXQiOjE3MDA3MjQwNjQsImF0X2hhc2giOiJNWFpoRGhrVGVNOGg2OVYyT193Vl93IiwiY19oYXNoIjoiWHFfQXFKSllsN3VrQ1ZRWVFqak5IZyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.p5r2XN0Jl19FsHv85meDrFExu-TneS7i5_ENsWMMa5ziAxJjC_mLjgeN-4CzdM9flN3U931mSO29H-b2lifLdf7bYwtSOuIMiwoBkklOEa2MQVGDybkgH4QTlaClYYNSVYL4o4ZLmt5CFL7t0cf8UTapeUZTynL1ZPPgLMepPoqvteuNx4rsXXPjmywMK_o8jMRVxPLSdpxAV0e75lEW6wjq-0kqg8j2BFXbIeiftKzlRwAUa6NYAQZxsQGhS7_C3zIymyndoqzK5rAflwiHOZRX_CgQS0MIym1uNkauuH7MekRB2y5h0PMwGZ6tVwvF_h8by8RgjS7lVOb8rxMDcg',
-      bucket: 'xxyy',
-      bucket_path: 'dataset/test/v1',
-      modalVisible: false,
     };
   }
 
@@ -100,188 +100,107 @@ class KubeAgiUpload$$Component extends React.Component {
       list: [
         {
           id: 'get_chunks',
-          type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/files/chunks`,
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
               isCors: true,
               method: 'GET',
               params: {},
-              headers: {
-                Authorization: this.props.Authorization || this.state.Authorization,
-              },
               timeout: 5000,
+              uri: `${this.getUrlPrex()}/files/chunks`,
             };
           }.bind(_this),
+          type: 'axios',
         },
         {
           id: 'new_multipart',
-          type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/files/chunks`,
-              isCors: true,
-              method: 'POST',
-              params: {},
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
               },
+              isCors: true,
+              method: 'POST',
+              params: {},
               timeout: 5000,
+              uri: `${this.getUrlPrex()}/files/chunks`,
             };
           }.bind(_this),
+          type: 'axios',
         },
         {
           id: 'get_multipart_url',
-          type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/files/chunk_url`,
-              isCors: true,
-              method: 'POST',
-              params: {},
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
               },
+              isCors: true,
+              method: 'POST',
+              params: {},
               timeout: 5000,
+              uri: `${this.getUrlPrex()}/files/chunk_url`,
             };
           }.bind(_this),
+          type: 'axios',
         },
         {
           id: 'complete_multipart',
-          type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/files/chunks`,
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
               isCors: true,
               method: 'PUT',
               params: {},
-              headers: {
-                Authorization: this.props.Authorization || this.state.Authorization,
-              },
               timeout: 5000000,
+              uri: `${this.getUrlPrex()}/files/chunks`,
             };
           }.bind(_this),
+          type: 'axios',
         },
         {
           id: 'delete_files',
-          type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              uri: `${this.getUrlPrex()}/delete_files`,
-              isCors: true,
-              method: 'POST',
-              params: {},
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
               },
+              isCors: true,
+              method: 'POST',
+              params: {},
               timeout: 5000000,
+              uri: `${this.getUrlPrex()}/delete_files`,
             };
           }.bind(_this),
+          type: 'axios',
         },
       ],
     };
-  }
-
-  handleBack() {
-    this.props?.handleSuccess();
-  }
-
-  handleReUpload() {
-    this.props.handleReUpload();
-    this.handleBack();
-    this.setState({
-      modalVisible: false,
-    });
   }
 
   closeModal() {
     this.setState({
       modalVisible: false,
     });
-  }
-
-  getDataSourceMap() {
-    return this.dataSourceMap;
-  }
-
-  getUrlPrex() {
-    return `${window.location.origin}/kubeagi-apis/bff/${
-      this.props?.isSupportFolder ? 'model' : 'versioneddataset'
-    }`;
-  }
-
-  getBucketPath() {
-    // bucket_path就是 dataset/<dataset-name>/ < version
-    return this.props?.getBucketPath() || this.state.bucket_path;
-  }
-
-  getBucket() {
-    // namespace
-    return this.props.bucket || this.state.bucket;
-  }
-
-  handleDelete(file) {
-    this.setState({
-      fileList: this.state.fileList?.filter(item => item.uid !== file.uid),
-    });
-    return true;
-  }
-
-  onFileAdded(file, fileAllList) {
-    // 文件夹和文件需要区分一下
-    // 如果支持文件夹
-    if (this.props?.isSupportFolder) {
-      const list = this.state.fileList || [];
-      const newList = [];
-      fileAllList.forEach(item => {
-        // 避免重复添加
-        if (!list.some(ele => ele.webkitRelativePath === item.webkitRelativePath)) {
-          newList.push(item);
-        }
-      });
-      this.setState({
-        fileList: [...(this.state.fileList || []), ...newList],
-      });
-    } else {
-      this.setState({
-        fileList: [...(this.state.fileList || []), file],
-      });
-    }
-    this.props?.setState({
-      uploadThis: this,
-    });
-    return false;
-  }
-
-  startUpload() {
-    this.setState({
-      ids: [...this.state.ids, file.uid],
-      progress: {
-        ...this.state.progress,
-        [file.uid]: 0,
-      },
-      status: {
-        ...this.state.status,
-        [file.uid]: '初始状态',
-      },
-    });
-    // 1. 计算MD5
-    this.computeMD5(file);
   }
 
   computeMD5(file) {
@@ -353,6 +272,63 @@ class KubeAgiUpload$$Component extends React.Component {
     }
   }
 
+  async computeMD5Success(file) {
+    await this.getSuccessChunks(file);
+    if (file.uploadID == '') {
+      //未上传过
+      await this.newMultiUpload(file);
+      if (file.uploadID != '') {
+        file.chunks = '';
+        this.multipartUpload(file);
+      } else {
+        //失败如何处理
+        this.setState({
+          status: {
+            ...this.state.status,
+            [file.uid]: '上传失败',
+          },
+        });
+        return;
+      }
+    } else {
+      if (file.done) {
+        //已上传成功
+        //秒传
+        console.log('文件已上传完成');
+        this.setState({
+          progress: {
+            ...this.state.progress,
+            [file.uid]: 100,
+          },
+          status: {
+            ...this.state.status,
+            [file.uid]: '上传完成',
+          },
+        });
+        // 向父级通知这文件已经上传过的了
+        this.props.calcUploadedFile && this.props.calcUploadedFile(file);
+        //window.location.reload();
+      } else {
+        //断点续传
+        this.multipartUpload(file);
+      }
+    }
+  }
+
+  getBucket() {
+    // namespace
+    return this.props.bucket || this.state.bucket;
+  }
+
+  getBucketPath() {
+    // bucket_path就是 dataset/<dataset-name>/ < version
+    return this.props?.getBucketPath() || this.state.bucket_path;
+  }
+
+  getDataSourceMap() {
+    return this.dataSourceMap;
+  }
+
   getSuccessChunks(file) {
     const pageThis = this;
     return new Promise((resolve, reject) => {
@@ -382,30 +358,28 @@ class KubeAgiUpload$$Component extends React.Component {
     });
   }
 
-  newMultiUpload(file) {
-    const pageThis = this;
-    return new Promise((resolve, reject) => {
-      pageThis
-        .getDataSourceMap()
-        .new_multipart.load({
-          chunkCount: file.totalChunkCounts,
-          md5: file.uniqueIdentifier,
-          size: file.size,
-          fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
-          bucket: pageThis.getBucket(),
-          bucketPath: pageThis.getBucketPath(),
-        })
-        .then(function (response) {
-          file.uploadID = response?.uploadID;
-          resolve(response);
-        })
-        .catch(function (error) {
-          pageThis.utils.notification.warnings({
-            message: pageThis.i18n('i18n-boehucun'),
-            errors: [error],
-          });
-          reject(error);
-        });
+  getUrlPrex() {
+    return `${window.location.origin}/kubeagi-apis/bff/${
+      this.props?.isSupportFolder ? 'model' : 'versioneddataset'
+    }`;
+  }
+
+  handleBack() {
+    this.props?.handleSuccess();
+  }
+
+  handleDelete(file) {
+    this.setState({
+      fileList: this.state.fileList?.filter(item => item.uid !== file.uid),
+    });
+    return true;
+  }
+
+  handleReUpload() {
+    this.props.handleReUpload();
+    this.handleBack();
+    this.setState({
+      modalVisible: false,
     });
   }
 
@@ -598,47 +572,73 @@ class KubeAgiUpload$$Component extends React.Component {
     }
   }
 
-  async computeMD5Success(file) {
-    await this.getSuccessChunks(file);
-    if (file.uploadID == '') {
-      //未上传过
-      await this.newMultiUpload(file);
-      if (file.uploadID != '') {
-        file.chunks = '';
-        this.multipartUpload(file);
-      } else {
-        //失败如何处理
-        this.setState({
-          status: {
-            ...this.state.status,
-            [file.uid]: '上传失败',
-          },
+  newMultiUpload(file) {
+    const pageThis = this;
+    return new Promise((resolve, reject) => {
+      pageThis
+        .getDataSourceMap()
+        .new_multipart.load({
+          chunkCount: file.totalChunkCounts,
+          md5: file.uniqueIdentifier,
+          size: file.size,
+          fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
+          bucket: pageThis.getBucket(),
+          bucketPath: pageThis.getBucketPath(),
+        })
+        .then(function (response) {
+          file.uploadID = response?.uploadID;
+          resolve(response);
+        })
+        .catch(function (error) {
+          pageThis.utils.notification.warnings({
+            message: pageThis.i18n('i18n-boehucun'),
+            errors: [error],
+          });
+          reject(error);
         });
-        return;
-      }
+    });
+  }
+
+  onFileAdded(file, fileAllList) {
+    // 文件夹和文件需要区分一下
+    // 如果支持文件夹
+    if (this.props?.isSupportFolder) {
+      const list = this.state.fileList || [];
+      const newList = [];
+      fileAllList.forEach(item => {
+        // 避免重复添加
+        if (!list.some(ele => ele.webkitRelativePath === item.webkitRelativePath)) {
+          newList.push(item);
+        }
+      });
+      this.setState({
+        fileList: [...(this.state.fileList || []), ...newList],
+      });
     } else {
-      if (file.done) {
-        //已上传成功
-        //秒传
-        console.log('文件已上传完成');
-        this.setState({
-          progress: {
-            ...this.state.progress,
-            [file.uid]: 100,
-          },
-          status: {
-            ...this.state.status,
-            [file.uid]: '上传完成',
-          },
-        });
-        // 向父级通知这文件已经上传过的了
-        this.props.calcUploadedFile && this.props.calcUploadedFile(file);
-        //window.location.reload();
-      } else {
-        //断点续传
-        this.multipartUpload(file);
-      }
+      this.setState({
+        fileList: [...(this.state.fileList || []), file],
+      });
     }
+    this.props?.setState({
+      uploadThis: this,
+    });
+    return false;
+  }
+
+  startUpload() {
+    this.setState({
+      ids: [...this.state.ids, file.uid],
+      progress: {
+        ...this.state.progress,
+        [file.uid]: 0,
+      },
+      status: {
+        ...this.state.status,
+        [file.uid]: '初始状态',
+      },
+    });
+    // 1. 计算MD5
+    this.computeMD5(file);
   }
 
   componentDidMount() {
@@ -651,137 +651,137 @@ class KubeAgiUpload$$Component extends React.Component {
     return (
       <Component>
         <Modal
-          mask={true}
-          open={__$$eval(() => this.state.modalVisible)}
-          style={{ width: '800px' }}
-          title={this.i18n('i18n-msjvy7uv') /* 提示 */}
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
           footer={
-            <Space align="center" direction="horizontal" __component_name="Space">
+            <Space __component_name="Space" align="center" direction="horizontal">
               <Button
+                __component_name="Button"
                 block={false}
-                ghost={false}
-                shape="default"
                 danger={false}
+                disabled={false}
+                ghost={false}
                 onClick={function () {
                   return this.closeModal.apply(
                     this,
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this)}
-                disabled={false}
-                __component_name="Button"
+                shape="default"
               >
                 {this.i18n('i18n-zughatwk') /* 取消 */}
               </Button>
               <Button
-                icon=""
-                type="primary"
+                __component_name="Button"
                 block={false}
-                ghost={false}
-                shape="default"
                 danger={false}
+                disabled={false}
+                ghost={false}
+                icon=""
                 onClick={function () {
                   return this.handleReUpload.apply(
                     this,
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this)}
-                disabled={false}
-                __component_name="Button"
+                shape="default"
+                type="primary"
               >
                 {this.i18n('i18n-uklfmuzu') /* 重新上传 */}
               </Button>
             </Space>
           }
-          centered={false}
+          forceRender={false}
           keyboard={true}
+          mask={true}
+          maskClosable={false}
           onCancel={function () {
             return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={false}
-          destroyOnClose={true}
-          __component_name="Modal"
+          open={__$$eval(() => this.state.modalVisible)}
+          style={{ width: '800px' }}
+          title={this.i18n('i18n-msjvy7uv') /* 提示 */}
         >
-          <Row wrap={true} __component_name="Row">
-            <Col span={24} __component_name="Col">
+          <Row __component_name="Row" wrap={true}>
+            <Col __component_name="Col" span={24}>
               <Typography.Text
-                style={{ fontSize: '' }}
-                strong={false}
+                __component_name="Typography.Text"
                 disabled={false}
                 ellipsis={true}
-                __component_name="Typography.Text"
+                strong={false}
+                style={{ fontSize: '' }}
               >
                 {this.i18n('i18n-432m045e') /* 文件上传失败，可能的原因包括： */}
               </Typography.Text>
             </Col>
-            <Col span={24} style={{ display: 'flex', alignItems: 'center' }} __component_name="Col">
+            <Col __component_name="Col" span={24} style={{ alignItems: 'center', display: 'flex' }}>
               <Typography.Text
-                style={{ fontSize: '' }}
-                strong={false}
+                __component_name="Typography.Text"
                 disabled={false}
                 ellipsis={true}
-                __component_name="Typography.Text"
+                strong={false}
+                style={{ fontSize: '' }}
               >
                 {this.i18n('i18n-mzls5g8w') /* 1. 证书不受信任。 */}
               </Typography.Text>
               <Button
+                __component_name="Button"
+                block={false}
+                danger={false}
+                disabled={false}
+                ghost={false}
                 href={__$$eval(() => this.state.modalLink || '-')}
                 icon=""
-                type="link"
-                block={false}
-                ghost={false}
                 shape="default"
                 style={{
-                  paddingTop: '0px',
+                  paddingBottom: '0px',
                   paddingLeft: '0px',
                   paddingRight: '0px',
-                  paddingBottom: '0px',
+                  paddingTop: '0px',
                 }}
-                danger={false}
                 target="_blank"
-                disabled={false}
-                __component_name="Button"
+                type="link"
               >
                 {[
                   <Typography.Text
-                    type="colorPrimary"
-                    style={{ fontSize: '' }}
-                    strong={false}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={false}
+                    style={{ fontSize: '' }}
+                    type="colorPrimary"
                     key="node_oclpuxu40yg"
                   >
                     {this.i18n('i18n-ymkxjalg') /* 点击信任证书 */}
                   </Typography.Text>,
                   <TenxIconLinkTo
-                    color="#4461EB"
                     __component_name="TenxIconLinkTo"
+                    color="#4461EB"
                     key="node_oclpuxu40yb"
                   />,
                 ]}
               </Button>
             </Col>
-            <Col span={24} __component_name="Col">
+            <Col __component_name="Col" span={24}>
               <Typography.Text
-                style={{ fontSize: '' }}
-                strong={false}
+                __component_name="Typography.Text"
                 disabled={false}
                 ellipsis={true}
-                __component_name="Typography.Text"
+                strong={false}
+                style={{ fontSize: '' }}
               >
                 {this.i18n('i18n-8qd53yxm') /* 2. 网络连接不稳定，请检查您的网络并稍后重试。 */}
               </Typography.Text>
             </Col>
-            <Col span={24} __component_name="Col">
+            <Col __component_name="Col" span={24}>
               <Typography.Text
-                style={{ fontSize: '' }}
-                strong={false}
+                __component_name="Typography.Text"
                 disabled={false}
                 ellipsis={true}
-                __component_name="Typography.Text"
+                strong={false}
+                style={{ fontSize: '' }}
               >
                 {
                   this.i18n(
@@ -793,13 +793,13 @@ class KubeAgiUpload$$Component extends React.Component {
           </Row>
           <Typography.Paragraph
             code={false}
-            mark={false}
-            style={{ fontSize: '', paddingTop: '20px' }}
             delete={false}
-            strong={false}
             disabled={false}
             editable={false}
             ellipsis={false}
+            mark={false}
+            strong={false}
+            style={{ fontSize: '', paddingTop: '20px' }}
             underline={false}
           >
             {
@@ -810,29 +810,30 @@ class KubeAgiUpload$$Component extends React.Component {
           </Typography.Paragraph>
         </Modal>
         <FormilyForm
-          ref={this._refsManager.linkRef('formily_KubeAGIUpload')}
-          formHelper={{ autoFocus: true, className: 'formily_KubeAGIUpload' }}
+          __component_name="FormilyForm"
           componentProps={{
             colon: false,
-            layout: 'horizontal',
-            labelCol: __$$eval(() => this.props?.labelSpan || 4),
             labelAlign: 'left',
+            labelCol: __$$eval(() => this.props?.labelSpan || 4),
             labelWidth: __$$eval(() => this.props?.labelWidth || '120px'),
+            layout: 'horizontal',
             wrapperCol: __$$eval(() => this.props?.contentSpan || 20),
             wrapperWidth: __$$eval(() => this.props?.contentWidth || '600px'),
           }}
-          __component_name="FormilyForm"
+          formHelper={{ autoFocus: true, className: 'formily_KubeAGIUpload' }}
+          ref={this._refsManager.linkRef('formily_KubeAGIUpload')}
         >
           <FormilyUpload
-            fieldProps={{
-              name: 'Upload',
-              title: __$$eval(() => this.props.label || this.i18n('i18n-b6z34has')),
-              'x-component': 'FormilyUpload',
-              'x-validator': [],
-              _unsafe_MixedSetter_title_select: 'VariableSetter',
-            }}
+            __component_name="FormilyUpload"
             componentProps={{
               'x-component-props': {
+                beforeUpload: function () {
+                  return this.onFileAdded.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this),
+                directory: __$$eval(() => this.props.isSupportFolder),
                 disabled: false,
                 onRemove: function () {
                   return this.handleDelete.apply(
@@ -840,122 +841,121 @@ class KubeAgiUpload$$Component extends React.Component {
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this),
-                directory: __$$eval(() => this.props.isSupportFolder),
-                beforeUpload: function () {
-                  return this.onFileAdded.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this),
               },
             }}
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-            __component_name="FormilyUpload"
+            fieldProps={{
+              _unsafe_MixedSetter_title_select: 'VariableSetter',
+              name: 'Upload',
+              title: __$$eval(() => this.props.label || this.i18n('i18n-b6z34has')),
+              'x-component': 'FormilyUpload',
+              'x-validator': [],
+            }}
           >
             <Flex
-              align="center"
-              style={{ border: '1px dashed #4461EB', height: '100px', borderRadius: '4px' }}
-              justify="center"
-              vertical={true}
               __component_name="Flex"
+              align="center"
+              justify="center"
+              style={{ border: '1px dashed #4461EB', borderRadius: '4px', height: '100px' }}
+              vertical={true}
             >
               <AntdIconPlusOutlined
-                style={{ color: '#4461EB', fontSize: '16' }}
                 __component_name="AntdIconPlusOutlined"
+                style={{ color: '#4461EB', fontSize: '16' }}
               />
               <Typography.Text
-                type="colorTextSecondary"
-                style={{ fontSize: '', paddingTop: '16px', paddingBottom: '16px' }}
-                strong={false}
+                __component_name="Typography.Text"
                 disabled={false}
                 ellipsis={true}
-                __component_name="Typography.Text"
+                strong={false}
+                style={{ fontSize: '', paddingBottom: '16px', paddingTop: '16px' }}
+                type="colorTextSecondary"
               >
                 {this.i18n('i18n-acu9gpik') /* 点击 / 拖拽文件到此区域上传 */}
               </Typography.Text>
               <Flex __component_name="Flex">
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 >
                   {this.i18n('i18n-ui0fj2sq') /* 仅支持 */}
                 </Typography.Text>
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 >
                   {__$$eval(() => this.props.accept || '')}
                 </Typography.Text>
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 >
                   文件
                 </Typography.Text>
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 >
                   {__$$eval(() => (this.props.isSupportFolder ? '夹' : ''))}
                 </Typography.Text>
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 >
                   ；
                 </Typography.Text>
                 <Typography.Text
-                  type="colorTextSecondary"
-                  style={{ fontSize: '', paddingLeft: '6px' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '', paddingLeft: '6px' }}
+                  type="colorTextSecondary"
                 >
                   {this.i18n('i18n-1v40vm3l') /* 单文件大小 */}
                 </Typography.Text>
                 <Typography.Text
-                  type="warning"
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
+                  type="warning"
                 >
-                  {this.i18n('i18n-o9uxngg9') /* 不超过2G， */}
+                  {__$$eval(() => (this.props.isSupportFolder ? '不超过100G，' : '不超过2G，'))}
                 </Typography.Text>
                 <Typography.Text
-                  type="colorTextSecondary"
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
+                  type="colorTextSecondary"
                 >
                   {this.i18n('i18n-w3k0sm1r') /* 单次上传文件数量 */}
                 </Typography.Text>
                 <Typography.Text
-                  type="warning"
-                  style={{ fontSize: '', paddingLeft: '6px' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '', paddingLeft: '6px' }}
+                  type="warning"
                 >
                   {this.i18n('i18n-07ryldck') /* 不超过20个 */}
                 </Typography.Text>
