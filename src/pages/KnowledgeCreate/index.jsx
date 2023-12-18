@@ -67,6 +67,11 @@ class KnowledgeCreate$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      currentStep: 0,
+      dataSet: '',
+      dataSetDataList: [],
+      dataSetFileList: [],
+      embedderList: [],
       form: {
         name: '',
         displayName: '',
@@ -77,15 +82,10 @@ class KnowledgeCreate$$Page extends React.Component {
         embedder: undefined,
         description: '',
       },
-      dataSet: '',
-      version: '',
-      submited: false,
-      currentStep: 0,
-      selectFiles: [],
-      embedderList: [],
       nextFileList: [],
-      dataSetDataList: [],
-      dataSetFileList: [],
+      selectFiles: [],
+      submited: false,
+      version: '',
     };
   }
 
@@ -97,12 +97,45 @@ class KnowledgeCreate$$Page extends React.Component {
     return this._refsManager.getAll(refName);
   };
 
-  getStatus() {
-    return {
-      type: 'success',
-      id: 'success',
-      children: ' ',
-    };
+  checkFileds() {
+    try {
+      const form = this.getFormInstence();
+      form.submit(async values => {
+        const { name, displayName, dataSetContain, description, embedder } = values;
+        const { dataset, version } = dataSetContain;
+        if (this.state.currentStep === 0) {
+          if (this.state.selectFiles.length === 0) {
+            this.utils.message.info('请选择文件');
+            return;
+          }
+        }
+        this.setState({
+          currentStep: this.state.currentStep + 1,
+          form: {
+            name,
+            displayName,
+            dataSetContain,
+            description,
+            embedder,
+          },
+        });
+      });
+    } catch (error) {}
+  }
+
+  getCheckBox(rows) {
+    try {
+      const { version } = this.state;
+      this.setState({
+        selectFiles: rows,
+        nextFileList: rows.map(item => {
+          return {
+            ...this.state.dataSetFileList.find(_item => _item.path === item),
+            version,
+          };
+        }),
+      });
+    } catch (error) {}
   }
 
   async getDataSet() {
@@ -151,67 +184,6 @@ class KnowledgeCreate$$Page extends React.Component {
     } catch (error) {}
   }
 
-  handleSave(v) {
-    // console.log(v, 'aaaaaaaaaaaaaaaaaaaa')
-  }
-
-  handleStep(event, { action }) {
-    // console.log(this.state.currentStep, action)
-    if (action === 'next') {
-      this.checkFileds();
-    } else {
-      this.setState(
-        {
-          currentStep: this.state.currentStep - 1,
-        },
-        () => {
-          this.initFormValue();
-        }
-      );
-    }
-  }
-
-  checkFileds() {
-    try {
-      const form = this.getFormInstence();
-      form.submit(async values => {
-        const { name, displayName, dataSetContain, description, embedder } = values;
-        const { dataset, version } = dataSetContain;
-        if (this.state.currentStep === 0) {
-          if (this.state.selectFiles.length === 0) {
-            this.utils.message.info('请选择文件');
-            return;
-          }
-        }
-        this.setState({
-          currentStep: this.state.currentStep + 1,
-          form: {
-            name,
-            displayName,
-            dataSetContain,
-            description,
-            embedder,
-          },
-        });
-      });
-    } catch (error) {}
-  }
-
-  getCheckBox(rows) {
-    try {
-      const { version } = this.state;
-      this.setState({
-        selectFiles: rows,
-        nextFileList: rows.map(item => {
-          return {
-            ...this.state.dataSetFileList.find(_item => _item.path === item),
-            version,
-          };
-        }),
-      });
-    } catch (error) {}
-  }
-
   async getEmbedder() {
     try {
       const form = this.getFormInstence();
@@ -245,6 +217,18 @@ class KnowledgeCreate$$Page extends React.Component {
     } catch (error) {}
   }
 
+  getFormInstence() {
+    return this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
+  }
+
+  getStatus() {
+    return {
+      type: 'success',
+      id: 'success',
+      children: ' ',
+    };
+  }
+
   async getTableList(pre_data_set_name, pre_data_set_version) {
     try {
       const res = await this.utils.bff.getVersionedDataset({
@@ -263,6 +247,26 @@ class KnowledgeCreate$$Page extends React.Component {
         }
       );
     } catch (error) {}
+  }
+
+  handleSave(v) {
+    // console.log(v, 'aaaaaaaaaaaaaaaaaaaa')
+  }
+
+  handleStep(event, { action }) {
+    // console.log(this.state.currentStep, action)
+    if (action === 'next') {
+      this.checkFileds();
+    } else {
+      this.setState(
+        {
+          currentStep: this.state.currentStep - 1,
+        },
+        () => {
+          this.initFormValue();
+        }
+      );
+    }
   }
 
   handleSubmit() {
@@ -306,12 +310,6 @@ class KnowledgeCreate$$Page extends React.Component {
     );
   }
 
-  onStepChange(value) {
-    this.setState({
-      currentStep: value,
-    });
-  }
-
   initFormValue() {
     try {
       const form = this.getFormInstence();
@@ -341,10 +339,6 @@ class KnowledgeCreate$$Page extends React.Component {
     } catch (error) {}
   }
 
-  getFormInstence() {
-    return this.$('formily_iwuyzsdvrhg')?.formRef?.current?.form;
-  }
-
   onDataSetChange(v) {
     try {
       const form = this.getFormInstence();
@@ -360,6 +354,12 @@ class KnowledgeCreate$$Page extends React.Component {
       });
       this.setDataSetAndDataSetVersionsSource(v);
     } catch (error) {}
+  }
+
+  onStepChange(value) {
+    this.setState({
+      currentStep: value,
+    });
   }
 
   onVersionChange(v) {
@@ -397,161 +397,157 @@ class KnowledgeCreate$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
-            <Space align="center" direction="horizontal" __component_name="Space">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
+            <Space __component_name="Space" align="center" direction="horizontal">
               <Button.Back
+                __component_name="Button.Back"
                 name="返回"
                 path="/knowledge"
-                type="primary"
                 title="新增知识库"
-                __component_name="Button.Back"
+                type="primary"
               />
             </Space>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="inner"
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              type="inner"
             >
-              <Flex style={{ marginBottom: '40px' }} justify="center" __component_name="Flex">
+              <Flex __component_name="Flex" justify="center" style={{ marginBottom: '40px' }}>
                 <Steps
-                  items={[{ title: '基本信息', subTitle: '' }, { title: '文件预览' }]}
-                  style={{ width: '500px' }}
+                  __component_name="Steps"
                   current={__$$eval(() => this.state.currentStep)}
+                  items={[{ subTitle: '', title: '基本信息' }, { title: '文件预览' }]}
                   onChange={function () {
                     return this.onStepChange.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  __component_name="Steps"
+                  style={{ width: '500px' }}
                 />
               </Flex>
               <Container
+                __component_name="Container"
                 style={__$$eval(() => ({
                   display: this.state.currentStep === 0 && !this.state.submited ? 'block' : 'none',
                 }))}
-                __component_name="Container"
               >
-                <Row wrap={true} __component_name="Row">
-                  <Col span={16} __component_name="Col">
+                <Row __component_name="Row" wrap={true}>
+                  <Col __component_name="Col" span={16}>
                     <FormilyForm
-                      ref={this._refsManager.linkRef('formily_iwuyzsdvrhg')}
-                      formHelper={{ autoFocus: true }}
+                      __component_name="FormilyForm"
                       componentProps={{
                         colon: false,
-                        layout: 'horizontal',
                         labelAlign: 'left',
                         labelWidth: '130px',
+                        layout: 'horizontal',
                         wrapperCol: 12,
                       }}
-                      __component_name="FormilyForm"
+                      formHelper={{ autoFocus: true }}
+                      ref={this._refsManager.linkRef('formily_iwuyzsdvrhg')}
                     >
                       <FormilyInput
-                        fieldProps={{
-                          name: 'name',
-                          title: '知识库名称',
-                          required: true,
-                          'x-validator': [
-                            {
-                              id: 'disabled',
-                              type: 'disabled',
-                              message:
-                                '只能包含小写字母、数字、连字符（-）和点号（.），且必须以字母或数字开头',
-                              pattern:
-                                '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$',
-                              children: '未知',
-                              required: true,
-                              whitespace: true,
-                            },
-                          ],
-                        }}
+                        __component_name="FormilyInput"
                         componentProps={{
                           'x-component-props': { placeholder: '请输入知识库名称' },
                         }}
                         decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                        __component_name="FormilyInput"
+                        fieldProps={{
+                          name: 'name',
+                          required: true,
+                          title: '知识库名称',
+                          'x-validator': [
+                            {
+                              children: '未知',
+                              id: 'disabled',
+                              message:
+                                '只能包含小写字母、数字、连字符（-）和点号（.），且必须以字母或数字开头',
+                              pattern:
+                                '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$',
+                              required: true,
+                              type: 'disabled',
+                              whitespace: true,
+                            },
+                          ],
+                        }}
                       />
                       <FormilyInput
-                        fieldProps={{
-                          name: 'displayName',
-                          title: '知识库别名',
-                          required: false,
-                          description: '',
-                          'x-validator': [],
-                        }}
+                        __component_name="FormilyInput"
                         componentProps={{
-                          'x-component-props': { suffix: '', placeholder: '请输入知识库别名' },
+                          'x-component-props': { placeholder: '请输入知识库别名', suffix: '' },
                         }}
                         decoratorProps={{
                           'x-decorator-props': {
-                            tooltip: '展示名称，可以为中文',
                             labelEllipsis: true,
+                            tooltip: '展示名称，可以为中文',
                           },
                         }}
-                        __component_name="FormilyInput"
+                        fieldProps={{
+                          description: '',
+                          name: 'displayName',
+                          required: false,
+                          title: '知识库别名',
+                          'x-validator': [],
+                        }}
                       />
                       <FormilySelect
-                        fieldProps={{
-                          enum: [],
-                          name: 'embedder',
-                          title: '向量化模型',
-                          required: true,
-                          description: '',
-                          'x-validator': [],
-                          _unsafe_MixedSetter_enum_select: 'ArraySetter',
-                        }}
+                        __component_name="FormilySelect"
                         componentProps={{
                           'x-component-props': {
-                            disabled: false,
-                            allowClear: false,
-                            placeholder: '请选择向量化模型',
                             _sdkSwrGetFunc: { label: '', value: '' },
+                            allowClear: false,
+                            disabled: false,
+                            placeholder: '请选择向量化模型',
                           },
                         }}
                         decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                        __component_name="FormilySelect"
+                        fieldProps={{
+                          _unsafe_MixedSetter_enum_select: 'ArraySetter',
+                          description: '',
+                          enum: [],
+                          name: 'embedder',
+                          required: true,
+                          title: '向量化模型',
+                          'x-validator': [],
+                        }}
                       />
                       <FormilyTextArea
+                        __component_name="FormilyTextArea"
+                        componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                         fieldProps={{
                           name: 'description',
                           title: '描述',
                           'x-component': 'Input.TextArea',
                           'x-validator': [],
                         }}
-                        componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
-                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                        __component_name="FormilyTextArea"
                       />
                       <FormilyFormItem
+                        __component_name="FormilyFormItem"
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                         fieldProps={{
                           name: 'dataSetContain',
-                          title: '处理数据集',
                           required: true,
+                          title: '处理数据集',
                           'x-component': 'FormilyFormItem',
                           'x-validator': [],
                         }}
-                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                        __component_name="FormilyFormItem"
                       >
-                        <Row wrap={true} __component_name="Row">
-                          <Col span={12} __component_name="Col">
+                        <Row __component_name="Row" wrap={true}>
+                          <Col __component_name="Col" span={12}>
                             <FormilySelect
-                              fieldProps={{
-                                name: 'dataset',
-                                title: '',
-                                required: true,
-                                description: '',
-                                'x-validator': [],
-                              }}
+                              __component_name="FormilySelect"
                               componentProps={{
                                 'x-component-props': {
+                                  _sdkSwrGetFunc: { label: '', value: '' },
+                                  allowClear: false,
                                   disabled: false,
                                   onChange: function () {
                                     return this.onDataSetChange.apply(
@@ -559,26 +555,27 @@ class KnowledgeCreate$$Page extends React.Component {
                                       Array.prototype.slice.call(arguments).concat([])
                                     );
                                   }.bind(this),
-                                  allowClear: false,
                                   placeholder: '请选择数据集',
-                                  _sdkSwrGetFunc: { label: '', value: '' },
                                 },
                               }}
                               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                              __component_name="FormilySelect"
+                              fieldProps={{
+                                description: '',
+                                name: 'dataset',
+                                required: true,
+                                title: '',
+                                'x-validator': [],
+                              }}
                             />
                           </Col>
-                          <Col span={12} __component_name="Col">
+                          <Col __component_name="Col" span={12}>
                             <FormilySelect
-                              fieldProps={{
-                                name: 'version',
-                                title: '',
-                                required: true,
-                                _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                                '_unsafe_MixedSetter_x-validator_select': 'ExpressionSetter',
-                              }}
+                              __component_name="FormilySelect"
                               componentProps={{
                                 'x-component-props': {
+                                  _sdkSwrGetFunc: { label: 'label', value: 'value' },
+                                  _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                                  allowClear: false,
                                   disabled: false,
                                   onChange: function () {
                                     return this.onVersionChange.apply(
@@ -586,15 +583,18 @@ class KnowledgeCreate$$Page extends React.Component {
                                       Array.prototype.slice.call(arguments).concat([])
                                     );
                                   }.bind(this),
-                                  allowClear: false,
-                                  showSearch: false,
                                   placeholder: '请选择版本',
-                                  _sdkSwrGetFunc: { label: 'label', value: 'value' },
-                                  _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                                  showSearch: false,
                                 },
                               }}
                               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                              __component_name="FormilySelect"
+                              fieldProps={{
+                                _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                                '_unsafe_MixedSetter_x-validator_select': 'ExpressionSetter',
+                                name: 'version',
+                                required: true,
+                                title: '',
+                              }}
                             />
                           </Col>
                         </Row>
@@ -602,172 +602,172 @@ class KnowledgeCreate$$Page extends React.Component {
                     </FormilyForm>
                   </Col>
                 </Row>
-                <Row wrap={false} __component_name="Row">
-                  <Col flex="130px" __component_name="Col">
+                <Row __component_name="Row" wrap={false}>
+                  <Col __component_name="Col" flex="130px">
                     <Typography.Text
-                      style={{ fontSize: '', marginLeft: '0px', paddingLeft: '10px' }}
-                      strong={false}
+                      __component_name="Typography.Text"
                       disabled={false}
                       ellipsis={true}
-                      __component_name="Typography.Text"
+                      strong={false}
+                      style={{ fontSize: '', marginLeft: '0px', paddingLeft: '10px' }}
                     >
                       文件选择
                     </Typography.Text>
                   </Col>
-                  <Col flex="auto" __component_name="Col">
+                  <Col __component_name="Col" flex="auto">
                     <Table
-                      size="middle"
-                      rowKey="path"
-                      scroll={{ scrollToFirstRowOnChange: true }}
+                      __component_name="Table"
                       columns={[
                         {
+                          dataIndex: 'path',
                           key: '',
-                          title: '名称',
                           render: (text, record, index) =>
                             (__$$context => (
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => text)}
                               </Typography.Text>
                             ))(__$$createChildContext(__$$context, { text, record, index })),
-                          dataIndex: 'path',
+                          title: '名称',
                         },
                         {
+                          dataIndex: 'fileType',
                           key: '',
-                          title: '类型',
                           render: (text, record, index) =>
                             (__$$context => (
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => text || '-')}
                               </Typography.Text>
                             ))(__$$createChildContext(__$$context, { text, record, index })),
-                          dataIndex: 'fileType',
+                          title: '类型',
                         },
-                        { title: '数据量', dataIndex: 'count' },
-                        { title: '大小', dataIndex: 'size' },
+                        { dataIndex: 'count', title: '数据量' },
+                        { dataIndex: 'size', title: '大小' },
                       ]}
                       dataSource={__$$eval(() => this.state.dataSetFileList)}
                       pagination={false}
-                      showHeader={true}
+                      rowKey="path"
                       rowSelection={{
-                        type: 'checkbox',
                         onChange: function () {
                           return this.getCheckBox.apply(
                             this,
                             Array.prototype.slice.call(arguments).concat([])
                           );
                         }.bind(this),
+                        type: 'checkbox',
                       }}
-                      __component_name="Table"
+                      scroll={{ scrollToFirstRowOnChange: true }}
+                      showHeader={true}
+                      size="middle"
                     />
                   </Col>
                 </Row>
               </Container>
               {!!__$$eval(() => this.state.currentStep === 1 && !this.state.submited) && (
-                <Flex wrap="nowrap" justify="right" vertical={true} __component_name="Flex">
+                <Flex __component_name="Flex" justify="right" vertical={true} wrap="nowrap">
                   <Row
-                    wrap={false}
-                    style={{ marginBottom: '25px' }}
-                    justify="space-between"
                     __component_name="Row"
+                    justify="space-between"
+                    style={{ marginBottom: '25px' }}
+                    wrap={false}
                   >
                     <Col __component_name="Col">
                       <Typography.Text
-                        style={{ fontSize: '' }}
-                        strong={false}
+                        __component_name="Typography.Text"
                         disabled={false}
                         ellipsis={true}
-                        __component_name="Typography.Text"
+                        strong={false}
+                        style={{ fontSize: '' }}
                       >
                         {__$$eval(() => `共有文件：${this.state.nextFileList.length}`)}
                       </Typography.Text>
                     </Col>
                     <Col __component_name="Col">
-                      <Input.Search placeholder="请输入" __component_name="Input.Search" />
+                      <Input.Search __component_name="Input.Search" placeholder="请输入" />
                     </Col>
                   </Row>
                   {__$$evalArray(() => this.state.nextFileList).map((item, index) =>
                     (__$$context => (
-                      <Row wrap={false} style={{ marginBottom: '8px' }} __component_name="Row">
-                        <Col flex="auto" __component_name="Col">
+                      <Row __component_name="Row" style={{ marginBottom: '8px' }} wrap={false}>
+                        <Col __component_name="Col" flex="auto">
                           <Row
-                            wrap={true}
+                            __component_name="Row"
                             align="stretch"
                             style={{
-                              height: '44px',
                               background: '#FAFAFA',
-                              lineHeight: '44px',
                               borderRadius: '0px 0px 0px 0px',
+                              height: '44px',
+                              lineHeight: '44px',
                             }}
-                            __component_name="Row"
+                            wrap={true}
                           >
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => item.path)}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => `文件来源：${item.version || '--'}`)}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => `类型：${__$$context.getType() || '-'}`)}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => `数据量：${item.count?.toString() || '-'}`)}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => item.fileSize?.toString())}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col" />
+                            <Col __component_name="Col" span={4} />
                           </Row>
                         </Col>
                       </Row>
@@ -776,124 +776,124 @@ class KnowledgeCreate$$Page extends React.Component {
                 </Flex>
               )}
               {!!__$$eval(() => this.state.submited) && (
-                <Flex wrap="nowrap" justify="right" vertical={true} __component_name="Flex">
+                <Flex __component_name="Flex" justify="right" vertical={true} wrap="nowrap">
                   <Row
-                    wrap={false}
-                    style={{ marginBottom: '25px' }}
-                    justify="space-between"
                     __component_name="Row"
+                    justify="space-between"
+                    style={{ marginBottom: '25px' }}
+                    wrap={false}
                   >
                     <Col __component_name="Col">
                       <Typography.Text
-                        style={{ fontSize: '' }}
-                        strong={false}
+                        __component_name="Typography.Text"
                         disabled={false}
                         ellipsis={true}
-                        __component_name="Typography.Text"
+                        strong={false}
+                        style={{ fontSize: '' }}
                       >
                         {__$$eval(() => `共有文件：${this.state.nextFileList.length}`)}
                       </Typography.Text>
                     </Col>
                     <Col __component_name="Col">
-                      <Input.Search placeholder="请输入" __component_name="Input.Search" />
+                      <Input.Search __component_name="Input.Search" placeholder="请输入" />
                     </Col>
                   </Row>
                   {__$$evalArray(() => this.state.nextFileList).map((item, index) =>
                     (__$$context => (
-                      <Row wrap={false} style={{ marginBottom: '8px' }} __component_name="Row">
+                      <Row __component_name="Row" style={{ marginBottom: '8px' }} wrap={false}>
                         <Col
+                          __component_name="Col"
                           flex="20px"
                           style={{ lineHeight: '44px', marginRight: '12px' }}
-                          __component_name="Col"
                         >
                           <Status
-                            id="disabled"
-                            types={[{ id: 'disabled', type: 'disabled', children: '未知' }]}
+                            __component_name="Status"
                             getTypes={function () {
                               return this.getStatus.apply(
                                 this,
                                 Array.prototype.slice.call(arguments).concat([])
                               );
                             }.bind(__$$context)}
-                            __component_name="Status"
+                            id="disabled"
+                            types={[{ children: '未知', id: 'disabled', type: 'disabled' }]}
                           />
                         </Col>
-                        <Col flex="auto" __component_name="Col">
+                        <Col __component_name="Col" flex="auto">
                           <Row
-                            wrap={true}
+                            __component_name="Row"
                             align="stretch"
                             style={{
-                              height: '44px',
                               background: '#FAFAFA',
-                              lineHeight: '44px',
                               borderRadius: '0px 0px 0px 0px',
+                              height: '44px',
+                              lineHeight: '44px',
                             }}
-                            __component_name="Row"
+                            wrap={true}
                           >
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => item.path)}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => `文件来源：${item.version || '-'}`)}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => `类型：${__$$context.getType() || '-'}`)}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => `数据量：${item.count?.toString() || '-'}`)}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(() => item.fileSize?.toString())}
                               </Typography.Text>
                             </Col>
-                            <Col span={4} __component_name="Col">
+                            <Col __component_name="Col" span={4}>
                               <Button
-                                icon=""
+                                __component_name="Button"
                                 block={false}
-                                ghost={false}
-                                shape="default"
                                 danger={false}
                                 disabled={false}
-                                __component_name="Button"
+                                ghost={false}
+                                icon=""
+                                shape="default"
                               >
                                 日志
                               </Button>
@@ -906,33 +906,33 @@ class KnowledgeCreate$$Page extends React.Component {
                 </Flex>
               )}
               <Divider
-                mode="line"
-                style={{ left: '-24px', width: 'calc(100% + 48px)', position: 'relative' }}
+                __component_name="Divider"
                 dashed={false}
                 defaultOpen={false}
-                __component_name="Divider"
+                mode="line"
+                style={{ left: '-24px', position: 'relative', width: 'calc(100% + 48px)' }}
               />
-              <Flex justify="center" __component_name="Flex">
+              <Flex __component_name="Flex" justify="center">
                 <Button
-                  href="/knowledge"
-                  icon=""
+                  __component_name="Button"
                   block={false}
-                  ghost={false}
-                  shape="default"
-                  style={{ marginRight: '10px' }}
                   danger={false}
                   disabled={false}
-                  __component_name="Button"
+                  ghost={false}
+                  href="/knowledge"
+                  icon=""
+                  shape="default"
+                  style={{ marginRight: '10px' }}
                 >
                   {__$$eval(() => `${this.state.submited ? '返回' : '取消'}`)}
                 </Button>
                 {!!__$$eval(() => this.state.currentStep > 0 && !this.state.submited) && (
                   <Button
+                    __component_name="Button"
                     block={false}
-                    ghost={false}
-                    shape="default"
-                    style={{ marginRight: '10px' }}
                     danger={false}
+                    disabled={false}
+                    ghost={false}
                     onClick={function () {
                       return this.handleStep.apply(
                         this,
@@ -943,19 +943,19 @@ class KnowledgeCreate$$Page extends React.Component {
                         ])
                       );
                     }.bind(this)}
-                    disabled={false}
-                    __component_name="Button"
+                    shape="default"
+                    style={{ marginRight: '10px' }}
                   >
                     上一步
                   </Button>
                 )}
                 {!!__$$eval(() => this.state.currentStep !== 1) && (
                   <Button
+                    __component_name="Button"
                     block={false}
-                    ghost={false}
-                    shape="default"
-                    style={{ marginRight: '10px' }}
                     danger={false}
+                    disabled={false}
+                    ghost={false}
                     onClick={function () {
                       return this.handleStep.apply(
                         this,
@@ -966,28 +966,28 @@ class KnowledgeCreate$$Page extends React.Component {
                         ])
                       );
                     }.bind(this)}
-                    disabled={false}
-                    __component_name="Button"
+                    shape="default"
+                    style={{ marginRight: '10px' }}
                   >
                     下一步
                   </Button>
                 )}
                 {!!__$$eval(() => this.state.currentStep === 1 && !this.state.submited) && (
                   <Button
-                    icon=""
-                    type="primary"
+                    __component_name="Button"
                     block={false}
-                    ghost={false}
-                    shape="default"
                     danger={false}
+                    disabled={false}
+                    ghost={false}
+                    icon=""
                     onClick={function () {
                       return this.handleSubmit.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    disabled={false}
-                    __component_name="Button"
+                    shape="default"
+                    type="primary"
                   >
                     确认
                   </Button>
@@ -1054,6 +1054,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
