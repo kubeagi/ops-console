@@ -31,8 +31,8 @@ jobs:
         run: |
           TAG=$(git describe --tags --abbrev=0 --match 'v*' 2> /dev/null) || true
           if [ -z "$TAG" ]; then
-            echo "No tag found, use v0.0.1 as default"
-            TAG=v0.0.1
+            echo "No tag found, use v0.1.0 as default"
+            TAG=v0.1.0
           fi
           echo "TAG=${TAG}" >> $GITHUB_OUTPUT
           echo "DATE=$(TZ=Asia/Shanghai date +'%Y%m%d')" >> $GITHUB_OUTPUT
