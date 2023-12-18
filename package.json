@@ -59,6 +59,7 @@
     "@tenx-ui/icon-materials": "^0.1.5",
     "@tenx-ui/logs": "^3.0.5",
     "@tenx-ui/materials": "1.5.27",
+    "@tenx-ui/react-markdown-lowcode-materials": "^0.1.4",
     "@tenx-ui/request": "^1.0.0-beta.6",
     "@tenx-ui/utils": "^2.3.1",
     "@umijs/max": "^4.0.42",

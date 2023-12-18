@@ -9,13 +9,13 @@ import {
   Card,
   Row,
   Col,
+  Descriptions,
   Typography,
+  Tag,
   Status,
   Tooltip,
   Tabs,
   Modal,
-  Descriptions,
-  Tag,
   Space,
   Input,
   Table,
@@ -30,6 +30,8 @@ import {
   AntdIconReloadOutlined,
   AntdIconDeleteOutlined,
 } from '@tenx-ui/icon-materials';
+
+import TenxUiReactMarkdownLowcodeMaterials from '@tenx-ui/react-markdown-lowcode-materials';
 
 import LccComponentQlsmm from 'KubeAGIUpload';
 
@@ -101,8 +103,11 @@ class ModelWarehouseDetail$$Page extends React.Component {
         keyword: '',
         currentPage: 1,
       },
+      isLoadedReadme: false,
       loading: false,
       name: this.match.params.name,
+      readmeData: '#### 暂无介绍',
+      readmeLoading: false,
       selectedFileList: [],
       submitLoading: false,
       uploadedFileCount: 0,
@@ -137,6 +142,44 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(_this),
           type: 'axios',
         },
+        {
+          id: 'get_file_size',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
+              isCors: true,
+              method: 'GET',
+              params: {},
+              timeout: 5000,
+              uri: `${this.getUrlPrex()}/model/files/stat`,
+            };
+          }.bind(_this),
+          type: 'axios',
+        },
+        {
+          id: 'download',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              headers: {
+                Authorization: this.props.Authorization || this.state.Authorization,
+              },
+              isCors: true,
+              method: 'GET',
+              params: {},
+              timeout: 5000,
+              uri: `${this.getUrlPrex()}/model/files/download`,
+            };
+          }.bind(_this),
+          type: 'axios',
+        },
       ],
     };
   }
@@ -167,6 +210,33 @@ class ModelWarehouseDetail$$Page extends React.Component {
     );
   }
 
+  checkHasReadmeFile(data) {
+    const fileList = data?.files?.nodes || [];
+    let haveReadme = false;
+    try {
+      for (let i = 0; i < fileList.length; i++) {
+        const item = fileList[i];
+        const pathAndNameList = item?.path.split('/');
+        const fileName = pathAndNameList[pathAndNameList.length - 1];
+        if (fileName.toLocaleLowerCase() === 'readme.md') {
+          haveReadme = true;
+          this.getReadmeSize({
+            name: item.path,
+            bucketPath: 'model/' + data.name,
+            namespace: data.namespace,
+          });
+        }
+      }
+      if (!haveReadme) {
+        this.setState({
+          readmeLoading: false,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   closeDeleteFilesModal() {
     this.setState({
       deleteFilesVisible: false,
@@ -177,6 +247,35 @@ class ModelWarehouseDetail$$Page extends React.Component {
   closeUploadModal() {
     this.setState({
       uploadModalVisible: false,
+    });
+  }
+
+  downloadReadme({ size, ...fileData }) {
+    const pageThis = this;
+    return new Promise((resolve, reject) => {
+      pageThis
+        .getDataSourceMap()
+        .download.load({
+          fileName: fileData.name,
+          bucket: fileData.namespace,
+          bucketPath: fileData.bucketPath,
+          from: 0,
+          end: size,
+        })
+        .then(function (response) {
+          pageThis.setState({
+            readmeData: response || '#### 暂无介绍',
+            isLoadedReadme: true,
+            readmeLoading: false,
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+          reject(error);
+          pageThis.setState({
+            readmeLoading: false,
+          });
+        });
     });
   }
 
@@ -192,6 +291,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
   getData() {
     this.setState({
       loading: true,
+      readmeLoading: true,
     });
     const project = this.history?.query.namespace || this.utils.getAuthData()?.project;
     const name = this.match.params.name;
@@ -215,6 +315,13 @@ class ModelWarehouseDetail$$Page extends React.Component {
           data: getModel,
           name: this.match.params.name,
         });
+        if (!this.state.isLoadedReadme) {
+          this.checkHasReadmeFile(getModel);
+        } else {
+          this.setState({
+            readmeLoading: false,
+          });
+        }
       })
       .catch(error => {
         this.setState({
@@ -226,6 +333,34 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
   getDataSourceMap() {
     return this.dataSourceMap;
+  }
+
+  getReadmeSize(fileData) {
+    const pageThis = this;
+    return new Promise((resolve, reject) => {
+      pageThis
+        .getDataSourceMap()
+        .get_file_size.load({
+          fileName: fileData.name,
+          bucket: fileData.namespace,
+          bucketPath: fileData.bucketPath,
+        })
+        .then(function (response) {
+          console.log(response);
+          const size = response.size;
+          pageThis.downloadReadme({
+            ...fileData,
+            size,
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+          reject(error);
+          pageThis.setState({
+            readmeLoading: false,
+          });
+        });
+    });
   }
 
   getUrlPrex() {
@@ -444,7 +579,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
             style={{ marginTop: '16px' }}
             type="default"
           >
-            <Row __component_name="Row" style={{ height: '56px' }} wrap={false}>
+            <Row __component_name="Row" style={{}} wrap={false}>
               <Col
                 __component_name="Col"
                 flex="56px"
@@ -459,17 +594,105 @@ class ModelWarehouseDetail$$Page extends React.Component {
               <Col
                 __component_name="Col"
                 flex="auto"
-                span={20}
-                style={{ alignItems: 'center', display: 'flex', height: '56px' }}
+                span={23}
+                style={{ alignItems: 'center', display: 'flex' }}
               >
                 <Row
                   __component_name="Row"
                   gutter={['', '']}
                   style={{ paddingLeft: '20px' }}
                   wrap={true}
-                >
-                  <Col __component_name="Col" span={24}>
-                    <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                />
+                <Descriptions
+                  __component_name="Descriptions"
+                  bordered={false}
+                  borderedBottom={false}
+                  borderedBottomDashed={false}
+                  colon={true}
+                  column={5}
+                  items={[
+                    {
+                      children: (
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={true}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                        >
+                          {__$$eval(() => this.state.data?.id)}
+                        </Typography.Text>
+                      ),
+                      key: 'wgs8wwlzyja',
+                      label: 'ID',
+                      span: 2,
+                    },
+                    {
+                      children: __$$evalArray(() => this.state.data?.types?.split(',')).map(
+                        (item, index) =>
+                          (__$$context => (
+                            <Tag __component_name="Tag" closable={false} color="success">
+                              {__$$eval(() =>
+                                item === 'llm' ? 'LLM' : item === 'embedding' ? 'Embedding' : item
+                              )}
+                            </Tag>
+                          ))(__$$createChildContext(__$$context, { item, index }))
+                      ),
+                      key: 'b6yd5zk0mh',
+                      label: '模型类型',
+                      span: 1,
+                    },
+                    {
+                      children: (
+                        <Typography.Time
+                          __component_name="Typography.Time"
+                          format=""
+                          relativeTime={false}
+                          time={__$$eval(() => this.state.data?.creationTimestamp)}
+                        />
+                      ),
+                      key: 'rvtflfoq0zo',
+                      label: '创建时间',
+                      span: 1,
+                    },
+                    {
+                      children: (
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={true}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                        >
+                          {__$$eval(() => this.state.data?.creator || '-')}
+                        </Typography.Text>
+                      ),
+                      key: '204yyaezthg',
+                      label: '创建者',
+                      span: 1,
+                    },
+                    {
+                      children: (
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={false}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                        >
+                          {__$$eval(() => this.state.data?.description || '-')}
+                        </Typography.Text>
+                      ),
+                      key: 'mn1yxmujfac',
+                      label: '描述',
+                      span: 4,
+                    },
+                  ]}
+                  layout="horizontal"
+                  size="default"
+                  style={{ paddingTop: '12px' }}
+                  title={
+                    <Row __component_name="Row" wrap={true}>
                       <Col __component_name="Col" span={24}>
                         <Typography.Title
                           __component_name="Typography.Title"
@@ -477,50 +700,34 @@ class ModelWarehouseDetail$$Page extends React.Component {
                           bordered={false}
                           ellipsis={true}
                           level={1}
+                          style={{ marginRight: '8px', paddingRight: '8px' }}
                         >
-                          {__$$eval(() => this.utils.getFullName(this.state.data))}
+                          {__$$eval(() => this.utils.getFullName(this.state.data) || '-')}
                         </Typography.Title>
-                      </Col>
-                      <Col __component_name="Col" span={24}>
                         <Status
                           __component_name="Status"
                           id={__$$eval(() => this.state.data.status)}
+                          style={{ fontSize: '12px', marginLeft: '8px' }}
                           types={[
                             { children: '异常', id: 'False', type: 'error' },
                             { children: '正常', id: 'True', type: 'success' },
                           ]}
                         />
-                        {!!__$$eval(() => this.state.data.status === 'False') && (
-                          <Tooltip
-                            __component_name="Tooltip"
-                            style={{}}
-                            title={__$$eval(() => this.state.data.message || '-')}
-                          >
+                        <Tooltip
+                          __component_name="Tooltip"
+                          title={__$$eval(() => this.state.data.message)}
+                        >
+                          {!!__$$eval(() => this.state.data.status === 'False') && (
                             <AntdIconInfoCircleOutlined
                               __component_name="AntdIconInfoCircleOutlined"
-                              style={{ marginLeft: '5px' }}
+                              style={{ marginLeft: '8px' }}
                             />
-                          </Tooltip>
-                        )}
-                        <Typography.Text
-                          __component_name="Typography.Text"
-                          disabled={false}
-                          ellipsis={true}
-                          strong={false}
-                          style={{ fontSize: '', paddingLeft: '12px' }}
-                        >
-                          更新时间：
-                        </Typography.Text>
-                        <Typography.Time
-                          __component_name="Typography.Time"
-                          format="YYYY-MM-DD HH:mm:ss"
-                          relativeTime={false}
-                          time={__$$eval(() => this.state.data?.updateTimestamp)}
-                        />
+                          )}
+                        </Tooltip>
                       </Col>
                     </Row>
-                  </Col>
-                </Row>
+                  }
+                />
               </Col>
             </Row>
           </Card>
@@ -542,116 +749,14 @@ class ModelWarehouseDetail$$Page extends React.Component {
             items={[
               {
                 children: (
-                  <Descriptions
-                    __component_name="Descriptions"
-                    bordered={false}
-                    borderedBottom={false}
-                    borderedBottomDashed={false}
-                    colon={false}
-                    column={1}
-                    id=""
-                    items={[
-                      {
-                        children: (
-                          <Typography.Text
-                            __component_name="Typography.Text"
-                            disabled={false}
-                            ellipsis={true}
-                            strong={false}
-                            style={{ fontSize: '' }}
-                          >
-                            {__$$eval(() => this.state.data?.id)}
-                          </Typography.Text>
-                        ),
-                        key: 'xhiw4rl3fr8',
-                        label: 'ID',
-                        span: 1,
-                      },
-                      {
-                        children: __$$evalArray(() => this.state.data?.types?.split(',')).map(
-                          (item, index) =>
-                            (__$$context => (
-                              <Tag __component_name="Tag" closable={false} color="success">
-                                {__$$eval(() =>
-                                  item === 'llm' ? 'LLM' : item === 'embedding' ? 'Embedding' : item
-                                )}
-                              </Tag>
-                            ))(__$$createChildContext(__$$context, { item, index }))
-                        ),
-                        key: 'hdx1if55is',
-                        label: '模型类型',
-                        span: 1,
-                      },
-                      {
-                        children: (
-                          <Typography.Time
-                            __component_name="Typography.Time"
-                            format=""
-                            relativeTime={false}
-                            time={__$$eval(() => this.state.data?.creationTimestamp)}
-                          />
-                        ),
-                        key: 'ik4agaf7r1d',
-                        label: '创建时间',
-                        span: 1,
-                      },
-                      {
-                        children: (
-                          <Typography.Text
-                            __component_name="Typography.Text"
-                            disabled={false}
-                            ellipsis={true}
-                            strong={false}
-                            style={{ fontSize: '' }}
-                          >
-                            {__$$eval(() => this.state.data?.creator || '-')}
-                          </Typography.Text>
-                        ),
-                        key: '5c0mxhs31zb',
-                        label: '创建者',
-                        span: 1,
-                      },
-                      {
-                        children: (
-                          <Typography.Text
-                            __component_name="Typography.Text"
-                            disabled={false}
-                            ellipsis={false}
-                            strong={false}
-                            style={{ fontSize: '' }}
-                          >
-                            {__$$eval(() => this.state.data?.description)}
-                          </Typography.Text>
-                        ),
-                        key: 'ys4jchfegg',
-                        label: '描述',
-                        span: 1,
-                      },
-                    ]}
-                    labelStyle={{ width: 100 }}
-                    layout="horizontal"
-                    size="default"
-                    title=""
-                  >
-                    <Descriptions.Item key="xhiw4rl3fr8" label="ID" span={1}>
-                      {null}
-                    </Descriptions.Item>
-                    <Descriptions.Item key="hdx1if55is" label="任务类型" span={1}>
-                      {null}
-                    </Descriptions.Item>
-                    <Descriptions.Item key="7vo7r2wbqev" label="处理前数据集" span={1}>
-                      {null}
-                    </Descriptions.Item>
-                    <Descriptions.Item key="ik4agaf7r1d" label="处理后数据集" span={1}>
-                      {null}
-                    </Descriptions.Item>
-                    <Descriptions.Item key="5c0mxhs31zb" label="创建时间" span={1}>
-                      {null}
-                    </Descriptions.Item>
-                    <Descriptions.Item key="ys4jchfegg" label="创建者" span={1}>
-                      {null}
-                    </Descriptions.Item>
-                  </Descriptions>
+                  <Spin __component_name="Spin" spinning={__$$eval(() => this.state.readmeLoading)}>
+                    <TenxUiReactMarkdownLowcodeMaterials
+                      __component_name="TenxUiReactMarkdownLowcodeMaterials"
+                     
+                    >
+                      {__$$eval(() => this.state.readmeData)}
+                    </TenxUiReactMarkdownLowcodeMaterials>
+                  </Spin>
                 ),
                 key: 'tab-item-1',
                 label: '详细信息',
@@ -854,6 +959,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
             tabPosition="top"
             type="line"
           >
+            <Spin __component_name="Spin" spinning={false} />
             <Modal
               __component_name="Modal"
               centered={false}
@@ -1015,6 +1121,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
