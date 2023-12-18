@@ -211,7 +211,7 @@ class KubeAgiUpload$$Component extends React.Component {
     let spark = new (this.utils.SparkMD5 || this.props.SparkMD5).ArrayBuffer();
     let fileReader = new FileReader();
     let time = new Date().getTime();
-    let blockMD5s = []; // 用于存储每个数据块的MD5
+    let blockMD5 = new this.utils.SparkMD5(); // 用于存储每个数据块的MD5
 
     console.log('计算MD5...');
     this.setState({
@@ -225,10 +225,10 @@ class KubeAgiUpload$$Component extends React.Component {
     fileReader.onload = e => {
       spark.append(e.target.result); // Append array buffer
       currentChunk++;
-      let chunkSpark = new (this.utils.SparkMD5 || this.props.SparkMD5).ArrayBuffer();
+      let chunkSpark = new this.utils.SparkMD5.ArrayBuffer();
       chunkSpark.append(e.target.result); // 追加数据块的 MD5
-      let chunkMD5 = chunkSpark.end(); // 获取数据块的 MD5
-      blockMD5s.push(chunkMD5); // 将数据块的 MD5 存入数组
+      let chunkMD5 = chunkSpark.end(true); // 获取数据块的 MD5
+      blockMD5.appendBinary(chunkMD5); // 将数据块的 MD5 存入数组
       chunkSpark.destroy(); //释放缓存
 
       if (currentChunk < chunks) {
@@ -245,8 +245,8 @@ class KubeAgiUpload$$Component extends React.Component {
         file.uniqueIdentifier = md5; //将文件md5赋值给文件唯一标识
         file.cmd5 = false; //取消计算md5状态
 
-        let fileMD5 = calculateTotalMD5(blockMD5s); // 计算所有块MD5的总MD5
-        file.etag = fileMD5; // 将总MD5作为etag属性
+        file.etag = `${blockMD5.end()}-${chunks}`; // 将总MD5作为etag属性
+        blockMD5.destroy();
         // 2. computeMD5Success
         this.computeMD5Success(file);
       }
@@ -274,7 +274,7 @@ class KubeAgiUpload$$Component extends React.Component {
 
   async computeMD5Success(file) {
     await this.getSuccessChunks(file);
-    if (file.uploadID == '') {
+    if (file.uploadID == '' && !file.done) {
       //未上传过
       await this.newMultiUpload(file);
       if (file.uploadID != '') {
@@ -1016,6 +1016,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
