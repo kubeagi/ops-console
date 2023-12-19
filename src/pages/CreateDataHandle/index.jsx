@@ -3163,13 +3163,6 @@ class $$Page extends React.Component {
                             type: 'disabled',
                             value: 'text',
                           },
-                          {
-                            children: '',
-                            id: 'disabled',
-                            label: 'QA文本',
-                            type: 'disabled',
-                            value: 'qa',
-                          },
                         ],
                         name: 'file_type',
                         required: true,
