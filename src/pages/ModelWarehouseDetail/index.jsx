@@ -247,6 +247,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
   closeUploadModal() {
     this.setState({
       uploadModalVisible: false,
+      submitLoading: false,
     });
   }
 
@@ -402,7 +403,9 @@ class ModelWarehouseDetail$$Page extends React.Component {
   }
 
   handleCancle() {
-    // this.utils.notification.success({ message: '上传成功,请刷新列表查看'})
+    this.utils.notification.success({
+      message: '上传成功,请刷新列表查看',
+    });
     this.setState(
       {
         submitLoading: false,
@@ -787,7 +790,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   <Spin __component_name="Spin" spinning={__$$eval(() => this.state.readmeLoading)}>
                     <TenxUiReactMarkdownLowcodeMaterials
                       __component_name="TenxUiReactMarkdownLowcodeMaterials"
-                    
+                     
                     >
                       {__$$eval(() => this.state.readmeData)}
                     </TenxUiReactMarkdownLowcodeMaterials>
