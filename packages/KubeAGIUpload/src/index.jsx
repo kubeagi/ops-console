@@ -414,6 +414,7 @@ class KubeAgiUpload$$Component extends React.Component {
             partNumber: currentChunk + 1,
             bucket: pageThis.getBucket(),
             bucketPath: pageThis.getBucketPath(),
+            fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
           })
           .then(function (response) {
             urls[currentChunk] = response?.url;
