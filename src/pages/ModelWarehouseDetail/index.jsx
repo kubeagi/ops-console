@@ -291,7 +291,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
   getData() {
     this.setState({
       loading: true,
-      readmeLoading: true,
     });
     const project = this.history?.query.namespace || this.utils.getAuthData()?.project;
     const name = this.match.params.name;
@@ -315,13 +314,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
           data: getModel,
           name: this.match.params.name,
         });
-        if (!this.state.isLoadedReadme) {
-          this.checkHasReadmeFile(getModel);
-        } else {
-          this.setState({
-            readmeLoading: false,
-          });
-        }
       })
       .catch(error => {
         this.setState({
@@ -333,6 +325,42 @@ class ModelWarehouseDetail$$Page extends React.Component {
 
   getDataSourceMap() {
     return this.dataSourceMap;
+  }
+
+  getFileData() {
+    this.setState({
+      readmeLoading: true,
+    });
+    const project = this.history?.query.namespace || this.utils.getAuthData()?.project;
+    const name = this.match.params.name;
+    const params = {
+      namespace: project,
+      name,
+      filesInput: {
+        keyword: 'README.md',
+        pageSize: 10,
+        page: 1,
+      },
+    };
+    this.utils.bff
+      .getModel(params)
+      .then(res => {
+        const { Model } = res;
+        const { getModel } = Model || {};
+        if (!this.state.isLoadedReadme) {
+          this.checkHasReadmeFile(getModel);
+        } else {
+          this.setState({
+            readmeLoading: false,
+          });
+        }
+      })
+      .catch(error => {
+        this.setState({
+          readmeLoading: false,
+          data: {},
+        });
+      });
   }
 
   getReadmeSize(fileData) {
@@ -520,6 +548,12 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this.handleReUpload();
   }
 
+  onTabChange(key) {
+    if (key === 'detail' && !this.state.isLoadedReadme) {
+      this.getFileData();
+    }
+  }
+
   openDeleteFilesModal(e, { record }) {
     this.setState({
       deleteFilesVisible: true,
@@ -547,6 +581,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this._dataSourceEngine.reloadDataSource();
 
     this.getData();
+    this.getFileData();
     console.log('did mount');
   }
 
@@ -752,14 +787,14 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   <Spin __component_name="Spin" spinning={__$$eval(() => this.state.readmeLoading)}>
                     <TenxUiReactMarkdownLowcodeMaterials
                       __component_name="TenxUiReactMarkdownLowcodeMaterials"
-                     
+                    
                     >
                       {__$$eval(() => this.state.readmeData)}
                     </TenxUiReactMarkdownLowcodeMaterials>
                   </Spin>
                 ),
-                key: 'tab-item-1',
-                label: '详细信息',
+                key: 'detail',
+                label: '模型介绍',
               },
               {
                 children: (
@@ -949,10 +984,13 @@ class ModelWarehouseDetail$$Page extends React.Component {
                     </Col>
                   </Row>
                 ),
-                key: 'tab-item-2',
+                key: 'file',
                 label: '模型文件',
               },
             ]}
+            onChange={function () {
+              return this.onTabChange.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
             size="large"
             style={{ marginTop: '-24px' }}
             tabBarGutter={24}
