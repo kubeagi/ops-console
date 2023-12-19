@@ -142,16 +142,16 @@ utils.getDataSetTypes = function __getDataSetTypes() {
         [valueKey]: 'text',
         [labelKey]: pageThis.i18n('i18n-3kxctf9p'),
       },
-      {
-        // 图片
-        [valueKey]: 'image',
-        [labelKey]: pageThis.i18n('i18n-4sbaoiyr'),
-      },
-      {
-        // 视频
-        [valueKey]: 'video',
-        [labelKey]: pageThis.i18n('i18n-516o6p6k'),
-      },
+      // {
+      //   // 图片
+      //   [valueKey]: 'image',
+      //   [labelKey]: pageThis.i18n('i18n-4sbaoiyr'),
+      // },
+      // {
+      //   // 视频
+      //   [valueKey]: 'video',
+      //   [labelKey]: pageThis.i18n('i18n-516o6p6k'),
+      // },
     ];
   };
 }.apply(utils);

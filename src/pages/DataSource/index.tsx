@@ -75,18 +75,18 @@ class DataSource$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      size: 12,
-      timer: undefined,
-      record: {},
-      sorter: undefined,
       current: 1,
       filters: undefined,
-      modalType: 'add',
-      searchKey: 'name',
-      pagination: undefined,
       isOpenModal: false,
-      searchValue: undefined,
       modalLoading: false,
+      modalType: 'add',
+      pagination: undefined,
+      record: {},
+      searchKey: 'name',
+      searchValue: undefined,
+      size: 12,
+      sorter: undefined,
+      timer: undefined,
     };
   }
 
@@ -100,12 +100,133 @@ class DataSource$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  closeModal() {
+    this.setState({
+      isOpenModal: false,
+    });
+  }
+
+  async confirmDeleteModal(e, payload) {
+    this.setState({
+      modalLoading: true,
+    });
+    try {
+      await this.utils.bff.deleteDatasources({
+        input: {
+          name: this.state.record?.name,
+          namespace: this.utils.getAuthData()?.project,
+        },
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-vf1xe64m'),
+      });
+      setTimeout(() => {
+        this.handleRefresh();
+        this.setState({
+          modalLoading: false,
+        });
+      }, 200);
+    } catch (error) {
+      this.setState({
+        modalLoading: false,
+      });
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-yc0jhxgr'),
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
   form(name) {
     return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
   goDetail(e, { record }) {
     this.history?.push(`/data-source/detail/${record?.name}`);
+  }
+
+  handleOperationClick(e, { record }) {
+    e?.domEvent?.stopPropagation();
+    this.openModal(undefined, {
+      record,
+      modalType: e.key,
+    });
+  }
+
+  handlePaginationChange(c, s) {
+    this.setState(
+      {
+        size: s,
+        current: c,
+      },
+      this.handleQueryChange
+    );
+  }
+
+  handleQueryChange() {
+    const { repositoryType, status } = this.state.filters || {};
+    const params = {
+      input: {
+        page: this.state?.current || 1,
+        pageSize: this.state?.size || 12,
+        keyword: this.state?.searchValue,
+        namespace: this.utils.getAuthData()?.project,
+      },
+    };
+    this.utils?.changeLocationQuery(this, 'useListDatasources', params);
+  }
+
+  handleRefresh(event) {
+    this.props.useListDatasources?.mutate();
+  }
+
+  handleSearch(v) {
+    this.setState(
+      {
+        current: 1,
+      },
+      this.handleQueryChange
+    );
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      // current: 1,
+    });
+  }
+
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState(
+      {
+        pagination,
+        filters,
+        sorter,
+      },
+      this.handleQueryChange
+    );
+  }
+
+  initEditForm(record) {
+    if (!this?.editThis?.initEditForm) {
+      this.state.timer && clearTimeout(this.state.timer);
+      this.setState({
+        timer: setTimeout(() => {
+          this.initEditForm({
+            ...(record || {}),
+            bucket: record?.oss?.bucket,
+            object: record?.oss?.object,
+            serverAddress: record?.endpoint?.url,
+            password: record?.endpoint?.auth?.password,
+            username: record?.endpoint?.auth?.username,
+            insecure: record?.endpoint?.insecure ? 'http' : 'https',
+          });
+        }, 200),
+      });
+      return;
+    }
+    this?.editThis?.initEditForm(record);
   }
 
   onSubmit(event) {
@@ -183,104 +304,12 @@ class DataSource$$Page extends React.Component {
     }
   }
 
-  closeModal() {
-    this.setState({
-      isOpenModal: false,
-    });
+  paginationShowTotal(total, range) {
+    return `${this.i18n('i18n-k0zli54g')} ${total} ${this.i18n('i18n-9ruso5ml')}`;
   }
 
   setEditThis(editThis) {
     this.editThis = editThis;
-  }
-
-  handleSearch(v) {
-    this.setState(
-      {
-        current: 1,
-      },
-      this.handleQueryChange
-    );
-  }
-
-  initEditForm(record) {
-    if (!this?.editThis?.initEditForm) {
-      this.state.timer && clearTimeout(this.state.timer);
-      this.setState({
-        timer: setTimeout(() => {
-          this.initEditForm({
-            ...(record || {}),
-            bucket: record?.oss?.bucket,
-            object: record?.oss?.object,
-            serverAddress: record?.endpoint?.url,
-            password: record?.endpoint?.auth?.password,
-            username: record?.endpoint?.auth?.username,
-            insecure: record?.endpoint?.insecure ? 'http' : 'https',
-          });
-        }, 200),
-      });
-      return;
-    }
-    this?.editThis?.initEditForm(record);
-  }
-
-  handleRefresh(event) {
-    this.props.useListDatasources?.mutate();
-  }
-
-  handleQueryChange() {
-    const { repositoryType, status } = this.state.filters || {};
-    const params = {
-      input: {
-        page: this.state?.current || 1,
-        pageSize: this.state?.size || 12,
-        keyword: this.state?.searchValue,
-        namespace: this.utils.getAuthData()?.project,
-      },
-    };
-    this.utils?.changeLocationQuery(this, 'useListDatasources', params);
-  }
-
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState(
-      {
-        pagination,
-        filters,
-        sorter,
-      },
-      this.handleQueryChange
-    );
-  }
-
-  async confirmDeleteModal(e, payload) {
-    this.setState({
-      modalLoading: true,
-    });
-    try {
-      await this.utils.bff.deleteDatasources({
-        input: {
-          name: this.state.record?.name,
-          namespace: this.utils.getAuthData()?.project,
-        },
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-vf1xe64m'),
-      });
-      setTimeout(() => {
-        this.handleRefresh();
-        this.setState({
-          modalLoading: false,
-        });
-      }, 200);
-    } catch (error) {
-      this.setState({
-        modalLoading: false,
-      });
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-yc0jhxgr'),
-        errors: error?.response?.errors,
-      });
-    }
   }
 
   async validatorNamespace(value, ...payload) {
@@ -299,35 +328,6 @@ class DataSource$$Page extends React.Component {
     } catch (e) {}
   }
 
-  paginationShowTotal(total, range) {
-    return `${this.i18n('i18n-k0zli54g')} ${total} ${this.i18n('i18n-9ruso5ml')}`;
-  }
-
-  handleOperationClick(e, { record }) {
-    e?.domEvent?.stopPropagation();
-    this.openModal(undefined, {
-      record,
-      modalType: e.key,
-    });
-  }
-
-  handlePaginationChange(c, s) {
-    this.setState(
-      {
-        size: s,
-        current: c,
-      },
-      this.handleQueryChange
-    );
-  }
-
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-      // current: 1,
-    });
-  }
-
   componentDidMount() {}
 
   render() {
@@ -336,7 +336,17 @@ class DataSource$$Page extends React.Component {
     return (
       <Page>
         <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.modalLoading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
           mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
           onOk={function () {
             return this.confirmDeleteModal.apply(
               this,
@@ -345,36 +355,26 @@ class DataSource$$Page extends React.Component {
           }.bind(this)}
           open={__$$eval(() => this.state.isOpenModal && this.state.modalType === 'delete')}
           title={this.i18n('i18n-1i46nz7w') /* 删除数据源 */}
-          centered={false}
-          keyboard={true}
-          onCancel={function () {
-            return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={__$$eval(() => this.state.modalLoading)}
-          destroyOnClose={true}
-          __component_name="Modal"
         >
           <Alert
-            type="warning"
+            __component_name="Alert"
             message={
-              <Space align="center" direction="horizontal" __component_name="Space">
+              <Space __component_name="Space" align="center" direction="horizontal">
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 >
                   {this.i18n('i18n-5h6srqet') /* 确定删除数据源 */}
                 </Typography.Text>
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={true}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={true}
+                  style={{ fontSize: '' }}
                 >
                   {__$$eval(
                     () =>
@@ -384,140 +384,141 @@ class DataSource$$Page extends React.Component {
                   )}
                 </Typography.Text>
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 >
                   ？
                 </Typography.Text>
               </Space>
             }
             showIcon={true}
-            __component_name="Alert"
+            type="warning"
           />
         </Modal>
         <Drawer
-          mask={true}
-          open={__$$eval(() => this.state.isOpenModal && this.state.modalType === 'edit')}
+          __component_name="Drawer"
+          className="edit-data-source-drawer"
+          destroyOnClose={true}
           extra=""
-          title={this.i18n('i18n-8vmpttzl') /* 编辑数据源 */}
-          width="600"
           footer={
             <Space
-              align="center"
-              style={{ height: '32px' }}
-              direction="horizontal"
               __component_name="Space"
+              align="center"
+              direction="horizontal"
+              style={{ height: '32px' }}
             >
               <Button
+                __component_name="Button"
                 block={false}
+                danger={false}
+                disabled={false}
                 ghost={false}
                 shape="default"
                 style={{ display: 'none' }}
-                danger={false}
-                disabled={false}
-                __component_name="Button"
               >
                 Button-2
               </Button>
             </Space>
           }
+          mask={true}
+          maskClosable={false}
           onClose={function () {
             return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
-          className="edit-data-source-drawer"
+          open={__$$eval(() => this.state.isOpenModal && this.state.modalType === 'edit')}
           placement="right"
-          maskClosable={false}
-          destroyOnClose={true}
-          __component_name="Drawer"
+          title={this.i18n('i18n-8vmpttzl') /* 编辑数据源 */}
+          width="600"
         >
           <LccComponentRu83f
+            __component_name="LccComponentRu83f"
             bff={__$$eval(() => this.props.appHelper.utils.bff)}
-            ref={this._refsManager.linkRef('LccComponentRu83f')}
             data={__$$eval(() => this.state?.record || {})}
-            project={__$$eval(() => this.utils.getAuthData()?.project)}
-            setThis={function () {
-              return this.setEditThis.apply(this, Array.prototype.slice.call(arguments).concat([]));
-            }.bind(this)}
-            handleSave={function () {
-              return this.onSubmit.apply(this, Array.prototype.slice.call(arguments).concat([]));
-            }.bind(this)}
             handelCancel={function () {
               return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
             }.bind(this)}
             handleCancel={function () {
               return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
             }.bind(this)}
-            __component_name="LccComponentRu83f"
+            handleSave={function () {
+              return this.onSubmit.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            project={__$$eval(() => this.utils.getAuthData()?.project)}
+            ref={this._refsManager.linkRef('LccComponentRu83f')}
+            setThis={function () {
+              return this.setEditThis.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
           />
         </Drawer>
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
             <Typography.Title
+              __component_name="Typography.Title"
               bold={true}
-              level={1}
               bordered={false}
               ellipsis={true}
-              __component_name="Typography.Title"
+              level={1}
             >
               {this.i18n('i18n-38tkeb1r') /* 数据源管理 */}
             </Typography.Title>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Alert
-              type="info"
+              __component_name="Alert"
               message="管理和查看平台数据源。作为 LLMOps 统一的数据入口，需要优先将训练数据、测试数据、知识库文件等数据内容接入数据源，以供其他模块的数据引用。"
               showIcon={true}
-              __component_name="Alert"
+              type="info"
             />
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="inner"
-              style={{ paddingTop: '4px', paddingBottom: '16px' }}
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              style={{ paddingBottom: '16px', paddingTop: '4px' }}
+              type="inner"
             >
-              <Row wrap={true} __component_name="Row">
-                <Col span={24} __component_name="Col">
-                  <Space align="center" direction="horizontal" __component_name="Space">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={24}>
+                  <Space __component_name="Space" align="center" direction="horizontal">
                     <Button
-                      href="/data-source/create"
-                      icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
-                      type="primary"
+                      __component_name="Button"
                       block={false}
-                      ghost={false}
-                      shape="default"
                       danger={false}
                       disabled={false}
-                      __component_name="Button"
+                      ghost={false}
+                      href="/data-source/create"
+                      icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
+                      shape="default"
+                      type="primary"
                     >
                       {this.i18n('i18n-ueslu0a9') /* 新增数据源 */}
                     </Button>
                     <Button
-                      icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
+                      __component_name="Button"
                       block={false}
-                      ghost={false}
-                      shape="default"
                       danger={false}
+                      disabled={false}
+                      ghost={false}
+                      icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
                       onClick={function () {
                         return this.handleRefresh.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      disabled={false}
-                      __component_name="Button"
+                      shape="default"
                     >
                       {this.i18n('i18n-jskgqh8o') /* 刷新 */}
                     </Button>
                     <Input.Search
+                      __component_name="Input.Search"
                       onChange={function () {
                         return this.handleSearchValueChange.apply(
                           this,
@@ -531,24 +532,12 @@ class DataSource$$Page extends React.Component {
                         );
                       }.bind(this)}
                       placeholder={this.i18n('i18n-hp37vpeo') /* 请输入数据源名称搜索 */}
-                      __component_name="Input.Search"
                     />
                   </Space>
                 </Col>
-                <Col span={24} __component_name="Col">
+                <Col __component_name="Col" span={24}>
                   <List
-                    grid={{ lg: 3, md: 3, sm: 3, xl: 4, xs: 3, xxl: 4, column: 3, gutter: 16 }}
-                    size="small"
-                    split={false}
-                    footer=""
-                    header=""
-                    rowKey="id"
-                    loading={__$$eval(
-                      () =>
-                        this.props.useListDatasources?.isLoading ||
-                        this.props?.useListDatasources?.loading ||
-                        false
-                    )}
+                    __component_name="List"
                     bordered={false}
                     dataSource={__$$eval(
                       () =>
@@ -559,17 +548,26 @@ class DataSource$$Page extends React.Component {
                           })
                         ) || []
                     )}
+                    footer=""
+                    grid={{ column: 3, gutter: 16, lg: 3, md: 3, sm: 3, xl: 4, xs: 3, xxl: 4 }}
                     gridEnable={true}
+                    header=""
                     itemLayout="horizontal"
+                    loading={__$$eval(
+                      () =>
+                        this.props.useListDatasources?.isLoading ||
+                        this.props?.useListDatasources?.loading ||
+                        false
+                    )}
                     pagination={false}
                     renderItem={record =>
                       (__$$context => (
                         <List.Item>
                           <Card
-                            size="default"
-                            type="default"
-                            style={{ border: '1px solid #E2E2E2' }}
                             actions={[]}
+                            bodyStyle={{ position: 'relative' }}
+                            bordered={false}
+                            hoverable={true}
                             loading={false}
                             onClick={function () {
                               return this.goDetail.apply(
@@ -581,23 +579,26 @@ class DataSource$$Page extends React.Component {
                                 ])
                               );
                             }.bind(__$$context)}
-                            bordered={false}
-                            bodyStyle={{ position: 'relative' }}
-                            hoverable={true}
+                            size="default"
+                            style={{ border: '1px solid #E2E2E2' }}
+                            type="default"
                           >
-                            <Row wrap={true} gutter={[0, 0]} __component_name="Row">
+                            <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
                               <Col
+                                __component_name="Col"
                                 span={24}
                                 style={{
                                   float: 'right',
-                                  right: '0px',
                                   height: '0',
-                                  zIndex: '1',
                                   position: 'relative',
+                                  right: '0px',
+                                  zIndex: '1',
                                 }}
-                                __component_name="Col"
                               >
                                 <Dropdown
+                                  __component_name="Dropdown"
+                                  destroyPopupOnHide={true}
+                                  disabled={false}
                                   menu={{
                                     items: [
                                       { key: 'edit', label: this.i18n('i18n-str3pnrc') /* 编辑 */ },
@@ -617,26 +618,23 @@ class DataSource$$Page extends React.Component {
                                       );
                                     }.bind(__$$context),
                                   }}
-                                  trigger={['hover']}
-                                  disabled={false}
                                   placement="bottomLeft"
-                                  __component_name="Dropdown"
-                                  destroyPopupOnHide={true}
+                                  trigger={['hover']}
                                 >
                                   <Button
-                                    type="default"
+                                    __component_name="Button"
                                     block={false}
+                                    danger={false}
+                                    disabled={false}
                                     ghost={false}
                                     shape="default"
                                     style={{
-                                      top: '-10px',
-                                      float: 'right',
                                       border: 'none',
+                                      float: 'right',
                                       padding: '0',
+                                      top: '-10px',
                                     }}
-                                    danger={false}
-                                    disabled={false}
-                                    __component_name="Button"
+                                    type="default"
                                   >
                                     {
                                       <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
@@ -644,15 +642,19 @@ class DataSource$$Page extends React.Component {
                                   </Button>
                                 </Dropdown>
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Row
-                                  wrap={false}
-                                  style={{ display: 'flex', alignItems: 'center' }}
-                                  gutter={[0, 0]}
                                   __component_name="Row"
+                                  gutter={[0, 0]}
+                                  style={{ alignItems: 'center', display: 'flex' }}
+                                  wrap={false}
                                 >
-                                  <Col flex="56px" __component_name="Col">
+                                  <Col __component_name="Col" flex="56px">
                                     <Image
+                                      __component_name="Image"
+                                      fallback=""
+                                      height={56}
+                                      preview={false}
                                       src={__$$eval(
                                         () =>
                                           __$$context.utils
@@ -661,54 +663,50 @@ class DataSource$$Page extends React.Component {
                                       )}
                                       style={{}}
                                       width={56}
-                                      height={56}
-                                      preview={false}
-                                      fallback=""
-                                      __component_name="Image"
                                     />
                                   </Col>
-                                  <Col flex="auto" __component_name="Col">
+                                  <Col __component_name="Col" flex="auto">
                                     <Row
-                                      wrap={true}
-                                      style={{ paddingLeft: '20px' }}
-                                      gutter={[0, 0]}
                                       __component_name="Row"
+                                      gutter={[0, 0]}
+                                      style={{ paddingLeft: '20px' }}
+                                      wrap={true}
                                     >
                                       <Col __component_name="Col">
                                         <Typography.Title
+                                          __component_name="Typography.Title"
                                           bold={true}
-                                          level={1}
                                           bordered={false}
                                           ellipsis={{
                                             tooltip: {
+                                              _unsafe_MixedSetter_title_select: 'VariableSetter',
                                               title: __$$eval(
                                                 () =>
                                                   `${record?.displayName || '-'}(${
                                                     record?.name || '-'
                                                   })`
                                               ),
-                                              _unsafe_MixedSetter_title_select: 'VariableSetter',
                                             },
                                           }}
-                                          __component_name="Typography.Title"
+                                          level={1}
                                         >
                                           {__$$eval(() => __$$context.utils.getFullName(record))}
                                         </Typography.Title>
                                       </Col>
-                                      <Col span={24} __component_name="Col">
+                                      <Col __component_name="Col" span={24}>
                                         <Typography.Paragraph
                                           code={false}
-                                          mark={false}
-                                          style={{ fontSize: '' }}
                                           delete={false}
-                                          strong={false}
                                           disabled={false}
                                           editable={false}
                                           ellipsis={{
+                                            expandable: false,
                                             rows: 2,
                                             tooltip: { title: '' },
-                                            expandable: false,
                                           }}
+                                          mark={false}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
                                           underline={false}
                                         >
                                           {__$$eval(() => record?.description || '-')}
@@ -719,51 +717,54 @@ class DataSource$$Page extends React.Component {
                                 </Row>
                               </Col>
                               <Col
+                                __component_name="Col"
                                 span={24}
                                 style={{ marginBottom: '-15px' }}
-                                __component_name="Col"
                               >
                                 <Divider
-                                  mode="line"
-                                  style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
+                                  __component_name="Divider"
                                   dashed={false}
                                   defaultOpen={false}
-                                  __component_name="Divider"
+                                  mode="line"
+                                  style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
                                 />
                               </Col>
-                              <Col span={24} __component_name="Col">
+                              <Col __component_name="Col" span={24}>
                                 <Descriptions
-                                  id=""
-                                  size="default"
+                                  __component_name="Descriptions"
+                                  bordered={false}
+                                  borderedBottom={true}
+                                  borderedBottomDashed={true}
                                   colon={false}
+                                  column={1}
+                                  contentStyle={{ marginTop: '8px', padding: '0' }}
+                                  id=""
                                   items={[
                                     {
-                                      key: 'yuqlalgvmn',
-                                      span: 1,
-                                      label: this.i18n('i18n-p7mextst') /* 状态 */,
                                       children: (
                                         <Row
-                                          wrap={true}
-                                          style={{ width: '100%' }}
                                           __component_name="Row"
+                                          style={{ width: '100%' }}
+                                          wrap={true}
                                         >
-                                          <Col span={24} __component_name="Col">
+                                          <Col __component_name="Col" span={24}>
                                             <Row
-                                              wrap={false}
-                                              style={{ display: 'flex' }}
-                                              justify="space-between"
                                               __component_name="Row"
                                               gutter={[0, 0]}
+                                              justify="space-between"
+                                              style={{ display: 'flex' }}
+                                              wrap={false}
                                             >
                                               <Col __component_name="Col">
                                                 <Space
-                                                  align="center"
-                                                  style={{}}
-                                                  direction="horizontal"
                                                   __component_name="Space"
+                                                  align="center"
+                                                  direction="horizontal"
                                                   size={0}
+                                                  style={{}}
                                                 >
                                                   <Status
+                                                    __component_name="Status"
                                                     id={__$$eval(() => record?.status)}
                                                     types={__$$eval(() =>
                                                       __$$context.utils.getDataSourceStatus(
@@ -771,20 +772,19 @@ class DataSource$$Page extends React.Component {
                                                         true
                                                       )
                                                     )}
-                                                    __component_name="Status"
                                                   />
                                                   {!!false && (
                                                     <Typography.Text
-                                                      type="colorPrimary"
-                                                      style={{
-                                                        top: '-2px',
-                                                        fontSize: '',
-                                                        position: 'relative',
-                                                      }}
-                                                      strong={false}
+                                                      __component_name="Typography.Text"
                                                       disabled={false}
                                                       ellipsis={true}
-                                                      __component_name="Typography.Text"
+                                                      strong={false}
+                                                      style={{
+                                                        fontSize: '',
+                                                        position: 'relative',
+                                                        top: '-2px',
+                                                      }}
+                                                      type="colorPrimary"
                                                     >
                                                       (30%)
                                                     </Typography.Text>
@@ -796,6 +796,9 @@ class DataSource$$Page extends React.Component {
                                                 style={{ verticalAlign: 'baseline' }}
                                               >
                                                 <Tag
+                                                  __component_name="Tag"
+                                                  bordered={false}
+                                                  closable={false}
                                                   color={__$$eval(
                                                     () =>
                                                       __$$context.utils
@@ -803,9 +806,6 @@ class DataSource$$Page extends React.Component {
                                                         ?.find(item => item.value === record.type)
                                                         ?.tagColor || 'primary'
                                                   )}
-                                                  bordered={false}
-                                                  closable={false}
-                                                  __component_name="Tag"
                                                 >
                                                   {__$$eval(
                                                     () =>
@@ -820,42 +820,40 @@ class DataSource$$Page extends React.Component {
                                           </Col>
                                         </Row>
                                       ),
+                                      key: 'yuqlalgvmn',
+                                      label: this.i18n('i18n-p7mextst') /* 状态 */,
+                                      span: 1,
                                     },
                                     {
-                                      key: 'bdtsm8b0pth',
-                                      span: 1,
-                                      label: this.i18n('i18n-uag94ndq') /* 更新时间 */,
                                       children: (
                                         <Typography.Time
-                                          time={__$$eval(() => record?.updateTimestamp)}
+                                          __component_name="Typography.Time"
                                           format=""
                                           relativeTime={false}
-                                          __component_name="Typography.Time"
+                                          time={__$$eval(() => record?.updateTimestamp)}
                                         />
                                       ),
+                                      key: 'bdtsm8b0pth',
+                                      label: this.i18n('i18n-uag94ndq') /* 更新时间 */,
+                                      span: 1,
                                     },
                                   ]}
-                                  title=""
-                                  column={1}
+                                  labelStyle={{ marginTop: '8px', padding: '0', width: '60px' }}
                                   layout="horizontal"
-                                  bordered={false}
-                                  labelStyle={{ width: '60px', padding: '0', marginTop: '8px' }}
-                                  contentStyle={{ padding: '0', marginTop: '8px' }}
-                                  borderedBottom={true}
-                                  __component_name="Descriptions"
-                                  borderedBottomDashed={true}
+                                  size="default"
+                                  title=""
                                 >
                                   <Descriptions.Item
                                     key="yuqlalgvmn"
-                                    span={1}
                                     label={this.i18n('i18n-p7mextst') /* 状态 */}
+                                    span={1}
                                   >
                                     {null}
                                   </Descriptions.Item>
                                   <Descriptions.Item
                                     key="bdtsm8b0pth"
-                                    span={1}
                                     label={this.i18n('i18n-uag94ndq') /* 更新时间 */}
+                                    span={1}
                                   >
                                     {null}
                                   </Descriptions.Item>
@@ -866,22 +864,18 @@ class DataSource$$Page extends React.Component {
                         </List.Item>
                       ))(__$$createChildContext(__$$context, { record }))
                     }
-                    __component_name="List"
+                    rowKey="id"
+                    size="small"
+                    split={false}
                   />
                 </Col>
                 <Col
-                  span={24}
-                  style={{ display: 'flex', justifyContent: 'center' }}
                   __component_name="Col"
+                  span={24}
+                  style={{ display: 'flex', justifyContent: 'flex-end' }}
                 >
                   <Pagination
-                    style={{ display: 'flex', marginTop: '8px' }}
-                    total={__$$eval(
-                      () =>
-                        this.props.useListDatasources?.data?.Datasource?.listDatasources
-                          ?.totalCount || 0
-                    )}
-                    simple={false}
+                    __component_name="Pagination"
                     current={__$$eval(() => this.state.current)}
                     onChange={function () {
                       return this.handlePaginationChange.apply(
@@ -889,14 +883,20 @@ class DataSource$$Page extends React.Component {
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    pageSize={__$$eval(() => this.state.size)}
-                    __component_name="Pagination"
                     onShowSizeChange={function () {
                       return this.handlePaginationChange.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
+                    pageSize={__$$eval(() => this.state.size)}
+                    simple={false}
+                    style={{ display: 'flex', marginTop: '8px' }}
+                    total={__$$eval(
+                      () =>
+                        this.props.useListDatasources?.data?.Datasource?.listDatasources
+                          ?.totalCount || 0
+                    )}
                   />
                 </Col>
               </Row>
@@ -972,6 +972,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
