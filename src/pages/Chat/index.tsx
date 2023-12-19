@@ -9,14 +9,18 @@
  * @date 2023-12-18
  */
 import ChatComponent from '@/pages/Chat/Chat';
-import * as React from 'react';
+import { history } from '@umijs/max';
+import React from 'react';
 
 interface Chat {}
 
 const Chat: React.FC<Chat> = props => {
   return (
     <>
-      <ChatComponent appName="base-chat-english-teacher" appNamespace="arcadia" />
+      <ChatComponent
+        appName={(history.location.query.appName || '') as string}
+        appNamespace={(history.location.query.appNamespace || '') as string}
+      />
     </>
   );
 };
