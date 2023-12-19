@@ -52,6 +52,8 @@
     "@formily/antd": "^2.1.4",
     "@formily/core": "^2.1.4",
     "@formily/react": "^2.1.4",
+    "@lobehub/ui": "^1.120.15",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@tenx-ui/auth-utils": "0.0.1",
     "@tenx-ui/charts": "1.1.2",
     "@tenx-ui/form-helper": "^0.0.2",
