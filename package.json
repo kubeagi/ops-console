@@ -66,7 +66,7 @@
     "@yunti/lowcode-datasource-axios-handler": "^1.0.1",
     "@yuntijs/arcadia-bff-sdk": "^1.0.34",
     "KubeAGIUpload": "workspace:*",
-    "antd": "latest",
+    "antd": "^5.12.2",
     "app-card": "workspace:*",
     "axios": "1.6.2",
     "babel-runtime": "^6.26.0",

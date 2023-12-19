@@ -25,6 +25,8 @@ jobs:
             package:
               - 'package.json'
               - 'pnpm-lock.yaml'
+              - '.npmrc'
+              - '.pnpmfile.cjs'
               - 'packages/**/package.json'
       - name: Set Variable
         id: set-env
