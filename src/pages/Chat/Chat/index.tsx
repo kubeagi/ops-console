@@ -8,6 +8,8 @@
  * @author songsz
  * @date 2023-12-18
  */
+import { constants } from '@/pages/Chat/Chat/helper';
+import { UserOutlined } from '@ant-design/icons';
 import {
   ActionsBar,
   ChatInputArea,
@@ -136,8 +138,8 @@ const Chat: React.FC<Chat> = props => {
             extra: {},
             id: userMsgId,
             meta: {
-              avatar: 'https://avatars.githubusercontent.com/u/17870709?v=4',
-              title: 'CanisMinor',
+              avatar: constants.userAvatar,
+              title: 'You',
             },
             role: 'user',
             updateAt: 1_686_437_950_084,
@@ -148,9 +150,9 @@ const Chat: React.FC<Chat> = props => {
             extra: {},
             id: assistantMsgId,
             meta: {
-              avatar: '😎',
+              avatar: constants.assistantAvatar,
               backgroundColor: '#E8DA5A',
-              title: 'Advertiser',
+              title: 'Assistant',
             },
             role: 'assistant',
             updateAt: 1_686_538_950_084,
