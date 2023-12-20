@@ -186,7 +186,7 @@ const Chat: React.FC<Chat> = props => {
             onInput={setInput}
             onSend={onSend}
             placeholder="请输入问题，可通过 shift+回车换行"
-            bottomAddons={<ChatSendButton onSend={() => scrollToBottom()} />}
+            bottomAddons={<ChatSendButton onSend={onSend} />}
           />
         </div>
       </div>
