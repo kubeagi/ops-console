@@ -1,24 +1,14 @@
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Dropdown,
-  Image,
-  Row,
-  Space,
-  Typography,
-} from '@tenx-ui/materials';
+import { Col, Divider, Dropdown, Image, Row, Space, Typography } from '@tenx-ui/materials';
+import { Card } from 'antd';
 import React, { useState } from 'react';
+import { useModalAppDetailContext } from '../index';
 import Delete from './Delete';
 import Edit from './Edit';
 import Publish from './Publish';
-
-import { useModalAppDetailContext } from '../index';
 interface HeaderProps {}
 
 const Header: React.FC<HeaderProps> = props => {
-  const { refresh, data } = useModalAppDetailContext();
+  const { refresh, data, loading } = useModalAppDetailContext();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<'publish' | 'edit' | 'delete'>();
 
@@ -35,7 +25,7 @@ const Header: React.FC<HeaderProps> = props => {
     setModalType('delete');
   };
   return (
-    <Card bordered={false}>
+    <Card bordered={false} loading={loading}>
       <Publish
         open={modalOpen && modalType === 'publish'}
         setOpen={setModalOpen}
@@ -48,21 +38,21 @@ const Header: React.FC<HeaderProps> = props => {
         setOpen={setModalOpen}
         refresh={refresh}
         type={modalType}
-        data={data}
+        data={data?.metadata}
       />
       <Delete
         open={modalOpen && modalType === 'delete'}
         setOpen={setModalOpen}
         refresh={refresh}
         type={modalType}
-        data={data}
+        data={data?.metadata}
       />
       <Row wrap={false}>
         <Col flex="auto">
           <Row wrap={false}>
             <Col flex="84px" style={{ display: 'flex', alignItems: 'center' }}>
               <Image
-                src={'----------'}
+                src={data?.metadata?.icon}
                 style={{ marginRight: '20px' }}
                 width={64}
                 height={64}
@@ -74,37 +64,45 @@ const Header: React.FC<HeaderProps> = props => {
               <Row wrap={true} gutter={['', 8]}>
                 <Col span={24}>
                   <Typography.Title bold={true} level={1} ellipsis={true}>
-                    title
+                    {data?.metadata?.displayName}
                   </Typography.Title>
                 </Col>
                 <Col span={24}>
                   <Typography.Text ellipsis={true}>名称：</Typography.Text>
                   <Typography.Text ellipsis={{ tooltip: 1 }} style={{ maxWidth: 200 }}>
-                    名称
+                    {data?.metadata?.name}
                   </Typography.Text>
                   <Divider mode="default" type="vertical" dashed={false} />
                   <Typography.Text strong={false} disabled={false} ellipsis={true}>
                     ID:
                   </Typography.Text>
                   <Typography.Text strong={false} disabled={false} ellipsis={true}>
-                    ID
+                    {data?.metadata?.id}
                   </Typography.Text>
                   <Divider mode="default" type="vertical" dashed={false} />
                   <Typography.Text strong={false} disabled={false} ellipsis={true}>
                     更新时间：
                   </Typography.Text>
-                  <Typography.Time time={''} format="" relativeTime={false} />
+                  <Typography.Time
+                    time={data?.metadata?.updateTimestamp}
+                    format=""
+                    relativeTime={false}
+                  />
                   <Divider mode="default" type="vertical" />
                   <Typography.Text strong={false} ellipsis={true}>
                     创建时间：
                   </Typography.Text>
-                  <Typography.Time time={''} format="" relativeTime={false} />
+                  <Typography.Time
+                    time={data?.metadata?.creationTimestamp}
+                    format=""
+                    relativeTime={false}
+                  />
                   <Divider mode="default" type="vertical" />
                   <Typography.Text strong={false} ellipsis={true}>
                     创建者：
                   </Typography.Text>
                   <Typography.Text strong={false} ellipsis={true}>
-                    creator
+                    {data?.metadata?.creator || '-'}
                   </Typography.Text>
                   <Divider mode="default" type="vertical" />
                   <Typography.Text ellipsis={true} strong={false}>
@@ -115,7 +113,7 @@ const Header: React.FC<HeaderProps> = props => {
                     style={{ maxWidth: 200 }}
                     strong={false}
                   >
-                    蚂蚁的企业级产品是一个庞大且复杂的体系。这类产品不仅量级巨大且功能复杂，而且变动和并发频繁，常常需要设计与开发能够快速的做出响应。同时这类产品中有存在很多类似的页面以及组件，可以通过抽象得到一些稳定且高复用性的内容。
+                    {data?.metadata?.description || '-'}
                   </Typography.Text>
                 </Col>
               </Row>

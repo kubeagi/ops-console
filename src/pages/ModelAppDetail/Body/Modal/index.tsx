@@ -2,6 +2,7 @@ import FormHelper from '@tenx-ui/form-helper';
 import { Modal } from '@tenx-ui/materials';
 import { Form, InputNumber, notification, Slider, Space } from 'antd';
 import React, { useEffect, useReducer } from 'react';
+import { useModalAppDetailContext } from '../../index';
 import styles from './index.less';
 
 export interface SliderProps {
@@ -33,7 +34,7 @@ export const SliderItem: React.FC<SliderProps> = props => {
           <Slider
             min={Config.min}
             max={Config.max}
-            step={Config.precision}
+            step={1 / Math.pow(10, Config.precision)}
             style={{ width: sliderWidth }}
             marks={{
               [Config.min]: Config.minMark || [Config.min],
@@ -71,31 +72,49 @@ export interface SettingProps {
   children?: React.ReactElement;
   handleSave?: (values: any) => void;
   form?: any;
+  configKey: string;
+  renderChildren?: (form, forceUpdate) => React.ReactElement;
 }
 const Setting: React.FC<SettingProps> = props => {
+  const { configs, setConfigs } = useModalAppDetailContext();
   const [form] = Form.useForm();
   const curForm = props.form || form;
-  const { open, setOpen, refresh, type, data, title, children, handleSave, ...otherProps } = props;
+  const {
+    renderChildren,
+    open,
+    setOpen,
+    refresh,
+    type,
+    data,
+    title,
+    children,
+    handleSave,
+    configKey,
+    ...otherProps
+  } = props;
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
-
-  useEffect(() => {
-    data && type === 'edit' && curForm.setFieldsValue(data);
-  }, [data, curForm, type]);
   return (
     <Modal
       {...otherProps}
       open={open}
       title={title}
-      onCancel={() => setOpen(false)}
+      onCancel={() => {
+        setOpen(false);
+        curForm.setFieldsValue(configs[configKey]);
+      }}
       onOk={() => {
         curForm.validateFields().then(async values => {
           try {
-            await handleSave(values);
             setOpen(false);
-            refresh && refresh();
-            notification.success({
-              message: `${title}成功`,
+            setConfigs({
+              ...(configs || {}),
+              [configKey]: values,
             });
+            handleSave && (await handleSave(values));
+            // refresh && refresh();
+            // notification.success({
+            //   message: `${title}成功`,
+            // });
           } catch (error) {
             notification.warning({
               message: `${title}失败`,
@@ -108,6 +127,7 @@ const Setting: React.FC<SettingProps> = props => {
       <FormHelper>
         <Form className={styles.form} form={curForm} labelAlign="left" labelCol={{ span: 5 }}>
           {children}
+          {renderChildren && renderChildren(curForm, forceUpdate)}
         </Form>
       </FormHelper>
     </Modal>

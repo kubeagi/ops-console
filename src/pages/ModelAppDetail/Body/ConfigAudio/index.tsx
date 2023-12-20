@@ -69,6 +69,7 @@ const ConfigAudio: React.FC<ConfigAudioProps> = props => {
   ];
   return (
     <Container
+      configKey="ConfigAudio"
       icon={<KubeagiRadio />}
       title={'语音播报'}
       actions={[
@@ -81,7 +82,6 @@ const ConfigAudio: React.FC<ConfigAudioProps> = props => {
             title: '语音播报配置',
             refresh: () => {},
             type: 'edit',
-            data: {},
             children: (
               <>
                 <Form.Item
