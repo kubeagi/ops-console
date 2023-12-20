@@ -1,10 +1,18 @@
+import { PlusOutlined } from '@ant-design/icons';
 import FormHelper from '@tenx-ui/form-helper';
-import { Modal } from '@tenx-ui/materials';
+import { Modal, notification } from '@tenx-ui/materials';
 import { Form, Input, Upload } from 'antd';
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
+import utils from '../../../../utils/__utils';
 import styles from './index.less';
 
-export interface RowData {}
+export interface RowData {
+  icon: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  namespace: string;
+}
 interface EditProps {
   open?: boolean;
   setOpen?: (open?: boolean) => void;
@@ -12,26 +20,65 @@ interface EditProps {
   type?: string;
   data?: RowData;
 }
+const getBase64 = (img, callback: (url: string) => void) => {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result as string));
+  reader.readAsDataURL(img);
+};
 const Edit: React.FC<EditProps> = props => {
   const [form] = Form.useForm();
   const { open, setOpen, refresh, type, data } = props;
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+  const [imageUrl, setImageUrl] = useState<string>();
+
   const title = type === 'add' ? '新建' : '编辑';
   const handelBlur = () => {
     forceUpdate();
   };
   useEffect(() => {
-    data && type === 'edit' && form.setFieldsValue(data);
+    if (data && type === 'edit') {
+      form.setFieldsValue(data);
+      setImageUrl(data?.icon);
+    }
   }, [data, form, type]);
+
+  const handleChange = info => {
+    getBase64(info.file, url => {
+      setImageUrl(url);
+    });
+  };
+
   return (
     <Modal
       open={open}
       title={`${title}应用`}
-      onCancel={() => setOpen(false)}
+      onCancel={() => {
+        setOpen(false);
+        setImageUrl(undefined);
+      }}
       onOk={() => {
         form.validateFields().then(async values => {
-          setOpen(false);
-          refresh && refresh();
+          try {
+            await utils.bff.updateApplication({
+              input: {
+                ...values,
+                icon: imageUrl,
+                name: data?.name,
+                namespace: data?.namespace,
+              },
+            });
+            setOpen(false);
+            setImageUrl(undefined);
+            refresh && refresh();
+            notification.success({
+              message: '编辑应用成功',
+            });
+          } catch (error) {
+            notification.warnings({
+              message: '编辑应用失败',
+              errors: error?.response?.errors,
+            });
+          }
         });
       }}
       destroyOnClose
@@ -77,6 +124,7 @@ const Edit: React.FC<EditProps> = props => {
             <Input placeholder="请输入模型应用别名" onBlur={handelBlur} />
           </Form.Item>
           <Form.Item
+            className={styles.uploadItem}
             label="应用头像"
             name="icon"
             required
@@ -91,8 +139,20 @@ const Edit: React.FC<EditProps> = props => {
               },
             ]}
           >
-            <Upload beforeUpload={() => false} accept=".jpg,.png">
-              上传
+            <Upload
+              beforeUpload={() => false}
+              accept=".jpg,.png"
+              onChange={handleChange}
+              showUploadList={false}
+              listType="picture-card"
+            >
+              {imageUrl ? (
+                <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+              ) : (
+                <div>
+                  <PlusOutlined />
+                </div>
+              )}
             </Upload>
           </Form.Item>
           <Form.Item

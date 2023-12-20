@@ -72,8 +72,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.0.43
-        version: 1.0.43(@tenx-ui/materials@1.5.27)(antd@5.12.2)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.0.46
+        version: 1.0.47(@tenx-ui/materials@1.5.27)(antd@5.12.3)(react@18.2.0)(swr@2.2.4)
       KubeAGIUpload:
         specifier: workspace:*
         version: link:packages/KubeAGIUpload
@@ -3007,7 +3007,7 @@ packages:
       '@dnd-kit/core': ^6.0.7
       react: '>=16.8.0'
     dependencies:
-      '@dnd-kit/core': 6.0.8(react-dom@18.2.0)(react@18.2.0)
+      '@dnd-kit/core': 6.0.8(react-dom@17.0.2)(react@18.2.0)
       '@dnd-kit/utilities': 3.2.1(react@18.2.0)
       react: 18.2.0
       tslib: 2.6.2
@@ -4460,7 +4460,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.298.0(react@18.2.0)
+      lucide-react: 0.299.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.0(react@18.2.0)
       query-string: 8.1.0
@@ -7103,8 +7103,8 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.0.43(@tenx-ui/materials@1.5.27)(antd@5.12.2)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-XpD9zxAhGYBKQ+JrxBfG4A+C3VHNe2ni8GI//FTa+63swrau2x/ERvsKfdo43vhF5MMDKHNKnjK+kd7Myfyn8g==}
+  /@yuntijs/arcadia-bff-sdk@1.0.47(@tenx-ui/materials@1.5.27)(antd@5.12.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-DFlY2rIYE5/JZLvM8F2XoVgeLBY/WcCMeHx3RTiwMP11TXXYikRoqBVYsAFKZVHXF72Bp/WN16SQaid1sP4Aog==}
     peerDependencies:
       '@tenx-ui/materials': '>=1.5.8'
       antd: '>=5.4.0'
@@ -13022,6 +13022,14 @@ packages:
 
   /lucide-react@0.298.0(react@18.2.0):
     resolution: {integrity: sha512-tWoxZ663Zf/n8VxXTHnTJsU/w1ysWT1LORnIL1pzqElFdSqBhWbZeJ3sLdCZ5FpzpbkpkYEtluhuTyG2BTDYNQ==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /lucide-react@0.299.0(react@18.2.0):
+    resolution: {integrity: sha512-59MiDzDzFI/efHhb4n0vGdXelMNwou7JlAFvVS4boA1G/7aYU7garPciYo73CODzkhrhz0JOgdtSTPSe5dMrlQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
