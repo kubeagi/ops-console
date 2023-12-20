@@ -845,6 +845,28 @@ class ModelServiceDetail$$Page extends React.Component {
                     span: 1,
                   },
                   {
+                    _unsafe_MixedSetter_children_select: 'SlotSetter',
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        {__$$eval(() =>
+                          this.getFullDescribe({
+                            key: 'api',
+                          })
+                        )}
+                      </Typography.Text>
+                    ),
+                    key: 'wdifgpbo6x',
+                    label: 'API地址',
+                    span: 1,
+                  },
+                  {
                     children: (
                       <Typography.Paragraph
                         code={false}
@@ -1044,6 +1066,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
