@@ -9,8 +9,7 @@
  * @date 2023-12-18
  */
 import { fetchEventSource } from '@/components/fetchEventSource';
-import { constants } from '@/pages/Chat/Chat/helper';
-import { UserOutlined } from '@ant-design/icons';
+import { getCvsMeta } from '@/pages/Chat/Chat/helper';
 import {
   ActionsBar,
   ChatInputArea,
@@ -21,6 +20,7 @@ import {
   useControls,
   useCreateStore,
 } from '@lobehub/ui';
+import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { debounce } from 'lodash';
 import React, { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import './index.less';
@@ -29,12 +29,12 @@ interface Chat {
   appName: string;
   appNamespace: string;
 }
-
+const safeAreaId = 'safe-area-id-not-use-in-your-code';
 class RetriableError extends Error {}
 class FatalError extends Error {}
 
 const scrollToBottom = debounce(() => {
-  window.scrollTo(0, document.body.scrollHeight);
+  document.querySelector(`#${safeAreaId}`)?.scrollIntoView();
 }, 100);
 let scrollToBottomTimeout;
 const ctrl = new AbortController();
@@ -45,6 +45,30 @@ const Chat: React.FC<Chat> = props => {
     loadingMsgId?: string;
     data: ChatMessage[];
   }>({ data: [] });
+
+  const application = sdk.useGetApplication({
+    name: props.appName,
+    namespace: props.appNamespace,
+  });
+  useEffect(() => {
+    if (conversion.data?.length) return;
+    const meta = application?.data?.Application?.getApplication?.metadata;
+    if (meta?.name) {
+      setConversion({
+        ...conversion,
+        data: [
+          getCvsMeta(
+            `##### 您好，我是${meta.displayName || meta.name}${
+              meta.description ? `\n\n${meta.description}` : ''
+            }`,
+            new Date().getTime().toString(),
+            false
+          ),
+        ],
+      });
+      scrollToBottom();
+    }
+  }, [conversion, application]);
   const [input, setInput] = useState<string>();
   const store = useCreateStore();
   const control: ChatListProps | any = useControls(
@@ -132,31 +156,8 @@ const Chat: React.FC<Chat> = props => {
         loadingMsgId: assistantMsgId,
         data: [
           ...conversion.data,
-          {
-            content: input,
-            createAt: 1_686_437_950_084,
-            extra: {},
-            id: userMsgId,
-            meta: {
-              avatar: constants.userAvatar,
-              title: 'You',
-            },
-            role: 'user',
-            updateAt: 1_686_437_950_084,
-          },
-          {
-            content: '',
-            createAt: 1_686_538_950_084,
-            extra: {},
-            id: assistantMsgId,
-            meta: {
-              avatar: constants.assistantAvatar,
-              backgroundColor: '#E8DA5A',
-              title: 'Assistant',
-            },
-            role: 'assistant',
-            updateAt: 1_686_538_950_084,
-          },
+          getCvsMeta(input, userMsgId, true),
+          getCvsMeta('', assistantMsgId, false),
         ],
       };
     });
@@ -178,14 +179,14 @@ const Chat: React.FC<Chat> = props => {
             {...control}
           />
         </div>
-        <div className="safeArea"></div>
+        <div className="safeArea" id={safeAreaId}></div>
         <div className="inputArea">
           <ChatInputArea
             value={input}
             onInput={setInput}
             onSend={onSend}
             placeholder="请输入问题，可通过 shift+回车换行"
-            bottomAddons={<ChatSendButton onSend={onSend} />}
+            bottomAddons={<ChatSendButton onSend={() => scrollToBottom()} />}
           />
         </div>
       </div>
