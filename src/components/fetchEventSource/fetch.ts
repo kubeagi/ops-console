@@ -114,7 +114,7 @@ export function fetchEventSource(
         await onopen(response);
 
         await getBytes(
-          response.body!,
+          response,
           getLines(
             getMessages(
               id => {
