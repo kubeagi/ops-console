@@ -35,9 +35,6 @@ importers:
       '@lobehub/ui':
         specifier: ^1.120.15
         version: 1.120.15(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd-style@3.6.1)(antd@5.12.3)(react-dom@18.2.0)(react@18.2.0)
-      '@microsoft/fetch-event-source':
-        specifier: ^2.0.1
-        version: 2.0.1
       '@tenx-ui/auth-utils':
         specifier: 0.0.1
         version: 0.0.1
@@ -75,8 +72,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.0.34
-        version: 1.0.34(@tenx-ui/materials@1.5.27)(antd@5.12.3)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.0.43
+        version: 1.0.43(@tenx-ui/materials@1.5.27)(antd@5.12.2)(react@18.2.0)(swr@2.2.4)
       KubeAGIUpload:
         specifier: workspace:*
         version: link:packages/KubeAGIUpload
@@ -3010,7 +3007,7 @@ packages:
       '@dnd-kit/core': ^6.0.7
       react: '>=16.8.0'
     dependencies:
-      '@dnd-kit/core': 6.0.8(react-dom@17.0.2)(react@18.2.0)
+      '@dnd-kit/core': 6.0.8(react-dom@18.2.0)(react@18.2.0)
       '@dnd-kit/utilities': 3.2.1(react@18.2.0)
       react: 18.2.0
       tslib: 2.6.2
@@ -4521,10 +4518,6 @@ packages:
       typescript: 5.0.4
     transitivePeerDependencies:
       - '@types/node'
-    dev: false
-
-  /@microsoft/fetch-event-source@2.0.1:
-    resolution: {integrity: sha512-W6CLUJ2eBMw3Rec70qrsEW0jOm/3twwJv21mrmj2yORiaVmVYGS4sSS5yUwvQc1ZlDLYGPnClVWmUUMagKNsfA==}
     dev: false
 
   /@microsoft/tsdoc-config@0.16.2:
@@ -7110,8 +7103,8 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.0.34(@tenx-ui/materials@1.5.27)(antd@5.12.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-sVinwy453bwxzBFrloBoa8ZnkIK2OFHoKmHDw4LL6IWkM//NLRrdBZKPOB4Pt1w8J67HSRkjN05sOlU8Dtx56g==}
+  /@yuntijs/arcadia-bff-sdk@1.0.43(@tenx-ui/materials@1.5.27)(antd@5.12.2)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-XpD9zxAhGYBKQ+JrxBfG4A+C3VHNe2ni8GI//FTa+63swrau2x/ERvsKfdo43vhF5MMDKHNKnjK+kd7Myfyn8g==}
     peerDependencies:
       '@tenx-ui/materials': '>=1.5.8'
       antd: '>=5.4.0'
