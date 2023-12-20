@@ -8,6 +8,7 @@
  * @author songsz
  * @date 2023-12-18
  */
+import { fetchEventSource } from '@/components/fetchEventSource';
 import { constants } from '@/pages/Chat/Chat/helper';
 import { UserOutlined } from '@ant-design/icons';
 import {
@@ -20,7 +21,6 @@ import {
   useControls,
   useCreateStore,
 } from '@lobehub/ui';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { debounce } from 'lodash';
 import React, { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import './index.less';
