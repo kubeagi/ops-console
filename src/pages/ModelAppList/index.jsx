@@ -254,7 +254,9 @@ class ModelAppList$$Page extends React.Component {
   onDetailClick(e, extParams) {
     // 事件的 handler
 
-    this.history.push(`/chat?namespace=${extParams.data.namespace}&name=${extParams.data.name}`);
+    this.history.push(
+      `/chat?appNamespace=${extParams.data.namespace}&appName=${extParams.data.name}`
+    );
   }
 
   onEdit(item) {
