@@ -752,7 +752,8 @@ class ModelWarehouse$$Page extends React.Component {
                             {!!__$$eval(() => item?.systemModel) && (
                               <Container
                                 __component_name="Container"
-                                defaultStyle={{
+                                defaultStyle={{}}
+                                style={{
                                   borderLeft: '40px solid transparent',
                                   borderLeftStyle: 'solid',
                                   borderTopColor: 'rgba(92,184,92,0.9)',
@@ -902,6 +903,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
