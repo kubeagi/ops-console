@@ -1,6 +1,6 @@
 import { Card, notification, Typography } from '@tenx-ui/materials';
 import { Button, Col, Flex, Row } from 'antd';
-import React from 'react';
+import React, { useState } from 'react';
 import utils from '../../../utils/__utils';
 import { useModalAppDetailContext } from '../index';
 import ConfigAudio from './ConfigAudio';
@@ -15,6 +15,7 @@ interface BodyProps {}
 
 const Body: React.FC<BodyProps> = props => {
   const { refresh, data, configs } = useModalAppDetailContext();
+  const [loading, setLoading] = useState(false);
   return (
     <Card loading={false} bordered={false} type="inner" className={styles.card}>
       <Flex justify="space-between" className={styles.action}>
@@ -23,6 +24,7 @@ const Body: React.FC<BodyProps> = props => {
           type="primary"
           onClick={async () => {
             try {
+              setLoading(true);
               let input = {
                 name: data?.metadata?.name,
                 namespace: data?.metadata?.namespace,
@@ -30,20 +32,25 @@ const Body: React.FC<BodyProps> = props => {
               Object.values(configs || {}).map(config => {
                 input = Object.assign(input, config);
               });
-              await utils.bff.updateApplicationConfig({
-                input,
-              });
-              refresh && refresh();
-              notification.success({
-                message: '保存应用配置成功',
-              });
+              setTimeout(async () => {
+                await utils.bff.updateApplicationConfig({
+                  input,
+                });
+                refresh && refresh();
+                notification.success({
+                  message: '保存应用配置成功',
+                });
+                setLoading(false);
+              }, 200);
             } catch (error) {
+              setLoading(false);
               notification.warnings({
                 message: '保存应用配置失败',
                 errors: error?.response?.errors,
               });
             }
           }}
+          loading={loading}
         >
           保存并预览
         </Button>

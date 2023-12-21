@@ -108,7 +108,10 @@ const Setting: React.FC<SettingProps> = props => {
             setOpen(false);
             setConfigs({
               ...(configs || {}),
-              [configKey]: values,
+              [configKey]: {
+                ...(configs?.[configKey] || []),
+                ...values,
+              },
             });
             handleSave && (await handleSave(values));
             // refresh && refresh();

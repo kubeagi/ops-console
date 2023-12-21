@@ -31,7 +31,7 @@ importers:
         version: 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)(typescript@4.9.5)
       '@lobehub/tts':
         specifier: ^1.23.4
-        version: 1.23.4(@lobehub/ui@1.120.15)(antd-style@3.6.1)(antd@5.12.3)(lucide-react@0.298.0)(react-dom@18.2.0)(react-layout-kit@1.7.4)(react@18.2.0)
+        version: 1.23.4(@lobehub/ui@1.120.15)(antd-style@3.6.1)(antd@5.12.3)(lucide-react@0.299.0)(react-dom@18.2.0)(react-layout-kit@1.7.4)(react@18.2.0)
       '@lobehub/ui':
         specifier: ^1.120.15
         version: 1.120.15(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd-style@3.6.1)(antd@5.12.3)(react-dom@18.2.0)(react@18.2.0)
@@ -54,8 +54,8 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5(antd@5.12.3)(classnames@2.3.2)(prop-types@15.8.1)(rc-dialog@9.3.4)(react-dom@18.2.0)(react@18.2.0)
       '@tenx-ui/materials':
-        specifier: 1.5.27
-        version: 1.5.27(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.12.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+        specifier: 1.5.28
+        version: 1.5.28(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.12.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
       '@tenx-ui/react-markdown-lowcode-materials':
         specifier: ^0.1.4
         version: 0.1.4(@types/react@18.2.30)(lodash@4.17.21)(react-dom@18.2.0)(react@18.2.0)
@@ -72,8 +72,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.0.46
-        version: 1.0.47(@tenx-ui/materials@1.5.27)(antd@5.12.3)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.0.48
+        version: 1.0.48(@tenx-ui/materials@1.5.28)(antd@5.12.3)(react@18.2.0)(swr@2.2.4)
       KubeAGIUpload:
         specifier: workspace:*
         version: link:packages/KubeAGIUpload
@@ -4394,7 +4394,7 @@ packages:
     resolution: {integrity: sha512-s9KnjaPjsEefaNv150G3aifvB+J3P4eEKG+epY9zDPS2BeB6+V2jELWqAZll+nkogMaVovjEE813z3V751QwGw==}
     dev: false
 
-  /@lobehub/tts@1.23.4(@lobehub/ui@1.120.15)(antd-style@3.6.1)(antd@5.12.3)(lucide-react@0.298.0)(react-dom@18.2.0)(react-layout-kit@1.7.4)(react@18.2.0):
+  /@lobehub/tts@1.23.4(@lobehub/ui@1.120.15)(antd-style@3.6.1)(antd@5.12.3)(lucide-react@0.299.0)(react-dom@18.2.0)(react-layout-kit@1.7.4)(react@18.2.0):
     resolution: {integrity: sha512-7xaxhNkdNbbNNOdFrWzksstitpMCejkNJ7eVvMx++yft/I5sFu/76yCOzlfDnGZ53D3YMoEXMhv2TPtQndASjg==}
     peerDependencies:
       '@lobehub/ui': '>=1'
@@ -4410,7 +4410,7 @@ packages:
       antd: 5.12.3(react-dom@18.2.0)(react@18.2.0)
       antd-style: 3.6.1(@types/react@18.2.30)(antd@5.12.3)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.298.0(react@18.2.0)
+      lucide-react: 0.299.0(react@18.2.0)
       openai: 4.23.0
       query-string: 8.1.0
       react: 18.2.0
@@ -5579,8 +5579,8 @@ packages:
       react-virtualized: 9.22.5(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
-  /@tenx-ui/materials@1.5.27(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.12.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5):
-    resolution: {integrity: sha512-aNZX81yzwK7dhHiKWM8N0bTUZ6PhKSq1FZNbcScUHb+B3rbKoEFe/c3IkHNHT+TTLMXjNcwnGW/8DLz+aXmq6A==}
+  /@tenx-ui/materials@1.5.28(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.12.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5):
+    resolution: {integrity: sha512-xboVV2uzi6TaHJKJIF5ENwRrjwKE+FAgc2gAJQlRQOnmkHSA4dvC1umtol4Ouy+95w+rmAor7n7NYmyvmYPGxQ==}
     peerDependencies:
       '@ant-design/icons': ^4.7.0
       antd: ^5.8.6
@@ -7103,15 +7103,15 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.0.47(@tenx-ui/materials@1.5.27)(antd@5.12.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-DFlY2rIYE5/JZLvM8F2XoVgeLBY/WcCMeHx3RTiwMP11TXXYikRoqBVYsAFKZVHXF72Bp/WN16SQaid1sP4Aog==}
+  /@yuntijs/arcadia-bff-sdk@1.0.48(@tenx-ui/materials@1.5.28)(antd@5.12.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-enOSvTjeznO0IIZ83EC1rYB6G94NcBg5+4kmXOPrjqCsdSWSB4okZ+lZVoi+e8eWsw9Edq/ONwfFXkPBAQFjwQ==}
     peerDependencies:
       '@tenx-ui/materials': '>=1.5.8'
       antd: '>=5.4.0'
       react: '>=16.9.0'
       swr: '>=2.0.0'
     dependencies:
-      '@tenx-ui/materials': 1.5.27(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.12.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
+      '@tenx-ui/materials': 1.5.28(@ant-design/icons@5.2.6)(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd@5.12.3)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.17.0)(react@18.2.0)(typescript@4.9.5)
       antd: 5.12.3(react-dom@18.2.0)(react@18.2.0)
       graphql: 16.8.1
       graphql-request: 6.1.0(graphql@16.8.1)
@@ -13019,14 +13019,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
-
-  /lucide-react@0.298.0(react@18.2.0):
-    resolution: {integrity: sha512-tWoxZ663Zf/n8VxXTHnTJsU/w1ysWT1LORnIL1pzqElFdSqBhWbZeJ3sLdCZ5FpzpbkpkYEtluhuTyG2BTDYNQ==}
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.2.0
-    dev: false
 
   /lucide-react@0.299.0(react@18.2.0):
     resolution: {integrity: sha512-59MiDzDzFI/efHhb4n0vGdXelMNwou7JlAFvVS4boA1G/7aYU7garPciYo73CODzkhrhz0JOgdtSTPSe5dMrlQ==}

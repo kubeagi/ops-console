@@ -35,7 +35,7 @@ const Container: React.FC<ContainerProps> = props => {
   useEffect(() => {
     form.setFieldsValue(initConfigs?.[configKey] || {});
     forceUpdate();
-  }, [initConfigs, form, configKey]);
+  }, [initConfigs?.[configKey], form]);
   return (
     <Form
       form={form}
