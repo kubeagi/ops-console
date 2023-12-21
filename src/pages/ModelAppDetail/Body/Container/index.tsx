@@ -26,12 +26,11 @@ interface ContainerProps {
 
 const Container: React.FC<ContainerProps> = props => {
   const { children, icon, title, actions, configKey, changeConfig, renderChildren } = props;
-  const [form] = Form.useForm();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<any>();
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
   const [actionData, setActionData] = useState<Action>();
-  const { initConfigs, configs, setConfigs } = useModalAppDetailContext();
+  const { initConfigs, configs, setConfigs, form } = useModalAppDetailContext();
   useEffect(() => {
     form.setFieldsValue(initConfigs?.[configKey] || {});
     forceUpdate();
