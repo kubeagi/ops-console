@@ -16,7 +16,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
         {
           key: 'switch',
           children: (
-            <Form.Item name="showNextGuide" style={{ marginBottom: 0 }}>
+            <Form.Item name="showNextGuid" style={{ marginBottom: 0 }}>
               <Switch />
             </Form.Item>
           ),

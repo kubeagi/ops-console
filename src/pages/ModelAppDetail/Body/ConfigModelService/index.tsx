@@ -84,7 +84,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
           <>
             <Form.Item
               labelAlign="left"
-              labelCol={{ span: 3 }}
+              labelCol={{ span: 4 }}
               style={{ marginBottom: 20 }}
               label="模型服务"
               name="llm"
@@ -116,7 +116,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
             {!noModelSelect && (
               <Form.Item
                 labelAlign="left"
-                labelCol={{ span: 3 }}
+                labelCol={{ span: 4 }}
                 style={{ marginBottom: 0 }}
                 label="模型"
                 name="model"

@@ -580,7 +580,7 @@ class DataSource$$Page extends React.Component {
                               );
                             }.bind(__$$context)}
                             size="default"
-                            style={{ border: '1px solid #E2E2E2' }}
+                            style={{}}
                             type="default"
                           >
                             <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
