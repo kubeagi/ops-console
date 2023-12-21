@@ -4,18 +4,21 @@ import React from 'react';
 
 import {
   Page,
+  Modal,
   Row,
   Col,
+  Typography,
+  Slider,
+  FormilyForm,
+  FormilyNumberPicker,
+  FormilyTextArea,
   Space,
   Button,
-  Typography,
   Steps,
   Divider,
   Card,
   Switch,
   Progress,
-  FormilyForm,
-  FormilyNumberPicker,
   FormilySelect,
   Table,
   InnerHtmlContainer,
@@ -145,6 +148,7 @@ class $$Page extends React.Component {
             '这个文档中的电话、身份证号、银行卡号等信息将会被去除，如：手机号 ，身份证号，银行卡号',
         },
       ],
+      cacheqaSplitHighConfig: {},
       configEnableMap: {},
       configMap: {
         qa_split: 'QAsplitChecked',
@@ -164,6 +168,7 @@ class $$Page extends React.Component {
         special_character_rate: 'SpecialCharactersRateChecked',
         pornography_violence_word_rate: 'PornographicViolenceRateChecked',
       },
+      configVisible: false,
       currentStep: 0,
       dataSetDataList: [],
       dataSetFileList: [],
@@ -175,7 +180,18 @@ class $$Page extends React.Component {
       fileSelectCheckErrorFlag: false,
       fileTableLoading: false,
       llmList: [],
+      max_token_marks: {
+        10: '10',
+        4096: '4096',
+      },
       numberInputStep: 0.1,
+      qaSplitHighConfig: {
+        temperature: 40,
+        max_tokens: 512,
+        prompt_template: `{text}
+
+请将上述内容按照问答的方式，提出不超过 25 个问题，并给出每个问题的答案，每个问题必须有 Q 和对应的 A，并严格按照以下方式展示： Q1: 问题。\n  A1: 答案。\n Q2: 问题 \n A2: 答案\n  注意，尽可能多的提出问题，但是 Q 不要重复，也不要出现只有 Q 没有 A 的情况。`,
+      },
       selectedFileList: [],
       showLlmModel: false,
       step1FormData: {},
@@ -210,6 +226,10 @@ class $$Page extends React.Component {
         RemoveNumberChecked: false,
       },
       step4Data: [],
+      temperature_marks: {
+        0: '精确',
+        100: '随机',
+      },
     };
   }
 
@@ -269,6 +289,8 @@ class $$Page extends React.Component {
                           item => item.value === this.state.step3Data.QAsplitForm.type
                         )._models[0]
                       : this.state.step3Data.QAsplitForm.model,
+                  ...this.state.qaSplitHighConfig,
+                  temperature: this.state.qaSplitHighConfig.temperature / 100,
                 },
               }
             : {};
@@ -483,6 +505,15 @@ class $$Page extends React.Component {
     this.history.push('/data-handle');
   }
 
+  onCloseConfigModal() {
+    this.setState({
+      configVisible: false,
+      qaSplitHighConfig: {
+        ...this.state.cacheqaSplitHighConfig,
+      },
+    });
+  }
+
   onDataSetChange(v) {
     this.setState({
       dataSetFileList: [],
@@ -652,6 +683,24 @@ class $$Page extends React.Component {
     );
   }
 
+  onOpenConfigModal() {
+    this.setState({
+      configVisible: true,
+      cacheqaSplitHighConfig: {
+        ...this.state.qaSplitHighConfig,
+      },
+    });
+    this.form('temperature_form')?.setValues({
+      temperature: this.state.qaSplitHighConfig.temperature / 100,
+    });
+    this.form('max_tokens_form')?.setValues({
+      max_tokens: this.state.qaSplitHighConfig.max_tokens,
+    });
+    this.form('prompt_template_form')?.setValues({
+      prompt_template: this.state.qaSplitHighConfig.prompt_template,
+    });
+  }
+
   onPageChange(page) {
     this.setState(
       {
@@ -710,6 +759,15 @@ class $$Page extends React.Component {
     });
   }
 
+  onSubmitHighConfig() {
+    this.setState({
+      configVisible: false,
+      cacheqaSplitHighConfig: {
+        ...this.state.qaSplitHighConfig,
+      },
+    });
+  }
+
   setDataSetVersionsSource(v) {
     const obj = this.state.dataSetDataList.find(item => item.value === v);
     const genOptionList = obj.versions;
@@ -719,6 +777,42 @@ class $$Page extends React.Component {
     this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
       dataSource: genOptionList,
     });
+  }
+
+  setQaSplitHighConfigValue(value, event, extraParams = {}) {
+    const fieldName = {
+      ...event,
+      ...extraParams,
+    }.fieldName;
+    const times = {
+      ...event,
+      ...extraParams,
+    }.times;
+    console.log({
+      ...event,
+      ...extraParams,
+    });
+    const qaSplitHighConfig = {
+      ...this.state.qaSplitHighConfig,
+      [fieldName]: times ? value * times : value,
+    };
+    this.setState(
+      {
+        qaSplitHighConfig,
+      },
+      () => {
+        console.log(this.state.qaSplitHighConfig);
+      }
+    );
+    if (fieldName === 'temperature') {
+      this.form('temperature_form').setValues({
+        temperature: qaSplitHighConfig.temperature / 100,
+      });
+    } else if (fieldName === 'max_tokens') {
+      this.form('max_tokens_form').setValues({
+        max_tokens: value,
+      });
+    }
   }
 
   updateStep3State(value, event, extraParams = {}) {
@@ -768,6 +862,247 @@ class $$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page style={{ marginBottom: '0px', paddingBottom: '0px' }}>
+        <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.onCloseConfigModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.onSubmitHighConfig.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.configVisible)}
+          title="模型高级配置"
+          width="700px"
+        >
+          <Row __component_name="Row" wrap={false}>
+            <Col
+              __component_name="Col"
+              flex="120px"
+              style={{ paddingLeft: '20px', paddingTop: '8px' }}
+            >
+              <Typography.Text
+                __component_name="Typography.Text"
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{}}
+              >
+                温度
+              </Typography.Text>
+            </Col>
+            <Col __component_name="Col" flex="auto">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={18}>
+                  <Slider
+                    __component_name="Slider"
+                    marks={__$$eval(() => this.state.temperature_marks)}
+                    max={100}
+                    min={0}
+                    onChange={function () {
+                      return this.setQaSplitHighConfigValue.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([
+                          {
+                            fieldName: 'temperature',
+                          },
+                        ])
+                      );
+                    }.bind(this)}
+                    value={__$$eval(() => this.state.qaSplitHighConfig.temperature)}
+                  />
+                </Col>
+                <Col __component_name="Col" span={6}>
+                  <FormilyForm
+                    __component_name="FormilyForm"
+                    componentProps={{
+                      colon: false,
+                      labelAlign: 'left',
+                      labelCol: 4,
+                      layout: 'horizontal',
+                      wrapperCol: 20,
+                    }}
+                    formHelper={{ autoFocus: true }}
+                    ref={this._refsManager.linkRef('temperature_form')}
+                  >
+                    <FormilyNumberPicker
+                      __component_name="FormilyNumberPicker"
+                      componentProps={{
+                        'x-component-props': {
+                          max: 1,
+                          min: 0,
+                          onChange: function () {
+                            return this.setQaSplitHighConfigValue.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([
+                                {
+                                  fieldName: 'temperature',
+                                  times: 100,
+                                },
+                              ])
+                            );
+                          }.bind(this),
+                          placeholder: '请输入',
+                          step: __$$eval(() => 1 / 100),
+                        },
+                      }}
+                      decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                      fieldProps={{
+                        _unsafe_MixedSetter_default_select: 'VariableSetter',
+                        default: __$$eval(() => this.state.qaSplitHighConfig.temperature / 100),
+                        name: 'temperature',
+                        title: '',
+                        'x-validator': [],
+                      }}
+                    />
+                  </FormilyForm>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+          <Row __component_name="Row" wrap={false}>
+            <Col
+              __component_name="Col"
+              flex="120px"
+              style={{ paddingLeft: '20px', paddingTop: '8px' }}
+            >
+              <Typography.Text
+                __component_name="Typography.Text"
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                最大响应长度
+              </Typography.Text>
+            </Col>
+            <Col __component_name="Col" flex="auto">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={18}>
+                  <Slider
+                    __component_name="Slider"
+                    marks={__$$eval(() => this.state.max_token_marks)}
+                    max={4096}
+                    min={10}
+                    onChange={function () {
+                      return this.setQaSplitHighConfigValue.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([
+                          {
+                            fieldName: 'max_tokens',
+                          },
+                        ])
+                      );
+                    }.bind(this)}
+                    value={__$$eval(() => this.state.qaSplitHighConfig.max_tokens)}
+                  />
+                </Col>
+                <Col __component_name="Col" span={6}>
+                  <FormilyForm
+                    __component_name="FormilyForm"
+                    componentProps={{
+                      colon: false,
+                      labelAlign: 'left',
+                      labelCol: 4,
+                      layout: 'horizontal',
+                      wrapperCol: 20,
+                    }}
+                    formHelper={{ autoFocus: true }}
+                    ref={this._refsManager.linkRef('max_tokens_form')}
+                  >
+                    <FormilyNumberPicker
+                      __component_name="FormilyNumberPicker"
+                      componentProps={{
+                        'x-component-props': {
+                          max: 4096,
+                          min: 10,
+                          onChange: function () {
+                            return this.setQaSplitHighConfigValue.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([
+                                {
+                                  fieldName: 'max_tokens',
+                                },
+                              ])
+                            );
+                          }.bind(this),
+                          placeholder: '请输入',
+                        },
+                      }}
+                      decoratorProps={{
+                        'x-decorator-props': {
+                          labelCol: 0,
+                          labelEllipsis: true,
+                          labelWidth: '0px',
+                        },
+                      }}
+                      fieldProps={{
+                        _unsafe_MixedSetter_default_select: 'VariableSetter',
+                        default: __$$eval(() => this.state.qaSplitHighConfig.max_tokens),
+                        name: 'max_tokens',
+                        title: '',
+                        'x-validator': [],
+                      }}
+                    />
+                  </FormilyForm>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 5,
+              layout: 'horizontal',
+              wrapperCol: 19,
+            }}
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('prompt_template_form')}
+          >
+            <FormilyTextArea
+              __component_name="FormilyTextArea"
+              componentProps={{
+                'x-component-props': {
+                  onChange: function () {
+                    return this.setQaSplitHighConfigValue.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([
+                        {
+                          fieldName: 'prompt_template',
+                        },
+                      ])
+                    );
+                  }.bind(this),
+                  placeholder: '请输入',
+                  rows: 15,
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, labelWidth: '120px' } }}
+              fieldProps={{
+                _unsafe_MixedSetter_default_select: 'VariableSetter',
+                default: __$$eval(() => this.state.qaSplitHighConfig.prompt_template),
+                name: 'prompt_template',
+                title: 'QA 拆分 Prompt',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+        </Modal>
         <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
           <Col __component_name="Col" span={24}>
             <Space __component_name="Space" align="center" direction="horizontal">
@@ -3015,6 +3350,26 @@ class $$Page extends React.Component {
                                     </Row>
                                   </Col>
                                 </Row>
+                                <Row __component_name="Row" justify="space-between" wrap={false}>
+                                  <Col __component_name="Col" />
+                                  <Col __component_name="Col">
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      onClick={function () {
+                                        return this.onOpenConfigModal.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([])
+                                        );
+                                      }.bind(this)}
+                                      strong={false}
+                                      style={{ color: '#4461eb', fontSize: '' }}
+                                    >
+                                      高级配置
+                                    </Typography.Text>
+                                  </Col>
+                                </Row>
                                 <Typography.Paragraph
                                   code={false}
                                   delete={false}
@@ -3027,7 +3382,7 @@ class $$Page extends React.Component {
                                   type="secondary"
                                   underline={false}
                                 >
-                                  根据文件中的文章与图表标题，自动将文件做 QA 拆分处理。
+                                  根据文件中的文章内容，自动将文件做 QA 拆分处理。
                                 </Typography.Paragraph>
                               </Col>
                             </Row>
