@@ -4,6 +4,11 @@ import React from 'react';
 
 import {
   Page,
+  Modal,
+  FormilyForm,
+  FormilyInput,
+  FormilyUpload,
+  FormilyTextArea,
   Row,
   Col,
   Typography,
@@ -13,24 +18,19 @@ import {
   Button,
   Input,
   List,
+  Image,
   Dropdown,
   Divider,
   Descriptions,
   Status,
   Pagination,
-  Modal,
-  FormilyForm,
-  FormilyInput,
-  FormilyUpload,
-  FormilyTextArea,
 } from '@tenx-ui/materials';
 
 import {
+  AntdIconCloudUploadOutlined,
   AntdIconPlusOutlined,
   AntdIconReloadOutlined,
-  AntdIconCodeSandboxCircleFilled,
   AntdIconSettingOutlined,
-  AntdIconCloudUploadOutlined,
 } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -76,12 +76,14 @@ class ModelAppList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      createBtnLoading: false,
       createModalVisible: false,
       currentRecord: null,
       data: [],
-      deleteBtnLoading: false,
       deleteLoading: false,
       deleteModalVisible: false,
+      editBtnLoading: false,
+      editModalVisible: false,
       fileList: [],
       imageUrl: '',
       keyword: '',
@@ -147,7 +149,6 @@ class ModelAppList$$Page extends React.Component {
         input: params,
       })
       .then(res => {
-        console.log(res);
         const { Application } = res;
         const { listApplicationMetadata } = Application || {};
         const { nodes, totalCount } = listApplicationMetadata || {};
@@ -183,6 +184,15 @@ class ModelAppList$$Page extends React.Component {
     });
   }
 
+  async handlePreview(file) {
+    if (!file.url && !file.preview) {
+      file.preview = await this.getBase64(file.originFileObj);
+    }
+    this.setState({
+      imageUrl: file.url || file.preview,
+    });
+  }
+
   onChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -202,11 +212,11 @@ class ModelAppList$$Page extends React.Component {
   onCloseCreateModel() {
     this.setState({
       createModalVisible: false,
+      createBtnLoading: false,
     });
   }
 
   onCloseDeleteModal(e, isNeedLoad) {
-    console.log('isNeedLoad', isNeedLoad);
     this.setState({
       deleteModalVisible: false,
       currentRecord: null,
@@ -216,12 +226,18 @@ class ModelAppList$$Page extends React.Component {
     }
   }
 
+  onCloseEditModel() {
+    this.setState({
+      editModalVisible: false,
+      editBtnLoading: false,
+    });
+  }
+
   onCreateClick(event) {
     this.history.push(`/model-app/create`);
   }
 
   onDelete() {
-    console.log(this.utils.bff);
     this.setState({
       deleteLoading: true,
     });
@@ -230,37 +246,102 @@ class ModelAppList$$Page extends React.Component {
       namespace: project,
       name: this.state.currentRecord.name,
     };
-    /**删除方法
-  this.utils.bff.deleteModel({ input: params }).then(res => {
-    this.setState({
-      deleteLoading: false
-    })
-    this.utils.notification.success({
-      message: '删除模型成功',
-    });
-    // 'event' 传参无意义，仅仅为了占数
-    this.onCloseDeleteModal('event',true)
-  }).catch(error => {
-    this.setState({
-      deleteLoading: false
-    })
-    this.utils.notification.warn({
-      message: '删除模型失败',
-    });
-  })
-   */
+    //删除方法
+    this.utils.bff
+      .deleteApplication({
+        input: params,
+      })
+      .then(res => {
+        this.setState({
+          deleteLoading: false,
+        });
+        this.utils.notification.success({
+          message: '删除应用成功',
+        });
+        // 'event' 传参无意义，仅仅为了占数
+        this.onCloseDeleteModal('event', true);
+      })
+      .catch(error => {
+        this.setState({
+          deleteLoading: false,
+        });
+        this.utils.notification.warn({
+          message: '删除应用失败',
+        });
+      });
   }
 
   onDetailClick(e, extParams) {
     // 事件的 handler
 
-    this.history.push(
-      `/chat?appNamespace=${extParams.data.namespace}&appName=${extParams.data.name}`
-    );
+    this.history.push(`/model-app/detail/${extParams.data.name}`);
   }
 
-  onEdit(item) {
-    // this.history.push(`/model-app/edit/${item.name}`)
+  onEdit() {
+    this.setState({
+      editBtnLoading: true,
+    });
+    this.form('edit_form')
+      .validate()
+      .then(res => {
+        const values = this.form('edit_form').values;
+        if (this.state.fileList[0]?.originFileObj) {
+          this.getBase64(this.state.fileList[0].originFileObj).then(res => {
+            const project = this.utils.getAuthData()?.project;
+            const params = {
+              namespace: project,
+              name: values.name,
+              displayName: values.displayName,
+              description: values.description,
+              icon: res,
+            };
+            this.utils.bff
+              .updateApplication({
+                input: params,
+              })
+              .then(res => {
+                this.utils.notification.success({
+                  message: '编辑成功',
+                });
+                this.setState({
+                  editBtnLoading: false,
+                });
+                this.onCloseEditModel();
+                this.getData();
+              });
+          });
+        } else {
+          const project = this.utils.getAuthData()?.project;
+          console.log(this.state.fileList);
+          const params = {
+            namespace: project,
+            name: values.name,
+            displayName: values.displayName,
+            description: values.description,
+            icon: this.state.fileList[0].url,
+          };
+          this.utils.bff
+            .updateApplication({
+              input: params,
+            })
+            .then(res => {
+              this.utils.notification.success({
+                message: '编辑成功',
+              });
+              this.setState({
+                editBtnLoading: false,
+              });
+              this.onCloseEditModel();
+              this.getData();
+            });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({
+          editBtnLoading: false,
+        });
+      });
   }
 
   onMenuClick(opItem, record) {
@@ -269,7 +350,7 @@ class ModelAppList$$Page extends React.Component {
     if (key === 'delete') {
       this.openDeleteModal(record.item);
     } else if (key === 'edit') {
-      this.onEdit(record.item);
+      this.openEditModal(record.item);
     }
   }
 
@@ -305,28 +386,42 @@ class ModelAppList$$Page extends React.Component {
   }
 
   onSubmitCreate() {
+    this.setState({
+      createBtnLoading: true,
+    });
     this.form('create_form')
       .validate()
       .then(res => {
         const values = this.form('create_form').values;
         this.getBase64(this.state.fileList[0].originFileObj).then(res => {
           const project = this.utils.getAuthData()?.project;
-          console.log(values);
           const params = {
             namespace: project,
             name: values.name,
             displayName: values.displayName,
             icon: res,
+            description: values.description,
           };
           this.utils.bff
-            .createKnowledgeBaseApplication({
+            .createApplication({
               input: params,
             })
             .then(res => {
-              const { KnowledgeBaseApplication } = res;
-              const { createKnowledgeBaseApplication } = KnowledgeBaseApplication || {};
-              console.log(createKnowledgeBaseApplication);
+              this.utils.notification.success({
+                message: '创建成功',
+              });
+              this.setState({
+                createBtnLoading: false,
+              });
+              this.onCloseCreateModel();
+              this.getData();
             });
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({
+          createBtnLoading: false,
         });
       });
   }
@@ -336,6 +431,41 @@ class ModelAppList$$Page extends React.Component {
       deleteModalVisible: true,
       currentRecord: item,
     });
+  }
+
+  openEditModal(item) {
+    this.setState(
+      {
+        editModalVisible: true,
+        currentRecord: item,
+      },
+      () => {
+        const pageThis = this;
+        setTimeout(() => {
+          pageThis.form('edit_form')?.setValues({
+            name: this.state.currentRecord.name,
+            displayName: this.state.currentRecord.displayName,
+            icon: {
+              fileList: [
+                {
+                  status: 'done',
+                  url: this.state.currentRecord.icon,
+                },
+              ],
+            },
+            description: this.state.currentRecord.description,
+          });
+        }, 500);
+        this.setState({
+          fileList: [
+            {
+              status: 'done',
+              url: this.state.currentRecord.icon,
+            },
+          ],
+        });
+      }
+    );
   }
 
   showTotal(total, range) {
@@ -353,6 +483,121 @@ class ModelAppList$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.createBtnLoading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.onCloseCreateModel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.onSubmitCreate.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.createModalVisible)}
+          title="新增应用"
+        >
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 6,
+              layout: 'horizontal',
+              wrapperCol: 18,
+            }}
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('create_form')}
+          >
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                name: 'name',
+                required: true,
+                title: '模型应用名称',
+                'x-validator': [
+                  {
+                    children: '未知',
+                    id: 'disabled',
+                    message: "必须由小写字母数字和'-'或'.'组成，并且必须以字母数字开头和结尾",
+                    pattern: '^[a-z0-9][a-z0-9.-]*[a-z0-9]$',
+                    type: 'disabled',
+                  },
+                ],
+              }}
+            />
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                name: 'displayName',
+                required: true,
+                title: '模型应用别名',
+                'x-validator': [],
+              }}
+            />
+            <FormilyUpload
+              __component_name="FormilyUpload"
+              componentProps={{
+                'x-component-props': {
+                  accept: 'image/*',
+                  beforeUpload: function () {
+                    return this.checkFileSize.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                  fileList: __$$eval(() => this.state.fileList),
+                  listType: 'picture',
+                  maxCount: 1,
+                  onChange: function () {
+                    return this.handleImageChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, size: 'default' } }}
+              fieldProps={{
+                name: '_icon',
+                required: true,
+                title: '上传',
+                'x-component': 'FormilyUpload',
+                'x-validator': [],
+              }}
+            >
+              <AntdIconCloudUploadOutlined
+                __component_name="AntdIconCloudUploadOutlined"
+                style={{ fontSize: 40 }}
+              />
+            </FormilyUpload>
+            <FormilyTextArea
+              __component_name="FormilyTextArea"
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                name: 'description',
+                title: '描述',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+        </Modal>
         <Row __component_name="Row" wrap={true}>
           <Col __component_name="Col" span={24}>
             <Typography.Title
@@ -483,19 +728,13 @@ class ModelAppList$$Page extends React.Component {
                               <Col __component_name="Col" span={24}>
                                 <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
                                   <Col __component_name="Col" flex="56px">
-                                    <AntdIconCodeSandboxCircleFilled
-                                      __component_name="AntdIconCodeSandboxCircleFilled"
-                                      onClick={function () {
-                                        return this.onDetailClick.apply(
-                                          this,
-                                          Array.prototype.slice.call(arguments).concat([
-                                            {
-                                              data: item,
-                                            },
-                                          ])
-                                        );
-                                      }.bind(__$$context)}
-                                      style={{ color: '#4a90e2', fontSize: 56 }}
+                                    <Image
+                                      __component_name="Image"
+                                      fallback=""
+                                      height={56}
+                                      preview={false}
+                                      src={__$$eval(() => item.icon)}
+                                      width={56}
                                     />
                                   </Col>
                                   <Col __component_name="Col" flex="auto">
@@ -639,6 +878,12 @@ class ModelAppList$$Page extends React.Component {
                   <Pagination
                     __component_name="Pagination"
                     current={__$$eval(() => this.state.pages.currentPage)}
+                    onChange={function () {
+                      return this.onChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
                     pageSize={__$$eval(() => this.state.pages.pageSize)}
                     showTotal={function () {
                       return this.showTotal.apply(
@@ -655,6 +900,111 @@ class ModelAppList$$Page extends React.Component {
             </Card>
           </Col>
         </Row>
+        <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.editBtnLoading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.onCloseEditModel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.onEdit.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          open={__$$eval(() => this.state.editModalVisible)}
+          title="编辑应用"
+        >
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 6,
+              layout: 'horizontal',
+              wrapperCol: 18,
+            }}
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('edit_form')}
+          >
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                name: 'name',
+                required: true,
+                title: '模型应用名称',
+                'x-pattern': 'disabled',
+                'x-validator': [],
+              }}
+            />
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                name: 'displayName',
+                required: true,
+                title: '模型应用别名',
+                'x-validator': [],
+              }}
+            />
+            <FormilyUpload
+              __component_name="FormilyUpload"
+              componentProps={{
+                'x-component-props': {
+                  accept: 'image/*',
+                  beforeUpload: function () {
+                    return this.checkFileSize.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                  fileList: __$$eval(() => this.state.fileList),
+                  listType: 'picture',
+                  maxCount: 1,
+                  onChange: function () {
+                    return this.handleImageChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, size: 'default' } }}
+              fieldProps={{
+                name: 'icon',
+                required: true,
+                title: '上传',
+                'x-component': 'FormilyUpload',
+                'x-validator': [],
+              }}
+            >
+              <AntdIconCloudUploadOutlined
+                __component_name="AntdIconCloudUploadOutlined"
+                style={{ fontSize: 40 }}
+              />
+            </FormilyUpload>
+            <FormilyTextArea
+              __component_name="FormilyTextArea"
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                name: 'description',
+                title: '描述',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+        </Modal>
         <Modal
           __component_name="Modal"
           cancelButtonProps={{ disabled: false }}
@@ -684,114 +1034,6 @@ class ModelAppList$$Page extends React.Component {
             showIcon={true}
             type="warning"
           />
-        </Modal>
-        <Modal
-          __component_name="Modal"
-          centered={false}
-          confirmLoading={false}
-          destroyOnClose={true}
-          forceRender={false}
-          keyboard={true}
-          mask={true}
-          maskClosable={false}
-          onCancel={function () {
-            return this.onCloseCreateModel.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
-          }.bind(this)}
-          onOk={function () {
-            return this.onSubmitCreate.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
-          }.bind(this)}
-          open={__$$eval(() => this.state.createModalVisible)}
-          title="新增应用"
-        >
-          <FormilyForm
-            __component_name="FormilyForm"
-            componentProps={{
-              colon: false,
-              labelAlign: 'left',
-              labelCol: 6,
-              layout: 'horizontal',
-              wrapperCol: 18,
-            }}
-            formHelper={{ autoFocus: true }}
-            ref={this._refsManager.linkRef('create_form')}
-          >
-            <FormilyInput
-              __component_name="FormilyInput"
-              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              fieldProps={{
-                name: 'name',
-                required: true,
-                title: '模型应用名称',
-                'x-validator': [],
-              }}
-            />
-            <FormilyInput
-              __component_name="FormilyInput"
-              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              fieldProps={{
-                name: 'displayName',
-                required: true,
-                title: '模型应用别名',
-                'x-validator': [],
-              }}
-            />
-            <FormilyUpload
-              __component_name="FormilyUpload"
-              componentProps={{
-                'x-component-props': {
-                  accept: 'image/*',
-                  beforeUpload: function () {
-                    return this.checkFileSize.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  fileList: __$$eval(() => this.state.fileList),
-                  listType: 'picture-circle',
-                  maxCount: 1,
-                  onChange: function () {
-                    return this.handleImageChange.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                },
-              }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, size: 'default' } }}
-              fieldProps={{
-                name: '_icon',
-                title: '上传',
-                'x-component': 'FormilyUpload',
-                'x-validator': [],
-              }}
-            >
-              {!!__$$eval(() => !this.state.fileList.length) && (
-                <AntdIconCloudUploadOutlined
-                  __component_name="AntdIconCloudUploadOutlined"
-                  style={{ fontSize: 40 }}
-                />
-              )}
-            </FormilyUpload>
-            <FormilyTextArea
-              __component_name="FormilyTextArea"
-              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              fieldProps={{
-                name: 'description',
-                title: '描述',
-                'x-component': 'Input.TextArea',
-                'x-validator': [],
-              }}
-            />
-          </FormilyForm>
         </Modal>
       </Page>
     );
