@@ -10,6 +10,7 @@
  */
 import { fetchEventSource } from '@/components/fetchEventSource';
 import { getCvsMeta } from '@/pages/Chat/Chat/helper';
+import Retry from '@/pages/Chat/Chat/retry';
 import {
   ActionsBar,
   ChatInputArea,
@@ -20,6 +21,7 @@ import {
   useControls,
   useCreateStore,
 } from '@lobehub/ui';
+import { getAuthData } from '@tenx-ui/auth-utils';
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { debounce } from 'lodash';
 import React, { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
@@ -28,6 +30,10 @@ import './index.less';
 interface Chat {
   appName: string;
   appNamespace: string;
+  // refresh 变化, 触发重新拉取
+  refresh?: boolean | number | string;
+  // debug为true,表示临时会话, 测试应用时使用, 不保存
+  debug?: boolean;
 }
 const safeAreaId = 'safe-area-id-not-use-in-your-code';
 class RetriableError extends Error {}
@@ -38,7 +44,7 @@ const scrollToBottom = debounce(() => {
 }, 100);
 let scrollToBottomTimeout;
 const ctrl = new AbortController();
-
+const retry = new Retry(ctrl, 3);
 const Chat: React.FC<Chat> = props => {
   const [conversion, setConversion] = useState<{
     id?: string;
@@ -81,11 +87,38 @@ const Chat: React.FC<Chat> = props => {
     },
     { store }
   );
+  const setLastCvsErr = useCallback(
+    (err: Error) => {
+      setConversion(_conversion => {
+        const [first, ...rest] = _conversion.data.reverse();
+        return {
+          ..._conversion,
+          loadingMsgId: undefined,
+          data: [
+            ...rest.reverse(),
+            {
+              ...first,
+              error: {
+                message: '请求出错',
+                type: 'error',
+                detail: err,
+              },
+            },
+          ],
+        };
+      });
+    },
+    [setConversion]
+  );
   const fetchConversion = useCallback(
     async query => {
       await fetchEventSource(`${window.location.origin}/kubeagi-apis/chat`, {
         method: 'POST',
         signal: ctrl.signal,
+        openWhenHidden: true,
+        headers: {
+          Authorization: getAuthData()?.token.id_token,
+        },
         body: JSON.stringify({
           query,
           response_mode: 'streaming',
@@ -122,7 +155,9 @@ const Chat: React.FC<Chat> = props => {
           scrollToBottom();
         },
         onerror(err) {
-          if (err instanceof FatalError) {
+          const retryRes = retry.retry();
+          if (retryRes === retry.abortFlag) {
+            setLastCvsErr(err);
             throw err; // rethrow to stop the operation
           } else {
             // do nothing to automatically retry. You can also
@@ -143,6 +178,7 @@ const Chat: React.FC<Chat> = props => {
   useEffect(() => {
     scrollToBottomTimeout = setTimeout(scrollToBottom, 100);
     return () => {
+      ctrl.abort();
       scrollToBottomTimeout && clearTimeout(scrollToBottomTimeout);
     };
   }, []);
@@ -174,6 +210,11 @@ const Chat: React.FC<Chat> = props => {
             renderActions={ActionsBar}
             renderMessages={{
               default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
+            }}
+            renderErrorMessages={{
+              error: {
+                Render: ({ id, error, ...res }) => <div>{error.detail?.stack?.toString()}</div>,
+              },
             }}
             loadingId={conversion.loadingMsgId}
             {...control}
