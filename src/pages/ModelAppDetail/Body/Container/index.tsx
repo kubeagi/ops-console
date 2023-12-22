@@ -35,18 +35,9 @@ const Container: React.FC<ContainerProps> = props => {
     form.setFieldsValue(initConfigs?.[configKey] || {});
     forceUpdate();
   }, [initConfigs?.[configKey], form]);
+
   return (
-    <Form
-      form={form}
-      className={styles.container}
-      onValuesChange={values => {
-        changeConfig &&
-          setConfigs({
-            ...(configs || {}),
-            [configKey]: values,
-          });
-      }}
-    >
+    <div className={styles.container}>
       <Modal
         form={form}
         open={modalOpen && modalType === actionData.key}
@@ -88,7 +79,7 @@ const Container: React.FC<ContainerProps> = props => {
       </Flex>
       {children}
       {renderChildren && renderChildren(form, forceUpdate)}
-    </Form>
+    </div>
   );
 };
 
