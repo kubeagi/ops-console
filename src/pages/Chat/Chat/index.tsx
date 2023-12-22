@@ -59,15 +59,18 @@ const Chat: React.FC<Chat> = props => {
   });
   useEffect(() => {
     if (conversion.data?.length) return;
-    const meta = application?.data?.Application?.getApplication?.metadata;
+    const app = application?.data?.Application?.getApplication;
+    const meta = app?.metadata;
+    const prologue = app?.prologue;
     if (meta?.name) {
       setConversion({
         ...conversion,
         data: [
           getCvsMeta(
-            `##### 您好，我是${meta.displayName || meta.name}${
-              meta.description ? `\n\n${meta.description}` : ''
-            }`,
+            prologue ||
+              `##### 您好，我是${meta.displayName || meta.name}${
+                meta.description ? `\n\n${meta.description}` : ''
+              }`,
             new Date().getTime().toString(),
             false
           ),
