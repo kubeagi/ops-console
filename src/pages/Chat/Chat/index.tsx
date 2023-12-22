@@ -117,7 +117,7 @@ const Chat: React.FC<Chat> = props => {
         signal: ctrl.signal,
         openWhenHidden: true,
         headers: {
-          Authorization: getAuthData()?.token.id_token,
+          Authorization: `bearer ${getAuthData()?.token.id_token}`,
         },
         body: JSON.stringify({
           query,
