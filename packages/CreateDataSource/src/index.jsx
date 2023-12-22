@@ -63,7 +63,7 @@ class CreateDataSource$$Component extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { type: undefined, checked: undefined, timer: undefined };
+    this.state = { checked: undefined, timer: undefined, type: undefined };
   }
 
   $ = refName => {
@@ -76,28 +76,8 @@ class CreateDataSource$$Component extends React.Component {
 
   componentWillUnmount() {}
 
-  handelCancel() {
-    this.props.handelCancel && this.props.handelCancel();
-  }
-
-  handleSave() {
-    this.form().submit(async v => {
-      this.props.handleSave && this.props.handleSave(v);
-    });
-  }
-
-  async validatorName(v) {
-    if (v && !this.props.data) {
-      try {
-        const res = await this.props?.bff?.getDatasource({
-          name: v,
-          namespace: this.props.project,
-        });
-        if (res?.Datasource?.getDatasource?.name) {
-          return '数据源名称重复';
-        }
-      } catch (error) {}
-    }
+  form(name) {
+    return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
   getDataSourceTypes(pageThis, labelKey = 'children') {
@@ -139,10 +119,21 @@ class CreateDataSource$$Component extends React.Component {
     ];
   }
 
-  handleResetChecked() {
-    this.setState({
-      checked: undefined,
-    });
+  getType() {
+    return (
+      this.props?.data?.type ||
+      this.state.type ||
+      this.getDataSourceTypes(this, 'label')?.[0]?.value
+    );
+  }
+
+  getTypeForms() {
+    return this.getDataSourceTypes(this, 'label')?.find(item => item.value === this.getType())
+      ?.forms;
+  }
+
+  handelCancel() {
+    this.props.handelCancel && this.props.handelCancel();
   }
 
   handleCheck() {
@@ -161,8 +152,8 @@ class CreateDataSource$$Component extends React.Component {
             url: v?.serverAddress,
             insecure: v?.insecure === 'https' ? false : true,
             auth: {
-              username: v?.username,
-              password: v?.password,
+              rootUser: v?.username,
+              rootPassword: v?.password,
             },
           },
         },
@@ -187,12 +178,16 @@ class CreateDataSource$$Component extends React.Component {
     });
   }
 
-  getType() {
-    return (
-      this.props?.data?.type ||
-      this.state.type ||
-      this.getDataSourceTypes(this, 'label')?.[0]?.value
-    );
+  handleResetChecked() {
+    this.setState({
+      checked: undefined,
+    });
+  }
+
+  handleSave() {
+    this.form().submit(async v => {
+      this.props.handleSave && this.props.handleSave(v);
+    });
   }
 
   initEditForm(values) {
@@ -208,11 +203,6 @@ class CreateDataSource$$Component extends React.Component {
     this.form()?.setValues(values || {});
   }
 
-  getTypeForms() {
-    return this.getDataSourceTypes(this, 'label')?.find(item => item.value === this.getType())
-      ?.forms;
-  }
-
   onItemClick(item) {
     this.form()?.setValues({
       type: item.value,
@@ -222,8 +212,18 @@ class CreateDataSource$$Component extends React.Component {
     });
   }
 
-  form(name) {
-    return this.$(name || 'formily_create')?.formRef?.current?.form;
+  async validatorName(v) {
+    if (v && !this.props.data) {
+      try {
+        const res = await this.props?.bff?.getDatasource({
+          name: v,
+          namespace: this.props.project,
+        });
+        if (res?.Datasource?.getDatasource?.name) {
+          return '数据源名称重复';
+        }
+      } catch (error) {}
+    }
   }
 
   componentDidMount() {
@@ -236,140 +236,140 @@ class CreateDataSource$$Component extends React.Component {
     return (
       <Component>
         <FormilyForm
-          ref={this._refsManager.linkRef('formily_create')}
-          formHelper={{ autoFocus: true }}
+          __component_name="FormilyForm"
           componentProps={{
             colon: false,
-            layout: 'horizontal',
-            labelCol: 4,
             labelAlign: 'left',
+            labelCol: 4,
+            layout: 'horizontal',
             wrapperCol: 20,
           }}
-          __component_name="FormilyForm"
+          formHelper={{ autoFocus: true }}
+          ref={this._refsManager.linkRef('formily_create')}
         >
           {!!__$$eval(() => this.props.data) && (
             <Divider
-              mode="default"
-              dashed={true}
-              content={[null]}
-              defaultOpen={true}
-              orientation="left"
               __component_name="Divider"
+              content={[null]}
+              dashed={true}
+              defaultOpen={true}
+              mode="default"
+              orientation="left"
               orientationMargin={0}
             >
               <Typography.Title
+                __component_name="Typography.Title"
                 bold={true}
-                level={2}
                 bordered={false}
                 ellipsis={true}
-                __component_name="Typography.Title"
+                level={2}
               >
                 基本信息
               </Typography.Title>
             </Divider>
           )}
           <FormilyInput
-            fieldProps={{
-              name: 'name',
-              title: this.i18n('i18n-k8ddthex') /* 数据源名称 */,
-              required: true,
-              'x-validator': [
-                {
-                  id: 'disabled',
-                  type: 'disabled',
-                  message: '数据源名称由 0~ 50 个字符组成',
-                  pattern: '^.{0,50}$',
-                  children: '未知',
-                },
-                {
-                  id: 'disabled',
-                  type: 'disabled',
-                  children: '未知',
-                  validator: function () {
-                    return this.validatorName.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  triggerType: 'onBlur',
-                },
-              ],
-            }}
+            __component_name="FormilyInput"
             componentProps={{
               'x-component-props': {
                 disabled: __$$eval(() => this.props.data),
-                placeholder: this.i18n('i18n-u4ayeyas') /* 请输入数据源名称 */,
                 onChange: function () {
                   return this.handleResetChecked.apply(
                     this,
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this),
+                placeholder: this.i18n('i18n-u4ayeyas') /* 请输入数据源名称 */,
               },
             }}
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-            __component_name="FormilyInput"
-          />
-          <FormilyInput
             fieldProps={{
-              name: 'displayName',
-              title: this.i18n('i18n-fr3ipxlc') /* 数据源别名 */,
-              required: false,
+              name: 'name',
+              required: true,
+              title: this.i18n('i18n-k8ddthex') /* 数据源名称 */,
               'x-validator': [
                 {
-                  id: 'disabled',
-                  type: 'disabled',
-                  message: '数据源别名由 0~ 50 个字符组成',
-                  pattern: '^.{0,50}$',
                   children: '未知',
+                  id: 'disabled',
+                  message: '数据源名称由 0~ 50 个字符组成',
+                  pattern: '^.{0,50}$',
+                  type: 'disabled',
+                },
+                {
+                  children: '未知',
+                  id: 'disabled',
+                  triggerType: 'onBlur',
+                  type: 'disabled',
+                  validator: function () {
+                    return this.validatorName.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                 },
               ],
             }}
+          />
+          <FormilyInput
+            __component_name="FormilyInput"
             componentProps={{
               'x-component-props': {
                 placeholder: this.i18n('i18n-aioalozj') /* 请输入数据源别名 */,
               },
             }}
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-            __component_name="FormilyInput"
+            fieldProps={{
+              name: 'displayName',
+              required: false,
+              title: this.i18n('i18n-fr3ipxlc') /* 数据源别名 */,
+              'x-validator': [
+                {
+                  children: '未知',
+                  id: 'disabled',
+                  message: '数据源别名由 0~ 50 个字符组成',
+                  pattern: '^.{0,50}$',
+                  type: 'disabled',
+                },
+              ],
+            }}
           />
           <FormilyTextArea
+            __component_name="FormilyTextArea"
+            componentProps={{
+              'x-component-props': { placeholder: this.i18n('i18n-eictbzlm') /* 请输入描述 */ },
+            }}
+            decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
             fieldProps={{
               name: 'description',
               title: this.i18n('i18n-7p3f51an') /* 描述 */,
               'x-component': 'Input.TextArea',
               'x-validator': [
                 {
+                  children: '未知',
                   id: 'disabled',
-                  type: 'disabled',
                   message: '描述由0 ~ 200 字符组成',
                   pattern: __$$eval(() => this.constants.DESCRIPTION_LENGTH_REG),
-                  children: '未知',
+                  type: 'disabled',
                 },
               ],
             }}
-            componentProps={{
-              'x-component-props': { placeholder: this.i18n('i18n-eictbzlm') /* 请输入描述 */ },
-            }}
-            decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-            __component_name="FormilyTextArea"
           />
           {!!__$$eval(() => !this.props.data) && (
             <Divider
-              mode="default"
-              dashed={true}
-              content={[null]}
-              defaultOpen={true}
-              orientation="left"
               __component_name="Divider"
+              content={[null]}
+              dashed={true}
+              defaultOpen={true}
+              mode="default"
+              orientation="left"
               orientationMargin={0}
             >
               <Typography.Title
+                __component_name="Typography.Title"
                 bold={true}
-                level={2}
                 bordered={false}
                 ellipsis={true}
-                __component_name="Typography.Title"
+                level={2}
               >
                 数据接入
               </Typography.Title>
@@ -377,20 +377,20 @@ class CreateDataSource$$Component extends React.Component {
           )}
           {!!__$$eval(() => this.props.data && !this.getTypeForms()?.includes('upload')) && (
             <Divider
-              mode="default"
-              dashed={true}
-              content={[null]}
-              defaultOpen={true}
-              orientation="left"
               __component_name="Divider"
+              content={[null]}
+              dashed={true}
+              defaultOpen={true}
+              mode="default"
+              orientation="left"
               orientationMargin={0}
             >
               <Typography.Title
+                __component_name="Typography.Title"
                 bold={true}
-                level={2}
                 bordered={false}
                 ellipsis={true}
-                __component_name="Typography.Title"
+                level={2}
               >
                 数据来源
               </Typography.Title>
@@ -398,148 +398,143 @@ class CreateDataSource$$Component extends React.Component {
           )}
           {!!__$$eval(() => !this.props.data) && (
             <FormilyFormItem
-              style={{ marginBottom: '-20px' }}
+              __component_name="FormilyFormItem"
+              decoratorProps={{ 'x-decorator-props': { asterisk: true, labelEllipsis: true } }}
               fieldProps={{
                 name: 'type',
-                type: 'object',
-                title: this.i18n('i18n-5am4k7to') /* 数据源 */,
                 required: false,
+                title: this.i18n('i18n-5am4k7to') /* 数据源 */,
+                type: 'object',
                 'x-component': 'FormilyFormItem',
                 'x-validator': [],
               }}
-              decoratorProps={{ 'x-decorator-props': { asterisk: true, labelEllipsis: true } }}
-              __component_name="FormilyFormItem"
+              style={{ marginBottom: '-20px' }}
             />
           )}
           {!!__$$eval(() => !this.props.data) && (
-            <Row wrap={true} style={{ marginBottom: '22px' }} __component_name="Row">
-              <Col span={4} __component_name="Col" />
-              <Col span={20} style={{ marginTop: '-30px' }} __component_name="Col">
+            <Row __component_name="Row" style={{ marginBottom: '22px' }} wrap={true}>
+              <Col __component_name="Col" span={4} />
+              <Col __component_name="Col" span={20} style={{ marginTop: '-30px' }}>
                 <LccComponentC6ipk
-                  value={__$$eval(() => this.getType())}
+                  __component_name="LccComponentC6ipk"
                   dataSource={__$$eval(() => this.getDataSourceTypes(this, 'label'))}
+                  defaultValue=""
                   onItemClick={function () {
                     return this.onItemClick.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  defaultValue=""
-                  __component_name="LccComponentC6ipk"
+                  value={__$$eval(() => this.getType())}
                 />
               </Col>
             </Row>
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('upload') && !this.props.data) && (
             <FormilyUpload
+              __component_name="FormilyUpload"
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
                 name: 'upload',
-                title: this.i18n('i18n-p1xi725y') /* 选择文件 */,
                 required: true,
-                'x-display': 'visible',
+                title: this.i18n('i18n-p1xi725y') /* 选择文件 */,
                 'x-component': 'FormilyUpload',
+                'x-display': 'visible',
                 'x-validator': [],
               }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyUpload"
             >
               <Flex
-                align="center"
-                style={{
-                  width: '680px',
-                  border: '1px dashed #4461EB',
-                  height: '100px',
-                  borderRadius: '4px',
-                }}
-                justify="center"
-                vertical={true}
                 __component_name="Flex"
+                align="center"
+                justify="center"
+                style={{
+                  border: '1px dashed #4461EB',
+                  borderRadius: '4px',
+                  height: '100px',
+                  width: '680px',
+                }}
+                vertical={true}
               >
                 <AntdIconPlusOutlined
-                  style={{ color: '#4461EB', fontSize: '16px' }}
                   __component_name="AntdIconPlusOutlined"
+                  style={{ color: '#4461EB', fontSize: '16px' }}
                 />
                 <Typography.Text
-                  type="colorTextSecondary"
-                  style={{ fontSize: '', paddingTop: '16px', paddingBottom: '16px' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '', paddingBottom: '16px', paddingTop: '16px' }}
+                  type="colorTextSecondary"
                 >
                   {this.i18n('i18n-23jovmbg') /* 点击 / 拖拽文件到此区域上传 */}
                 </Typography.Text>
                 <Flex __component_name="Flex">
                   <Typography.Text
-                    type="colorTextSecondary"
-                    style={{ fontSize: '' }}
-                    strong={false}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={false}
+                    style={{ fontSize: '' }}
+                    type="colorTextSecondary"
                   >
                     {this.i18n('i18n-1gfbnspc') /* 仅支持 .txt,.doc,.docx,.pdf,.md 文件； */}
                   </Typography.Text>
                   <Typography.Text
-                    type="colorTextSecondary"
-                    style={{ fontSize: '' }}
-                    strong={false}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={false}
+                    style={{ fontSize: '' }}
+                    type="colorTextSecondary"
                   >
                     {this.i18n('i18n-h0lq7h8f') /* 单文件大小  */}
                   </Typography.Text>
                   <Typography.Text
-                    type="warning"
-                    style={{ fontSize: '', paddingLeft: '6px' }}
-                    strong={false}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={false}
+                    style={{ fontSize: '', paddingLeft: '6px' }}
+                    type="warning"
                   >
                     不超过 2G，
                   </Typography.Text>
                   <Typography.Text
-                    type="colorTextSecondary"
-                    style={{ fontSize: '' }}
-                    strong={false}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={false}
+                    style={{ fontSize: '' }}
+                    type="colorTextSecondary"
                   >
                     {this.i18n('i18n-vuolk538') /* 单次上传文件数量 */}
                   </Typography.Text>
                   <Typography.Text
-                    type="warning"
-                    style={{ fontSize: '', paddingLeft: '6px' }}
-                    strong={false}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={false}
+                    style={{ fontSize: '', paddingLeft: '6px' }}
+                    type="warning"
                   >
                     不超过 20个
                   </Typography.Text>
                 </Flex>
                 <Typography.Text
-                  style={{ fontSize: '' }}
-                  strong={false}
+                  __component_name="Typography.Text"
                   children=""
                   disabled={false}
                   ellipsis={true}
-                  __component_name="Typography.Text"
+                  strong={false}
+                  style={{ fontSize: '' }}
                 />
               </Flex>
             </FormilyUpload>
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('serverAddress')) && (
             <FormilyInput
-              fieldProps={{
-                name: 'serverAddress',
-                title: this.i18n('i18n-wg1t5zxg') /* 服务地址 */,
-                required: true,
-                'x-validator': [],
-              }}
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
                   onChange: function () {
@@ -552,32 +547,32 @@ class CreateDataSource$$Component extends React.Component {
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
+              fieldProps={{
+                name: 'serverAddress',
+                required: true,
+                title: this.i18n('i18n-wg1t5zxg') /* 服务地址 */,
+                'x-validator': [],
+              }}
             />
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('path')) && (
             <FormilyInput
-              fieldProps={{
-                name: 'lujing',
-                title: this.i18n('i18n-tw87ecqw') /* 路径 */,
-                required: true,
-                'x-validator': [],
-              }}
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': { placeholder: this.i18n('i18n-h18e958l') /* 请输入路径 */ },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
+              fieldProps={{
+                name: 'lujing',
+                required: true,
+                title: this.i18n('i18n-tw87ecqw') /* 路径 */,
+                'x-validator': [],
+              }}
             />
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('username')) && (
             <FormilyInput
-              fieldProps={{
-                name: 'username',
-                title: this.i18n('i18n-ifb9v7p6') /* 用户名 */,
-                required: true,
-                'x-validator': [],
-              }}
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
                   onChange: function () {
@@ -590,124 +585,121 @@ class CreateDataSource$$Component extends React.Component {
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
+              fieldProps={{
+                name: 'username',
+                required: true,
+                title: this.i18n('i18n-ifb9v7p6') /* 用户名 */,
+                'x-validator': [],
+              }}
             />
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('apiAddress')) && (
             <FormilyInput
-              fieldProps={{
-                name: 'api',
-                title: this.i18n('i18n-6y63riyn') /* API 地址 */,
-                required: true,
-                'x-validator': [],
-              }}
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
                   placeholder: this.i18n('i18n-232nz66x') /* 请输入 API 地址 */,
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
+              fieldProps={{
+                name: 'api',
+                required: true,
+                title: this.i18n('i18n-6y63riyn') /* API 地址 */,
+                'x-validator': [],
+              }}
             />
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('token')) && (
             <FormilyInput
-              fieldProps={{
-                name: 'token',
-                title: this.i18n('i18n-af2ovuoj') /* Token */,
-                required: true,
-                'x-validator': [],
-              }}
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': { placeholder: this.i18n('i18n-l88g15y8') /* 请输入 Token */ },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
+              fieldProps={{
+                name: 'token',
+                required: true,
+                title: this.i18n('i18n-af2ovuoj') /* Token */,
+                'x-validator': [],
+              }}
             />
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('password')) && (
             <FormilyPassword
               __component_name="FormilyPassword"
-              fieldProps={{
-                name: 'password',
-                title: this.i18n('i18n-mtolrn4c') /* 密码 */,
-                'x-validator': [],
-                required: true,
-              }}
               componentProps={{
                 'x-component-props': {
-                  placeholder: this.i18n('i18n-yzicgjma') /* 请输入密码 */,
                   onChange: function () {
                     return this.handleResetChecked.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this),
+                  placeholder: this.i18n('i18n-yzicgjma') /* 请输入密码 */,
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                name: 'password',
+                required: true,
+                title: this.i18n('i18n-mtolrn4c') /* 密码 */,
+                'x-validator': [],
+              }}
             />
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('bucket')) && (
             <FormilyInput
-              fieldProps={{
-                name: 'bucket',
-                title: this.i18n('i18n-a17g4buw') /* Bucket */,
-                required: true,
-                'x-validator': [],
-              }}
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
-                  placeholder: this.i18n('i18n-9vkabv9j') /* 请输入 Bucket */,
                   onChange: function () {
                     return this.handleResetChecked.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this),
+                  placeholder: this.i18n('i18n-9vkabv9j') /* 请输入 Bucket */,
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
+              fieldProps={{
+                name: 'bucket',
+                required: true,
+                title: this.i18n('i18n-a17g4buw') /* Bucket */,
+                'x-validator': [],
+              }}
             />
           )}
           {!!__$$eval(() => this.getTypeForms()?.includes('object')) && (
             <FormilyInput
-              fieldProps={{
-                name: 'object',
-                title: this.i18n('i18n-147ypkac') /* Object */,
-                required: false,
-                'x-validator': [],
-              }}
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
-                  placeholder: this.i18n('i18n-iazmtrsp') /* 请输入 Object */,
                   onChange: function () {
                     return this.handleResetChecked.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this),
+                  placeholder: this.i18n('i18n-iazmtrsp') /* 请输入 Object */,
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
+              fieldProps={{
+                name: 'object',
+                required: false,
+                title: this.i18n('i18n-147ypkac') /* Object */,
+                'x-validator': [],
+              }}
             />
           )}
           <FormilyRadio
-            fieldProps={{
-              enum: [
-                { label: 'HTTPS', value: 'https' },
-                { label: 'HTTP', value: 'http' },
-              ],
-              name: 'insecure',
-              title: this.i18n('i18n-oe4qfho1') /* 协议类型 */,
-              default: 'https',
-              'x-validator': [],
-            }}
+            __component_name="FormilyRadio"
             componentProps={{
               'x-component-props': {
-                size: 'middle',
+                _sdkSwrGetFunc: {},
+                buttonStyle: 'outline',
                 disabled: false,
                 onChange: function () {
                   return this.handleResetChecked.apply(
@@ -715,32 +707,40 @@ class CreateDataSource$$Component extends React.Component {
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this),
-                buttonStyle: 'outline',
-                _sdkSwrGetFunc: {},
+                size: 'middle',
               },
             }}
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-            __component_name="FormilyRadio"
+            fieldProps={{
+              default: 'https',
+              enum: [
+                { label: 'HTTPS', value: 'https' },
+                { label: 'HTTP', value: 'http' },
+              ],
+              name: 'insecure',
+              title: this.i18n('i18n-oe4qfho1') /* 协议类型 */,
+              'x-validator': [],
+            }}
           />
           {!!__$$eval(() => !this.getTypeForms()?.includes('upload')) && (
-            <Row wrap={true} __component_name="Row">
-              <Col span={4} style={{}} __component_name="Col" />
-              <Col span={20} style={{ marginBottom: '20px' }} __component_name="Col">
-                <Space __component_name="Space" direction="horizontal" align="center" size={5}>
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" span={4} style={{}} />
+              <Col __component_name="Col" span={20} style={{ marginBottom: '20px' }}>
+                <Space __component_name="Space" align="center" direction="horizontal" size={5}>
                   {!!__$$eval(() => this.state.checked === undefined) && (
                     <Typography.Text
-                      type="colorPrimary"
-                      style={{ cursor: 'pointer', fontSize: '' }}
-                      strong={false}
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
                       onClick={function () {
                         return this.handleCheck.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      disabled={false}
-                      ellipsis={true}
-                      __component_name="Typography.Text"
+                      strong={false}
+                      style={{ cursor: 'pointer', fontSize: '' }}
+                      type="colorPrimary"
                     >
                       {this.i18n('i18n-z7scyw9j') /* 测试连接 */}
                     </Typography.Text>
@@ -752,8 +752,8 @@ class CreateDataSource$$Component extends React.Component {
                     {!!__$$eval(() => this.state.checked === false) && (
                       <Space
                         __component_name="Space"
-                        direction="horizontal"
                         align="center"
+                        direction="horizontal"
                         size={5}
                       >
                         <AntdIconCloseCircleFilled
@@ -761,12 +761,12 @@ class CreateDataSource$$Component extends React.Component {
                           style={{ color: '#ff4d4f' }}
                         />
                         <Typography.Text
-                          type="danger"
-                          style={{ cursor: 'pointer', fontSize: '' }}
-                          strong={false}
+                          __component_name="Typography.Text"
                           disabled={false}
                           ellipsis={true}
-                          __component_name="Typography.Text"
+                          strong={false}
+                          style={{ cursor: 'pointer', fontSize: '' }}
+                          type="danger"
                         >
                           连接异常
                         </Typography.Text>
@@ -781,12 +781,12 @@ class CreateDataSource$$Component extends React.Component {
                   )}
                   {!!__$$eval(() => this.state.checked === true) && (
                     <Typography.Text
-                      type="success"
-                      style={{ cursor: 'pointer', fontSize: '' }}
-                      strong={false}
+                      __component_name="Typography.Text"
                       disabled={false}
                       ellipsis={true}
-                      __component_name="Typography.Text"
+                      strong={false}
+                      style={{ cursor: 'pointer', fontSize: '' }}
+                      type="success"
                     >
                       连接成功
                     </Typography.Text>
@@ -797,19 +797,21 @@ class CreateDataSource$$Component extends React.Component {
           )}
           {!!__$$eval(() => !this.props.data) && (
             <Divider
-              mode="line"
-              style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
+              __component_name="Divider"
               dashed={false}
               defaultOpen={false}
-              __component_name="Divider"
+              mode="line"
+              style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
             />
           )}
-          <Row wrap={true} __component_name="Row">
-            <Col span={4} style={{}} __component_name="Col" />
-            <Col span={20} __component_name="Col">
+          <Row __component_name="Row" wrap={true}>
+            <Col __component_name="Col" span={4} style={{}} />
+            <Col __component_name="Col" span={20}>
               <Space
-                size="middle"
+                __component_name="Space"
                 align="center"
+                direction="horizontal"
+                size="middle"
                 style={__$$eval(
                   () =>
                     this.props.data && {
@@ -820,50 +822,48 @@ class CreateDataSource$$Component extends React.Component {
                       right: '24px',
                     }
                 )}
-                direction="horizontal"
-                __component_name="Space"
               >
                 <Button
+                  __component_name="Button"
                   block={false}
-                  ghost={false}
-                  shape="default"
                   danger={false}
+                  disabled={false}
+                  ghost={false}
                   onClick={function () {
                     return this.handelCancel.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  disabled={false}
-                  __component_name="Button"
+                  shape="default"
                 >
                   {this.i18n('i18n-0ujub8i3') /* 取消 */}
                 </Button>
                 <Tooltip
+                  __component_name="Tooltip"
                   title={__$$eval(
                     () =>
                       !this.state.checked &&
                       !this.getTypeForms()?.includes('upload') &&
                       '请先测试连接并通过'
                   )}
-                  __component_name="Tooltip"
                 >
                   <Button
-                    type="primary"
+                    __component_name="Button"
                     block={false}
-                    ghost={false}
-                    shape="default"
                     danger={false}
+                    disabled={__$$eval(
+                      () => !this.state.checked && !this.getTypeForms()?.includes('upload')
+                    )}
+                    ghost={false}
                     onClick={function () {
                       return this.handleSave.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    disabled={__$$eval(
-                      () => !this.state.checked && !this.getTypeForms()?.includes('upload')
-                    )}
-                    __component_name="Button"
+                    shape="default"
+                    type="primary"
                   >
                     {this.i18n('i18n-cz31s8vq') /* 确定 */}
                   </Button>
@@ -925,6 +925,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;

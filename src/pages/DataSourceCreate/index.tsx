@@ -61,10 +61,8 @@ class DataSourceCreate$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  setThis(createThis) {
-    this.setState({
-      createThis,
-    });
+  handleCancel(v) {
+    this.history?.go('-1');
   }
 
   handleSave(v) {
@@ -88,8 +86,8 @@ class DataSourceCreate$$Page extends React.Component {
             url: v?.serverAddress,
             insecure: v?.insecure === 'https' ? false : true,
             auth: {
-              username: v?.username,
-              password: v?.password,
+              rootUser: v?.username,
+              rootPassword: v?.password,
             },
           },
         },
@@ -129,8 +127,10 @@ class DataSourceCreate$$Page extends React.Component {
     });
   }
 
-  handleCancel(v) {
-    this.history?.go('-1');
+  setThis(createThis) {
+    this.setState({
+      createThis,
+    });
   }
 
   componentDidMount() {}
@@ -140,44 +140,44 @@ class DataSourceCreate$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
-            <Space align="center" direction="horizontal" __component_name="Space">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
+            <Space __component_name="Space" align="center" direction="horizontal">
               <Button.Back
-                name={this.i18n('i18n-wourf2xg') /* 返回 */}
-                type="primary"
-                title={this.i18n('i18n-ueslu0a9') /* 新增数据源 */}
                 __component_name="Button.Back"
+                name={this.i18n('i18n-wourf2xg') /* 返回 */}
+                title={this.i18n('i18n-ueslu0a9') /* 新增数据源 */}
+                type="primary"
               />
             </Space>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="inner"
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              type="inner"
             >
               <FormilyForm
-                ref={this._refsManager.linkRef('formily_w64au9q0w2l')}
-                formHelper={{ autoFocus: true }}
+                __component_name="FormilyForm"
                 componentProps={{
                   colon: false,
-                  layout: 'horizontal',
-                  labelCol: 4,
                   labelAlign: 'left',
+                  labelCol: 4,
+                  layout: 'horizontal',
                   wrapperCol: 20,
                 }}
-                __component_name="FormilyForm"
+                formHelper={{ autoFocus: true }}
+                ref={this._refsManager.linkRef('formily_w64au9q0w2l')}
               >
                 <LccComponentRu83f
+                  __component_name="LccComponentRu83f"
                   bff={__$$eval(() => this.props.appHelper.utils.bff)}
-                  project={__$$eval(() => this.utils.getAuthData()?.project)}
-                  setThis={function () {
-                    return this.setThis.apply(
+                  handelCancel={function () {
+                    return this.handleCancel.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
@@ -188,13 +188,13 @@ class DataSourceCreate$$Page extends React.Component {
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  handelCancel={function () {
-                    return this.handleCancel.apply(
+                  project={__$$eval(() => this.utils.getAuthData()?.project)}
+                  setThis={function () {
+                    return this.setThis.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  __component_name="LccComponentRu83f"
                 />
               </FormilyForm>
             </Card>
@@ -253,6 +253,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;

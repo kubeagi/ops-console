@@ -251,8 +251,8 @@ class DataSource$$Page extends React.Component {
             url: v?.serverAddress,
             insecure: v?.insecure === 'https' ? false : true,
             auth: {
-              username: v?.username,
-              password: v?.password,
+              rootUser: v?.username,
+              rootPassword: v?.password,
             },
           },
         },

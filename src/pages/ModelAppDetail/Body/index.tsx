@@ -1,5 +1,5 @@
 import { Card, notification, Typography } from '@tenx-ui/materials';
-import { Button, Col, Flex, Row, Tooltip } from 'antd';
+import { Button, Col, Flex, Form, Row, Tooltip } from 'antd';
 import { isEqual } from 'lodash';
 import React, { useState } from 'react';
 import utils from '../../../utils/__utils';
@@ -70,12 +70,14 @@ const Body: React.FC<BodyProps> = props => {
       <Row className={styles.content}>
         <Col span={10}>
           <Card className={styles.setting}>
-            <ConfigConversationStarter />
-            <ConfigModelService />
-            <ConfigKnowledge />
-            <ConfigPrompt />
-            {/* <ConfigAudio /> */}
-            <ConfigNext />
+            <Form form={form}>
+              <ConfigConversationStarter />
+              <ConfigModelService />
+              <ConfigKnowledge />
+              <ConfigPrompt />
+              {/* <ConfigAudio /> */}
+              <ConfigNext />
+            </Form>
           </Card>
         </Col>
         <Col span={14}>
