@@ -11,4 +11,5 @@ WORKDIR /usr/src/app
 # Install dependencies modules
 ADD .npmrc package.json pnpm-lock.yaml .pnpmfile.cjs pnpm-workspace.yaml ./
 ADD packages ./packages
+ADD patches ./patches
 RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm i pnpm @antfu/ni -g && ni
