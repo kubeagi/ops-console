@@ -1,6 +1,6 @@
 /**
- * Licensed Materials - Property of tenxcloud.com
- * (C) Copyright 2023 TenxCloud. All Rights Reserved.
+ * Licensed Materials - Property of k8s.com.cn
+ * (C) Copyright 2023 KubeAGI. All Rights Reserved.
  */
 
 /**

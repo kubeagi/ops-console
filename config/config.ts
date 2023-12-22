@@ -1,6 +1,6 @@
 /**
- * Licensed Materials - Property of tenxcloud.com
- * (C) Copyright 2023 TenxCloud. All Rights Reserved.
+ * Licensed Materials - Property of k8s.com.cn
+ * (C) Copyright 2023 KubeAGI. All Rights Reserved.
  */
 
 /**
@@ -25,7 +25,7 @@ const getLastCommitHash = () => {
   }
 };
 
-const site = 'tenxcloud.com';
+const site = 'k8s.com.cn';
 const bannerFlag = `@Licensed Materials - Property of ${site}`;
 const banner = `${bannerFlag}
 (C) Copyright 2023~2024 ${site}. All Rights Reserved.
