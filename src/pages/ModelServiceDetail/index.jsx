@@ -772,6 +772,28 @@ class ModelServiceDetail$$Page extends React.Component {
                     span: 1,
                   },
                   {
+                    _unsafe_MixedSetter_children_select: 'SlotSetter',
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        {__$$eval(() =>
+                          this.getFullDescribe({
+                            key: 'api',
+                          })
+                        )}
+                      </Typography.Text>
+                    ),
+                    key: 'wdifgpbo6x',
+                    label: 'API地址',
+                    span: 1,
+                  },
+                  {
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
@@ -842,28 +864,6 @@ class ModelServiceDetail$$Page extends React.Component {
                     ),
                     key: '0o3tlvtap77d',
                     label: this.i18n('i18n-vgl4ncps') /* 模型 */,
-                    span: 1,
-                  },
-                  {
-                    _unsafe_MixedSetter_children_select: 'SlotSetter',
-                    _unsafe_MixedSetter_label_select: 'StringSetter',
-                    children: (
-                      <Typography.Text
-                        __component_name="Typography.Text"
-                        disabled={false}
-                        ellipsis={true}
-                        strong={false}
-                        style={{ fontSize: '' }}
-                      >
-                        {__$$eval(() =>
-                          this.getFullDescribe({
-                            key: 'api',
-                          })
-                        )}
-                      </Typography.Text>
-                    ),
-                    key: 'wdifgpbo6x',
-                    label: 'API地址',
                     span: 1,
                   },
                   {
