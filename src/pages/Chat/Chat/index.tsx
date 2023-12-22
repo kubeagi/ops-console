@@ -23,6 +23,7 @@ import {
 } from '@lobehub/ui';
 import { getAuthData } from '@tenx-ui/auth-utils';
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
+import classNames from 'classnames';
 import { debounce } from 'lodash';
 import React, { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import './index.less';
@@ -203,7 +204,11 @@ const Chat: React.FC<Chat> = props => {
   }, [input, setInput, setConversion, fetchConversion]);
   return (
     <div className="chatComponent">
-      <div className="chatColumn">
+      <div
+        className={classNames('chatColumn', {
+          chatDebug: props.debug,
+        })}
+      >
         <div className="chatList">
           <ChatItemsList
             data={conversion?.data}
@@ -219,8 +224,8 @@ const Chat: React.FC<Chat> = props => {
             loadingId={conversion.loadingMsgId}
             {...control}
           />
+          <div className="safeArea" id={safeAreaId}></div>
         </div>
-        <div className="safeArea" id={safeAreaId}></div>
         <div className="inputArea">
           <ChatInputArea
             value={input}
