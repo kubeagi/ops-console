@@ -126,6 +126,7 @@ const Chat: React.FC<Chat> = props => {
           conversion_id: conversion?.id || '',
           app_name: props.appName,
           app_namespace: props.appNamespace,
+          debug: Boolean(props.debug),
         }),
         async onopen(response) {
           if (response.ok) {
