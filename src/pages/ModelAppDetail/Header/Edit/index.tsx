@@ -36,11 +36,11 @@ const Edit: React.FC<EditProps> = props => {
     forceUpdate();
   };
   useEffect(() => {
-    if (data && type === 'edit') {
+    if (open && data && type === 'edit') {
       form.setFieldsValue(data);
       setImageUrl(data?.icon);
     }
-  }, [data, form, type]);
+  }, [data, form, type, open]);
 
   const handleChange = info => {
     getBase64(info.file, url => {

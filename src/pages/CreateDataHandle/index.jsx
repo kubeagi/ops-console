@@ -190,7 +190,7 @@ class $$Page extends React.Component {
         max_tokens: 512,
         prompt_template: `{text}
 
-请将上述内容按照问答的方式，提出不超过 25 个问题，并给出每个问题的答案，每个问题必须有 Q 和对应的 A，并严格按照以下方式展示： Q1: 问题。\n  A1: 答案。\n Q2: 问题 \n A2: 答案\n  注意，尽可能多的提出问题，但是 Q 不要重复，也不要出现只有 Q 没有 A 的情况。`,
+请将上述内容按照问答的方式，提出不超过 25 个问题，并给出每个问题的答案，每个问题必须有 Q 和对应的 A，并严格按照以下方式展示： Q1: 问题。\n A1: 答案。\n Q2: 问题 \n A2: 答案\n  注意，尽可能多的提出问题，但是 Q 不要重复，也不要出现只有 Q 没有 A 的情况。`,
       },
       selectedFileList: [],
       showLlmModel: false,
@@ -779,7 +779,7 @@ class $$Page extends React.Component {
     });
   }
 
-  setQaSplitHighConfigValue(value, event, extraParams = {}) {
+  setQaSplitHighConfigValue(_value, event, extraParams = {}) {
     const fieldName = {
       ...event,
       ...extraParams,
@@ -788,22 +788,14 @@ class $$Page extends React.Component {
       ...event,
       ...extraParams,
     }.times;
-    console.log({
-      ...event,
-      ...extraParams,
-    });
+    const value = fieldName === 'prompt_template' ? _value.target.value : _value;
     const qaSplitHighConfig = {
       ...this.state.qaSplitHighConfig,
       [fieldName]: times ? value * times : value,
     };
-    this.setState(
-      {
-        qaSplitHighConfig,
-      },
-      () => {
-        console.log(this.state.qaSplitHighConfig);
-      }
-    );
+    this.setState({
+      qaSplitHighConfig,
+    });
     if (fieldName === 'temperature') {
       this.form('temperature_form').setValues({
         temperature: qaSplitHighConfig.temperature / 100,

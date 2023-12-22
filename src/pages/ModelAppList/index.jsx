@@ -312,7 +312,6 @@ class ModelAppList$$Page extends React.Component {
           });
         } else {
           const project = this.utils.getAuthData()?.project;
-          console.log(this.state.fileList);
           const params = {
             namespace: project,
             name: values.name,
@@ -473,6 +472,12 @@ class ModelAppList$$Page extends React.Component {
     return `共 ${total} 条`;
   }
 
+  validate(value, item) {
+    if (!value?.fileList?.length) {
+      return '请选择文件上传';
+    }
+  }
+
   componentDidMount() {
     console.log('did mount', this.utils.bff);
     this.getData();
@@ -571,13 +576,28 @@ class ModelAppList$$Page extends React.Component {
                   }.bind(this),
                 },
               }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, size: 'default' } }}
+              decoratorProps={{
+                'x-decorator-props': { asterisk: true, labelEllipsis: true, size: 'default' },
+              }}
               fieldProps={{
                 name: '_icon',
-                required: true,
+                required: false,
                 title: '上传',
                 'x-component': 'FormilyUpload',
-                'x-validator': [],
+                'x-validator': [
+                  {
+                    children: '未知',
+                    id: 'disabled',
+                    required: false,
+                    type: 'disabled',
+                    validator: function () {
+                      return this.validate.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                  },
+                ],
               }}
             >
               <AntdIconCloudUploadOutlined
@@ -751,16 +771,6 @@ class ModelAppList$$Page extends React.Component {
                                           bordered={false}
                                           ellipsis={true}
                                           level={1}
-                                          onClick={function () {
-                                            return this.onDetailClick.apply(
-                                              this,
-                                              Array.prototype.slice.call(arguments).concat([
-                                                {
-                                                  data: item,
-                                                },
-                                              ])
-                                            );
-                                          }.bind(__$$context)}
                                         >
                                           {__$$eval(() => __$$context.utils.getFullName(item))}
                                         </Typography.Title>
@@ -978,13 +988,28 @@ class ModelAppList$$Page extends React.Component {
                   }.bind(this),
                 },
               }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, size: 'default' } }}
+              decoratorProps={{
+                'x-decorator-props': { asterisk: true, labelEllipsis: true, size: 'default' },
+              }}
               fieldProps={{
+                enum: [],
                 name: 'icon',
-                required: true,
+                required: false,
                 title: '上传',
                 'x-component': 'FormilyUpload',
-                'x-validator': [],
+                'x-validator': [
+                  {
+                    children: '未知',
+                    id: 'disabled',
+                    type: 'disabled',
+                    validator: function () {
+                      return this.validate.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                  },
+                ],
               }}
             >
               <AntdIconCloudUploadOutlined

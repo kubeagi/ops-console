@@ -30,51 +30,51 @@ const Knowledge: React.FC<KnowledgeProps> = props => {
   }, [props.checkedIds]);
   return (
     <Flex wrap="wrap" gap="small">
-      {(canSelect ? items : checkedIds?.map(id => items?.find(item => item.id === id)))?.map(
+      {(canSelect ? items : checkedIds?.map(id => items?.find(item => item?.id === id)))?.map(
         item => {
           return (
             <Flex
               justify="space-between"
-              key={item.id}
+              key={item?.id}
               className={`${styles.KnowledgeItem} ${canSelect && styles.KnowledgeItemCanSelect} ${
-                checkedIds.includes(item.id) && styles.KnowledgeItemSelected
+                checkedIds.includes(item?.id) && styles.KnowledgeItemSelected
               }`}
               align="center"
               onClick={() => {
                 if (!canSelect) return;
                 if (!multi) {
-                  setCheckedIds([item.id]);
-                  props.setCheckedIds && props.setCheckedIds([item.id]);
+                  setCheckedIds([item?.id]);
+                  props.setCheckedIds && props.setCheckedIds([item?.id]);
                   return;
                 }
-                if (checkedIds.includes(item.id)) {
-                  setCheckedIds(checkedIds?.filter(id => id !== item.id));
+                if (checkedIds.includes(item?.id)) {
+                  setCheckedIds(checkedIds?.filter(id => id !== item?.id));
                   props.setCheckedIds &&
-                    props.setCheckedIds(checkedIds?.filter(id => id !== item.id));
+                    props.setCheckedIds(checkedIds?.filter(id => id !== item?.id));
                   return;
                 }
-                setCheckedIds([...checkedIds, item.id]);
-                props.setCheckedIds && props.setCheckedIds([...checkedIds, item.id]);
+                setCheckedIds([...checkedIds, item?.id]);
+                props.setCheckedIds && props.setCheckedIds([...checkedIds, item?.id]);
               }}
             >
               <div>
                 <span className={styles.icon}>
-                  <img width={24} src={item.icon} />
+                  <img width={24} src={item?.icon} />
                 </span>
                 <Typography.Text
                   style={{ position: 'relative', top: -2, width: 98 }}
-                  ellipsis={{ tooltip: item.name }}
+                  ellipsis={{ tooltip: item?.name }}
                 >
-                  {item.name}
+                  {item?.name}
                 </Typography.Text>
               </div>
               {canDelete && (
                 <DeleteOutlined
                   className={styles.delete}
                   onClick={() => {
-                    setCheckedIds && setCheckedIds(checkedIds?.filter(id => item.id !== id));
+                    setCheckedIds && setCheckedIds(checkedIds?.filter(id => item?.id !== id));
                     props.setCheckedIds &&
-                      props.setCheckedIds(checkedIds?.filter(id => item.id !== id));
+                      props.setCheckedIds(checkedIds?.filter(id => item?.id !== id));
                   }}
                 />
               )}

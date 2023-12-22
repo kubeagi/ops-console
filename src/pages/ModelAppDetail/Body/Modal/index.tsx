@@ -125,7 +125,6 @@ const Setting: React.FC<SettingProps> = props => {
           }
         });
       }}
-      destroyOnClose
     >
       <FormHelper>
         <Form className={styles.form} form={curForm} labelAlign="left" labelCol={{ span: 5 }}>

@@ -1,16 +1,19 @@
 import { Col, Divider, Dropdown, Image, Row, Space, Typography } from '@tenx-ui/materials';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Card } from 'antd';
 import React, { useState } from 'react';
 import { useModalAppDetailContext } from '../index';
 import Delete from './Delete';
 import Edit from './Edit';
 import Publish from './Publish';
+
 interface HeaderProps {}
 
 const Header: React.FC<HeaderProps> = props => {
   const { refresh, data, loading } = useModalAppDetailContext();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<'publish' | 'edit' | 'delete'>();
+  const history = getUnifiedHistory();
 
   const handlePublish = () => {
     setModalOpen(true);
@@ -143,11 +146,14 @@ const Header: React.FC<HeaderProps> = props => {
                 },
               }}
               onClick={() => {
-                handlePublish();
+                history.push(
+                  `/chat?appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
+                );
+                // handlePublish();
               }}
               destroyPopupOnHide={true}
             >
-              发布
+              对话
             </Dropdown.Button>
           </Space>
         </Col>

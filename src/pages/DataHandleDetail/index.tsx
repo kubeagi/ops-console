@@ -77,7 +77,7 @@ const DataHandleDetail = props => {
     {
       key: 'data-handle',
       label: '数据处理',
-      children: <DataHandle data={detailData} />,
+      children: <DataHandle data={detailData} getData={getData} />,
     },
   ];
 
