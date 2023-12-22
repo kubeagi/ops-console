@@ -24,6 +24,22 @@ const data = [
     icon: KubeagiModelService,
     children: [
       {
+        id: 'yunti-kubeagi-portal-app',
+        text: '应用管理',
+        textEn: '应用管理',
+        children: [
+          {
+            id: 'yunti-kubeagi-portal-model-app',
+            text: 'AI 智能体',
+            textEn: 'AI 智能体',
+            icon: KubeagiModelApp,
+            pathname: '/model-app',
+            tenant: true,
+            project: true,
+          },
+        ],
+      },
+      {
         id: 'yunti-kubeagi-portal-data',
         text: '数据管理',
         textEn: '数据管理',
@@ -86,31 +102,6 @@ const data = [
             textEn: '模型服务',
             icon: KubeagiModelService,
             pathname: '/model-service',
-            tenant: true,
-            project: true,
-          },
-        ],
-      },
-      {
-        id: 'yunti-kubeagi-portal-app',
-        text: '应用管理',
-        textEn: '应用管理',
-        children: [
-          {
-            id: 'yunti-kubeagi-portal-model-app',
-            text: '模型应用',
-            textEn: '模型应用',
-            icon: KubeagiModelApp,
-            pathname: '/model-app',
-            tenant: true,
-            project: true,
-          },
-          {
-            id: 'yunti-kubeagi-portal-chat',
-            text: '对话管理',
-            textEn: '对话管理',
-            icon: MessageWarn,
-            pathname: '/chat',
             tenant: true,
             project: true,
           },
