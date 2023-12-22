@@ -23,6 +23,7 @@ import {
 } from '@lobehub/ui';
 import { getAuthData } from '@tenx-ui/auth-utils';
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
+import classNames from 'classnames';
 import { debounce } from 'lodash';
 import React, { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import './index.less';
@@ -58,15 +59,18 @@ const Chat: React.FC<Chat> = props => {
   });
   useEffect(() => {
     if (conversion.data?.length) return;
-    const meta = application?.data?.Application?.getApplication?.metadata;
+    const app = application?.data?.Application?.getApplication;
+    const meta = app?.metadata;
+    const prologue = app?.prologue;
     if (meta?.name) {
       setConversion({
         ...conversion,
         data: [
           getCvsMeta(
-            `##### 您好，我是${meta.displayName || meta.name}${
-              meta.description ? `\n\n${meta.description}` : ''
-            }`,
+            prologue ||
+              `##### 您好，我是${meta.displayName || meta.name}${
+                meta.description ? `\n\n${meta.description}` : ''
+              }`,
             new Date().getTime().toString(),
             false
           ),
@@ -125,6 +129,7 @@ const Chat: React.FC<Chat> = props => {
           conversion_id: conversion?.id || '',
           app_name: props.appName,
           app_namespace: props.appNamespace,
+          debug: Boolean(props.debug),
         }),
         async onopen(response) {
           if (response.ok) {
@@ -203,7 +208,11 @@ const Chat: React.FC<Chat> = props => {
   }, [input, setInput, setConversion, fetchConversion]);
   return (
     <div className="chatComponent">
-      <div className="chatColumn">
+      <div
+        className={classNames('chatColumn', {
+          chatDebug: props.debug,
+        })}
+      >
         <div className="chatList">
           <ChatItemsList
             data={conversion?.data}
@@ -219,8 +228,8 @@ const Chat: React.FC<Chat> = props => {
             loadingId={conversion.loadingMsgId}
             {...control}
           />
+          <div className="safeArea" id={safeAreaId}></div>
         </div>
-        <div className="safeArea" id={safeAreaId}></div>
         <div className="inputArea">
           <ChatInputArea
             value={input}

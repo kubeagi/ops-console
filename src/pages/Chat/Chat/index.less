@@ -1,41 +1,52 @@
+@import '@/assets/style/index.less';
 @inputAreaHeight: 150px;
 
 .chatComponent {
-  width: 100%;
   height: 100%;
-  position: relative;
-  padding: 0 40px;
   display: flex;
-  justify-content: center;
+  align-items: flex-end;
+  @width: calc(100% - 48px);
+  @max-width: 876px;
   .chatColumn {
+    width: 100%;
+    height: calc(100vh - 100px);
+    position: relative;
+    padding: 24px 0;
     display: flex;
+    justify-content: space-between;
     flex-direction: column;
-    width: 876px; // TODO: 宽度目前写死了
+    align-items: center;
     .chatList {
       display: flex;
-      width: 100%;
+      flex-direction: column;
+      width: @width;
+      max-width: @max-width;
+      height: calc(100% - @inputAreaHeight - 24px);
+      overflow-y: auto;
       &>div {
         width: 100%;
       }
       article > *:last-child {
         margin-bottom: unset;
       }
-    }
-    .safeArea {
-      height: @inputAreaHeight + 24px;
-      width: 100%;
+      //.safeArea {
+      //  height: @inputAreaHeight + 24px;
+      //  width: 100%;
+      //}
     }
     .inputArea {
       display: flex;
       height: @inputAreaHeight;
-      width: 100%;
-      max-width: 876px;
-      position: fixed;
-      bottom: 24px;
+      width: @width;
+      max-width: @max-width;
       &>div {
-        background: #fff;
+        background: @background-color;
+        position: unset !important;
       }
     }
   }
-
+  .chatDebug {
+    height: calc(100vh - 350px);
+  }
 }
+
