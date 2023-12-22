@@ -1,0 +1,16 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index 68441b59a7e15e655df99c3160b8cd0e09d9d990..0000000000000000000000000000000000000000
+diff --git a/dist/browser-ponyfill.js b/dist/browser-ponyfill.js
+index f216aa35a9d32f86df5701c78cf7b039bc2cd47c..34036d8be283d7bd49cbecda7bca4b3360815456 100644
+--- a/dist/browser-ponyfill.js
++++ b/dist/browser-ponyfill.js
+@@ -1,7 +1,7 @@
+ var global = typeof self !== 'undefined' ? self : this;
+ var __self__ = (function () {
+ function F() {
+-this.fetch = false;
++// this.fetch = false;
+ this.DOMException = global.DOMException
+ }
+ F.prototype = global;
