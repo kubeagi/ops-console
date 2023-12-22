@@ -1,19 +1,22 @@
 import Icon from '@/assets/img/model-app-bx.png';
 import ChatComponent from '@/pages/Chat/Chat';
 import { Typography } from '@tenx-ui/materials';
-import { Card, Space, Tag } from 'antd';
-import React, { useState } from 'react';
+import { Card, Space, Spin, Tag } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { useModalAppDetailContext } from '../../index';
 import Modal from '../Modal';
-interface DialogueProps {}
+
+interface DialogueProps {
+  saveIng: boolean;
+}
 
 const Dialogue: React.FC<DialogueProps> = props => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<any>('reference');
   const [modalData, setModalData] = useState<any>();
-  const { data } = useModalAppDetailContext();
+  const { data, loading } = useModalAppDetailContext();
   return (
-    <>
+    <Spin spinning={loading}>
       {/* <div
         onClick={() => {
           setModalOpen(true);
@@ -21,7 +24,12 @@ const Dialogue: React.FC<DialogueProps> = props => {
       >
         对话引用弹窗
       </div> */}
-      <ChatComponent appName={data?.metadata?.name} appNamespace={data?.metadata?.namespace} />
+      <ChatComponent
+        debug={true}
+        refresh={props.saveIng}
+        appName={data?.metadata?.name}
+        appNamespace={data?.metadata?.namespace}
+      />
       <Modal
         title={`引用数据（3）`}
         open={modalOpen && modalType === 'reference'}
@@ -43,7 +51,7 @@ const Dialogue: React.FC<DialogueProps> = props => {
           <Typography.Paragraph>Card content</Typography.Paragraph>
         </Card>
       </Modal>
-    </>
+    </Spin>
   );
 };
 
