@@ -7,7 +7,10 @@ import {
   Modal,
   FormilyForm,
   FormilyInput,
+  Container,
+  Image,
   FormilyUpload,
+  FormilyFormItem,
   FormilyTextArea,
   Row,
   Col,
@@ -18,7 +21,6 @@ import {
   Button,
   Input,
   List,
-  Image,
   Dropdown,
   Divider,
   Descriptions,
@@ -109,15 +111,7 @@ class ModelAppList$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  checkFileSize(file) {
-    const maxSize = 2 * 1024 * 1024; // 2MB，你可以根据需要设置文件大小限制
-    if (file.size > maxSize) {
-      this.utils.message.warn('文件大小不能超过2MB！');
-      return false; // 阻止上传
-    }
-
-    return true; // 允许上传
-  }
+  beforeUpload() {}
 
   form(name) {
     return this.$(name || 'formily_create')?.formRef?.current?.form;
@@ -169,9 +163,33 @@ class ModelAppList$$Page extends React.Component {
       });
   }
 
+  handleEditImageChange({ fileList: newFileList }) {
+    this.setState({
+      fileList: newFileList,
+    });
+    this.getBase64(newFileList[0].originFileObj).then(res => {
+      this.form('edit_form').setValues({
+        imageUrl: res,
+      });
+      this.setState({
+        imageUrl: res,
+      });
+      this.imageUrl = res;
+    });
+  }
+
   handleImageChange({ fileList: newFileList }) {
     this.setState({
       fileList: newFileList,
+    });
+    this.getBase64(newFileList[0].originFileObj).then(res => {
+      this.form('create_form').setValues({
+        imageUrl: res,
+      });
+      this.setState({
+        imageUrl: res,
+      });
+      this.imageUrl = res;
     });
   }
 
@@ -213,6 +231,7 @@ class ModelAppList$$Page extends React.Component {
     this.setState({
       createModalVisible: false,
       createBtnLoading: false,
+      imageUrl: '',
     });
   }
 
@@ -230,6 +249,7 @@ class ModelAppList$$Page extends React.Component {
     this.setState({
       editModalVisible: false,
       editBtnLoading: false,
+      imageUrl: '',
     });
   }
 
@@ -413,7 +433,7 @@ class ModelAppList$$Page extends React.Component {
                 createBtnLoading: false,
               });
               this.onCloseCreateModel();
-              this.getData();
+              this.history.push(`/model-app/detail/${res.Application.createApplication.name}`);
             });
         });
       })
@@ -456,6 +476,7 @@ class ModelAppList$$Page extends React.Component {
           });
         }, 500);
         this.setState({
+          imageUrl: this.state.currentRecord.icon,
           fileList: [
             {
               status: 'done',
@@ -554,6 +575,22 @@ class ModelAppList$$Page extends React.Component {
                 'x-validator': [],
               }}
             />
+            {!!__$$eval(() => this.state.imageUrl) && (
+              <Container
+                __component_name="Container"
+                style={{ left: '160px', position: 'absolute', top: '215px' }}
+              >
+                <Image
+                  __component_name="Image"
+                  fallback=""
+                  height={60}
+                  preview={false}
+                  src={__$$eval(() => this.state.imageUrl)}
+                  style={{}}
+                  width={60}
+                />
+              </Container>
+            )}
             <FormilyUpload
               __component_name="FormilyUpload"
               componentProps={{
@@ -566,7 +603,7 @@ class ModelAppList$$Page extends React.Component {
                     );
                   }.bind(this),
                   fileList: __$$eval(() => this.state.fileList),
-                  listType: 'picture',
+                  listType: 'picture-circle',
                   maxCount: 1,
                   onChange: function () {
                     return this.handleImageChange.apply(
@@ -574,13 +611,14 @@ class ModelAppList$$Page extends React.Component {
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this),
+                  showUploadList: false,
                 },
               }}
               decoratorProps={{
                 'x-decorator-props': { asterisk: true, labelEllipsis: true, size: 'default' },
               }}
               fieldProps={{
-                name: '_icon',
+                name: 'icon',
                 required: false,
                 title: '上传',
                 'x-component': 'FormilyUpload',
@@ -600,10 +638,30 @@ class ModelAppList$$Page extends React.Component {
                 ],
               }}
             >
-              <AntdIconCloudUploadOutlined
-                __component_name="AntdIconCloudUploadOutlined"
-                style={{ fontSize: 40 }}
-              />
+              <FormilyFormItem
+                __component_name="FormilyFormItem"
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                fieldProps={{
+                  name: 'FormilyFormItem1',
+                  title: '',
+                  type: 'object',
+                  'x-component': 'FormilyFormItem',
+                  'x-display':
+                    "{{$form.values?.icon?.fileList?.length > 0 ? 'hidden' : 'visible' }}",
+                  'x-validator': [],
+                }}
+              >
+                <AntdIconCloudUploadOutlined
+                  __component_name="AntdIconCloudUploadOutlined"
+                  style={{ fontSize: 40 }}
+                />
+              </FormilyFormItem>
+              {!!false && (
+                <AntdIconCloudUploadOutlined
+                  __component_name="AntdIconCloudUploadOutlined"
+                  style={{ fontSize: 40 }}
+                />
+              )}
             </FormilyUpload>
             <FormilyTextArea
               __component_name="FormilyTextArea"
@@ -966,6 +1024,22 @@ class ModelAppList$$Page extends React.Component {
                 'x-validator': [],
               }}
             />
+            {!!__$$eval(() => this.state.imageUrl) && (
+              <Container
+                __component_name="Container"
+                style={{ left: '160px', position: 'absolute', top: '215px' }}
+              >
+                <Image
+                  __component_name="Image"
+                  fallback=""
+                  height={60}
+                  preview={false}
+                  src={__$$eval(() => this.state.imageUrl)}
+                  style={{}}
+                  width={60}
+                />
+              </Container>
+            )}
             <FormilyUpload
               __component_name="FormilyUpload"
               componentProps={{
@@ -978,23 +1052,22 @@ class ModelAppList$$Page extends React.Component {
                     );
                   }.bind(this),
                   fileList: __$$eval(() => this.state.fileList),
-                  listType: 'picture',
+                  listType: 'picture-circle',
                   maxCount: 1,
                   onChange: function () {
-                    return this.handleImageChange.apply(
+                    return this.handleEditImageChange.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this),
+                  showUploadList: false,
                 },
               }}
               decoratorProps={{
                 'x-decorator-props': { asterisk: true, labelEllipsis: true, size: 'default' },
               }}
               fieldProps={{
-                enum: [],
                 name: 'icon',
-                required: false,
                 title: '上传',
                 'x-component': 'FormilyUpload',
                 'x-validator': [
@@ -1012,10 +1085,30 @@ class ModelAppList$$Page extends React.Component {
                 ],
               }}
             >
-              <AntdIconCloudUploadOutlined
-                __component_name="AntdIconCloudUploadOutlined"
-                style={{ fontSize: 40 }}
-              />
+              <FormilyFormItem
+                __component_name="FormilyFormItem"
+                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                fieldProps={{
+                  name: 'FormilyFormItem1',
+                  title: '',
+                  type: 'object',
+                  'x-component': 'FormilyFormItem',
+                  'x-display':
+                    "{{$form.values?.icon?.fileList?.length > 0 ? 'hidden' : 'visible' }}",
+                  'x-validator': [],
+                }}
+              >
+                <AntdIconCloudUploadOutlined
+                  __component_name="AntdIconCloudUploadOutlined"
+                  style={{ fontSize: 40 }}
+                />
+              </FormilyFormItem>
+              {!!false && (
+                <AntdIconCloudUploadOutlined
+                  __component_name="AntdIconCloudUploadOutlined"
+                  style={{ fontSize: 40 }}
+                />
+              )}
             </FormilyUpload>
             <FormilyTextArea
               __component_name="FormilyTextArea"
