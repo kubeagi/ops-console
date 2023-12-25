@@ -110,8 +110,8 @@ const DataHandle: React.FC<Iprops> = props => {
                   模型:{' '}
                   <span>
                     {item.llm_config?.provider === 'worker'
-                      ? item.llm_config?.name
-                      : item.llm_config?.name + '/' + item.llm_config?.model}
+                      ? item.llm_config?.name || '-'
+                      : (item.llm_config?.name || '-') + '/' + (item.llm_config?.model || '-')}
                   </span>
                 </div>
                 <div style={{ textAlign: 'right', flex: 1 }}>
@@ -252,7 +252,7 @@ const DataHandle: React.FC<Iprops> = props => {
     },
   };
   useEffect(() => {
-    const item = config.map(item => {
+    const item = config?.map(item => {
       return {
         title: (
           <>
@@ -302,11 +302,11 @@ const DataHandle: React.FC<Iprops> = props => {
       <Steps size="small" items={items} direction="vertical" />
       <Modal title="模型配置" open={highConfigVisible} onCancel={closeHighConfig} footer={null}>
         <Form labelAlign="right" {...layout}>
-          <Form.Item label="温度">{highConfig?.temperature}</Form.Item>
-          <Form.Item label="最大响应长度">{highConfig?.max_tokens}</Form.Item>
+          <Form.Item label="温度">{highConfig?.temperature || '-'}</Form.Item>
+          <Form.Item label="最大响应长度">{highConfig?.max_tokens || '-'}</Form.Item>
           <Form.Item label="QA 拆分 Prompt">
             <div style={{ width: '370px', marginTop: 10, padding: 12, border: '1px solid #ccc' }}>
-              <pre style={{ whiteSpace: 'pre-wrap' }}>{highConfig?.prompt_template}</pre>
+              <pre style={{ whiteSpace: 'pre-wrap' }}>{highConfig?.prompt_template || '-'}</pre>
             </div>
           </Form.Item>
         </Form>

@@ -56,10 +56,10 @@ const DataHandleDetail = props => {
         setLoading(false);
       })
       .catch(err => {
-        console.warn(err);
         setLoading(false);
         notification.warning({
           message: '失败',
+          description: err[0]?.message || '获取详细信息失败',
         });
       });
   };
