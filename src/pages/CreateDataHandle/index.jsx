@@ -8,6 +8,7 @@ import {
   Row,
   Col,
   Typography,
+  Tooltip,
   Slider,
   FormilyForm,
   FormilyNumberPicker,
@@ -27,7 +28,10 @@ import {
   Pagination,
 } from '@tenx-ui/materials';
 
-import { AntdIconEyeInvisibleFilled } from '@tenx-ui/icon-materials';
+import {
+  AntdIconQuestionCircleOutlined,
+  AntdIconEyeInvisibleFilled,
+} from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -187,7 +191,7 @@ class $$Page extends React.Component {
       numberInputStep: 0.1,
       qaSplitHighConfig: {
         temperature: 40,
-        max_tokens: 512,
+        max_tokens: 2048,
         prompt_template: `{text}
 
 请将上述内容按照问答的方式，提出不超过 25 个问题，并给出每个问题的答案，每个问题必须有 Q 和对应的 A，并严格按照以下方式展示： Q1: 问题。\n A1: 答案。\n Q2: 问题 \n A2: 答案\n  注意，尽可能多的提出问题，但是 Q 不要重复，也不要出现只有 Q 没有 A 的情况。`,
@@ -882,7 +886,7 @@ class $$Page extends React.Component {
           <Row __component_name="Row" wrap={false}>
             <Col
               __component_name="Col"
-              flex="120px"
+              flex="140px"
               style={{ paddingLeft: '20px', paddingTop: '8px' }}
             >
               <Typography.Text
@@ -890,10 +894,19 @@ class $$Page extends React.Component {
                 disabled={false}
                 ellipsis={true}
                 strong={false}
-                style={{}}
+                style={{ fontSize: '' }}
               >
                 温度
               </Typography.Text>
+              <Tooltip
+                __component_name="Tooltip"
+                title="配置 AI 回复的发散程度，较高的数值会使输出更加随机，较低的数值会使输出更加精确，范围为(0, 1]。"
+              >
+                <AntdIconQuestionCircleOutlined
+                  __component_name="AntdIconQuestionCircleOutlined"
+                  style={{ marginLeft: '5px' }}
+                />
+              </Tooltip>
             </Col>
             <Col __component_name="Col" flex="auto">
               <Row __component_name="Row" wrap={true}>
@@ -967,7 +980,7 @@ class $$Page extends React.Component {
           <Row __component_name="Row" wrap={false}>
             <Col
               __component_name="Col"
-              flex="120px"
+              flex="140px"
               style={{ paddingLeft: '20px', paddingTop: '8px' }}
             >
               <Typography.Text
@@ -979,6 +992,15 @@ class $$Page extends React.Component {
               >
                 最大响应长度
               </Typography.Text>
+              <Tooltip
+                __component_name="Tooltip"
+                title="控制 AI 回复的最大 Tokens，范围为[10，4096],较小的值可以一定程度上减少 AI 的废话，但也可能导致 AI 回复不完整。"
+              >
+                <AntdIconQuestionCircleOutlined
+                  __component_name="AntdIconQuestionCircleOutlined"
+                  style={{ marginLeft: '5px' }}
+                />
+              </Tooltip>
             </Col>
             <Col __component_name="Col" flex="auto">
               <Row __component_name="Row" wrap={true}>
@@ -1083,7 +1105,14 @@ class $$Page extends React.Component {
                   rows: 15,
                 },
               }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, labelWidth: '120px' } }}
+              decoratorProps={{
+                'x-decorator-props': {
+                  labelEllipsis: true,
+                  labelWidth: '140px',
+                  tooltip:
+                    'QA 拆分 Prompt：提示词可以帮助模型更好地理解做 QA 拆分的意图，该提示词会输出给大模型，帮助您去做文档 QA 拆分处理。输入内容必须包含变量，如：{text}。',
+                },
+              }}
               fieldProps={{
                 _unsafe_MixedSetter_default_select: 'VariableSetter',
                 default: __$$eval(() => this.state.qaSplitHighConfig.prompt_template),
