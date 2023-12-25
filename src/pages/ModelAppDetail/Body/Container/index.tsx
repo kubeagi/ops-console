@@ -22,6 +22,7 @@ interface ContainerProps {
   configKey: string;
   changeConfig?: boolean;
   renderChildren?: (form, forceUpdate) => React.ReactElement;
+  style?: any;
 }
 
 const Container: React.FC<ContainerProps> = props => {
@@ -37,7 +38,7 @@ const Container: React.FC<ContainerProps> = props => {
   }, [initConfigs?.[configKey], form]);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={props.style}>
       <Modal
         form={form}
         open={modalOpen && modalType === actionData.key}

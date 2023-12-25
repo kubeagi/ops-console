@@ -1,7 +1,12 @@
 import Icon from '@/assets/img/model-app-bx.png';
-import { DeleteOutlined, PlusCircleOutlined, SettingOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  PlusCircleOutlined,
+  QuestionCircleOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import { KubeagiKnowledge } from '@tenx-ui/icon';
-import { Flex, Form, Input, Typography } from 'antd';
+import { Flex, Form, Input, Space, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
@@ -88,7 +93,7 @@ const Knowledge: React.FC<KnowledgeProps> = props => {
 interface ConfigKnowledgeProps {}
 
 const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
-  const { configs, setConfigs } = useModalAppDetailContext();
+  const { configs, setConfigs, form } = useModalAppDetailContext();
   const knowledgesRes = utils.bff.useListKnowledgeBases({
     input: {
       page: 1,
@@ -103,6 +108,9 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
   }));
   return (
     <Container
+      style={{
+        marginBottom: configs?.ConfigKnowledge?.knowledgebase ? '0' : '-12px',
+      }}
       configKey="ConfigKnowledge"
       icon={<KubeagiKnowledge />}
       title={'知识库'}
@@ -156,7 +164,14 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
             children: (
               <>
                 <SliderItem
-                  label="最低相似度"
+                  label={
+                    <Space size={3}>
+                      最低相似度
+                      <Tooltip title="匹配用户问题的最低相似度阈值，范围为[0，1]，阈值越低，匹配的内容越发散，阈值越高，匹配的内容越精确。不同知识库最低相似度有差异，建议根据具体的知识库配置合适的相似度。">
+                        <QuestionCircleOutlined className={styles.tooltip} />
+                      </Tooltip>
+                    </Space>
+                  }
                   name="scoreThreshold"
                   Config={{
                     initialValue: 0.7,
@@ -166,7 +181,14 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                   }}
                 />
                 <SliderItem
-                  label="引用上限"
+                  label={
+                    <Space size={3}>
+                      引用上限
+                      <Tooltip title="单词搜索匹配答案的最大数量，范围为[1，10]。">
+                        <QuestionCircleOutlined className={styles.tooltip} />
+                      </Tooltip>
+                    </Space>
+                  }
                   name="numDocuments"
                   Config={{
                     initialValue: 5,
@@ -209,6 +231,10 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
           configs?.ConfigKnowledge?.knowledgebase ? [configs?.ConfigKnowledge?.knowledgebase] : []
         }
         setCheckedIds={v => {
+          form.setFieldsValue({
+            ...configs?.ConfigKnowledge,
+            knowledgebase: v?.[0],
+          });
           setConfigs({
             ...configs,
             ConfigKnowledge: {

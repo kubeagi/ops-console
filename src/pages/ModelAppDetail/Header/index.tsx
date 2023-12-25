@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { useModalAppDetailContext } from '../index';
 import Delete from './Delete';
 import Edit from './Edit';
+import styles from './index.less';
 import Publish from './Publish';
-
 interface HeaderProps {}
 
 const Header: React.FC<HeaderProps> = props => {
@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = props => {
     setModalType('delete');
   };
   return (
-    <Card bordered={false} loading={loading}>
+    <Card bordered={false} loading={loading} className={styles.header}>
       <Publish
         open={modalOpen && modalType === 'publish'}
         setOpen={setModalOpen}

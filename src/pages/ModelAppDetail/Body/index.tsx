@@ -76,7 +76,7 @@ const Body: React.FC<BodyProps> = props => {
               <ConfigKnowledge />
               <ConfigPrompt />
               {/* <ConfigAudio /> */}
-              <ConfigNext />
+              {/* <ConfigNext /> */}
             </Form>
           </Card>
         </Col>

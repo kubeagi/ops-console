@@ -1,10 +1,11 @@
-import { SettingOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import { KubeagiModelService } from '@tenx-ui/icon';
-import { Form, Select } from 'antd';
+import { Form, Select, Space, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
 import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
+import styles from '../index.less';
 import { SliderItem } from '../Modal';
 
 interface ConfigModelServiceProps {}
@@ -58,16 +59,42 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
             title: '模型高级配置',
             refresh: () => {},
             type: 'edit',
+            width: 540,
             children: (
               <>
-                <SliderItem label="温度" name="temperature" Config={TEMPERATURE_DEFAULT} />
                 <SliderItem
-                  label="最大响应长度"
+                  label={
+                    <Space size={3}>
+                      温度
+                      <Tooltip title="配置 AI 回复的发散程度，较高的数值会使输出更加随机，较低的数值会使输出更加精确，范围为(0, 1]。">
+                        <QuestionCircleOutlined className={styles.tooltip} />
+                      </Tooltip>
+                    </Space>
+                  }
+                  name="temperature"
+                  Config={TEMPERATURE_DEFAULT}
+                />
+                <SliderItem
+                  label={
+                    <Space size={3}>
+                      最大响应长度
+                      <Tooltip title="控制 AI 回复的最大 Tokens，范围为[10，4096],较小的值可以一定程度上减少 AI 的废话，但也可能导致 AI 回复不完整。">
+                        <QuestionCircleOutlined className={styles.tooltip} />
+                      </Tooltip>
+                    </Space>
+                  }
                   name="maxLength"
                   Config={MAX_RESPONSE_LENGTH_DEFAULT}
                 />
                 <SliderItem
-                  label="对话轮次"
+                  label={
+                    <Space size={3}>
+                      对话轮次
+                      <Tooltip title="保留多轮对话上下文最多组数，范围为[1,30]。">
+                        <QuestionCircleOutlined className={styles.tooltip} />
+                      </Tooltip>
+                    </Space>
+                  }
                   name="conversionWindowSize"
                   Config={SESSION_ROUND_DEFAULT}
                 />
@@ -82,13 +109,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
         const noModelSelect = llm?.provider === 'worker' || !llm;
         return (
           <>
-            <Form.Item
-              labelAlign="left"
-              labelCol={{ span: 4 }}
-              style={{ marginBottom: 20 }}
-              label="模型服务"
-              name="llm"
-            >
+            <Form.Item style={{ marginBottom: noModelSelect ? 0 : 20 }} name="llm">
               <Select
                 placeholder="请选择模型服务"
                 onChange={v => {
@@ -114,13 +135,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
               </Select>
             </Form.Item>
             {!noModelSelect && (
-              <Form.Item
-                labelAlign="left"
-                labelCol={{ span: 4 }}
-                style={{ marginBottom: 0 }}
-                label="模型"
-                name="model"
-              >
+              <Form.Item style={{ marginBottom: 0 }} name="model">
                 <Select
                   placeholder="请选择模型"
                   onChange={v => {
