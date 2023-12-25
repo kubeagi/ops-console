@@ -566,7 +566,7 @@ class DataSource$$Page extends React.Component {
                           <Card
                             actions={[]}
                             bodyStyle={{ position: 'relative' }}
-                            bordered={false}
+                            bordered={true}
                             hoverable={true}
                             loading={false}
                             onClick={function () {

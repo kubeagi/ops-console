@@ -6,7 +6,7 @@ import { useModalAppDetailContext } from '../../index';
 import styles from './index.less';
 
 export interface SliderProps {
-  label: string;
+  label: React.ReactElement | string;
   name: string;
   Config: {
     initialValue: number;
