@@ -8,13 +8,14 @@
  * @author songsz
  * @date 2023-12-18
  */
-import ChatComponent from '@/pages/Chat/Chat';
 import { history } from '@umijs/max';
 import React from 'react';
 
-interface Chat {}
+import ChatComponent from '@/pages/Chat/Chat';
 
-const Chat: React.FC<Chat> = props => {
+interface IChat {}
+
+const Chat: React.FC<IChat> = props => {
   return (
     <>
       <ChatComponent

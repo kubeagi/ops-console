@@ -1,7 +1,8 @@
 import FormHelper from '@tenx-ui/form-helper';
 import { Modal } from '@tenx-ui/materials';
-import { Form, Input, Upload } from 'antd';
-import React, { useEffect, useReducer } from 'react';
+import { Form, Input } from 'antd';
+import React, { useReducer } from 'react';
+
 import styles from './index.less';
 
 export interface RowData {}
@@ -23,8 +24,7 @@ const Publish: React.FC<PublishProps> = props => {
 
   return (
     <Modal
-      open={open}
-      title={`${title}应用`}
+      destroyOnClose
       onCancel={() => setOpen(false)}
       onOk={() => {
         form.validateFields().then(async values => {
@@ -32,7 +32,8 @@ const Publish: React.FC<PublishProps> = props => {
           refresh && refresh();
         });
       }}
-      destroyOnClose
+      open={open}
+      title={`${title}应用`}
     >
       <FormHelper>
         <Form className={styles.form} form={form} labelAlign="left" labelCol={{ span: 5 }}>
@@ -53,8 +54,8 @@ const Publish: React.FC<PublishProps> = props => {
           >
             <Input
               disabled={type === 'edit'}
-              placeholder="请输入模型应用名称"
               onBlur={handelBlur}
+              placeholder="请输入模型应用名称"
             />
           </Form.Item>
         </Form>

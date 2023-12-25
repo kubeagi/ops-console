@@ -8,9 +8,8 @@
  * @author lqq
  * @date 2023-11-30
  */
-
 import TenxIcon from '@tenx-ui/icon/es/_old';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface props {
   text: any;

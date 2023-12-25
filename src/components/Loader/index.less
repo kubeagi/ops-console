@@ -2,10 +2,12 @@
 
 .loader {
   display: flex;
-  justify-content: center;
   align-items: center;
-  opacity: 1;
+  justify-content: center;
+
   text-align: center;
+
+  opacity: 1;
 
   &.fullScreen {
     position: absolute;
@@ -15,31 +17,35 @@
   }
 
   .warpper {
-    width: 100px;
-    height: 100px;
     display: inline-flex;
     flex-direction: column;
     justify-content: space-around;
+
+    width: 100px;
+    height: 100px;
   }
 
   .spin {
-    color: @font-color-1;
     font-size: 40px !important;
+    color: @font-color-1;
   }
 
   .text {
     width: 100px;
     height: 20px;
-    text-align: center;
+
     font-size: 12px;
-    letter-spacing: 4px;
     color: @font-color-1;
+    text-align: center;
+    letter-spacing: 4px;
   }
 
   &.hidden {
     z-index: -1;
     opacity: 0;
-    transition: opacity 1s ease 0.5s, z-index 0.1s ease 1.5s;
+    transition:
+      opacity 1s ease 0.5s,
+      z-index 0.1s ease 1.5s;
   }
 }
 

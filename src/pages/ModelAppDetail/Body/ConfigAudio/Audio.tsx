@@ -1,8 +1,10 @@
 import { PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { OpenaiVoice } from '@lobehub/tts';
-import { AudioPlayer, useOpenAITTS } from '@lobehub/tts/react';
+import { useOpenAITTS } from '@lobehub/tts/react';
 import { Space } from 'antd';
+
 import styles from './index.less';
+
 // import { OPENAI_BASE_URL } from '@lobehub/tts/core/const/api';
 const OPENAI_BASE_URL = 'https://api.openai.com/v1';
 const defaultText = '这是一段使用 OpenAI Speech to Text 的语音演示';
@@ -26,11 +28,11 @@ const Audio: React.FC<AudioProps> = props => {
   });
   return (
     <Space
-      size={5}
+      className={styles.Audio}
       onClick={e => {
         e.stopPropagation();
       }}
-      className={styles.Audio}
+      size={5}
     >
       {isGlobalLoading ? (
         <span onClick={stop}>

@@ -77,18 +77,22 @@ export function getLines(onLine: (line: Uint8Array, fieldLength: number) => void
       let lineEnd = -1; // index of the \r or \n char
       for (; position < bufLength && lineEnd === -1; ++position) {
         switch (buffer[position]) {
-          case ControlChars.Colon:
+          case ControlChars.Colon: {
             if (fieldLength === -1) {
               // first colon in line
               fieldLength = position - lineStart;
             }
             break;
+          }
           // @ts-ignore:7029 \r case below should fallthrough to \n:
-          case ControlChars.CarriageReturn:
+          case ControlChars.CarriageReturn: {
             discardTrailingNewline = true;
-          case ControlChars.NewLine:
+          }
+          // eslint-disable-next-line no-fallthrough
+          case ControlChars.NewLine: {
             lineEnd = position;
             break;
+          }
         }
       }
 
@@ -145,24 +149,28 @@ export function getMessages(
       const value = decoder.decode(line.subarray(valueOffset));
 
       switch (field) {
-        case 'data':
+        case 'data': {
           // if this message already has data, append the new value to the old.
           // otherwise, just set to the new value:
           message.data = message.data ? message.data + '\n' + value : value; // otherwise,
           break;
-        case 'event':
+        }
+        case 'event': {
           message.event = value;
           break;
-        case 'id':
+        }
+        case 'id': {
           onId((message.id = value));
           break;
-        case 'retry':
-          const retry = parseInt(value, 10);
+        }
+        case 'retry': {
+          const retry = Number.parseInt(value, 10);
           if (!isNaN(retry)) {
             // per spec, ignore non-integers
             onRetry((message.retry = retry));
           }
           break;
+        }
       }
     }
   };

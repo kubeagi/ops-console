@@ -1,22 +1,16 @@
 // 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
 // 例外：react 框架的导出名和各种组件名除外。
-import React from 'react';
-
 import { Button, Card, Col, FormilyForm, Page, Row, Space } from '@tenx-ui/materials';
-
-import LccComponentRu83f from 'CreateDataSource';
-
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { matchPath, useLocation } from '@umijs/max';
+import LccComponentRu83f from 'CreateDataSource';
 import qs from 'query-string';
+import React from 'react';
 import { DataProvider } from 'shared-components';
 
-import utils, { RefsManager } from '../../utils/__utils';
-
-import * as __$$i18n from '../../i18n';
-
 import __$$constants from '../../__constants';
-
+import * as __$$i18n from '../../i18n';
+import utils, { RefsManager } from '../../utils/__utils';
 import './index.css';
 
 class DataSourceCreate$$Page extends React.Component {
@@ -177,23 +171,20 @@ class DataSourceCreate$$Page extends React.Component {
                   __component_name="LccComponentRu83f"
                   bff={__$$eval(() => this.props.appHelper.utils.bff)}
                   handelCancel={function () {
-                    return this.handleCancel.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
+                    return Reflect.apply(this.handleCancel, this, [
+                      ...Array.prototype.slice.call(arguments),
+                    ]);
                   }.bind(this)}
                   handleSave={function () {
-                    return this.handleSave.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
+                    return Reflect.apply(this.handleSave, this, [
+                      ...Array.prototype.slice.call(arguments),
+                    ]);
                   }.bind(this)}
                   project={__$$eval(() => this.utils.getAuthData()?.project)}
                   setThis={function () {
-                    return this.setThis.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
+                    return Reflect.apply(this.setThis, this, [
+                      ...Array.prototype.slice.call(arguments),
+                    ]);
                   }.bind(this)}
                 />
               </FormilyForm>
@@ -224,15 +215,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      self={self}
+      render={dataProps => (
+        <DataSourceCreate$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
+      )}
       sdkInitFunc={{
         enabled: undefined,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      render={dataProps => (
-        <DataSourceCreate$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
-      )}
+      self={self}
     />
   );
 };
@@ -241,7 +232,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch {}
 }
 
 function __$$evalArray(expr) {

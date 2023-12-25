@@ -1,6 +1,7 @@
-import { Alert, Modal, notification, Space, Typography } from '@tenx-ui/materials';
+import { Alert, Modal, Space, Typography, notification } from '@tenx-ui/materials';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import React from 'react';
+
 import utils from '../../../../utils/__utils';
 
 export interface RowData {
@@ -21,8 +22,7 @@ const Publish: React.FC<PublishProps> = props => {
 
   return (
     <Modal
-      open={open}
-      title={`${title}应用`}
+      destroyOnClose
       onCancel={() => setOpen(false)}
       onOk={async () => {
         try {
@@ -44,7 +44,8 @@ const Publish: React.FC<PublishProps> = props => {
           });
         }
       }}
-      destroyOnClose
+      open={open}
+      title={`${title}应用`}
     >
       <Alert
         message={

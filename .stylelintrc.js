@@ -1,3 +1,1 @@
-module.exports = {
-  extends: 'stylelint-config-tenx',
-};
+module.exports = require('@yuntijs/lint').stylelint;

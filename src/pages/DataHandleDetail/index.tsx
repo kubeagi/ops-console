@@ -1,7 +1,7 @@
 import { Button, Col, Page, Row, Space, Typography } from '@tenx-ui/materials';
 import { matchPath, useLocation } from '@umijs/max';
 import type { TabsProps } from 'antd';
-import { Avatar, Divider, List, notification, Spin, Tabs } from 'antd';
+import { Avatar, Divider, List, Spin, Tabs, notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import Status from '../../components/Status';
@@ -55,11 +55,11 @@ const DataHandleDetail = props => {
         }
         setLoading(false);
       })
-      .catch(err => {
+      .catch(error => {
         setLoading(false);
         notification.warning({
           message: '失败',
-          description: err[0]?.message || '获取详细信息失败',
+          description: error[0]?.message || '获取详细信息失败',
         });
       });
   };
@@ -83,17 +83,17 @@ const DataHandleDetail = props => {
 
   return (
     <Page style={{ marginBottom: '0px', paddingBottom: '0px' }}>
-      <Row wrap={true} style={{ marginBottom: '16px' }} __component_name="Row">
-        <Col span={24} __component_name="Col">
-          <Space align="center" direction="horizontal" __component_name="Space">
-            <Button.Back type="primary" title="" __component_name="Button.Back" />
+      <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
+        <Col __component_name="Col" span={24}>
+          <Space __component_name="Space" align="center" direction="horizontal">
+            <Button.Back __component_name="Button.Back" title="" type="primary" />
           </Space>
           <Typography.Title
+            __component_name="Typography.Title"
             bold={true}
-            level={2}
             bordered={false}
             ellipsis={true}
-            __component_name="Typography.Title"
+            level={2}
           >
             数据处理详情
           </Typography.Title>
@@ -102,8 +102,8 @@ const DataHandleDetail = props => {
       <Spin spinning={loading}>
         <div className={styles.info}>
           <List
-            itemLayout="horizontal"
             dataSource={[detailData]}
+            itemLayout="horizontal"
             renderItem={(item, index) => (
               <List.Item
               // actions={[<Button>删除</Button>]}
@@ -114,7 +114,6 @@ const DataHandleDetail = props => {
                       U
                     </Avatar>
                   }
-                  title={<h4>{item.name || '这是一个名'}</h4>}
                   description={
                     <>
                       <span>
@@ -127,6 +126,7 @@ const DataHandleDetail = props => {
                       </span>
                     </>
                   }
+                  title={<h4>{item.name || '这是一个名'}</h4>}
                 />
               </List.Item>
             )}

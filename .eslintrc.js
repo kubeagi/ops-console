@@ -1,3 +1,1 @@
-module.exports = {
-  extends: 'eslint-config-tenx',
-};
+module.exports = require('@yuntijs/lint').eslint;

@@ -13,6 +13,7 @@ import { getAuthData } from '@tenx-ui/auth-utils';
 import { IOptions, IRequest, IRequestResponse, IUploadRequestOptions } from '@tenx-ui/request';
 import RequestCore from '@tenx-ui/request/es/core';
 import { mergeHeaders } from '@tenx-ui/request/es/helpers';
+
 import { apiUrl } from '../../config/api';
 
 export type Options = IOptions;
@@ -115,7 +116,7 @@ const getRequestInstance = (initOptions: IOptions): RequestInstance => {
 
   // 请求语法糖
   const METHODS = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options', 'rpc'];
-  METHODS.forEach(method => {
+  for (const method of METHODS) {
     requestInstance[method] = (params: RequestParams) => {
       const { url, options = {} } = params;
       return requestInstance({
@@ -123,7 +124,7 @@ const getRequestInstance = (initOptions: IOptions): RequestInstance => {
         options: { ...options, method },
       });
     };
-  });
+  }
 
   requestInstance.extendOptions = coreInstance.extendOptions.bind(coreInstance);
 

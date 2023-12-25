@@ -1,7 +1,8 @@
 import FormHelper from '@tenx-ui/form-helper';
 import { Modal } from '@tenx-ui/materials';
-import { Form, InputNumber, notification, Slider, Space } from 'antd';
-import React, { useEffect, useReducer } from 'react';
+import { Form, InputNumber, Slider, Space, notification } from 'antd';
+import React, { useReducer } from 'react';
+
 import { useModalAppDetailContext } from '../../index';
 import styles from './index.less';
 
@@ -25,35 +26,35 @@ export const SliderItem: React.FC<SliderProps> = props => {
     <Form.Item label={label} style={{ marginBottom }}>
       <Space>
         <Form.Item
-          style={{ marginBottom }}
           initialValue={Config.initialValue}
           name={name}
           required
           rules={[{ required: true, message: `请输入` }]}
+          style={{ marginBottom }}
         >
           <Slider
-            min={Config.min}
-            max={Config.max}
-            step={1 / Math.pow(10, Config.precision)}
-            style={{ width: sliderWidth }}
             marks={{
               [Config.min]: Config.minMark || [Config.min],
               [Config.max]: Config.maxMark || [Config.max],
             }}
+            max={Config.max}
+            min={Config.min}
+            step={1 / Math.pow(10, Config.precision)}
+            style={{ width: sliderWidth }}
           />
         </Form.Item>
         <Form.Item
-          style={{ marginBottom }}
           initialValue={Config.initialValue}
           name={name}
           required
           rules={[{ required: true, message: `请输入` }]}
+          style={{ marginBottom }}
         >
           <InputNumber
-            min={Config.min}
             max={Config.max}
-            precision={Config.precision}
+            min={Config.min}
             placeholder={`请输入`}
+            precision={Config.precision}
           />
         </Form.Item>
       </Space>
@@ -96,8 +97,6 @@ const Setting: React.FC<SettingProps> = props => {
   return (
     <Modal
       {...otherProps}
-      open={open}
-      title={title}
       onCancel={() => {
         setOpen(false);
         curForm.setFieldsValue(configs[configKey]);
@@ -107,7 +106,7 @@ const Setting: React.FC<SettingProps> = props => {
           try {
             setOpen(false);
             setConfigs({
-              ...(configs || {}),
+              ...configs,
               [configKey]: {
                 ...(configs?.[configKey] || []),
                 ...values,
@@ -118,13 +117,15 @@ const Setting: React.FC<SettingProps> = props => {
             // notification.success({
             //   message: `${title}成功`,
             // });
-          } catch (error) {
+          } catch {
             notification.warning({
               message: `${title}失败`,
             });
           }
         });
       }}
+      open={open}
+      title={title}
     >
       <FormHelper>
         <Form className={styles.form} form={curForm} labelAlign="left" labelCol={{ span: 5 }}>

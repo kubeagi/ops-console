@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "kubeagi-portal",
   "description": "KubeAGI 的前端 portal",
   "version": "0.1.0",
@@ -16,32 +15,36 @@
     "build:menu": "node ./config/menu/index.mjs",
     "build:menu-watch": "cross-env WATCH=1 MENU_JSON_PATH=../../public/menu.json node ./config/menu/index.mjs",
     "build:all": "nr build && ./build.sh",
-    "lint": "npm run lint:es && npm run lint:style && npm run lint:prettier",
+    "lint": "npm run lint:es && npm run lint:style",
     "lint:es": "eslint --ext .jsx,.js,.tsx,.ts src",
-    "lint:style": "stylelint \"src/{pages,components,assets}/**/*.less\" --syntax less",
-    "lint:prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
+    "lint:style": "stylelint \"{src,tests}/**/*.{css,less,js,jsx,ts,tsx}\"",
+    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "lint-fix": "npm run lint-fix:es && npm run lint-fix:style",
     "lint-fix:es": "eslint --ext .jsx,.js,.tsx,.ts src --fix",
-    "lint-fix:style": "stylelint \"src/{pages,components,assets}/**/*.less\" --syntax less --fix",
-    "lint-staged": "lint-staged",
-    "lint-staged:es": "eslint --ext .js,.jsx,.ts,.tsx ",
+    "lint-fix:style": "stylelint \"{src,tests}/**/*.{css,less,js,jsx,ts,tsx}\" --fix",
     "prepare": "husky install"
   },
   "lint-staged": {
-    "**/*.js?(x)": [
+    "*.md": [
+      "remark --quiet --output --",
+      "prettier --write --no-error-on-unmatched-pattern"
+    ],
+    "*.json": [
+      "prettier --write --no-error-on-unmatched-pattern"
+    ],
+    "*.{css,less}": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "*.{js,jsx}": [
+      "stylelint --fix",
       "eslint --fix",
       "prettier --write"
     ],
-    "**/*.ts?(x)": [
+    "*.{ts,tsx}": [
+      "stylelint --fix",
       "eslint --fix",
       "prettier --parser=typescript --write"
-    ],
-    "**/*.{less}": [
-      "stylelint --allow-empty-input --syntax less",
-      "prettier --write"
-    ],
-    "**/*.{md,json}": [
-      "prettier --write"
     ]
   },
   "dependencies": {
@@ -100,20 +103,17 @@
     "@types/qs": "^6.5.3",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "@yuntijs/lint": "^1.2.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.13",
     "concurrently": "^7.6.0",
     "cross-env": "^5.1.4",
-    "eslint": "^8.29.0",
-    "eslint-config-tenx": "^4.0.0",
+    "eslint": "^8.56.0",
     "husky": "^8.0.1",
     "jest": "^27",
-    "lint-staged": "^10.0.7",
-    "prettier": "^2.8.0",
-    "prettier-plugin-organize-imports": "^3.2.2",
-    "prettier-plugin-packagejson": "^2.4.5",
-    "stylelint": "^13.3.3",
-    "stylelint-config-tenx": "^2.1.0",
-    "typescript": "^4.1.2"
+    "lint-staged": "^15",
+    "prettier": "^3.1.1",
+    "stylelint": "^15",
+    "typescript": "^5"
   },
   "engines": {
     "node": ">=18.12.0",

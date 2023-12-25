@@ -10,6 +10,7 @@
  */
 import { useModel } from '@umijs/max';
 import * as React from 'react';
+
 type QiankunData = {
   // 存储 主应用 的 state
   state?: any;

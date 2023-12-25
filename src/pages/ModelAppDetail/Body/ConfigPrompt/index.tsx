@@ -2,9 +2,11 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { KubeagiPrompt } from '@tenx-ui/icon';
 import { Form, Input, Space, Tooltip } from 'antd';
 import React from 'react';
+
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 import styles from '../index.less';
+
 interface ConfigPromptProps {}
 
 const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
@@ -23,19 +25,19 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
         </Space>
       }
     >
-      <Form.Item style={{ marginBottom: 0 }} name="userPrompt">
+      <Form.Item name="userPrompt" style={{ marginBottom: 0 }}>
         <Input.TextArea
           onChange={e => {
             setConfigs({
-              ...(configs || {}),
+              ...configs,
               ConfigPrompt: {
                 ...configs?.ConfigPrompt,
                 userPrompt: e.target.value,
               },
             });
           }}
-          rows={3}
           placeholder="请输入 Prompt"
+          rows={3}
         />
       </Form.Item>
     </Container>

@@ -1,8 +1,10 @@
-import Icon from '@/assets/img/model-app-bx.png';
-import ChatComponent from '@/pages/Chat/Chat';
 import { Typography } from '@tenx-ui/materials';
 import { Card, Space, Spin, Tag } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+
+import Icon from '@/assets/img/model-app-bx.png';
+import ChatComponent from '@/pages/Chat/Chat';
+
 import { useModalAppDetailContext } from '../../index';
 import Modal from '../Modal';
 
@@ -25,23 +27,23 @@ const Dialogue: React.FC<DialogueProps> = props => {
         对话引用弹窗
       </div> */}
       <ChatComponent
-        debug={true}
-        refresh={props.saveIng}
         appName={data?.metadata?.name}
         appNamespace={data?.metadata?.namespace}
+        debug={true}
+        refresh={props.saveIng}
       />
       <Modal
-        title={`引用数据（3）`}
+        data={modalData}
         open={modalOpen && modalType === 'reference'}
         setOpen={setModalOpen}
-        data={modalData}
+        title={`引用数据（3）`}
       >
         <Card
           title={
             <Space>
               <img src={Icon} width={24} />
               <Typography.Title>aaaawer</Typography.Title>
-              <Tag color="green" bordered={false}>
+              <Tag bordered={false} color="green">
                 相似度 {0.1}
               </Tag>
             </Space>

@@ -1,4 +1,3 @@
-import Icon from '@/assets/img/model-app-bx.png';
 import {
   DeleteOutlined,
   PlusCircleOutlined,
@@ -8,6 +7,7 @@ import {
 import { KubeagiKnowledge } from '@tenx-ui/icon';
 import { Flex, Form, Input, Space, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
+
 import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
@@ -34,17 +34,17 @@ const Knowledge: React.FC<KnowledgeProps> = props => {
     setCheckedIds(props.checkedIds);
   }, [props.checkedIds]);
   return (
-    <Flex wrap="wrap" gap="small">
+    <Flex gap="small" wrap="wrap">
       {(canSelect ? items : checkedIds?.map(id => items?.find(item => item?.id === id)))?.map(
         item => {
           return (
             <Flex
-              justify="space-between"
-              key={item?.id}
+              align="center"
               className={`${styles.KnowledgeItem} ${canSelect && styles.KnowledgeItemCanSelect} ${
                 checkedIds.includes(item?.id) && styles.KnowledgeItemSelected
               }`}
-              align="center"
+              justify="space-between"
+              key={item?.id}
               onClick={() => {
                 if (!canSelect) return;
                 if (!multi) {
@@ -64,11 +64,11 @@ const Knowledge: React.FC<KnowledgeProps> = props => {
             >
               <div>
                 <span className={styles.icon}>
-                  <img width={24} src={item?.icon} />
+                  <img src={item?.icon} width={24} />
                 </span>
                 <Typography.Text
-                  style={{ position: 'relative', top: -2, width: 98 }}
                   ellipsis={{ tooltip: item?.name }}
+                  style={{ position: 'relative', top: -2, width: 98 }}
                 >
                   {item?.name}
                 </Typography.Text>
@@ -97,7 +97,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
   const knowledgesRes = utils.bff.useListKnowledgeBases({
     input: {
       page: 1,
-      pageSize: 999999,
+      pageSize: 999_999,
       namespace: utils.getAuthData().project,
     },
   });
@@ -108,12 +108,6 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
   }));
   return (
     <Container
-      style={{
-        marginBottom: configs?.ConfigKnowledge?.knowledgebase ? '0' : '-12px',
-      }}
-      configKey="ConfigKnowledge"
-      icon={<KubeagiKnowledge />}
-      title={'知识库'}
       actions={[
         {
           key: 'string',
@@ -135,15 +129,15 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                 <>
                   <Form.Item name="knowledgebase" style={{ display: 'none' }}></Form.Item>
                   <Knowledge
-                    items={knowledges}
+                    canDelete={false}
+                    canSelect={true}
                     checkedIds={[form.getFieldValue('knowledgebase')]}
+                    items={knowledges}
                     setCheckedIds={v => {
                       form.setFieldsValue({
                         knowledgebase: v?.[0],
                       });
                     }}
-                    canDelete={false}
-                    canSelect={true}
                   />
                 </>
               );
@@ -164,6 +158,12 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
             children: (
               <>
                 <SliderItem
+                  Config={{
+                    initialValue: 0.7,
+                    min: 0,
+                    max: 1,
+                    precision: 2,
+                  }}
                   label={
                     <Space size={3}>
                       最低相似度
@@ -173,14 +173,14 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                     </Space>
                   }
                   name="scoreThreshold"
-                  Config={{
-                    initialValue: 0.7,
-                    min: 0,
-                    max: 1,
-                    precision: 2,
-                  }}
                 />
                 <SliderItem
+                  Config={{
+                    initialValue: 5,
+                    min: 1,
+                    max: 10,
+                    precision: 0,
+                  }}
                   label={
                     <Space size={3}>
                       引用上限
@@ -190,18 +190,11 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                     </Space>
                   }
                   name="numDocuments"
-                  Config={{
-                    initialValue: 5,
-                    min: 1,
-                    max: 10,
-                    precision: 0,
-                  }}
                 />
                 <Form.Item
-                  style={{ marginBottom: 0, marginTop: 10 }}
+                  initialValue={'未找到您询问的内容，请详细描述您的问题'}
                   label="空搜索回复"
                   name="docNullReturn"
-                  initialValue={'未找到您询问的内容，请详细描述您的问题'}
                   rules={[
                     {
                       validator: (_, value, callback) => {
@@ -212,10 +205,11 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                       },
                     },
                   ]}
+                  style={{ marginBottom: 0, marginTop: 10 }}
                 >
                   <Input.TextArea
-                    rows={3}
                     placeholder="没有搜索到合适的内容时，将会直接回复此内容"
+                    rows={3}
                   />
                 </Form.Item>
               </>
@@ -224,12 +218,21 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
           },
         },
       ]}
+      configKey="ConfigKnowledge"
+      icon={<KubeagiKnowledge />}
+      style={{
+        marginBottom: configs?.ConfigKnowledge?.knowledgebase ? '0' : '-12px',
+      }}
+      title={'知识库'}
     >
       <Knowledge
-        items={knowledges}
+        canDelete={true}
+        canSelect={false}
         checkedIds={
           configs?.ConfigKnowledge?.knowledgebase ? [configs?.ConfigKnowledge?.knowledgebase] : []
         }
+        items={knowledges}
+        multi={false}
         setCheckedIds={v => {
           form.setFieldsValue({
             ...configs?.ConfigKnowledge,
@@ -243,9 +246,6 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
             },
           });
         }}
-        canDelete={true}
-        canSelect={false}
-        multi={false}
       />
     </Container>
   );

@@ -3,6 +3,7 @@ import FormHelper from '@tenx-ui/form-helper';
 import { Modal, notification } from '@tenx-ui/materials';
 import { Form, Input, Upload } from 'antd';
 import React, { useEffect, useReducer, useState } from 'react';
+
 import utils from '../../../../utils/__utils';
 import styles from './index.less';
 
@@ -50,11 +51,10 @@ const Edit: React.FC<EditProps> = props => {
 
   return (
     <Modal
-      open={open}
-      title={`${title}应用`}
+      destroyOnClose
       onCancel={() => {
         setOpen(false);
-        setImageUrl(undefined);
+        setImageUrl();
       }}
       onOk={() => {
         form.validateFields().then(async values => {
@@ -68,7 +68,7 @@ const Edit: React.FC<EditProps> = props => {
               },
             });
             setOpen(false);
-            setImageUrl(undefined);
+            setImageUrl();
             refresh && refresh();
             notification.success({
               message: '编辑应用成功',
@@ -81,7 +81,8 @@ const Edit: React.FC<EditProps> = props => {
           }
         });
       }}
-      destroyOnClose
+      open={open}
+      title={`${title}应用`}
     >
       <FormHelper>
         <Form className={styles.form} form={form} labelAlign="left" labelCol={{ span: 5 }}>
@@ -102,8 +103,8 @@ const Edit: React.FC<EditProps> = props => {
           >
             <Input
               disabled={type === 'edit'}
-              placeholder="请输入模型应用名称"
               onBlur={handelBlur}
+              placeholder="请输入模型应用名称"
             />
           </Form.Item>
           <Form.Item
@@ -121,7 +122,7 @@ const Edit: React.FC<EditProps> = props => {
               },
             ]}
           >
-            <Input placeholder="请输入模型应用别名" onBlur={handelBlur} />
+            <Input onBlur={handelBlur} placeholder="请输入模型应用别名" />
           </Form.Item>
           <Form.Item
             className={styles.uploadItem}
@@ -140,14 +141,14 @@ const Edit: React.FC<EditProps> = props => {
             ]}
           >
             <Upload
-              beforeUpload={() => false}
               accept=".jpg,.png"
+              beforeUpload={() => false}
+              listType="picture-card"
               onChange={handleChange}
               showUploadList={false}
-              listType="picture-card"
             >
               {imageUrl ? (
-                <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                <img alt="avatar" src={imageUrl} style={{ width: '100%' }} />
               ) : (
                 <div>
                   <PlusOutlined />

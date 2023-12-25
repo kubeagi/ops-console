@@ -8,9 +8,6 @@
  * @author songsz
  * @date 2023-12-18
  */
-import { fetchEventSource } from '@/components/fetchEventSource';
-import { getCvsMeta } from '@/pages/Chat/Chat/helper';
-import Retry from '@/pages/Chat/Chat/retry';
 import {
   ActionsBar,
   ChatInputArea,
@@ -25,10 +22,15 @@ import { getAuthData } from '@tenx-ui/auth-utils';
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
-import React, { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { fetchEventSource } from '@/components/fetchEventSource';
+import { getCvsMeta } from '@/pages/Chat/Chat/helper';
+import Retry from '@/pages/Chat/Chat/retry';
+
 import './index.less';
 
-interface Chat {
+interface IChat {
   appName: string;
   appNamespace: string;
   // refresh 变化, 触发重新拉取
@@ -46,7 +48,7 @@ const scrollToBottom = debounce(() => {
 let scrollToBottomTimeout;
 const ctrl = new AbortController();
 const retry = new Retry(ctrl, 3);
-const Chat: React.FC<Chat> = props => {
+const Chat: React.FC<IChat> = props => {
   const [conversion, setConversion] = useState<{
     id?: string;
     loadingMsgId?: string;
@@ -71,7 +73,7 @@ const Chat: React.FC<Chat> = props => {
               `##### 您好，我是${meta.displayName || meta.name}${
                 meta.description ? `\n\n${meta.description}` : ''
               }`,
-            new Date().getTime().toString(),
+            Date.now().toString(),
             false
           ),
         ],
@@ -149,7 +151,7 @@ const Chat: React.FC<Chat> = props => {
               id: parsedData.conversion_id,
               data: _conversion.data.map((item, index) => {
                 if (index < _conversion.data.length - 1) return item;
-                const last = _conversion.data[_conversion.data.length - 1];
+                const last = _conversion.data.at(-1);
                 return {
                   ...last,
                   content: last.content + (parsedData?.message || ''),
@@ -184,14 +186,16 @@ const Chat: React.FC<Chat> = props => {
     scrollToBottomTimeout = setTimeout(scrollToBottom, 100);
     return () => {
       ctrl.abort();
-      scrollToBottomTimeout && clearTimeout(scrollToBottomTimeout);
+      if (scrollToBottomTimeout) {
+        clearTimeout(scrollToBottomTimeout);
+      }
     };
   }, []);
   const onSend = useCallback(() => {
     if (!input) return;
     setConversion(conversion => {
-      const userMsgId = new Date().getTime().toString();
-      const assistantMsgId = (new Date().getTime() + 10).toString();
+      const userMsgId = Date.now().toString();
+      const assistantMsgId = (Date.now() + 10).toString();
       return {
         ...conversion,
         loadingMsgId: assistantMsgId,
@@ -204,7 +208,7 @@ const Chat: React.FC<Chat> = props => {
     });
     scrollToBottom();
     fetchConversion(input);
-    setInput(undefined);
+    setInput();
   }, [input, setInput, setConversion, fetchConversion]);
   return (
     <div className="chatComponent">
@@ -216,27 +220,27 @@ const Chat: React.FC<Chat> = props => {
         <div className="chatList">
           <ChatItemsList
             data={conversion?.data}
+            loadingId={conversion.loadingMsgId}
             renderActions={ActionsBar}
-            renderMessages={{
-              default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
-            }}
             renderErrorMessages={{
               error: {
                 Render: ({ id, error, ...res }) => <div>{error.detail?.stack?.toString()}</div>,
               },
             }}
-            loadingId={conversion.loadingMsgId}
+            renderMessages={{
+              default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
+            }}
             {...control}
           />
           <div className="safeArea" id={safeAreaId}></div>
         </div>
         <div className="inputArea">
           <ChatInputArea
-            value={input}
+            bottomAddons={<ChatSendButton onSend={onSend} />}
             onInput={setInput}
             onSend={onSend}
             placeholder="请输入问题，可通过 shift+回车换行"
-            bottomAddons={<ChatSendButton onSend={onSend} />}
+            value={input}
           />
         </div>
       </div>

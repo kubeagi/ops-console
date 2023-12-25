@@ -1,6 +1,7 @@
 import { DownOutlined, EyeInvisibleFilled, UpOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Form, Modal, Progress, Row, Steps, Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
+
 import styles from './datahandle.less';
 
 const SPLIT_TYPE_NAME = '拆分处理';
@@ -92,8 +93,8 @@ const DataHandle: React.FC<Iprops> = props => {
       _dataSource.push(...item.preview);
       return (
         <Col
-          span={type === SPLIT_TYPE_NAME ? 10 : 6}
           key={item.zh_name}
+          span={type === SPLIT_TYPE_NAME ? 10 : 6}
           style={{ marginBottom: 12 }}
         >
           <Card bodyStyle={{ padding: 12 }}>
@@ -132,20 +133,20 @@ const DataHandle: React.FC<Iprops> = props => {
     const dataSource = [];
     // 拆分处理的表格只展示文件名和拆分后
     if (type === SPLIT_TYPE_NAME) {
-      _dataSource.forEach(item => {
+      for (const item of _dataSource) {
         const content = item?.content || [];
         const data = [];
-        content.forEach(ele => {
+        for (const ele of content) {
           const obj = { file_name: item.file_name, post: ele };
           data.push(obj);
-        });
+        }
         dataSource.push(...data);
-      });
+      }
     } else {
-      _dataSource.forEach(item => {
+      for (const item of _dataSource) {
         const data = item?.content?.map(ele => ({ file_name: item.file_name, ...ele }));
         dataSource.push(...data);
-      });
+      }
     }
     // 如果是未处理的状态
     if (!visibleMap[type] && sourceItem.status === 'not_start') {
@@ -160,53 +161,51 @@ const DataHandle: React.FC<Iprops> = props => {
       );
     }
     // 如果是拆分处理的配置，单独处理
-    if (type === SPLIT_TYPE_NAME) {
-      if (!visibleMap[type]) {
-        // 如果是QA-拆分 处理中 的任务
-        if (sourceItem.status === 'doing') {
-          const qa_split_data = data.find(item => item.name === 'qa_split');
-          const fileProgress = qa_split_data.file_progress;
-          // mock
-          // const fileProgress = [{progress:"30",id:1,file_name:'xx1'},{progress:"0",id:2,file_name:'xx2'},{progress:"80",id:3,file_name:'xx3'}];
-          const progressPrecent = fileProgress.filter(item => parseInt(item.progress) === 100);
-          return (
-            <>
-              <div style={{ paddingTop: 8 }}>
-                <Row gutter={16}>{_data}</Row>
-                <div style={{ padding: '8px 0', color: '#000' }}>
-                  {' '}
-                  对 {fileProgress.length} 个文件进行了{type}，处理进度:{progressPrecent.length}/
-                  {fileProgress.length}
-                </div>
-                {fileProgress.map((item, index) => {
-                  return (
-                    <div style={{ display: 'flex', width: '80%' }} key={item.id}>
-                      <div
-                        style={{ marginRight: 12, minWidth: '150px', color: 'rgba(0,0,0,0.8)' }}
-                        key={item.id}
-                      >
-                        {item.file_name}
-                      </div>
-                      <Progress percent={parseInt(item.progress)} key={item.id} />
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          );
-        }
+    if (type === SPLIT_TYPE_NAME && !visibleMap[type]) {
+      // 如果是QA-拆分 处理中 的任务
+      if (sourceItem.status === 'doing') {
+        const qa_split_data = data.find(item => item.name === 'qa_split');
+        const fileProgress = qa_split_data.file_progress;
+        // mock
+        // const fileProgress = [{progress:"30",id:1,file_name:'xx1'},{progress:"0",id:2,file_name:'xx2'},{progress:"80",id:3,file_name:'xx3'}];
+        const progressPrecent = fileProgress.filter(item => Number.parseInt(item.progress) === 100);
         return (
-          <div style={{ paddingTop: 8 }}>
-            <Row gutter={16}>{_data}</Row>
-            <div style={{ padding: '8px 0', color: '#000' }}>
-              {' '}
-              对 {props?.data?.file_num} 个文件进行了{type}
-              ，以下内容为处理效果抽样预览，并非全部内容
+          <>
+            <div style={{ paddingTop: 8 }}>
+              <Row gutter={16}>{_data}</Row>
+              <div style={{ padding: '8px 0', color: '#000' }}>
+                {' '}
+                对 {fileProgress.length} 个文件进行了{type}，处理进度:{progressPrecent.length}/
+                {fileProgress.length}
+              </div>
+              {fileProgress.map((item, index) => {
+                return (
+                  <div key={item.id} style={{ display: 'flex', width: '80%' }}>
+                    <div
+                      key={item.id}
+                      style={{ marginRight: 12, minWidth: '150px', color: 'rgba(0,0,0,0.8)' }}
+                    >
+                      {item.file_name}
+                    </div>
+                    <Progress key={item.id} percent={Number.parseInt(item.progress)} />
+                  </div>
+                );
+              })}
             </div>
-            <Table columns={getSplitColumns} dataSource={dataSource} pagination={false} />
-          </div>
+          </>
         );
       }
+      return (
+        <div style={{ paddingTop: 8 }}>
+          <Row gutter={16}>{_data}</Row>
+          <div style={{ padding: '8px 0', color: '#000' }}>
+            {' '}
+            对 {props?.data?.file_num} 个文件进行了{type}
+            ，以下内容为处理效果抽样预览，并非全部内容
+          </div>
+          <Table columns={getSplitColumns} dataSource={dataSource} pagination={false} />
+        </div>
+      );
     }
     return (
       !visibleMap[type] && (
@@ -262,7 +261,16 @@ const DataHandle: React.FC<Iprops> = props => {
             </span>
           </>
         ),
-        subTitle: !visibleMap[item.description] ? (
+        subTitle: visibleMap[item.description] ? (
+          <a
+            className={styles.stepSubtitle}
+            onClick={() => {
+              setVisibleMap({ ...visibleMap, [item.description]: !visibleMap[item.description] });
+            }}
+          >
+            展开 <UpOutlined />
+          </a>
+        ) : (
           <>
             <a
               className={styles.stepSubtitle}
@@ -273,15 +281,6 @@ const DataHandle: React.FC<Iprops> = props => {
               收起 <DownOutlined />
             </a>
           </>
-        ) : (
-          <a
-            className={styles.stepSubtitle}
-            onClick={() => {
-              setVisibleMap({ ...visibleMap, [item.description]: !visibleMap[item.description] });
-            }}
-          >
-            展开 <UpOutlined />
-          </a>
         ),
         description: renderDesc(item.children, item.description, item),
         status: stepStatuesMap[item.status],
@@ -299,8 +298,8 @@ const DataHandle: React.FC<Iprops> = props => {
       ) : (
         ''
       )}
-      <Steps size="small" items={items} direction="vertical" />
-      <Modal title="模型配置" open={highConfigVisible} onCancel={closeHighConfig} footer={null}>
+      <Steps direction="vertical" items={items} size="small" />
+      <Modal footer={null} onCancel={closeHighConfig} open={highConfigVisible} title="模型配置">
         <Form labelAlign="right" {...layout}>
           <Form.Item label="温度">{highConfig?.temperature || '-'}</Form.Item>
           <Form.Item label="最大响应长度">{highConfig?.max_tokens || '-'}</Form.Item>

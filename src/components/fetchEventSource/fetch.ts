@@ -137,18 +137,18 @@ export function fetchEventSource(
         onclose?.();
         dispose();
         resolve();
-      } catch (err) {
+      } catch (error) {
         if (!curRequestController.signal.aborted) {
           // if we haven't aborted the request ourselves:
           try {
             // check if we need to retry:
-            const interval: any = onerror?.(err) ?? retryInterval;
+            const interval: any = onerror?.(error) ?? retryInterval;
             window.clearTimeout(retryTimer);
             retryTimer = window.setTimeout(create, interval);
-          } catch (innerErr) {
+          } catch (error) {
             // we should not retry anymore:
             dispose();
-            reject(innerErr);
+            reject(error);
           }
         }
       }

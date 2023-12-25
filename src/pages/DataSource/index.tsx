@@ -1,7 +1,10 @@
 // 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
 // 例外：react 框架的导出名和各种组件名除外。
-import React from 'react';
-
+import {
+  AntdIconPlusOutlined,
+  AntdIconSettingOutlined,
+  TenxIconRefresh,
+} from '@tenx-ui/icon-materials';
 import {
   Alert,
   Button,
@@ -23,26 +26,16 @@ import {
   Tag,
   Typography,
 } from '@tenx-ui/materials';
-
-import LccComponentRu83f from 'CreateDataSource';
-
-import {
-  AntdIconPlusOutlined,
-  AntdIconSettingOutlined,
-  TenxIconRefresh,
-} from '@tenx-ui/icon-materials';
-
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { matchPath, useLocation } from '@umijs/max';
+import LccComponentRu83f from 'CreateDataSource';
 import qs from 'query-string';
+import React from 'react';
 import { DataProvider } from 'shared-components';
 
-import utils, { RefsManager } from '../../utils/__utils';
-
-import * as __$$i18n from '../../i18n';
-
 import __$$constants from '../../__constants';
-
+import * as __$$i18n from '../../i18n';
+import utils, { RefsManager } from '../../utils/__utils';
 import './index.css';
 
 class DataSource$$Page extends React.Component {
@@ -214,7 +207,7 @@ class DataSource$$Page extends React.Component {
       this.setState({
         timer: setTimeout(() => {
           this.initEditForm({
-            ...(record || {}),
+            ...record,
             bucket: record?.oss?.bucket,
             object: record?.oss?.object,
             serverAddress: record?.endpoint?.url,
@@ -325,7 +318,7 @@ class DataSource$$Page extends React.Component {
       ) {
         return this.i18n('i18n-q8a45i4l');
       }
-    } catch (e) {}
+    } catch {}
   }
 
   componentDidMount() {}
@@ -345,13 +338,12 @@ class DataSource$$Page extends React.Component {
           mask={true}
           maskClosable={false}
           onCancel={function () {
-            return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            return Reflect.apply(this.closeModal, this, [...Array.prototype.slice.call(arguments)]);
           }.bind(this)}
           onOk={function () {
-            return this.confirmDeleteModal.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
+            return Reflect.apply(this.confirmDeleteModal, this, [
+              ...Array.prototype.slice.call(arguments),
+            ]);
           }.bind(this)}
           open={__$$eval(() => this.state.isOpenModal && this.state.modalType === 'delete')}
           title={this.i18n('i18n-1i46nz7w') /* 删除数据源 */}
@@ -426,7 +418,7 @@ class DataSource$$Page extends React.Component {
           mask={true}
           maskClosable={false}
           onClose={function () {
-            return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            return Reflect.apply(this.closeModal, this, [...Array.prototype.slice.call(arguments)]);
           }.bind(this)}
           open={__$$eval(() => this.state.isOpenModal && this.state.modalType === 'edit')}
           placement="right"
@@ -438,18 +430,24 @@ class DataSource$$Page extends React.Component {
             bff={__$$eval(() => this.props.appHelper.utils.bff)}
             data={__$$eval(() => this.state?.record || {})}
             handelCancel={function () {
-              return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
+              return Reflect.apply(this.closeModal, this, [
+                ...Array.prototype.slice.call(arguments),
+              ]);
             }.bind(this)}
             handleCancel={function () {
-              return this.closeModal.apply(this, Array.prototype.slice.call(arguments).concat([]));
+              return Reflect.apply(this.closeModal, this, [
+                ...Array.prototype.slice.call(arguments),
+              ]);
             }.bind(this)}
             handleSave={function () {
-              return this.onSubmit.apply(this, Array.prototype.slice.call(arguments).concat([]));
+              return Reflect.apply(this.onSubmit, this, [...Array.prototype.slice.call(arguments)]);
             }.bind(this)}
             project={__$$eval(() => this.utils.getAuthData()?.project)}
             ref={this._refsManager.linkRef('LccComponentRu83f')}
             setThis={function () {
-              return this.setEditThis.apply(this, Array.prototype.slice.call(arguments).concat([]));
+              return Reflect.apply(this.setEditThis, this, [
+                ...Array.prototype.slice.call(arguments),
+              ]);
             }.bind(this)}
           />
         </Drawer>
@@ -508,10 +506,9 @@ class DataSource$$Page extends React.Component {
                       ghost={false}
                       icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
                       onClick={function () {
-                        return this.handleRefresh.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleRefresh, this, [
+                          ...Array.prototype.slice.call(arguments),
+                        ]);
                       }.bind(this)}
                       shape="default"
                     >
@@ -520,16 +517,14 @@ class DataSource$$Page extends React.Component {
                     <Input.Search
                       __component_name="Input.Search"
                       onChange={function () {
-                        return this.handleSearchValueChange.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleSearchValueChange, this, [
+                          ...Array.prototype.slice.call(arguments),
+                        ]);
                       }.bind(this)}
                       onSearch={function () {
-                        return this.handleSearch.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleSearch, this, [
+                          ...Array.prototype.slice.call(arguments),
+                        ]);
                       }.bind(this)}
                       placeholder={this.i18n('i18n-hp37vpeo') /* 请输入数据源名称搜索 */}
                     />
@@ -570,14 +565,12 @@ class DataSource$$Page extends React.Component {
                             hoverable={true}
                             loading={false}
                             onClick={function () {
-                              return this.goDetail.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([
-                                  {
-                                    record: record,
-                                  },
-                                ])
-                              );
+                              return Reflect.apply(this.goDetail, this, [
+                                ...Array.prototype.slice.call(arguments),
+                                {
+                                  record: record,
+                                },
+                              ]);
                             }.bind(__$$context)}
                             size="default"
                             style={{}}
@@ -608,14 +601,12 @@ class DataSource$$Page extends React.Component {
                                       },
                                     ],
                                     onClick: function () {
-                                      return this.handleOperationClick.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([
-                                          {
-                                            record: record,
-                                          },
-                                        ])
-                                      );
+                                      return Reflect.apply(this.handleOperationClick, this, [
+                                        ...Array.prototype.slice.call(arguments),
+                                        {
+                                          record: record,
+                                        },
+                                      ]);
                                     }.bind(__$$context),
                                   }}
                                   placement="bottomLeft"
@@ -878,16 +869,14 @@ class DataSource$$Page extends React.Component {
                     __component_name="Pagination"
                     current={__$$eval(() => this.state.current)}
                     onChange={function () {
-                      return this.handlePaginationChange.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
+                      return Reflect.apply(this.handlePaginationChange, this, [
+                        ...Array.prototype.slice.call(arguments),
+                      ]);
                     }.bind(this)}
                     onShowSizeChange={function () {
-                      return this.handlePaginationChange.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
+                      return Reflect.apply(this.handlePaginationChange, this, [
+                        ...Array.prototype.slice.call(arguments),
+                      ]);
                     }.bind(this)}
                     pageSize={__$$eval(() => this.state.size)}
                     simple={false}
@@ -927,7 +916,9 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      self={self}
+      render={dataProps => (
+        <DataSource$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
+      )}
       sdkInitFunc={{
         enabled: undefined,
         params: undefined,
@@ -949,9 +940,7 @@ const PageWrapper = (props = {}) => {
           }.apply(self),
         },
       ]}
-      render={dataProps => (
-        <DataSource$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
-      )}
+      self={self}
     />
   );
 };
@@ -960,7 +949,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch {}
 }
 
 function __$$evalArray(expr) {

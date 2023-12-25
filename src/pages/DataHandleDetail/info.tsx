@@ -1,6 +1,7 @@
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Descriptions } from 'antd';
 import React, { useEffect, useState } from 'react';
+
 interface Iprops {
   data: Record<string, any>;
 }
@@ -83,7 +84,7 @@ const Info: React.FC<Iprops> = props => {
     ];
     setItems(_items);
   }, [data]);
-  return <Descriptions items={items} column={1} labelStyle={{ width: 100 }} />;
+  return <Descriptions column={1} items={items} labelStyle={{ width: 100 }} />;
 };
 
 export default Info;

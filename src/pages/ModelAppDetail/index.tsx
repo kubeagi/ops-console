@@ -2,9 +2,11 @@ import { Button, Col, Page, Row, Space } from '@tenx-ui/materials';
 import { matchPath, useLocation } from '@umijs/max';
 import { Form } from 'antd';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+
 import utils from '../../utils/__utils';
 import Body from './Body';
 import Header from './Header';
+
 export const ModalAppDetailContext = createContext(null);
 export const useModalAppDetailContext = () => {
   return useContext(ModalAppDetailContext);
@@ -74,7 +76,7 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
         <Row wrap={true}>
           <Col span={24}>
             <Space align="center" direction="horizontal">
-              <Button.Back type="primary" title="模型应用详情" />
+              <Button.Back title="模型应用详情" type="primary" />
             </Space>
           </Col>
           <Col span={24}>

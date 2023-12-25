@@ -1,6 +1,7 @@
 import { KubeagiNextLead } from '@tenx-ui/icon';
 import { Form, Switch } from 'antd';
 import React from 'react';
+
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 
@@ -10,10 +11,6 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
   const { configs, setConfigs } = useModalAppDetailContext();
   return (
     <Container
-      changeConfig
-      configKey="ConfigNext"
-      icon={<KubeagiNextLead />}
-      title={'下一步引导'}
       actions={[
         {
           key: 'switch',
@@ -22,7 +19,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
               <Switch
                 onChange={v => {
                   setConfigs({
-                    ...(configs || {}),
+                    ...configs,
                     ConfigNext: {
                       ...configs?.ConfigNext,
                       showNextGuid: v,
@@ -35,6 +32,10 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
           data: {},
         },
       ]}
+      changeConfig
+      configKey="ConfigNext"
+      icon={<KubeagiNextLead />}
+      title={'下一步引导'}
     ></Container>
   );
 };

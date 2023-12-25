@@ -1,8 +1,10 @@
-import Icon from '@/assets/img/model-app-bx.png';
 import { SettingOutlined } from '@ant-design/icons';
 import { KubeagiRadio } from '@tenx-ui/icon';
-import { Flex, Form, Select, Space, Typography } from 'antd';
+import { Flex, Form, Select, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
+
+import Icon from '@/assets/img/model-app-bx.png';
+
 import Container from '../Container';
 import { SliderItem } from '../Modal';
 import Audio from './Audio';
@@ -25,16 +27,16 @@ const AudioStyle: React.FC<AudioStyleProps> = props => {
     setCheckedId(props.checkedId);
   }, [props.checkedId]);
   return (
-    <Flex wrap="wrap" gap="small">
+    <Flex gap="small" wrap="wrap">
       {items?.map(item => {
         return (
           <Flex
-            justify="space-between"
-            key={item.id}
+            align="center"
             className={`${styles.AudioItem} ${styles.AudioItemCanSelect} ${
               item.id === checkedId && styles.AudioItemSelected
             }`}
-            align="center"
+            justify="space-between"
+            key={item.id}
             onClick={() => {
               setCheckedId(item.id);
               props.setCheckedId && setCheckedId(item.id);
@@ -42,7 +44,7 @@ const AudioStyle: React.FC<AudioStyleProps> = props => {
           >
             <div>
               <span className={styles.icon}>
-                <img width={24} src={item.icon} />
+                <img src={item.icon} width={24} />
               </span>
               <Typography.Text style={{ position: 'relative', top: 2 }}>
                 {item.name}
@@ -69,9 +71,6 @@ const ConfigAudio: React.FC<ConfigAudioProps> = props => {
   ];
   return (
     <Container
-      configKey="ConfigAudio"
-      icon={<KubeagiRadio />}
-      title={'语音播报'}
       actions={[
         {
           key: 'string',
@@ -85,33 +84,33 @@ const ConfigAudio: React.FC<ConfigAudioProps> = props => {
             children: (
               <>
                 <Form.Item
+                  initialValue={'alloy'}
                   label="语音模型"
                   name="voice"
-                  initialValue={'alloy'}
                   style={{ marginBottom: 10 }}
                 >
                   <Select placeholder="请选择语音模型">
                     {['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'].map(value => (
-                      <Select.Option value={value} key={value}>
+                      <Select.Option key={value} value={value}>
                         {value}
                       </Select.Option>
                     ))}
                   </Select>
                 </Form.Item>
                 <SliderItem
-                  label="语速"
-                  name="语速"
                   Config={{
                     initialValue: 1,
                     min: 0,
                     max: 10,
                     precision: 0,
                   }}
+                  label="语速"
+                  name="语速"
                 />
                 <Form.Item label="语音风格" style={{ marginBottom: 0 }}>
                   <AudioStyle
-                    items={audioStyles}
                     checkedId={checkedAudioStyleTemp}
+                    items={audioStyles}
                     setCheckedId={setCheckedAudioStyleTemp}
                   />
                 </Form.Item>
@@ -121,6 +120,9 @@ const ConfigAudio: React.FC<ConfigAudioProps> = props => {
           },
         },
       ]}
+      configKey="ConfigAudio"
+      icon={<KubeagiRadio />}
+      title={'语音播报'}
     ></Container>
   );
 };

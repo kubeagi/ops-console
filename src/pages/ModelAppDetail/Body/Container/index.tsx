@@ -1,6 +1,7 @@
 import { Typography } from '@tenx-ui/materials';
-import { Divider, Flex, Form, Space } from 'antd';
+import { Divider, Flex, Space } from 'antd';
 import React, { useEffect, useReducer, useState } from 'react';
+
 import { useModalAppDetailContext } from '../../index';
 import Modal, { SettingProps } from '../Modal';
 import styles from './index.less';
@@ -46,7 +47,7 @@ const Container: React.FC<ContainerProps> = props => {
         {...(actionData?.modal || {})}
         configKey={configKey}
       />
-      <Flex justify="space-between" className={styles.header}>
+      <Flex className={styles.header} justify="space-between">
         <Space size={5}>
           <span className={styles.titleIcon}>{icon}</span>
           <Typography.Title level={3}>{title}</Typography.Title>
@@ -71,7 +72,7 @@ const Container: React.FC<ContainerProps> = props => {
                 )}
                 {actionChildren}
                 {i !== actions.length - 1 && (
-                  <Divider mode="default" type="vertical" dashed={false} />
+                  <Divider dashed={false} mode="default" type="vertical" />
                 )}
               </>
             );

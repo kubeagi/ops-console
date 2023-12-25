@@ -2,11 +2,12 @@ import { QuestionCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import { KubeagiModelService } from '@tenx-ui/icon';
 import { Form, Select, Space, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
+
 import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
-import styles from '../index.less';
 import { SliderItem } from '../Modal';
+import styles from '../index.less';
 
 interface ConfigModelServiceProps {}
 const TEMPERATURE_DEFAULT = {
@@ -46,9 +47,6 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
 
   return (
     <Container
-      configKey="ConfigModelService"
-      icon={<KubeagiModelService />}
-      title={'模型服务'}
       actions={[
         {
           key: 'string',
@@ -63,6 +61,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
             children: (
               <>
                 <SliderItem
+                  Config={TEMPERATURE_DEFAULT}
                   label={
                     <Space size={3}>
                       温度
@@ -72,9 +71,9 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
                     </Space>
                   }
                   name="temperature"
-                  Config={TEMPERATURE_DEFAULT}
                 />
                 <SliderItem
+                  Config={MAX_RESPONSE_LENGTH_DEFAULT}
                   label={
                     <Space size={3}>
                       最大响应长度
@@ -84,9 +83,9 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
                     </Space>
                   }
                   name="maxLength"
-                  Config={MAX_RESPONSE_LENGTH_DEFAULT}
                 />
                 <SliderItem
+                  Config={SESSION_ROUND_DEFAULT}
                   label={
                     <Space size={3}>
                       对话轮次
@@ -96,7 +95,6 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
                     </Space>
                   }
                   name="conversionWindowSize"
-                  Config={SESSION_ROUND_DEFAULT}
                 />
               </>
             ),
@@ -104,21 +102,22 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
           },
         },
       ]}
+      configKey="ConfigModelService"
+      icon={<KubeagiModelService />}
       renderChildren={(form, forceUpdate) => {
         const llm = llmList?.find(item => item.name === form.getFieldValue('llm'));
         const noModelSelect = llm?.provider === 'worker' || !llm;
         return (
           <>
-            <Form.Item style={{ marginBottom: noModelSelect ? 0 : 20 }} name="llm">
+            <Form.Item name="llm" style={{ marginBottom: noModelSelect ? 0 : 20 }}>
               <Select
-                placeholder="请选择模型服务"
                 onChange={v => {
                   forceUpdate();
                   form.setFieldsValue({
                     model: undefined,
                   });
                   setConfigs({
-                    ...(configs || {}),
+                    ...configs,
                     ConfigModelService: {
                       ...configs?.ConfigModelService,
                       model: undefined,
@@ -126,27 +125,28 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
                     },
                   });
                 }}
+                placeholder="请选择模型服务"
               >
                 {llmList?.map(item => (
-                  <Select.Option value={item.name} key={item.name}>
+                  <Select.Option key={item.name} value={item.name}>
                     {utils.getFullName(item)}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
             {!noModelSelect && (
-              <Form.Item style={{ marginBottom: 0 }} name="model">
+              <Form.Item name="model" style={{ marginBottom: 0 }}>
                 <Select
-                  placeholder="请选择模型"
                   onChange={v => {
                     setConfigs({
-                      ...(configs || {}),
+                      ...configs,
                       ConfigModelService: {
                         ...configs?.ConfigModelService,
                         model: v,
                       },
                     });
                   }}
+                  placeholder="请选择模型"
                 >
                   {llm?.models?.map(item => (
                     <Select.Option key={item} value={item}>
@@ -159,6 +159,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
           </>
         );
       }}
+      title={'模型服务'}
     ></Container>
   );
 };
