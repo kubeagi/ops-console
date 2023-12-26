@@ -15,6 +15,7 @@ import {
   ChatListProps,
   ChatMessage,
   ChatSendButton,
+  Highlighter,
   useControls,
   useCreateStore,
 } from '@lobehub/ui';
@@ -26,7 +27,7 @@ import { debounce } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
-import { getCvsMeta } from '@/pages/Chat/Chat/helper';
+import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
 import Retry from '@/pages/Chat/Chat/retry';
 
 import './index.less';
@@ -178,8 +179,7 @@ const Chat: React.FC<IChat> = props => {
             setLastCvsErr(err);
             throw err; // rethrow to stop the operation
           } else {
-            // do nothing to automatically retry. You can also
-            // return a specific retry interval here.
+            setLastCvsErr(err);
           }
         },
         onclose() {
@@ -235,7 +235,16 @@ const Chat: React.FC<IChat> = props => {
             renderActions={ActionsBar}
             renderErrorMessages={{
               error: {
-                Render: ({ id, error, ...res }) => <div>{error.detail?.stack?.toString()}</div>,
+                Render: error => {
+                  if (typeof error?.error?.detail?.message === 'string') {
+                    return (
+                      <Highlighter copyButtonSize="small" language="json" type="pure">
+                        {formatJson(error?.error?.detail?.message)}
+                      </Highlighter>
+                    );
+                  }
+                  return <div>{error?.detail?.stack?.toString()}</div>;
+                },
               },
             }}
             renderMessages={{

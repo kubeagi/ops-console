@@ -31,3 +31,11 @@ export const getCvsMeta = (content: string, id: string, isUser?: boolean): ChatM
     role: isUser ? 'user' : 'assistant',
   };
 };
+
+export const formatJson = (json: string, space: number = 2): string => {
+  try {
+    return JSON.stringify(JSON.parse(json), null, space);
+  } catch {
+    return json;
+  }
+};
