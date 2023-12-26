@@ -124,12 +124,14 @@ export function getLines(onLine: (line: Uint8Array, fieldLength: number) => void
  * @param onId A function that will be called on each `id` field.
  * @param onRetry A function that will be called on each `retry` field.
  * @param onMessage A function that will be called on each message.
+ * @param onError A function that will be called on message errors.
  * @returns A function that should be called for each incoming line buffer.
  */
 export function getMessages(
   onId: (id: string) => void,
   onRetry: (retry: number) => void,
-  onMessage?: (msg: EventSourceMessage) => void
+  onMessage?: (msg: EventSourceMessage) => void,
+  onError?: (err: Error) => void
 ) {
   let message = newMessage();
   const decoder = new TextDecoder();
@@ -147,7 +149,12 @@ export function getMessages(
       const field = decoder.decode(line.subarray(0, fieldLength));
       const valueOffset = fieldLength + (line[fieldLength + 1] === ControlChars.Space ? 2 : 1);
       const value = decoder.decode(line.subarray(valueOffset));
-
+      // Agreement with the backend: When the event is error, throw an exception directly.
+      if (message.event === 'error') {
+        const error = new Error(value);
+        error.message = value;
+        onError?.(error);
+      }
       switch (field) {
         case 'data': {
           // if this message already has data, append the new value to the old.

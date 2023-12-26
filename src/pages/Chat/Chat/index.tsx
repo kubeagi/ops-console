@@ -15,6 +15,7 @@ import {
   ChatListProps,
   ChatMessage,
   ChatSendButton,
+  Highlighter,
   useControls,
   useCreateStore,
 } from '@lobehub/ui';
@@ -26,7 +27,7 @@ import { debounce } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
-import { getCvsMeta } from '@/pages/Chat/Chat/helper';
+import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
 import Retry from '@/pages/Chat/Chat/retry';
 
 import './index.less';
@@ -34,6 +35,8 @@ import './index.less';
 interface IChat {
   appName: string;
   appNamespace: string;
+  // 会话id, 如果有值, 则拉取并继续该会话; 否则新建会话
+  conversationId?: string;
   // refresh 变化, 触发重新拉取
   refresh?: boolean | number | string;
   // debug为true,表示临时会话, 测试应用时使用, 不保存
@@ -50,42 +53,45 @@ let scrollToBottomTimeout;
 const ctrl = new AbortController();
 const retry = new Retry(ctrl, 3);
 const Chat: React.FC<IChat> = props => {
-  const [conversion, setConversion] = useState<{
+  const [conversation, setConversation] = useState<{
     id?: string;
     loadingMsgId?: string;
     data: ChatMessage[];
-  }>({ data: [] });
+  }>({
+    id: props.conversationId,
+    data: [],
+  });
 
   const application = sdk.useGetApplication({
     name: props.appName,
     namespace: props.appNamespace,
   });
   useEffect(() => {
-    if (conversion.data?.length) return;
+    if (conversation.data?.length) return;
     const app = application?.data?.Application?.getApplication;
     const meta = app?.metadata;
     const prologue = app?.prologue;
     if (meta?.name) {
-      setConversion({
-        ...conversion,
+      setConversation({
+        ...conversation,
         data: [
           getCvsMeta(
             prologue ||
               `##### 您好，我是${meta.displayName || meta.name}${
                 meta.description ? `\n\n${meta.description}` : ''
               }`,
-            Date.now().toString(),
+            props.conversationId || Date.now().toString(),
             false
           ),
         ],
       });
       scrollToBottom();
     }
-  }, [conversion, application]);
+  }, [conversation, application, props.conversationId]);
   useEffect(() => {
     application.mutate();
   }, []);
-  const [input, setInput] = useState<string>();
+  const [input, setInput] = useState<string | undefined>();
   const store = useCreateStore();
   const control: ChatListProps | any = useControls(
     {
@@ -99,10 +105,10 @@ const Chat: React.FC<IChat> = props => {
   );
   const setLastCvsErr = useCallback(
     (err: Error) => {
-      setConversion(_conversion => {
-        const [first, ...rest] = _conversion.data.reverse();
+      setConversation(_conversation => {
+        const [first, ...rest] = _conversation.data.reverse();
         return {
-          ..._conversion,
+          ..._conversation,
           loadingMsgId: undefined,
           data: [
             ...rest.reverse(),
@@ -118,9 +124,9 @@ const Chat: React.FC<IChat> = props => {
         };
       });
     },
-    [setConversion]
+    [setConversation]
   );
-  const fetchConversion = useCallback(
+  const fetchConversation = useCallback(
     async query => {
       await fetchEventSource(`${window.location.origin}/kubeagi-apis/chat`, {
         method: 'POST',
@@ -132,7 +138,7 @@ const Chat: React.FC<IChat> = props => {
         body: JSON.stringify({
           query,
           response_mode: 'streaming',
-          conversion_id: conversion?.id || '',
+          conversation_id: conversation?.id || '',
           app_name: props.appName,
           app_namespace: props.appNamespace,
           // TODO: 防止每次都生成新的对话, 暂时设为true; 引入历史会话后,再修改回来
@@ -151,13 +157,13 @@ const Chat: React.FC<IChat> = props => {
         },
         onmessage(event) {
           const parsedData = JSON.parse(event.data);
-          setConversion(_conversion => {
+          setConversation(_conversation => {
             return {
-              ..._conversion,
-              id: parsedData.conversion_id,
-              data: _conversion.data.map((item, index) => {
-                if (index < _conversion.data.length - 1) return item;
-                const last = _conversion.data.at(-1);
+              ..._conversation,
+              id: parsedData.conversation_id,
+              data: _conversation.data.map((item, index) => {
+                if (index < _conversation.data.length - 1) return item;
+                const last = _conversation.data.at(-1);
                 return {
                   ...last,
                   content: last.content + (parsedData?.message || ''),
@@ -173,19 +179,18 @@ const Chat: React.FC<IChat> = props => {
             setLastCvsErr(err);
             throw err; // rethrow to stop the operation
           } else {
-            // do nothing to automatically retry. You can also
-            // return a specific retry interval here.
+            setLastCvsErr(err);
           }
         },
         onclose() {
-          setConversion(_conversion => ({
-            ..._conversion,
+          setConversation(_conversation => ({
+            ..._conversation,
             loadingMsgId: undefined,
           }));
         },
       });
     },
-    [conversion, setConversion]
+    [conversation, setConversation]
   );
 
   useEffect(() => {
@@ -199,23 +204,23 @@ const Chat: React.FC<IChat> = props => {
   }, []);
   const onSend = useCallback(() => {
     if (!input) return;
-    setConversion(conversion => {
+    setConversation(conversation => {
       const userMsgId = Date.now().toString();
       const assistantMsgId = (Date.now() + 10).toString();
       return {
-        ...conversion,
+        ...conversation,
         loadingMsgId: assistantMsgId,
         data: [
-          ...conversion.data,
+          ...conversation.data,
           getCvsMeta(input, userMsgId, true),
           getCvsMeta('', assistantMsgId, false),
         ],
       };
     });
     scrollToBottom();
-    fetchConversion(input);
+    fetchConversation(input);
     setInput();
-  }, [input, setInput, setConversion, fetchConversion]);
+  }, [input, setInput, setConversation, fetchConversation]);
   return (
     <div className="chatComponent">
       <div
@@ -225,12 +230,21 @@ const Chat: React.FC<IChat> = props => {
       >
         <div className="chatList">
           <ChatItemsList
-            data={conversion?.data}
-            loadingId={conversion.loadingMsgId}
+            data={conversation?.data}
+            loadingId={conversation.loadingMsgId}
             renderActions={ActionsBar}
             renderErrorMessages={{
               error: {
-                Render: ({ id, error, ...res }) => <div>{error.detail?.stack?.toString()}</div>,
+                Render: error => {
+                  if (typeof error?.error?.detail?.message === 'string') {
+                    return (
+                      <Highlighter copyButtonSize="small" language="json" type="pure">
+                        {formatJson(error?.error?.detail?.message)}
+                      </Highlighter>
+                    );
+                  }
+                  return <div>{error?.detail?.stack?.toString()}</div>;
+                },
               },
             }}
             renderMessages={{
@@ -254,7 +268,7 @@ const Chat: React.FC<IChat> = props => {
   );
 };
 let tmpRefresh;
-const ChatComponent: React.FC<Chat> = props => {
+const ChatComponent: React.FC<IChat> = props => {
   const [_refresh, setRefresh] = useState(false);
   useEffect(() => {
     if (props.refresh === tmpRefresh) {

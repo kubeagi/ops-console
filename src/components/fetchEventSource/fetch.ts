@@ -129,7 +129,8 @@ export function fetchEventSource(
               retry => {
                 retryInterval = retry;
               },
-              onmessage
+              onmessage,
+              onerror
             )
           )
         );
