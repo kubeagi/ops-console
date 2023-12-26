@@ -1,28 +1,27 @@
 {
   "name": "kubeagi-portal",
-  "description": "KubeAGI 的前端 portal",
   "version": "0.1.0",
-  "packageManager": "pnpm",
+  "description": "KubeAGI 的前端 portal",
   "scripts": {
     "analyze": "cross-env ANALYZE=1 UMI_ENV=prod max build --max_old_space_size=4096",
-    "start": "max dev",
-    "preview": "max preview",
-    "dev": "concurrently \"max dev\" \"npm run build:menu-watch\"",
-    "postinstall": "max setup",
-    "test": "jest",
-    "test:coverage": "max g jest --coverage",
     "build": "cross-env UMI_ENV=prod max build --max_old_space_size=4096 && npm run build:menu",
+    "build:all": "nr build && ./build.sh",
     "build:menu": "node ./config/menu/index.mjs",
     "build:menu-watch": "cross-env WATCH=1 MENU_JSON_PATH=../../public/menu.json node ./config/menu/index.mjs",
-    "build:all": "nr build && ./build.sh",
+    "dev": "concurrently \"max dev\" \"npm run build:menu-watch\"",
+    "postinstall": "max setup",
     "lint": "npm run lint:es && npm run lint:style",
-    "lint:es": "eslint --ext .jsx,.js,.tsx,.ts src",
-    "lint:style": "stylelint \"{src,tests}/**/*.{css,less,js,jsx,ts,tsx}\"",
-    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "lint-fix": "npm run lint-fix:es && npm run lint-fix:style",
     "lint-fix:es": "eslint --ext .jsx,.js,.tsx,.ts src --fix",
     "lint-fix:style": "stylelint \"{src,tests}/**/*.{css,less,js,jsx,ts,tsx}\" --fix",
-    "prepare": "husky install"
+    "lint:es": "eslint --ext .jsx,.js,.tsx,.ts src",
+    "lint:style": "stylelint \"{src,tests}/**/*.{css,less,js,jsx,ts,tsx}\"",
+    "prepare": "husky install",
+    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
+    "preview": "max preview",
+    "start": "max dev",
+    "test": "jest",
+    "test:coverage": "max g jest --coverage"
   },
   "lint-staged": {
     "*.md": [
@@ -33,11 +32,11 @@
       "prettier --write --no-error-on-unmatched-pattern"
     ],
     "*.{css,less}": [
-      "stylelint --fix",
+      "stylelint --fix --allow-empty-input",
       "prettier --write"
     ],
     "*.{js,jsx}": [
-      "stylelint --fix",
+      "stylelint --fix --allow-empty-input",
       "eslint --fix",
       "prettier --write"
     ],
@@ -103,7 +102,7 @@
     "@types/qs": "^6.5.3",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "@yuntijs/lint": "^1.2.0",
+    "@yuntijs/lint": "^1.3.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.13",
     "concurrently": "^7.6.0",
     "cross-env": "^5.1.4",
@@ -111,10 +110,11 @@
     "husky": "^8.0.1",
     "jest": "^27",
     "lint-staged": "^15",
-    "prettier": "^3.1.1",
+    "prettier": "^3",
     "stylelint": "^15",
     "typescript": "^5"
   },
+  "packageManager": "pnpm",
   "engines": {
     "node": ">=18.12.0",
     "pnpm": ">=8.1.0"
