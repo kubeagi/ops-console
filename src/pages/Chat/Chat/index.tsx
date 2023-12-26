@@ -20,6 +20,7 @@ import {
 } from '@lobehub/ui';
 import { getAuthData } from '@tenx-ui/auth-utils';
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
+import { Spin } from 'antd';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -81,6 +82,9 @@ const Chat: React.FC<IChat> = props => {
       scrollToBottom();
     }
   }, [conversion, application]);
+  useEffect(() => {
+    application.mutate();
+  }, []);
   const [input, setInput] = useState<string>();
   const store = useCreateStore();
   const control: ChatListProps | any = useControls(
@@ -131,7 +135,9 @@ const Chat: React.FC<IChat> = props => {
           conversion_id: conversion?.id || '',
           app_name: props.appName,
           app_namespace: props.appNamespace,
-          debug: Boolean(props.debug),
+          // TODO: 防止每次都生成新的对话, 暂时设为true; 引入历史会话后,再修改回来
+          debug: true,
+          // debug: Boolean(props.debug),
         }),
         async onopen(response) {
           if (response.ok) {
@@ -247,4 +253,24 @@ const Chat: React.FC<IChat> = props => {
     </div>
   );
 };
-export default Chat;
+let tmpRefresh;
+const ChatComponent: React.FC<Chat> = props => {
+  const [_refresh, setRefresh] = useState(false);
+  useEffect(() => {
+    if (props.refresh === tmpRefresh) {
+      return;
+    }
+    setRefresh(true);
+    setTimeout(setRefresh.bind('', false), 500);
+    tmpRefresh = props.refresh;
+    ctrl.abort(); // 正在生成的对话取消
+  }, [setRefresh, props.refresh]);
+  if (_refresh)
+    return (
+      <div className="chatSpin">
+        <Spin spinning />
+      </div>
+    );
+  return <Chat {...props} />;
+};
+export default ChatComponent;
