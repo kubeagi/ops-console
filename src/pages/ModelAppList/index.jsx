@@ -499,6 +499,24 @@ class ModelAppList$$Page extends React.Component {
     }
   }
 
+  async validatorName(v) {
+    if (v) {
+      try {
+        const res = await this.utils.bff.listApplications({
+          input: {
+            keyword: v,
+            namespace: this.utils.getAuthData()?.project,
+            page: 1,
+            pageSize: 10,
+          },
+        });
+        if (res?.Application?.listApplicationMetadata?.nodes?.length) {
+          return '应用名称重复';
+        }
+      } catch (error) {}
+    }
+  }
+
   componentDidMount() {
     console.log('did mount', this.utils.bff);
     this.getData();
@@ -560,6 +578,18 @@ class ModelAppList$$Page extends React.Component {
                     message: "必须由小写字母数字和'-'或'.'组成，并且必须以字母数字开头和结尾",
                     pattern: '^[a-z0-9][a-z0-9.-]*[a-z0-9]$',
                     type: 'disabled',
+                  },
+                  {
+                    children: '未知',
+                    id: 'disabled',
+                    triggerType: 'onBlur',
+                    type: 'disabled',
+                    validator: function () {
+                      return this.validatorName.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
                   },
                 ],
               }}

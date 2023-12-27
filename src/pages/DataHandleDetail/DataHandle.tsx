@@ -1,4 +1,21 @@
-import { DownOutlined, EyeInvisibleFilled, UpOutlined } from '@ant-design/icons';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import {
+  Bukejian,
+  Cizhongfuguolv,
+  Fanzhuanjian,
+  Jinyong,
+  Konggechuli,
+  QAchaifen,
+  Quchubiaoqing,
+  Quchuemail,
+  Quchuip,
+  Quchuluanma,
+  Quchushuzi,
+  Quchuwangyebiaoshifu,
+  Simshash,
+  Teshuzifu,
+  Wenbenfenduan,
+} from '@tenx-ui/icon';
 import { Button, Card, Col, Form, Modal, Progress, Row, Steps, Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -99,9 +116,7 @@ const DataHandle: React.FC<Iprops> = props => {
         >
           <Card bodyStyle={{ padding: 12 }}>
             <div className={styles.card}>
-              <div className={styles.cardIcon}>
-                <EyeInvisibleFilled />
-              </div>
+              <div className={styles.cardIcon}>{configNameMapIcon[item.name]}</div>
               <div className={styles.cardTitle}>{item.zh_name}</div>
             </div>
             <p className={styles.desc}>{item.description}</p>
@@ -225,6 +240,24 @@ const DataHandle: React.FC<Iprops> = props => {
     );
   };
 
+  const configNameMapIcon = {
+    qa_split: <QAchaifen />,
+    document_chunk: <Wenbenfenduan />,
+    remove_invisible_characters: <Bukejian />,
+    space_standardization: <Konggechuli />,
+    remove_garbled_text: <Quchuluanma />,
+    traditional_to_simplified: <Fanzhuanjian />,
+    remove_html_tag: <Quchuwangyebiaoshifu />,
+    remove_emojis: <Quchubiaoqing />,
+    simhash_operator: <Simshash />,
+    remove_email: <Quchuemail />,
+    remove_ip_address: <Quchuip />,
+    remove_number: <Quchushuzi />,
+    character_duplication_rate: <Wenbenfenduan />,
+    word_duplication_rate: <Cizhongfuguolv />,
+    special_character_rate: <Teshuzifu />,
+    pornography_violence_word_rate: <Jinyong />,
+  };
   const stepStatuesMap = {
     not_start: 'wait',
     doing: 'info',
