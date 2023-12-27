@@ -109,11 +109,7 @@ const DataHandleDetail = props => {
               // actions={[<Button>删除</Button>]}
               >
                 <List.Item.Meta
-                  avatar={
-                    <Avatar size={48} style={{ backgroundColor: '#fde3cf', color: '#f56a00' }}>
-                      U
-                    </Avatar>
-                  }
+                  avatar={<Avatar size={56} src="/数据处理详情.png"></Avatar>}
                   description={
                     <>
                       <span>

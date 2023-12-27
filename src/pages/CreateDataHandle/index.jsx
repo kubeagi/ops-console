@@ -30,7 +30,21 @@ import {
 
 import {
   AntdIconQuestionCircleOutlined,
-  AntdIconEyeInvisibleFilled,
+  TenxIconBukejian,
+  TenxIconKonggechuli,
+  TenxIconQuchuluanma,
+  TenxIconFanzhuanjian,
+  TenxIconQuchuwangyebiaoshifu,
+  TenxIconQuchubiaoqing,
+  TenxIconWenbenfenduan,
+  TenxIconCizhongfuguolv,
+  TenxIconTeshuzifu,
+  TenxIconJinyong,
+  TenxIconSimshash,
+  TenxIconQuchuemail,
+  TenxIconQuchuip,
+  TenxIconQuchushuzi,
+  TenxIconQAchaifen,
 } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -131,7 +145,7 @@ class $$Page extends React.Component {
           type: '去除邮箱',
           before:
             '这个文档中的 Email 信息将会被去除，如：<span style="background-color:rgba(250, 205, 145, 0.4);">example@gmail.com</span>',
-          after: '这个文档中的 IPv4 或 IPv6 地址信息将会被去除，如：',
+          after: '这个文档中的 Email 信息将会被去除，如：',
         },
         {
           _type: 'remove_ip_address',
@@ -825,6 +839,24 @@ class $$Page extends React.Component {
     });
   }
 
+  async validatorName(v) {
+    if (v) {
+      try {
+        const res = await this.utils.bff.allDataProcessListByPage({
+          input: {
+            pageIndex: 0,
+            pageSize: 10,
+            keyword: v,
+            namespace: this.utils.getAuthData().project,
+          },
+        });
+        if (res?.dataProcess?.allDataProcessListByPage?.data?.length) {
+          return '名称重复';
+        }
+      } catch (error) {}
+    }
+  }
+
   valToKey(obj) {
     const _obj = {};
     for (let key in obj) {
@@ -1230,10 +1262,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" style={{}}>
+                                        <TenxIconBukejian
+                                          __component_name="TenxIconBukejian"
+                                          size={16}
+                                          style={{ marginBottom: '-2px' }}
                                         />
                                       </Col>
                                       <Col
@@ -1318,10 +1351,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconKonggechuli
+                                          __component_name="TenxIconKonggechuli"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -1408,10 +1442,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconQuchuluanma
+                                          __component_name="TenxIconQuchuluanma"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -1496,10 +1531,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconFanzhuanjian
+                                          __component_name="TenxIconFanzhuanjian"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -1586,10 +1622,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px">
+                                        <TenxIconQuchuwangyebiaoshifu
+                                          __component_name="TenxIconQuchuwangyebiaoshifu"
+                                          size={16}
+                                          style={{ marginBottom: '-2px' }}
                                         />
                                       </Col>
                                       <Col
@@ -1675,10 +1712,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="" style={{}}>
+                                        <TenxIconQuchubiaoqing
+                                          __component_name="TenxIconQuchubiaoqing"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -1789,10 +1827,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px">
+                                        <TenxIconWenbenfenduan
+                                          __component_name="TenxIconWenbenfenduan"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -1952,10 +1991,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconCizhongfuguolv
+                                          __component_name="TenxIconCizhongfuguolv"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -2110,10 +2150,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconTeshuzifu
+                                          __component_name="TenxIconTeshuzifu"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -2268,10 +2309,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconJinyong
+                                          __component_name="TenxIconJinyong"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -2451,10 +2493,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px">
+                                        <TenxIconSimshash
+                                          __component_name="TenxIconSimshash"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -2637,10 +2680,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconQuchuemail
+                                          __component_name="TenxIconQuchuemail"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -2726,10 +2770,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconQuchuip
+                                          __component_name="TenxIconQuchuip"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -2815,10 +2860,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconQuchushuzi
+                                          __component_name="TenxIconQuchushuzi"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -2931,10 +2977,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconWenbenfenduan
+                                          __component_name="TenxIconWenbenfenduan"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -3221,10 +3268,11 @@ class $$Page extends React.Component {
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" span="">
-                                        <AntdIconEyeInvisibleFilled
-                                          __component_name="AntdIconEyeInvisibleFilled"
-                                          style={{ fontSize: 16, marginLeft: '8px' }}
+                                      <Col __component_name="Col" flex="20px" span="">
+                                        <TenxIconQAchaifen
+                                          __component_name="TenxIconQAchaifen"
+                                          size={16}
+                                          style={{ marginBottom: '-3px' }}
                                         />
                                       </Col>
                                       <Col
@@ -3513,6 +3561,18 @@ class $$Page extends React.Component {
                         title: '任务名称',
                         'x-validator': [
                           { children: '未知', id: 'disabled', required: true, type: 'disabled' },
+                          {
+                            children: '未知',
+                            id: 'disabled',
+                            triggerType: 'onBlur',
+                            type: 'disabled',
+                            validator: function () {
+                              return this.validatorName.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this),
+                          },
                         ],
                       }}
                       style={{ width: '500px' }}
