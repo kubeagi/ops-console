@@ -170,7 +170,7 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0', color: '#000' }}>
             {' '}
-            对 {props?.data?.file_num} 个文件进行了{type}。
+            对 {sourceItem.file_num} 个文件进行了{type}。
           </div>
         </div>
       );
@@ -182,7 +182,7 @@ const DataHandle: React.FC<Iprops> = props => {
         const qa_split_data = data.find(item => item.name === 'qa_split');
         const fileProgress = qa_split_data.file_progress;
         // mock
-        // const fileProgress = [{progress:"30",id:1,file_name:'xx1'},{progress:"0",id:2,file_name:'xx2'},{progress:"80",id:3,file_name:'xx3'}];
+        // const fileProgress = [{progress:"30",id:1,file_name:'新员工入职与试用期管理办法-2022.pdf'},{progress:"0",id:2,file_name:'财务报销管理细则-v1.00-202201.pdf'},{progress:"80",id:3,file_name:'员工考勤管理制度-2023.pdf'}];
         const progressPrecent = fileProgress.filter(item => Number.parseInt(item.progress) === 100);
         return (
           <>
@@ -190,7 +190,7 @@ const DataHandle: React.FC<Iprops> = props => {
               <Row gutter={16}>{_data}</Row>
               <div style={{ padding: '8px 0', color: '#000' }}>
                 {' '}
-                对 {fileProgress.length} 个文件进行了{type}，处理进度:{progressPrecent.length}/
+                对 {sourceItem.file_num} 个文件进行了{type}，处理进度:{progressPrecent.length}/
                 {fileProgress.length}
               </div>
               {fileProgress.map((item, index) => {
@@ -198,7 +198,7 @@ const DataHandle: React.FC<Iprops> = props => {
                   <div key={item.id} style={{ display: 'flex', width: '80%' }}>
                     <div
                       key={item.id}
-                      style={{ marginRight: 12, minWidth: '150px', color: 'rgba(0,0,0,0.8)' }}
+                      style={{ marginRight: 12, width: '200px', color: 'rgba(0,0,0,0.8)' }}
                     >
                       {item.file_name}
                     </div>
@@ -215,7 +215,7 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0', color: '#000' }}>
             {' '}
-            对 {props?.data?.file_num} 个文件进行了{type}
+            对 {sourceItem.file_num} 个文件进行了{type}
             ，以下内容为处理效果抽样预览，并非全部内容
           </div>
           <Table columns={getSplitColumns} dataSource={dataSource} pagination={false} />
@@ -228,7 +228,7 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0', color: '#000' }}>
             {' '}
-            对 {props?.data?.file_num} 个文件进行了{type}，以下内容为处理效果抽样预览，并非全部内容
+            对 {sourceItem.file_num} 个文件进行了{type}，以下内容为处理效果抽样预览，并非全部内容
           </div>
           <Table
             columns={type === SPLIT_TYPE_NAME ? getSplitColumns : getColumns}
