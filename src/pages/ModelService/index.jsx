@@ -75,9 +75,12 @@ class ModelService$$Page extends React.Component {
       dataSource: [],
       delVisible: false,
       keyword: '',
+      loading: true,
       modelTypes: '',
       page: 1,
       pageSize: 12,
+      providerType: '',
+      totalCount: 0,
     };
   }
 
@@ -88,42 +91,84 @@ class ModelService$$Page extends React.Component {
   componentWillUnmount() {}
 
   async getListWorkers() {
+    this.setState({
+      loading: true,
+    });
     try {
-      const { keyword, pageSize, page, modelTypes } = this.state;
+      const { keyword, pageSize, page, modelTypes, providerType } = this.state;
       const namespace = this.utils.getAuthData().project || 'system-tce';
       const input = {
-        modelTypes,
         pageSize,
         page,
         namespace,
       };
       if (keyword) input.keyword = keyword;
-      const res = await this.props.appHelper.utils.bff?.listWorkers({
+      if (modelTypes) input.types = modelTypes;
+      if (providerType) input.providerType = providerType;
+      const res = await this.props.appHelper.utils.bff?.listModelServices({
         input,
       });
       this.setState({
-        dataSource: res.Worker?.listWorkers?.nodes,
+        dataSource: res.ModelService?.listModelServices?.nodes,
+        totalCount: res.ModelService?.listModelServices?.totalCount,
+        loading: false,
       });
     } catch (error) {
       this.utils.notification.warnings({
         message: '获取服务失败',
         errors: error?.response?.errors,
       });
+      this.setState({
+        loading: false,
+      });
     }
   }
 
-  localMenuOnClick(e, item) {
+  async localMenuOnClick(e, item) {
     e.domEvent.stopPropagation();
     switch (e.key) {
-      case 'edit':
-        this.history.push(`/model-service/editModelService?name=${item.name}`);
+      case 'offline': {
+        try {
+          const params = {
+            name: item.name,
+            namespace: item.namespace,
+            displayName: item.displayName,
+            description: item.description,
+            resources: item.resources,
+            replicas: item.status === 'Offline' ? '1' : '0',
+          };
+          const res = await this.props.appHelper.utils.bff?.updateWorker({
+            input: params,
+          });
+          this.utils.notification.success({
+            message: `${item.status === 'Offline' ? '上线' : '下线'}成功`,
+          });
+          setTimeout(() => {
+            this.getListWorkers();
+          }, 500);
+        } catch (error) {
+          this.utils.notification.warnings({
+            message: `${item.status === 'Offline' ? '上线' : '下线'}失败`,
+            errors: error?.response?.errors,
+          });
+        }
         break;
-      case 'delete':
+      }
+      case 'edit': {
+        this.history.push(
+          `/model-service/editModelService?name=${item.name}&type=${
+            item.providerType === 'worker' ? 'local' : 'external'
+          }`
+        );
+        break;
+      }
+      case 'delete': {
         this.setState({
           currentModel: item,
           delVisible: true,
         });
         break;
+      }
     }
   }
 
@@ -142,16 +187,23 @@ class ModelService$$Page extends React.Component {
     );
   }
 
+  onChangeProviderType(e) {
+    this.setState(
+      {
+        providerType: e,
+      },
+      this.getListWorkers
+    );
+  }
+
   onClickCreatModel(event) {
     this.history.push('/model-service/createModelService');
   }
 
-  onClickCreatOutsideModel(event) {
-    this.history.push('/model-service/createOutsideModelService');
-  }
-
-  onClickToDetail(e, { id }) {
-    this.history.push(`/model-service/detail/${id}?type=local`);
+  onClickToDetail(e, { id, type }) {
+    this.history.push(
+      `/model-service/detail/${id}?type=${type === 'worker' ? 'local' : 'external'}`
+    );
   }
 
   onDelCancel() {
@@ -163,14 +215,17 @@ class ModelService$$Page extends React.Component {
 
   async onDelOk() {
     try {
+      const { currentModel } = this.state;
       const namespace = this.utils.getAuthData().project || 'system-tce';
       const input = {
         namespace,
         name: this.state.currentModel.name,
       };
-      const res = await this.props.appHelper.utils.bff?.deleteWorkers({
-        input,
-      });
+      await (currentModel.providerType === 'worker' ? this.props.appHelper.utils.bff?.deleteWorkers({
+          input,
+        }) : this.props.appHelper.utils.bff?.deleteModelServices({
+          input,
+        }));
       this.utils.notification.success({
         message: '删除成功',
       });
@@ -193,6 +248,16 @@ class ModelService$$Page extends React.Component {
 
   onSearch(value, event) {
     this.getListWorkers();
+  }
+
+  paginationOnChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState(
+      {
+        page,
+      },
+      this.getListWorkers
+    );
   }
 
   componentDidMount() {
@@ -250,10 +315,7 @@ class ModelService$$Page extends React.Component {
                           ghost={false}
                           icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
                           onClick={function () {
-                            return this.onClickCreatModel.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
+                            return Reflect.apply(this.onClickCreatModel, this, [...Array.prototype.slice.call(arguments)]);
                           }.bind(this)}
                           shape="default"
                           type="primary"
@@ -268,10 +330,7 @@ class ModelService$$Page extends React.Component {
                           ghost={false}
                           icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
                           onClick={function () {
-                            return this.onRefresh.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
+                            return Reflect.apply(this.onRefresh, this, [...Array.prototype.slice.call(arguments)]);
                           }.bind(this)}
                           shape="default"
                         >
@@ -280,16 +339,10 @@ class ModelService$$Page extends React.Component {
                         <Input.Search
                           __component_name="Input.Search"
                           onChange={function () {
-                            return this.onChangeKeyword.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
+                            return Reflect.apply(this.onChangeKeyword, this, [...Array.prototype.slice.call(arguments)]);
                           }.bind(this)}
                           onSearch={function () {
-                            return this.onSearch.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
+                            return Reflect.apply(this.onSearch, this, [...Array.prototype.slice.call(arguments)]);
                           }.bind(this)}
                           placeholder={this.i18n('i18n-f591ezbf') /* 请输入模型服务名称搜索 */}
                           value={__$$eval(() => this.state.keyword)}
@@ -298,28 +351,45 @@ class ModelService$$Page extends React.Component {
                     </Col>
                     <Col __component_name="Col">
                       <Row __component_name="Row" justify="space-between" wrap={false}>
-                        <Col __component_name="Col">
-                          <Select
-                            __component_name="Select"
-                            _sdkSwrGetFunc={{ func: __$$eval(() => this.state.modelTypes) }}
-                            allowClear={true}
-                            disabled={false}
-                            onChange={function () {
-                              return this.onChangeModelTypes.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([])
-                              );
-                            }.bind(this)}
-                            options={[
-                              { label: '全部类型', value: '' },
-                              { label: 'LLM', value: 'llm' },
-                              { label: 'Embedding', value: 'embedding' },
-                            ]}
-                            placeholder="请选择"
-                            showSearch={true}
-                            style={{ width: 200 }}
-                            value={__$$eval(() => this.state.modelTypes)}
-                          />
+                        <Col __component_name="Col" style={{}}>
+                          <Space __component_name="Space" align="center" direction="horizontal">
+                            <Select
+                              __component_name="Select"
+                              _sdkSwrGetFunc={{ func: __$$eval(() => this.state.providerType) }}
+                              allowClear={true}
+                              disabled={false}
+                              onChange={function () {
+                                return Reflect.apply(this.onChangeProviderType, this, [...Array.prototype.slice.call(arguments)]);
+                              }.bind(this)}
+                              options={[
+                                { label: '全部来源', value: '' },
+                                { label: '本地模型', value: 'worker' },
+                                { label: '外部模型', value: '3rd_party' },
+                              ]}
+                              placeholder="请选择"
+                              showSearch={true}
+                              style={{ width: 200 }}
+                              value={__$$eval(() => this.state.providerType)}
+                            />
+                            <Select
+                              __component_name="Select"
+                              _sdkSwrGetFunc={{ func: __$$eval(() => this.state.modelTypes) }}
+                              allowClear={true}
+                              disabled={false}
+                              onChange={function () {
+                                return Reflect.apply(this.onChangeModelTypes, this, [...Array.prototype.slice.call(arguments)]);
+                              }.bind(this)}
+                              options={[
+                                { label: '全部类型', value: '' },
+                                { label: 'LLM', value: 'llm' },
+                                { label: 'Embedding', value: 'embedding' },
+                              ]}
+                              placeholder="请选择"
+                              showSearch={true}
+                              style={{ width: 200 }}
+                              value={__$$eval(() => this.state.modelTypes)}
+                            />
+                          </Space>
                         </Col>
                       </Row>
                     </Col>
@@ -333,13 +403,19 @@ class ModelService$$Page extends React.Component {
                     grid={{ column: 3, gutter: 20, lg: 3, md: 3, sm: 3, xl: 3, xs: 3, xxl: 4 }}
                     gridEnable={true}
                     itemLayout="horizontal"
+                    loading={__$$eval(() => this.state.loading)}
                     pagination={{
+                      onChange: function () {
+                        return Reflect.apply(this.paginationOnChange, this, [...Array.prototype.slice.call(arguments)]);
+                      }.bind(this),
+                      pageSize: 12,
                       pagination: { pageSize: 5 },
                       position: 'bottom',
                       showQuickJumper: false,
                       showSizeChanger: false,
                       simple: false,
                       size: 'default',
+                      total: __$$eval(() => this.state.totalCount),
                     }}
                     renderItem={item =>
                       (__$$context => (
@@ -351,14 +427,12 @@ class ModelService$$Page extends React.Component {
                             hoverable={true}
                             loading={false}
                             onClick={function () {
-                              return this.onClickToDetail.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([
+                              return Reflect.apply(this.onClickToDetail, this, [...Array.prototype.slice.call(arguments), 
                                   {
                                     id: item?.name,
+                                    type: item?.providerType,
                                   },
-                                ])
-                              );
+                                ]);
                             }.bind(__$$context)}
                             size="default"
                             style={{}}
@@ -387,6 +461,16 @@ class ModelService$$Page extends React.Component {
                                       menu={{
                                         items: [
                                           {
+                                            _unsafe_MixedSetter_label_select: 'VariableSetter',
+                                            disabled: __$$eval(
+                                              () => item.providerType !== 'worker'
+                                            ),
+                                            key: 'offline',
+                                            label: __$$eval(() =>
+                                              item.status === 'Offline' ? '上线' : '下线'
+                                            ),
+                                          },
+                                          {
                                             key: 'edit',
                                             label: this.i18n('i18n-str3pnrc') /* 编辑 */,
                                           },
@@ -396,14 +480,11 @@ class ModelService$$Page extends React.Component {
                                           },
                                         ],
                                         onClick: function () {
-                                          return this.localMenuOnClick.apply(
-                                            this,
-                                            Array.prototype.slice.call(arguments).concat([
+                                          return Reflect.apply(this.localMenuOnClick, this, [...Array.prototype.slice.call(arguments), 
                                               {
                                                 ...item,
                                               },
-                                            ])
-                                          );
+                                            ]);
                                         }.bind(__$$context),
                                       }}
                                       placement="bottomLeft"
@@ -519,7 +600,7 @@ class ModelService$$Page extends React.Component {
                                         >
                                           <Status
                                             __component_name="Status"
-                                            id={__$$eval(() => item.status)}
+                                            id={__$$eval(() => item?.status)}
                                             types={[
                                               {
                                                 children: '运行中',
@@ -534,6 +615,18 @@ class ModelService$$Page extends React.Component {
                                                 id: 'Deleting',
                                                 type: 'warning',
                                               },
+                                              {
+                                                children: '已下线',
+                                                id: 'Offline',
+                                                type: 'success',
+                                              },
+                                              { children: '正常', id: 'True', type: 'success' },
+                                              {
+                                                children: '下线中',
+                                                id: 'OfflineInProgress',
+                                                type: 'warning',
+                                              },
+                                              { children: '异常', id: 'False', type: 'error' },
                                             ]}
                                           />
                                         </Tooltip>
@@ -543,7 +636,16 @@ class ModelService$$Page extends React.Component {
                                         flex="auto"
                                         style={{ display: 'flex', justifyContent: 'center' }}
                                       >
-                                        {__$$evalArray(() => item.modelTypes.split(',')).map(
+                                        <Tag
+                                          __component_name="Tag"
+                                          closable={false}
+                                          color="processing"
+                                        >
+                                          {__$$eval(() =>
+                                            item.providerType === 'worker' ? '本地模型' : '外部模型'
+                                          )}
+                                        </Tag>
+                                        {__$$evalArray(() => item.types.split(',')).map(
                                           (item, index) =>
                                             (__$$context => (
                                               <Tag
@@ -604,10 +706,10 @@ class ModelService$$Page extends React.Component {
           mask={true}
           maskClosable={false}
           onCancel={function () {
-            return this.onDelCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            return Reflect.apply(this.onDelCancel, this, [...Array.prototype.slice.call(arguments)]);
           }.bind(this)}
           onOk={function () {
-            return this.onDelOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            return Reflect.apply(this.onDelOk, this, [...Array.prototype.slice.call(arguments)]);
           }.bind(this)}
           open={__$$eval(() => this.state.delVisible)}
           style={{}}
@@ -645,15 +747,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      self={self}
+      render={dataProps => (
+        <ModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
+      )}
       sdkInitFunc={{
         enabled: false,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      render={dataProps => (
-        <ModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
-      )}
+      self={self}
     />
   );
 };
@@ -662,7 +764,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch {}
 }
 
 function __$$evalArray(expr) {

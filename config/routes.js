@@ -84,10 +84,6 @@ const routes = [
         component: '@/pages/ModelService',
       },
       {
-        path: '/model-service/createOutsideModelService',
-        component: '@/pages/CreateOutsideModelService',
-      },
-      {
         path: '/model-service/createModelService',
         component: '@/pages/CreateModelService',
       },
