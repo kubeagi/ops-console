@@ -1,4 +1,4 @@
-import { Button, Col, Page, Row, Space, Typography } from '@tenx-ui/materials';
+import { Alert, Button, Col, Modal, Page, Row, Space, Typography } from '@tenx-ui/materials';
 import { matchPath, useLocation } from '@umijs/max';
 import type { TabsProps } from 'antd';
 import { Avatar, Divider, List, Spin, Tabs, notification } from 'antd';
@@ -29,6 +29,7 @@ const DataHandleDetail = props => {
   };
   const [detailData, setDetailData] = useState({});
   const [loading, setLoading] = useState(false);
+  const [deleteVisible, setDelevisible] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -83,6 +84,9 @@ const DataHandleDetail = props => {
     },
   ];
 
+  const onDel = () => {
+    setDelevisible(true);
+  };
   return (
     <Page style={{ marginBottom: '0px', paddingBottom: '0px' }}>
       <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
@@ -108,16 +112,26 @@ const DataHandleDetail = props => {
             itemLayout="horizontal"
             renderItem={(item, index) => (
               <List.Item
-              // actions={[<Button>删除</Button>]}
+                actions={[
+                  <Button key={index} onClick={onDel}>
+                    删除
+                  </Button>,
+                ]}
               >
                 <List.Item.Meta
-                  avatar={<Avatar size={56} src={detail}></Avatar>}
+                  avatar={<Avatar size={56} src={detail} style={{ marginRight: 4 }}></Avatar>}
                   description={
                     <>
                       <span>
                         <Status {...statuesMap[item.status]} />
                       </span>
-                      <Divider type="vertical" />
+                      <Divider
+                        style={{
+                          borderInlineStart: '1px solid rgba(5, 5, 5, 0.15)',
+                          marginInline: 16,
+                        }}
+                        type="vertical"
+                      />
                       <span>
                         更新时间：
                         {item.end_time ? formatTime(item.end_time) : formatTime(item.start_time)}
@@ -133,6 +147,33 @@ const DataHandleDetail = props => {
         <div className={styles.tabs}>
           <Tabs items={items} />
         </div>
+        <Modal
+          destroyOnClose
+          onCancel={() => setDelevisible(false)}
+          onOk={async () => {
+            try {
+              await utils.bff.deleteDataProcessTask({
+                input: {
+                  id: detailData?.id,
+                },
+              });
+              setDelevisible(false);
+              notification.success({
+                message: '删除任务成功',
+              });
+              history.go(-1);
+            } catch (error) {
+              notification.warnings({
+                message: '删除任务失败',
+                errors: error?.response?.errors,
+              });
+            }
+          }}
+          open={deleteVisible}
+          title={`删除`}
+        >
+          <Alert message="确认删除任务？" showIcon={true} type="warning" />
+        </Modal>
       </Spin>
     </Page>
   );

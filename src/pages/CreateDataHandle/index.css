@@ -17,7 +17,7 @@ body {
 }
 
 .step3_disabled_style:hover::before {
-  content: '敬请期待';
+  content: '';
   position: absolute;
   top: 0;
   left: 0;

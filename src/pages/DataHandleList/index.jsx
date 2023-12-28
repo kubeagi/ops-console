@@ -64,15 +64,15 @@ class DataHandleList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      keyword: '',
-      pageSize: 10,
-      totalCount: 0,
       currentPage: 1,
-      listLoading: false,
       currentRecord: null,
       dataHandleList: [],
       delModalvisible: false,
+      keyword: '',
+      listLoading: false,
       logModalVisible: false,
+      pageSize: 10,
+      totalCount: 0,
     };
   }
 
@@ -82,23 +82,6 @@ class DataHandleList$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
-  }
-
-  onRefresh(event) {
-    // 点击按钮时的回调
-    this.setState(
-      {
-        currentPage: 1,
-      },
-      () => {
-        this.getDataList();
-      }
-    );
-  }
-
-  showTotal(total, range) {
-    // 用于格式化显示表格数据总量
-    return `共 ${total} 条`;
   }
 
   async getDataList() {
@@ -138,30 +121,22 @@ class DataHandleList$$Page extends React.Component {
     }
   }
 
-  onLinkCreate() {
-    // 点击按钮时的回调
-    this.history.push('/data-handle/create');
-  }
-
-  onOpenDelModal(e, { record }) {
-    this.setState({
-      delModalvisible: true,
-      currentRecord: record,
-    });
-  }
-
-  onOpenLogModal(e, record) {
-    this.setState({
-      logModalVisible: true,
-      currentRecord: record,
-    });
-  }
-
-  onhandleChange(event) {
+  handleSearchValueChange(event) {
     // 输入框内容变化时的回调
-    console.log('onChange', event);
+    this.setState(
+      {
+        currentPage: 1,
+      },
+      () => {
+        this.getDataList();
+      }
+    );
+  }
+
+  onCancelDelModal(e) {
     this.setState({
-      keyword: event.target.value,
+      delModalvisible: false,
+      currentRecord: null,
     });
   }
 
@@ -191,13 +166,6 @@ class DataHandleList$$Page extends React.Component {
     });
   }
 
-  onCancelDelModal(e) {
-    this.setState({
-      delModalvisible: false,
-      currentRecord: null,
-    });
-  }
-
   onCurrentPageChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
     this.setState(
@@ -210,8 +178,35 @@ class DataHandleList$$Page extends React.Component {
     );
   }
 
-  handleSearchValueChange(event) {
+  onhandleChange(event) {
     // 输入框内容变化时的回调
+    console.log('onChange', event);
+    this.setState({
+      keyword: event.target.value,
+    });
+  }
+
+  onLinkCreate() {
+    // 点击按钮时的回调
+    this.history.push('/data-handle/create');
+  }
+
+  onOpenDelModal(e, { record }) {
+    this.setState({
+      delModalvisible: true,
+      currentRecord: record,
+    });
+  }
+
+  onOpenLogModal(e, record) {
+    this.setState({
+      logModalVisible: true,
+      currentRecord: record,
+    });
+  }
+
+  onRefresh(event) {
+    // 点击按钮时的回调
     this.setState(
       {
         currentPage: 1,
@@ -220,6 +215,11 @@ class DataHandleList$$Page extends React.Component {
         this.getDataList();
       }
     );
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   componentDidMount() {
@@ -232,89 +232,88 @@ class DataHandleList$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page
-        style={{ marginBottom: '0px', paddingBottom: '24px' }}
         pagePadding={24}
-        pagePaddingTop={24}
         pagePaddingBottom={24}
+        pagePaddingTop={24}
+        style={{ marginBottom: '0px', paddingBottom: '24px' }}
       >
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
             <Typography.Title
+              __component_name="Typography.Title"
               bold={true}
-              level={1}
               bordered={false}
               ellipsis={true}
-              __component_name="Typography.Title"
+              level={1}
             >
               数据处理
             </Typography.Title>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Alert
-              type="info"
+              __component_name="Alert"
               message="一站式数据处理方案，支持文本数据的拆分、数据异常清洗、数据过滤、数据去重以及数据去除隐私等处理配置，可大幅提升数据质量。"
               showIcon={true}
-              __component_name="Alert"
+              type="info"
             />
           </Col>
-          <Col span={24} style={{}} __component_name="Col">
-            <Row wrap={true} __component_name="Row">
-              <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24} style={{}}>
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" span={24}>
                 <Card
-                  size="default"
-                  type="inner"
-                  style={{ paddingTop: '4px', paddingBottom: '24px' }}
+                  __component_name="Card"
                   actions={[]}
-                  loading={false}
                   bordered={false}
                   hoverable={false}
-                  __component_name="Card"
+                  loading={false}
+                  size="default"
+                  style={{ paddingBottom: '24px', paddingTop: '4px' }}
+                  type="inner"
                 >
-                  <Row wrap={false} justify="space-between" __component_name="Row">
+                  <Row __component_name="Row" justify="space-between" wrap={false}>
                     <Col __component_name="Col">
-                      <Space size={12} align="center" direction="horizontal">
+                      <Space align="center" direction="horizontal" size={12}>
                         <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
                           href=""
                           icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
-                          type="primary"
-                          block={false}
-                          ghost={false}
-                          shape="default"
-                          danger={false}
-                          target="_self"
                           onClick={function () {
                             return this.onLinkCreate.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          disabled={false}
-                          __component_name="Button"
+                          shape="default"
+                          target="_self"
+                          type="primary"
                         >
                           创建处理任务
                         </Button>
                         <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
                           icon={
                             <AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />
                           }
-                          block={false}
-                          ghost={false}
-                          shape="default"
-                          danger={false}
                           onClick={function () {
                             return this.onRefresh.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          disabled={false}
-                          __component_name="Button"
+                          shape="default"
                         >
                           刷新
                         </Button>
                         <Input.Search
-                          style={{ width: '240px' }}
-                          value={__$$eval(() => this.state.keyword)}
+                          __component_name="Input.Search"
                           onChange={function () {
                             return this.onhandleChange.apply(
                               this,
@@ -328,16 +327,30 @@ class DataHandleList$$Page extends React.Component {
                             );
                           }.bind(this)}
                           placeholder="请输入任务名称搜索"
-                          __component_name="Input.Search"
+                          style={{ width: '240px' }}
+                          value={__$$eval(() => this.state.keyword)}
                         />
                       </Space>
                     </Col>
                   </Row>
-                  <Row wrap={true} gutter={[0, 0]} __component_name="Row">
-                    <Col span={24} __component_name="Col">
+                  <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                    <Col __component_name="Col" span={24}>
                       {!!__$$eval(() => this.state.delModalvisible) && (
                         <Modal
+                          __component_name="Modal"
+                          centered={false}
+                          confirmLoading={false}
+                          destroyOnClose={true}
+                          forceRender={false}
+                          keyboard={true}
                           mask={true}
+                          maskClosable={false}
+                          onCancel={function () {
+                            return this.onCloseDelModal.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
                           onOk={function () {
                             return this.onCloseDelModal.apply(
                               this,
@@ -346,96 +359,82 @@ class DataHandleList$$Page extends React.Component {
                           }.bind(this)}
                           open={true}
                           title="删除任务"
-                          centered={false}
-                          keyboard={true}
-                          onCancel={function () {
-                            return this.onCloseDelModal.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          forceRender={false}
-                          maskClosable={false}
-                          confirmLoading={false}
-                          destroyOnClose={true}
-                          __component_name="Modal"
                         >
                           <Alert
-                            type="warning"
+                            __component_name="Alert"
                             message="确认删除任务？"
                             showIcon={true}
-                            __component_name="Alert"
+                            type="warning"
                           />
                         </Modal>
                       )}
                       <Table
-                        size="default"
-                        style={{ marginTop: '24px' }}
-                        rowKey=""
-                        scroll={{ scrollToFirstRowOnChange: true }}
+                        __component_name="Table"
                         columns={[
                           {
+                            dataIndex: 'name',
+                            ellipsis: { showTitle: true },
                             key: 'name',
-                            title: '任务名称',
                             render: (text, record, index) =>
                               (__$$context => (
                                 <UnifiedLink
-                                  to={__$$eval(() => '/data-handle/detail/' + record.id)}
-                                  target="_self"
                                   __component_name="UnifiedLink"
+                                  target="_self"
+                                  to={__$$eval(() => '/data-handle/detail/' + record.id)}
                                 >
                                   {__$$eval(() => text)}
                                 </UnifiedLink>
                               ))(__$$createChildContext(__$$context, { text, record, index })),
-                            ellipsis: { showTitle: true },
-                            dataIndex: 'name',
+                            title: '任务名称',
                           },
                           {
+                            dataIndex: 'status',
                             key: 'status',
-                            title: '状态',
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Status
+                                  __component_name="Status"
                                   id={__$$eval(() => record.status)}
                                   types={[
-                                    { id: 'processing', type: 'info', children: '处理中' },
+                                    { children: '处理中', id: 'processing', type: 'info' },
                                     {
+                                      children: '处理完成',
                                       id: 'process_complete',
                                       type: 'success',
-                                      children: '处理完成',
                                     },
-                                    { id: 'process_fail', type: 'error', children: '处理失败' },
+                                    { children: '处理失败', id: 'process_fail', type: 'error' },
                                   ]}
-                                  __component_name="Status"
                                 />
                               ))(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'status',
+                            title: '状态',
                           },
                           {
+                            dataIndex: 'pre_data_set_name',
                             key: 'pre_data_set_name',
-                            title: '处理前数据集',
                             render: (text, record, index) =>
                               (__$$context => [
                                 <UnifiedLink
-                                  to={__$$eval(() => '/dataset/detail/' + record.pre_data_set_name)}
-                                  target="_self"
                                   __component_name="UnifiedLink"
+                                  target="_self"
+                                  to={__$$eval(() => '/dataset/detail/' + record.pre_data_set_name)}
                                   key="node_oclpc8ipq71"
                                 >
                                   {__$$eval(() => record.pre_data_set_name)}
                                 </UnifiedLink>,
                                 <Typography.Text
-                                  style={{ fontSize: '' }}
-                                  strong={false}
+                                  __component_name="Typography.Text"
                                   disabled={false}
                                   ellipsis={true}
-                                  __component_name="Typography.Text"
+                                  strong={false}
+                                  style={{ fontSize: '' }}
                                   key="node_oclpb5hlmy7"
                                 >
                                   {' '}
                                   /{' '}
                                 </Typography.Text>,
                                 <UnifiedLink
+                                  __component_name="UnifiedLink"
+                                  target="_self"
                                   to={__$$eval(
                                     () =>
                                       '/dataset/detail/' +
@@ -445,41 +444,41 @@ class DataHandleList$$Page extends React.Component {
                                       '-' +
                                       record.pre_data_set_version
                                   )}
-                                  target="_self"
-                                  __component_name="UnifiedLink"
                                   key="node_oclpc8ipq77"
                                 >
                                   {__$$eval(() => record.pre_data_set_version)}
                                 </UnifiedLink>,
                               ])(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'pre_data_set_name',
+                            title: '处理前数据集',
                           },
                           {
+                            dataIndex: 'dataset_info.postDataSetName',
                             key: 'postDataSetName',
-                            title: '处理后数据集',
                             render: (text, record, index) =>
                               (__$$context => [
                                 <UnifiedLink
+                                  __component_name="UnifiedLink"
+                                  target="_self"
                                   to={__$$eval(
                                     () => '/dataset/detail/' + record.post_data_set_name
                                   )}
-                                  target="_self"
-                                  __component_name="UnifiedLink"
                                   key="node_oclpc8ipq78"
                                 >
                                   {__$$eval(() => record.post_data_set_name)}
                                 </UnifiedLink>,
                                 <Typography.Text
-                                  style={{ fontSize: '' }}
-                                  strong={false}
+                                  __component_name="Typography.Text"
                                   disabled={false}
                                   ellipsis={true}
-                                  __component_name="Typography.Text"
+                                  strong={false}
+                                  style={{ fontSize: '' }}
                                   key="node_oclpb2s62x4"
                                 >
                                   /
                                 </Typography.Text>,
                                 <UnifiedLink
+                                  __component_name="UnifiedLink"
+                                  target="_self"
                                   to={__$$eval(
                                     () =>
                                       '/dataset/detail/' +
@@ -489,45 +488,43 @@ class DataHandleList$$Page extends React.Component {
                                       '-' +
                                       record.post_data_set_version
                                   )}
-                                  target="_self"
-                                  __component_name="UnifiedLink"
                                   key="node_oclpc8ipq79"
                                 >
                                   {__$$eval(() => record.post_data_set_version)}
                                 </UnifiedLink>,
                               ])(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'dataset_info.postDataSetName',
+                            title: '处理后数据集',
                           },
                           {
+                            dataIndex: 'start_datetime',
                             key: 'start_datetime',
-                            title: '开始时间',
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Typography.Time
-                                  time={__$$eval(() => record.start_datetime)}
+                                  __component_name="Typography.Time"
                                   format=""
                                   relativeTime={false}
-                                  __component_name="Typography.Time"
+                                  time={__$$eval(() => record.start_datetime)}
                                 />
                               ))(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'start_datetime',
+                            title: '开始时间',
                           },
                           {
+                            dataIndex: 'op',
                             key: 'op',
-                            title: '操作',
                             render: (text, record, index) =>
                               (__$$context => (
                                 <Space
+                                  __component_name="Space"
                                   align="center"
                                   direction="horizontal"
-                                  __component_name="Space"
                                 >
                                   <Button
-                                    size="middle"
+                                    __component_name="Button"
                                     block={false}
-                                    ghost={false}
-                                    shape="default"
                                     danger={false}
+                                    disabled={false}
+                                    ghost={false}
                                     onClick={function () {
                                       return this.onOpenLogModal.apply(
                                         this,
@@ -538,17 +535,17 @@ class DataHandleList$$Page extends React.Component {
                                         ])
                                       );
                                     }.bind(__$$context)}
-                                    disabled={false}
-                                    __component_name="Button"
+                                    shape="default"
+                                    size="small"
                                   >
                                     查看日志
                                   </Button>
                                   <Button
-                                    size="middle"
+                                    __component_name="Button"
                                     block={false}
-                                    ghost={false}
-                                    shape="default"
                                     danger={false}
+                                    disabled={false}
+                                    ghost={false}
                                     onClick={function () {
                                       return this.onOpenDelModal.apply(
                                         this,
@@ -559,16 +556,18 @@ class DataHandleList$$Page extends React.Component {
                                         ])
                                       );
                                     }.bind(__$$context)}
-                                    disabled={false}
-                                    __component_name="Button"
+                                    shape="default"
+                                    size="small"
                                   >
                                     删除
                                   </Button>
                                 </Space>
                               ))(__$$createChildContext(__$$context, { text, record, index })),
-                            dataIndex: 'op',
+                            title: '操作',
+                            width: 160,
                           },
                         ]}
+                        dataSource={__$$eval(() => this.state.dataHandleList)}
                         loading={__$$eval(() => this.state.listLoading)}
                         onChange={function () {
                           return this.handleTableChange.apply(
@@ -576,22 +575,23 @@ class DataHandleList$$Page extends React.Component {
                             Array.prototype.slice.call(arguments).concat([])
                           );
                         }.bind(this)}
-                        dataSource={__$$eval(() => this.state.dataHandleList)}
                         pagination={{
-                          size: 'default',
-                          simple: false,
                           position: [],
                           showQuickJumper: false,
                           showSizeChanger: false,
+                          simple: false,
+                          size: 'default',
                         }}
+                        rowKey=""
+                        scroll={{ scrollToFirstRowOnChange: true }}
                         showHeader={true}
-                        __component_name="Table"
+                        size="middle"
+                        style={{ marginTop: '28px' }}
                       />
                     </Col>
                   </Row>
                   <Pagination
-                    total={__$$eval(() => this.state.totalCount)}
-                    simple={false}
+                    __component_name="Pagination"
                     current={__$$eval(() => this.state.currentPage)}
                     onChange={function () {
                       return this.onCurrentPageChange.apply(
@@ -606,8 +606,9 @@ class DataHandleList$$Page extends React.Component {
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    __component_name="Pagination"
-                    style={{ textAlign: 'right', marginTop: '12px' }}
+                    simple={false}
+                    style={{ marginTop: '12px', textAlign: 'right' }}
+                    total={__$$eval(() => this.state.totalCount)}
                   />
                 </Card>
               </Col>
@@ -616,36 +617,51 @@ class DataHandleList$$Page extends React.Component {
         </Row>
         {!!__$$eval(() => this.state.logModalVisible) && (
           <Modal
-            mask={true}
-            open={true}
-            title="日志"
-            footer=""
+            __component_name="Modal"
             centered={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            footer=""
+            forceRender={false}
             keyboard={true}
+            mask={true}
+            maskClosable={false}
             onCancel={function () {
               return this.onCloseLogModal.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
             }.bind(this)}
-            forceRender={false}
-            maskClosable={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            __component_name="Modal"
+            open={true}
+            title="日志"
           >
             <Logs
-              logs="123"
+              __component_name="Logs"
               getComponentRef={function e(t) {
                 return t;
               }}
-              __component_name="Logs"
+              logs="123"
             />
           </Modal>
         )}
         {!!__$$eval(() => this.state.delModalvisible) && (
           <Modal
+            __component_name="Modal"
+            cancelButtonProps={{ disabled: false }}
+            centered={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            forceRender={false}
+            keyboard={true}
             mask={true}
+            maskClosable={false}
+            okButtonProps={{ disabled: false }}
+            onCancel={function () {
+              return this.onCancelDelModal.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
             onOk={function () {
               return this.onCloseDelModal.apply(
                 this,
@@ -654,27 +670,12 @@ class DataHandleList$$Page extends React.Component {
             }.bind(this)}
             open={true}
             title="删除"
-            centered={false}
-            keyboard={true}
-            onCancel={function () {
-              return this.onCancelDelModal.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            forceRender={false}
-            maskClosable={false}
-            okButtonProps={{ disabled: false }}
-            confirmLoading={false}
-            destroyOnClose={true}
-            __component_name="Modal"
-            cancelButtonProps={{ disabled: false }}
           >
             <Alert
-              type="warning"
+              __component_name="Alert"
               message="确认删除此任务？"
               showIcon={true}
-              __component_name="Alert"
+              type="warning"
             />
           </Modal>
         )}
@@ -731,6 +732,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
