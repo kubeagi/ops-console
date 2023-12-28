@@ -502,15 +502,11 @@ class ModelAppList$$Page extends React.Component {
   async validatorName(v) {
     if (v) {
       try {
-        const res = await this.utils.bff.listApplications({
-          input: {
-            keyword: v,
-            namespace: this.utils.getAuthData()?.project,
-            page: 1,
-            pageSize: 10,
-          },
+        const res = await this.utils.bff.getApplication({
+          name: v,
+          namespace: this.utils.getAuthData()?.project,
         });
-        if (res?.Application?.listApplicationMetadata?.nodes?.length) {
+        if (res?.Application?.getApplication?.metadata?.name) {
           return '应用名称重复';
         }
       } catch (error) {}
