@@ -110,6 +110,8 @@
     "jest": "^27",
     "lint-staged": "^15",
     "prettier": "^3",
+    "remark": "^14",
+    "remark-cli": "^11",
     "stylelint": "^15",
     "typescript": "^5"
   },
