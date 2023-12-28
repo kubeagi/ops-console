@@ -4,6 +4,8 @@ import type { TabsProps } from 'antd';
 import { Avatar, Divider, List, Spin, Tabs, notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 
+import detail from '@/assets/img/data-handle-detail.png';
+
 import Status from '../../components/Status';
 import utils from '../../utils/__utils';
 import DataHandle from './DataHandle';
@@ -109,7 +111,7 @@ const DataHandleDetail = props => {
               // actions={[<Button>删除</Button>]}
               >
                 <List.Item.Meta
-                  avatar={<Avatar size={56} src="/数据处理详情.png"></Avatar>}
+                  avatar={<Avatar size={56} src={detail}></Avatar>}
                   description={
                     <>
                       <span>
