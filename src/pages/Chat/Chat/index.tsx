@@ -5,7 +5,7 @@
 
 /**
  * Chat
- * @author songsz
+ * @author zggmd
  * @date 2023-12-18
  */
 import {
@@ -20,6 +20,7 @@ import {
   useCreateStore,
 } from '@lobehub/ui';
 import { getAuthData } from '@tenx-ui/auth-utils';
+// @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin } from 'antd';
 import classNames from 'classnames';
@@ -27,6 +28,7 @@ import { debounce } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
+import useGetCommonData from '@/components/hooks/useGetCommonData';
 import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
 import Retry from '@/pages/Chat/Chat/retry';
 
@@ -38,9 +40,11 @@ interface IChat {
   // 会话id, 如果有值, 则拉取并继续该会话; 否则新建会话
   conversationId?: string;
   // refresh 变化, 触发重新拉取
-  refresh?: boolean | number | string;
+  refresh?: boolean | number | string | symbol;
   // debug为true,表示临时会话, 测试应用时使用, 不保存
   debug?: boolean;
+  // 当第一次建立新会话时, 触发该事件
+  onNewChat?: (conversationId: string) => any;
 }
 const safeAreaId = 'safe-area-id-not-use-in-your-code';
 class RetriableError extends Error {}
@@ -50,6 +54,7 @@ const scrollToBottom = debounce(() => {
   document.querySelector(`#${safeAreaId}`)?.scrollIntoView();
 }, 100);
 let scrollToBottomTimeout;
+let shouldUpdateConversationId: boolean = false;
 const ctrl = new AbortController();
 const retry = new Retry(ctrl, 3);
 const Chat: React.FC<IChat> = props => {
@@ -66,8 +71,42 @@ const Chat: React.FC<IChat> = props => {
     name: props.appName,
     namespace: props.appNamespace,
   });
+  const [messages, messagesLoading] = useGetCommonData<
+    { id: string; query: string; answer: string }[]
+  >({
+    url: '/kubeagi-apis/chat/messages',
+    method: 'post',
+    options: {
+      body: {
+        app_name: props.appName,
+        app_namespace: props.appNamespace,
+        conversation_id: props.conversationId,
+      },
+    },
+    initValue: [],
+    resStr: 'messages',
+    notFetch: !props.conversationId,
+  });
   useEffect(() => {
     if (conversation.data?.length) return;
+    // 存在会话id, 展示历史聊天内容
+    if (props.conversationId) {
+      if (messagesLoading || !messages?.length) return;
+      setConversation({
+        ...conversation,
+        data: messages?.reduce(
+          (pre, cur) => [
+            ...pre,
+            getCvsMeta(cur.query, cur.id + '_query', true),
+            getCvsMeta(cur.answer, cur.id + '_answer', false),
+          ],
+          []
+        ),
+      });
+      scrollToBottom();
+      return;
+    }
+    // 不存在会话id, 展示欢迎语
     const app = application?.data?.Application?.getApplication;
     const meta = app?.metadata;
     const prologue = app?.prologue;
@@ -87,7 +126,7 @@ const Chat: React.FC<IChat> = props => {
       });
       scrollToBottom();
     }
-  }, [conversation, application, props.conversationId]);
+  }, [conversation, application, props.conversationId, messages, messagesLoading]);
   useEffect(() => {
     application.mutate();
   }, []);
@@ -146,6 +185,7 @@ const Chat: React.FC<IChat> = props => {
           // debug: Boolean(props.debug),
         }),
         async onopen(response) {
+          shouldUpdateConversationId = false;
           if (response.ok) {
             return; // everything's good
           } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
@@ -158,6 +198,9 @@ const Chat: React.FC<IChat> = props => {
         onmessage(event) {
           const parsedData = JSON.parse(event.data);
           setConversation(_conversation => {
+            if (parsedData.conversation_id !== _conversation.id) {
+              shouldUpdateConversationId = true;
+            }
             return {
               ..._conversation,
               id: parsedData.conversation_id,
@@ -183,10 +226,16 @@ const Chat: React.FC<IChat> = props => {
           }
         },
         onclose() {
-          setConversation(_conversation => ({
-            ..._conversation,
-            loadingMsgId: undefined,
-          }));
+          setConversation(_conversation => {
+            if (shouldUpdateConversationId) {
+              shouldUpdateConversationId = false;
+              props.onNewChat?.(_conversation.id);
+            }
+            return {
+              ..._conversation,
+              loadingMsgId: undefined,
+            };
+          });
         },
       });
     },
@@ -219,7 +268,7 @@ const Chat: React.FC<IChat> = props => {
     });
     scrollToBottom();
     fetchConversation(input);
-    setInput();
+    setInput('');
   }, [input, setInput, setConversation, fetchConversation]);
   return (
     <div className="chatComponent">
@@ -243,6 +292,7 @@ const Chat: React.FC<IChat> = props => {
                       </Highlighter>
                     );
                   }
+                  // @ts-ignore
                   return <div>{error?.detail?.stack?.toString()}</div>;
                 },
               },
@@ -267,6 +317,7 @@ const Chat: React.FC<IChat> = props => {
     </div>
   );
 };
+let refreshTimeout;
 let tmpRefresh;
 const ChatComponent: React.FC<IChat> = props => {
   const [_refresh, setRefresh] = useState(false);
@@ -275,9 +326,12 @@ const ChatComponent: React.FC<IChat> = props => {
       return;
     }
     setRefresh(true);
-    setTimeout(setRefresh.bind('', false), 500);
+    refreshTimeout = setTimeout(setRefresh.bind('', false), 500);
     tmpRefresh = props.refresh;
     ctrl.abort(); // 正在生成的对话取消
+    return () => {
+      refreshTimeout && clearTimeout(refreshTimeout);
+    };
   }, [setRefresh, props.refresh]);
   if (_refresh)
     return (
