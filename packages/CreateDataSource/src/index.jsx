@@ -240,9 +240,9 @@ class CreateDataSource$$Component extends React.Component {
           componentProps={{
             colon: false,
             labelAlign: 'left',
-            labelCol: 4,
+            labelWidth: '120px',
             layout: 'horizontal',
-            wrapperCol: 20,
+            wrapperWidth: __$$eval(() => this.props.colWidth || '600px'),
           }}
           formHelper={{ autoFocus: true }}
           ref={this._refsManager.linkRef('formily_create')}
@@ -413,7 +413,7 @@ class CreateDataSource$$Component extends React.Component {
           )}
           {!!__$$eval(() => !this.props.data) && (
             <Row __component_name="Row" style={{ marginBottom: '22px' }} wrap={true}>
-              <Col __component_name="Col" span={4} />
+              <Col __component_name="Col" flex="120px" />
               <Col __component_name="Col" span={20} style={{ marginTop: '-30px' }}>
                 <LccComponentC6ipk
                   __component_name="LccComponentC6ipk"
@@ -447,12 +447,12 @@ class CreateDataSource$$Component extends React.Component {
                 __component_name="Flex"
                 align="center"
                 justify="center"
-                style={{
+                style={__$$eval(() => ({
+                  width: this.props.colWidth || '600px',
                   border: '1px dashed #4461EB',
-                  borderRadius: '4px',
                   height: '100px',
-                  width: '680px',
-                }}
+                  'border-radius': '4px',
+                }))}
                 vertical={true}
               >
                 <AntdIconPlusOutlined
@@ -724,7 +724,7 @@ class CreateDataSource$$Component extends React.Component {
           />
           {!!__$$eval(() => !this.getTypeForms()?.includes('upload')) && (
             <Row __component_name="Row" wrap={true}>
-              <Col __component_name="Col" span={4} style={{}} />
+              <Col __component_name="Col" flex="120px" span={4} style={{}} />
               <Col __component_name="Col" span={20} style={{ marginBottom: '20px' }}>
                 <Space __component_name="Space" align="center" direction="horizontal" size={5}>
                   {!!__$$eval(() => this.state.checked === undefined) && (
@@ -805,7 +805,7 @@ class CreateDataSource$$Component extends React.Component {
             />
           )}
           <Row __component_name="Row" wrap={true}>
-            <Col __component_name="Col" span={4} style={{}} />
+            <Col __component_name="Col" flex="120px" style={{}} />
             <Col __component_name="Col" span={20}>
               <Space
                 __component_name="Space"
