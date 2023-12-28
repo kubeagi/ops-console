@@ -1,0 +1,38 @@
+/**
+ * Licensed Materials - Property of k8s.com.cn
+ * (C) Copyright 2023 KubeAGI. All Rights Reserved.
+ */
+
+/**
+ * Chat
+ * @author zggmd
+ * @date 2023-12-27
+ */
+@import '@/assets/style/index.less';
+@import '../index.less';
+
+.conversationList {
+  width: @siderBarWidth;
+  background: @background-color;
+  .space {
+    width: 100%;
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      .avatar {
+        width: 40px;
+        height: 40px;
+        margin: 0 8px;
+        border-radius: 50%;
+      }
+      .title {
+        margin-bottom: 0;
+      }
+    }
+    .new {
+      width: calc(100% - 16px);
+      margin: 0 8px;
+    }
+  }
+}
