@@ -428,6 +428,7 @@ class DataSource$$Page extends React.Component {
           <LccComponentRu83f
             __component_name="LccComponentRu83f"
             bff={__$$eval(() => this.props.appHelper.utils.bff)}
+            colWidth="430px"
             data={__$$eval(() => this.state?.record || {})}
             handelCancel={function () {
               return Reflect.apply(this.closeModal, this, [
