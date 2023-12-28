@@ -13,9 +13,9 @@ import {
   Divider,
   Typography,
   FormilyInput,
-  FormilyRadio,
   FormilyTextArea,
   FormilySelect,
+  FormilyCheckbox,
   FormilyFormItem,
   FormilySlider,
   FormilyNumberPicker,
@@ -101,6 +101,7 @@ class EditModelService$$Page extends React.Component {
         4: '8',
         5: '16',
       },
+      modelSource: '',
       modelTypes: '',
     };
   }
@@ -121,7 +122,7 @@ class EditModelService$$Page extends React.Component {
           id: 'get_chunks',
           isInit: function () {
             return false;
-          },
+          }.bind(_this),
           options: function () {
             return {
               headers: {
@@ -136,7 +137,7 @@ class EditModelService$$Page extends React.Component {
               timeout: 5000,
               uri: 'https://portal.172.22.96.136.nip.io/kubeagi-apis/minio/get_chunks',
             };
-          },
+          }.bind(_this),
           type: 'axios',
         },
       ],
@@ -169,47 +170,75 @@ class EditModelService$$Page extends React.Component {
       this.setState({
         listModels: res.Model.listModels.nodes,
       });
-    } catch (error) {
+    } catch {
       // console.log(error, '===> err')
     }
   }
 
   async getWorkersDetail() {
+    const type = this.history?.query?.type === 'local' ? 'worker' : '3rd_party';
+    this.form().setValues({
+      modelSource: type,
+    });
+    this.setState({
+      modelSource: type,
+    });
     try {
-      const res = await this.props?.appHelper?.utils?.bff?.getWorker({
-        namespace: this.appHelper?.utils?.getAuthData()?.project || 'system-tce',
-        name: this.history?.query?.name || 'test3',
-      });
-      const {
-        Worker: { getWorker },
-      } = res;
-      const { resources = {} } = getWorker;
-      const { marks, gpuMarks } = this.state;
-      const isMarksCpu = Object.values(marks).includes(resources.cpu);
-      const isMarksMemory = Object.values(marks).includes(resources.memory?.split('Gi')[0]);
-      this.form().setValues({
-        name: getWorker.name,
-        displayName: getWorker.displayName,
-        model: getWorker.model.name,
-        description: getWorker.description,
-        resources: {
-          cpu: isMarksCpu ? marks[Object.values(marks).findIndex(v => v === resources.cpu)] : 0,
-          memory: isMarksMemory
-            ? marks[Object.values(marks).findIndex(v => v === resources.memory?.split('Gi')[0])]
-            : 0,
-          nvidiaGPU: gpuMarks[resources.nvidiaGPU] || 1,
-          customCPU: !isMarksCpu && resources.cpu !== '500m' ? resources.cpu : undefined,
-          customMemory:
-            !isMarksMemory && resources.memory !== '512Mi'
-              ? resources.memory?.split('Gi')[0]
-              : undefined,
-          customGPU: !gpuMarks[resources.nvidiaGPU] ? resources.nvidiaGPU : undefined,
-        },
-      });
-      this.setState({
-        modelTypes: getWorker.modelTypes,
-      });
-    } catch (error) {
+      if (type === 'worker') {
+        const res = await this.props?.appHelper?.utils?.bff?.getWorker({
+          namespace: this.appHelper?.utils?.getAuthData()?.project || 'system-tce',
+          name: this.history?.query?.name,
+        });
+        const {
+          Worker: { getWorker },
+        } = res;
+        const { resources = {} } = getWorker;
+        const { marks, gpuMarks } = this.state;
+        const isMarksCpu = Object.values(marks).includes(resources.cpu);
+        const isMarksMemory = Object.values(marks).includes(resources.memory?.split('Gi')[0]);
+        this.form().setValues({
+          name: getWorker.name,
+          displayName: getWorker.displayName,
+          model: getWorker.model.name,
+          description: getWorker.description,
+          type: getWorker.type === 'fastchat-vllm' ? [getWorker.type] : [],
+          resources: {
+            cpu: isMarksCpu ? marks[Object.values(marks).indexOf(resources.cpu)] : 0,
+            memory: isMarksMemory
+              ? marks[Object.values(marks).findIndex(v => v === resources.memory?.split('Gi')[0])]
+              : 0,
+            nvidiaGPU: gpuMarks[resources.nvidiaGPU] || 1,
+            customCPU: !isMarksCpu && resources.cpu !== '500m' ? resources.cpu : undefined,
+            customMemory:
+              !isMarksMemory && resources.memory !== '512Mi'
+                ? resources.memory?.split('Gi')[0]
+                : undefined,
+            customGPU: gpuMarks[resources.nvidiaGPU] ? undefined : resources.nvidiaGPU,
+          },
+        });
+        this.setState({
+          modelTypes: getWorker.modelTypes,
+        });
+        this.getListModels();
+      }
+      if (type === '3rd_party') {
+        const res = await this.props?.appHelper?.utils?.bff?.getModelService({
+          namespace: this.appHelper?.utils?.getAuthData()?.project || 'system-tce',
+          name: this.history?.query?.name,
+        });
+        const {
+          ModelService: { getModelService },
+        } = res;
+        this.form().setValues({
+          name: getModelService.name,
+          displayName: getModelService.displayName,
+          description: getModelService.description,
+          apiType: getModelService.apiType,
+          baseUrl: getModelService.baseUrl,
+          types: getModelService.types.split(','),
+        });
+      }
+    } catch {
       // console.log(error, '===> error')
     }
   }
@@ -223,30 +252,53 @@ class EditModelService$$Page extends React.Component {
       this.setState({
         createLoading: true,
       });
-      const { marks, gpuMarks, listModels } = this.state;
-      const { resources = {} } = v;
-      const params = {
-        ...v,
-        namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
-        resources: {
-          cpu: resources.customCPU || marks[resources.cpu],
-          memory: `${
-            resources.customMemory || resources.customMemory === 0
-              ? resources.customMemory
-              : marks[resources.memory]
-          }Gi`,
-          nvidiaGPU:
-            resources.customGPU || resources.customGPU === 0
-              ? resources.customGPU
-              : gpuMarks[resources.nvidiaGPU],
-        },
-      };
-      delete params.modelSource;
-      delete params.model;
+      const { marks, gpuMarks, listModels, modelSource } = this.state;
       try {
-        const res = await this.props.appHelper.utils.bff?.updateWorker({
-          input: params,
-        });
+        let res = {};
+        if (modelSource === 'worker') {
+          const { resources = {} } = v;
+          const params = {
+            name: v.name,
+            displayName: v.displayName,
+            description: v.description,
+            namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+            type: v.type && v.type.length > 0 ? 'fastchat-vllm' : 'fastchat',
+            resources: {
+              cpu: resources.customCPU || marks[resources.cpu],
+              memory: `${
+                resources.customMemory || resources.customMemory === 0
+                  ? resources.customMemory
+                  : marks[resources.memory]
+              }Gi`,
+              nvidiaGPU:
+                resources.customGPU || resources.customGPU === 0
+                  ? resources.customGPU
+                  : gpuMarks[resources.nvidiaGPU],
+            },
+          };
+          res = await this.props.appHelper.utils.bff?.updateWorker({
+            input: params,
+          });
+        }
+        if (modelSource === '3rd_party') {
+          const params = {
+            name: v.name,
+            displayName: v.displayName,
+            description: v.description,
+            types: v.types.join(','),
+            apiType: v.apiType,
+            endpoint: {
+              auth: {
+                apiKey: v.endpoint,
+              },
+              baseUrl: v.baseUrl,
+            },
+            namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+          };
+          res = await this.props.appHelper.utils.bff?.updateModelService({
+            input: params,
+          });
+        }
         this.utils.notification.success({
           message: '编辑模型服务成功',
         });
@@ -270,11 +322,45 @@ class EditModelService$$Page extends React.Component {
     });
   }
 
+  onClickCheck(event) {
+    this.form()?.submit(async v => {
+      try {
+        const params = {
+          name: v.name,
+          displayName: v.displayName,
+          description: v.description,
+          types: v.types.join(','),
+          apiType: v.apiType,
+          endpoint: {
+            auth: {
+              apiKey: v.endpoint,
+            },
+            url: v.baseUrl,
+          },
+          namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+        };
+        const res = await this.props.appHelper.utils.bff?.checkModelService({
+          input: params,
+        });
+        this.utils.notification.success({
+          message: '测试成功',
+        });
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: '测试失败',
+          errors: error?.response?.errors,
+        });
+        this.setState({
+          createLoading: false,
+        });
+      }
+    });
+  }
+
   componentDidMount() {
     this._dataSourceEngine.reloadDataSource();
 
     this.getWorkersDetail();
-    this.getListModels();
   }
 
   render() {
@@ -313,10 +399,7 @@ class EditModelService$$Page extends React.Component {
                   wrapperCol: 20,
                 }}
                 createFormProps={{
-                  initialValues: {
-                    modelSource: 'worker',
-                    resources: { cpu: 0, memory: 0, nvidiaGPU: 0 },
-                  },
+                  initialValues: { resources: { cpu: 0, memory: 0, nvidiaGPU: 0 } },
                 }}
                 formHelper={{ autoFocus: true }}
                 ref={this._refsManager.linkRef('formily_create')}
@@ -375,27 +458,6 @@ class EditModelService$$Page extends React.Component {
                     'x-validator': [],
                   }}
                 />
-                <FormilyRadio
-                  __component_name="FormilyRadio"
-                  componentProps={{
-                    'x-component-props': {
-                      _sdkSwrGetFunc: {},
-                      buttonStyle: 'outline',
-                      disabled: false,
-                      size: 'middle',
-                    },
-                  }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  fieldProps={{
-                    enum: [
-                      { label: '本地模型', value: 'worker' },
-                      { label: '外部模型', value: '3rd_party' },
-                    ],
-                    name: 'modelSource',
-                    title: '模型来源',
-                    'x-validator': [],
-                  }}
-                />
                 <FormilyTextArea
                   __component_name="FormilyTextArea"
                   componentProps={{
@@ -447,10 +509,7 @@ class EditModelService$$Page extends React.Component {
                       disabled: false,
                       mode: 'single',
                       onChange: function () {
-                        return this.onChangeModel.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.onChangeModel, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this),
                       placeholder: '请选择模型',
                     },
@@ -462,46 +521,66 @@ class EditModelService$$Page extends React.Component {
                     name: 'model',
                     required: true,
                     title: '模型',
-                    'x-pattern': 'disabled',
+                    'x-display':
+                      "{{ $form.values?.modelSource === 'worker' ? 'visible' : 'hidden' }}",
+                    'x-pattern': '',
                     'x-validator': [],
                   }}
                 />
-                <Row
-                  __component_name="Row"
-                  gutter={[0, 0]}
-                  style={{ marginBottom: '24px' }}
-                  wrap={false}
-                >
-                  <Col __component_name="Col" flex="" span={4} style={{ paddingLeft: '10px' }}>
-                    <Typography.Text
-                      __component_name="Typography.Text"
-                      disabled={false}
-                      ellipsis={true}
-                      strong={false}
-                      style={{ fontSize: '' }}
-                    >
-                      模型类型
-                    </Typography.Text>
-                  </Col>
-                  <Col __component_name="Col" flex="auto" style={{}}>
-                    <Typography.Text
-                      __component_name="Typography.Text"
-                      disabled={false}
-                      ellipsis={true}
-                      strong={false}
-                      style={{ fontSize: '', height: '16px' }}
-                    >
-                      {__$$eval(() => this.state.modelTypes)}
-                    </Typography.Text>
-                  </Col>
-                </Row>
+                {!!__$$eval(() => this.state.modelSource === 'worker') && (
+                  <Row
+                    __component_name="Row"
+                    gutter={[0, 0]}
+                    style={{ marginBottom: '24px' }}
+                    wrap={false}
+                  >
+                    <Col __component_name="Col" flex="" span={4} style={{ paddingLeft: '10px' }}>
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        模型类型
+                      </Typography.Text>
+                    </Col>
+                    <Col __component_name="Col" flex="auto" style={{}}>
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '', height: '16px' }}
+                      >
+                        {__$$eval(() => this.state.modelTypes)}
+                      </Typography.Text>
+                    </Col>
+                  </Row>
+                )}
+                <FormilyCheckbox
+                  __component_name="FormilyCheckbox"
+                  componentProps={{ 'x-component-props': { _sdkSwrGetFunc: {} } }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    enum: [{ label: 'VLLM 加速', value: 'fastchat-vllm' }],
+                    name: 'type',
+                    title: 'VLLM 加速',
+                    'x-display':
+                      "{{ $form.values?.modelSource === 'worker' ? 'visible' : 'hidden' }}",
+                    'x-validator': [],
+                  }}
+                />
                 <FormilyFormItem
                   __component_name="FormilyFormItem"
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
                     name: 'resources',
                     title: this.i18n('i18n-n55cj6ks') /* 服务规格 */,
+                    type: 'object',
                     'x-component': 'FormilyFormItem',
+                    'x-display':
+                      "{{ $form.values?.modelSource === 'worker' ? 'visible' : 'hidden' }}",
                     'x-validator': [],
                   }}
                 >
@@ -811,6 +890,112 @@ class EditModelService$$Page extends React.Component {
                     </Col>
                   </Row>
                 </FormilyFormItem>
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: {},
+                      allowClear: false,
+                      disabled: false,
+                      placeholder: '请选择模型服务供应商',
+                    },
+                  }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    enum: [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        label: 'zhipuai',
+                        type: 'disabled',
+                        value: 'zhipuai',
+                      },
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        label: 'openai',
+                        type: 'disabled',
+                        value: 'openai',
+                      },
+                    ],
+                    name: 'apiType',
+                    required: true,
+                    title: '模型服务供应商',
+                    'x-display':
+                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                    'x-validator': [],
+                  }}
+                />
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{ 'x-component-props': { placeholder: '请输入模型服务地址' } }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    name: 'baseUrl',
+                    required: true,
+                    title: '模型服务地址',
+                    'x-display':
+                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                    'x-validator': [],
+                  }}
+                />
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{ 'x-component-props': { placeholder: '请输入Token' } }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    name: 'endpoint',
+                    required: true,
+                    title: 'Token',
+                    'x-display':
+                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                    'x-validator': [],
+                  }}
+                />
+                {!!__$$eval(() => this.state.modelSource === '3rd_party') && (
+                  <Row
+                    __component_name="Row"
+                    gutter={[0, 0]}
+                    style={{ marginBottom: '24px', marginTop: '-8px' }}
+                    wrap={false}
+                  >
+                    <Col __component_name="Col" flex="" span={4} />
+                    <Col __component_name="Col" flex="auto">
+                      <Button
+                        __component_name="Button"
+                        block={false}
+                        danger={false}
+                        disabled={false}
+                        ghost={false}
+                        onClick={function () {
+                          return Reflect.apply(this.onClickCheck, this, [...Array.prototype.slice.call(arguments)]);
+                        }.bind(this)}
+                        shape="default"
+                        size="small"
+                        type="link"
+                      >
+                        测试链接
+                      </Button>
+                    </Col>
+                  </Row>
+                )}
+                <FormilyCheckbox
+                  __component_name="FormilyCheckbox"
+                  componentProps={{ 'x-component-props': { _sdkSwrGetFunc: {} } }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    enum: [
+                      { label: 'LLM', value: 'llm' },
+                      { label: 'Embedding', value: 'embedding' },
+                    ],
+                    name: 'types',
+                    required: true,
+                    title: '模型服务类型',
+                    'x-display':
+                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                    'x-validator': [],
+                  }}
+                />
               </FormilyForm>
               <Divider
                 __component_name="Divider"
@@ -830,10 +1015,7 @@ class EditModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return this.handleCancle.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleCancle, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this)}
                       shape="default"
                     >
@@ -846,10 +1028,7 @@ class EditModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return this.handleConfirm.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleConfirm, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this)}
                       shape="default"
                       type="primary"
@@ -886,15 +1065,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      self={self}
+      render={dataProps => (
+        <EditModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
+      )}
       sdkInitFunc={{
         enabled: undefined,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      render={dataProps => (
-        <EditModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
-      )}
+      self={self}
     />
   );
 };
@@ -903,7 +1082,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch {}
 }
 
 function __$$evalArray(expr) {
@@ -915,6 +1094,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
