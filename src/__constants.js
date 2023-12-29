@@ -141,3 +141,11 @@ constants.DESCRIPTION_LENGTH_REG = function applyThis() {
 }.apply(constants);
 export const DESCRIPTION_LENGTH_REG = constants.DESCRIPTION_LENGTH_REG;
 export default constants;
+
+/** 文件相关的接口的origin, 开发环境使用https://portal.172.22.96.136.nip.io，使用方式： this.constants.FILES_API_ORIGIN */
+constants.FILES_API_ORIGIN = function applyThis() {
+  return process.env.NODE_ENV === 'production'
+    ? window.location.origin
+    : 'https://portal.172.22.96.136.nip.io';
+}.apply(constants);
+export const FILES_API_ORIGIN = constants.FILES_API_ORIGIN;

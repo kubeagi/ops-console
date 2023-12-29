@@ -5,3 +5,7 @@ body {
 .tenx-ui-materials-card-body {
   padding-top: 0;
 }
+
+.custom-table .tenx-ui-materials-table-thead {
+  background-color: #f8f8f8;
+}

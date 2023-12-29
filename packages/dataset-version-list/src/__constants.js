@@ -58,19 +58,24 @@ constants.DATASET_DATA = function applyThis() {
     ],
     syncStatus: [
       {
-        children: '同步中',
+        children: '导入中',
         id: 'FileSyncing',
         type: 'info',
       },
       {
-        children: '同步失败',
+        children: '导入失败',
         id: 'FileSyncFailed',
         type: 'error',
       },
       {
-        children: '同步成功',
+        children: '导入成功',
         id: 'FileSyncSuccess',
         type: 'success',
+      },
+      {
+        children: '未导入',
+        id: 'no',
+        type: 'info',
       },
     ],
     released: [
