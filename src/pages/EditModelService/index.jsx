@@ -291,7 +291,7 @@ class EditModelService$$Page extends React.Component {
               auth: {
                 apiKey: v.endpoint,
               },
-              baseUrl: v.baseUrl,
+              url: v.baseUrl,
             },
             namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
           };
