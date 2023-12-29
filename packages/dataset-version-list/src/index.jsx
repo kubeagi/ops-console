@@ -57,49 +57,6 @@ class DatasetVersionList$$Component extends React.Component {
     console.log('will unmount');
   }
 
-  release(params) {
-    this.setState({
-      confirm: {
-        id: new Date().getTime(),
-        title: '发布数据集',
-        content: `数据发布后不可更改，确定发布：${params.dataset.name} - ${params.version.version}？`,
-        onOk: async () => {
-          const res = await this.utils.bff
-            .updateVersionedDataset({
-              input: {
-                namespace: params.dataset.namespace,
-                name: params.version.name,
-                released: 1,
-              },
-            })
-            .then(res => {
-              this.utils.notification.success({
-                message: '发布数据集版本成功',
-              });
-              this.props.refresh?.(params);
-            })
-            .catch(e => {
-              this.utils.notification.warn({
-                message: '发布数据集版本失败',
-              });
-            });
-        },
-      },
-    });
-  }
-
-  getProps() {
-    if (this.props.dataset) return this.props;
-    return {
-      dataset: this.mockData.data?.Dataset?.getDataset || {},
-      datasource: this.mockData.data?.Dataset?.getDataset?.versions?.nodes || [],
-    };
-  }
-
-  toDetail(event, params) {
-    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
-  }
-
   delVersion(params) {
     this.setState({
       confirm: {
@@ -161,6 +118,14 @@ class DatasetVersionList$$Component extends React.Component {
     return list.sort((a, b) => a.index - b.index);
   }
 
+  getProps() {
+    if (this.props.dataset) return this.props;
+    return {
+      dataset: this.mockData.data?.Dataset?.getDataset || {},
+      datasource: this.mockData.data?.Dataset?.getDataset?.versions?.nodes || [],
+    };
+  }
+
   onDropdownClick(event, params) {
     if (event.key === 'delete') {
       return this.delVersion(params);
@@ -177,6 +142,41 @@ class DatasetVersionList$$Component extends React.Component {
     });
   }
 
+  release(params) {
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '发布数据集',
+        content: `数据发布后不可更改，确定发布：${params.dataset.name} - ${params.version.version}？`,
+        onOk: async () => {
+          const res = await this.utils.bff
+            .updateVersionedDataset({
+              input: {
+                namespace: params.dataset.namespace,
+                name: params.version.name,
+                released: 1,
+              },
+            })
+            .then(res => {
+              this.utils.notification.success({
+                message: '发布数据集版本成功',
+              });
+              this.props.refresh?.(params);
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '发布数据集版本失败',
+              });
+            });
+        },
+      },
+    });
+  }
+
+  toDetail(event, params) {
+    this.history.push(`/dataset/detail/${params.datasetName}/version/${params.versionName}`);
+  }
+
   componentDidMount() {}
 
   render() {
@@ -185,67 +185,69 @@ class DatasetVersionList$$Component extends React.Component {
     return (
       <Component>
         <LccComponentSbva0
-          data={__$$eval(() => this.state.confirm)}
           __component_name="LccComponentSbva0"
+          data={__$$eval(() => this.state.confirm)}
         />
         <Table
-          size="middle"
-          rowKey="version"
-          scroll={{ scrollToFirstRowOnChange: true }}
+          __component_name="Table"
           columns={[
-            { key: 'version', title: '版本', dataIndex: 'version' },
+            { dataIndex: 'version', key: 'version', title: '版本' },
             {
+              dataIndex: 'syncStatus',
               key: 'syncStatus',
-              title: '导入状态',
               render: (text, record, index) =>
                 (__$$context => (
                   <Status
-                    id={__$$eval(() => record.syncStatus)}
-                    types={__$$eval(() => __$$context.constants.DATASET_DATA.syncStatus)}
                     __component_name="Status"
+                    id={__$$eval(() => record.syncStatus || 'no')}
+                    types={__$$eval(() => __$$context.constants.DATASET_DATA.syncStatus)}
                   />
                 ))(__$$createChildContext(__$$context, { text, record, index })),
-              dataIndex: 'syncStatus',
+              title: '导入状态',
             },
             {
+              dataIndex: 'dataProcessStatus',
               key: 'dataProcessStatus',
-              title: '数据处理状态',
               render: (text, record, index) =>
                 (__$$context => (
                   <Status
+                    __component_name="Status"
                     id={__$$eval(() => record.dataProcessStatus || 'no')}
                     types={__$$eval(() => __$$context.constants.DATASET_DATA.dataProcessStatus)}
-                    __component_name="Status"
                   />
                 ))(__$$createChildContext(__$$context, { text, record, index })),
-              dataIndex: 'dataProcessStatus',
+              title: '数据处理状态',
             },
             {
-              key: 'files',
-              title: '数据量',
-              render: (text, record) => text.totalCount,
               dataIndex: 'files',
+              key: 'files',
+              render: (text, record) => text.totalCount,
+              title: '数据量',
             },
             {
+              dataIndex: 'updateTimestamp',
               key: 'updateTimestamp',
-              title: '最后更新时间',
               render: (text, record, index) =>
                 (__$$context => (
                   <Typography.Time
-                    time={__$$eval(() => text)}
+                    __component_name="Typography.Time"
                     format=""
                     relativeTime={true}
-                    __component_name="Typography.Time"
+                    time={__$$eval(() => text)}
                   />
                 ))(__$$createChildContext(__$$context, { text, record, index })),
-              dataIndex: 'updateTimestamp',
+              title: '最后更新时间',
             },
             {
+              dataIndex: 'action',
               key: 'action',
-              title: '操作',
               render: (text, record, index) =>
                 (__$$context => (
                   <Dropdown.Button
+                    __component_name="Dropdown.Button"
+                    danger={false}
+                    destroyPopupOnHide={true}
+                    disabled={false}
                     menu={{
                       items: __$$eval(() => __$$context.dropdownList(record)),
                       onClick: function () {
@@ -260,8 +262,6 @@ class DatasetVersionList$$Component extends React.Component {
                         );
                       }.bind(__$$context),
                     }}
-                    style={{}}
-                    danger={false}
                     onClick={function () {
                       return this.toDetail.apply(
                         this,
@@ -273,39 +273,39 @@ class DatasetVersionList$$Component extends React.Component {
                         ])
                       );
                     }.bind(__$$context)}
-                    trigger={['hover']}
-                    disabled={false}
                     placement="bottomRight"
-                    __component_name="Dropdown.Button"
-                    destroyPopupOnHide={true}
+                    style={{}}
+                    trigger={['hover']}
                   >
                     <Typography.Text
-                      style={{ fontSize: '', paddingTop: '3px' }}
-                      strong={false}
+                      __component_name="Typography.Text"
                       disabled={false}
                       ellipsis={true}
-                      __component_name="Typography.Text"
+                      strong={false}
+                      style={{ fontSize: '', paddingTop: '3px' }}
                     >
                       查看详情
                     </Typography.Text>
                   </Dropdown.Button>
                 ))(__$$createChildContext(__$$context, { text, record, index })),
-              dataIndex: 'action',
+              title: '操作',
             },
           ]}
           dataSource={__$$eval(() => this.getProps().datasource || [])}
           pagination={{
-            size: 'default',
-            simple: false,
+            _unsafe_MixedSetter_position_select: 'ArraySetter',
             pageSize: 10,
-            position: ['bottomRight'],
             pagination: { pageSize: 10 },
+            position: ['bottomRight'],
             showQuickJumper: false,
             showSizeChanger: false,
-            _unsafe_MixedSetter_position_select: 'ArraySetter',
+            simple: false,
+            size: 'default',
           }}
+          rowKey="version"
+          scroll={{ scrollToFirstRowOnChange: true }}
           showHeader={true}
-          __component_name="Table"
+          size="middle"
         />
       </Component>
     );
@@ -360,6 +360,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;

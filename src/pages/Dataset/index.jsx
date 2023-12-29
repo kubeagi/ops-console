@@ -22,7 +22,6 @@ import {
   List,
   Collapse,
   Image,
-  UnifiedLink,
   Tag,
   Divider,
 } from '@tenx-ui/materials';
@@ -715,15 +714,16 @@ class Dataset$$Page extends React.Component {
                                     )}
                                     width={32}
                                   />
-                                  <UnifiedLink
-                                    __component_name="UnifiedLink"
-                                    inQianKun={false}
-                                    style={{ fontSize: '18px', marginLeft: '16px' }}
-                                    target="_self"
-                                    to={__$$eval(() => `/dataset/detail/${item.name}`)}
+                                  <Typography.Title
+                                    __component_name="Typography.Title"
+                                    bold={false}
+                                    bordered={false}
+                                    ellipsis={true}
+                                    level={1}
+                                    style={{ paddingLeft: '8px' }}
                                   >
                                     {__$$eval(() => __$$context.utils.getFullName(item))}
-                                  </UnifiedLink>
+                                  </Typography.Title>
                                 </Col>
                                 <Col
                                   __component_name="Col"
@@ -922,6 +922,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;

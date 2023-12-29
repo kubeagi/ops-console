@@ -20,7 +20,6 @@ import {
   Divider,
   Tabs,
   Descriptions,
-  UnifiedLink,
 } from '@tenx-ui/materials';
 
 import LccComponentQlsmm from 'KubeAGIUpload';
@@ -71,16 +70,16 @@ class DatasetVersionDetail$$Page extends React.Component {
 
     this.state = {
       addFileVisible: false,
-      upload: {},
       confirm: {},
-      openFile: false,
-      fileData: {},
       cvsData: {
         current: 1,
         list: [],
         total: 0,
         loading: false,
       },
+      fileData: {},
+      openFile: false,
+      upload: {},
     };
   }
 
@@ -94,8 +93,20 @@ class DatasetVersionDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  form(name) {
-    return this.$(name || 'add_file')?.formRef?.current?.form;
+  addFileClick(event) {
+    this.setState({
+      addFileVisible: true,
+    });
+  }
+
+  addFileOk() {
+    const fetch = async () => {
+      try {
+        this.handleReUpload();
+      } catch (e) {}
+    };
+    // 点击确定回调
+    this.form()?.submit(fetch);
   }
 
   data() {
@@ -105,11 +116,40 @@ class DatasetVersionDetail$$Page extends React.Component {
     };
   }
 
-  refresh() {
-    this.utils?.changeLocationQuery(this, 'useGetVersionedDataset', {
-      name: this.match?.params?.versionId,
-      namespace: this.utils.getAuthData?.()?.project,
-      _: new Date().getTime(),
+  delFileClick(event, { data }) {
+    // 点击按钮时的回调
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除文件',
+        content: `确定删除文件：${data?.path} ？`,
+        onOk: async () => {
+          await this.utils.axios
+            .delete(`${this.constants.FILES_API_ORIGIN}/kubeagi-apis/bff/versioneddataset/files`, {
+              data: {
+                files: [data.path],
+                bucket: this.utils.getAuthData?.()?.project,
+                bucketPath: this.getBucketPath(),
+              },
+              headers: {
+                Authorization: this.utils.getAuthorization(),
+              },
+            })
+            .then(res => {
+              if (res?.data === 'success') {
+                this.utils.notification.success({
+                  message: '删除文件成功',
+                });
+                this.refresh();
+              }
+            })
+            .catch(e => {
+              this.utils.notification.warn({
+                message: '删除文件失败',
+              });
+            });
+        },
+      },
     });
   }
 
@@ -141,122 +181,14 @@ class DatasetVersionDetail$$Page extends React.Component {
     });
   }
 
-  setUploadState(state) {
-    this.setState({
-      upload: state,
-    });
-  }
-
-  handleReUpload() {
-    if (!(this.state.upload?.uploadThis?.state?.fileList?.length > 0)) {
-      this.handleCancle();
-      return;
-    }
-    this.state.upload?.uploadThis?.state?.fileList?.forEach(file => {
-      this.state.upload?.uploadThis?.computeMD5(file);
-    });
-  }
-
-  handleCancle() {
-    this.setState({
-      addFileVisible: false,
-    });
-  }
-
-  handleUploadSuccess() {
-    this.setState({
-      addFileVisible: false,
-    });
-    this.utils.notification.success({
-      message: '新增文件成功',
-    });
-    this.refresh();
-  }
-
-  addFileClick(event) {
-    this.setState({
-      addFileVisible: true,
-    });
-  }
-
-  addFileOk() {
-    const fetch = async () => {
-      try {
-        this.handleReUpload();
-      } catch (e) {}
-    };
-    // 点击确定回调
-    this.form()?.submit(fetch);
+  form(name) {
+    return this.$(name || 'add_file')?.formRef?.current?.form;
   }
 
   getBucketPath() {
     return `dataset/${this.props.useGetDataset.data?.Dataset?.getDataset?.name}/${
       this.data().data?.version
     }`;
-  }
-
-  handleUploadFinished(file, res) {
-    console.log('handleUploadFinished,', file, res);
-  }
-
-  delFileClick(event, { data }) {
-    // 点击按钮时的回调
-    this.setState({
-      confirm: {
-        id: new Date().getTime(),
-        title: '删除文件',
-        content: `确定删除文件：${data?.path} ？`,
-        onOk: async () => {
-          await this.utils.axios
-            .delete(`${window.location.origin}/kubeagi-apis/bff/versioneddataset/files`, {
-              data: {
-                files: [data.path],
-                bucket: this.utils.getAuthData?.()?.project,
-                bucketPath: this.getBucketPath(),
-              },
-              headers: {
-                Authorization: this.utils.getAuthorization(),
-              },
-            })
-            .then(res => {
-              if (res?.data === 'success') {
-                this.utils.notification.success({
-                  message: '删除文件成功',
-                });
-                this.refresh();
-              }
-            })
-            .catch(e => {
-              this.utils.notification.warn({
-                message: '删除文件失败',
-              });
-            });
-        },
-      },
-    });
-  }
-
-  openFileDetail(e, { data }) {
-    this.setState(
-      {
-        openFile: true,
-        fileData: data,
-      },
-      this.getFile.bind(this)
-    );
-  }
-
-  onFileClose(event) {
-    this.setState({
-      openFile: false,
-      fileData: {},
-      cvsData: {
-        current: 1,
-        loading: false,
-        list: [],
-        total: 0,
-      },
-    });
   }
 
   async getFile() {
@@ -267,7 +199,7 @@ class DatasetVersionDetail$$Page extends React.Component {
       },
     });
     const res = await this.utils.axios.get(
-      `${window.location.origin}/kubeagi-apis/bff/versioneddataset/files/csv?page=${
+      `${this.constants.FILES_API_ORIGIN}/kubeagi-apis/bff/versioneddataset/files/csv?page=${
         this.state.cvsData?.current
       }&size=10&bucket=${
         this.utils.getAuthData?.()?.project
@@ -291,9 +223,51 @@ class DatasetVersionDetail$$Page extends React.Component {
     });
   }
 
+  handleCancle() {
+    this.setState({
+      addFileVisible: false,
+    });
+  }
+
+  handleReUpload() {
+    if (!(this.state.upload?.uploadThis?.state?.fileList?.length > 0)) {
+      this.handleCancle();
+      return;
+    }
+    this.state.upload?.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.upload?.uploadThis?.computeMD5(file);
+    });
+  }
+
+  handleUploadFinished(file, res) {
+    console.log('handleUploadFinished,', file, res);
+  }
+
+  handleUploadSuccess() {
+    this.setState({
+      addFileVisible: false,
+    });
+    this.utils.notification.success({
+      message: '新增文件成功',
+    });
+    this.refresh();
+  }
+
+  onFileClose(event) {
+    this.setState({
+      openFile: false,
+      fileData: {},
+      cvsData: {
+        current: 1,
+        loading: false,
+        list: [],
+        total: 0,
+      },
+    });
+  }
+
   onFilePageChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
-    console.log('onPaginationChange', page, pageSize);
     this.setState(
       {
         cvsData: {
@@ -305,6 +279,30 @@ class DatasetVersionDetail$$Page extends React.Component {
     );
   }
 
+  openFileDetail(e, { data }) {
+    this.setState(
+      {
+        openFile: true,
+        fileData: data,
+      },
+      this.getFile.bind(this)
+    );
+  }
+
+  refresh() {
+    this.utils?.changeLocationQuery(this, 'useGetVersionedDataset', {
+      name: this.match?.params?.versionId,
+      namespace: this.utils.getAuthData?.()?.project,
+      _: new Date().getTime(),
+    });
+  }
+
+  setUploadState(state) {
+    this.setState({
+      upload: state,
+    });
+  }
+
   componentDidMount() {}
 
   render() {
@@ -313,147 +311,140 @@ class DatasetVersionDetail$$Page extends React.Component {
     return (
       <Page>
         <Drawer
-          mask={true}
-          open={__$$eval(() => this.state.openFile)}
+          __component_name="Drawer"
+          destroyOnClose={true}
           extra=""
-          title={__$$eval(() => this.state.fileData.path)}
-          width="70%"
           footer=""
+          mask={true}
+          maskClosable={true}
           onClose={function () {
             return this.onFileClose.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
+          open={__$$eval(() => this.state.openFile)}
           placement="right"
-          maskClosable={true}
-          destroyOnClose={true}
-          __component_name="Drawer"
+          title={__$$eval(() => this.state.fileData.path)}
+          width="70%"
         >
           <Table
             __component_name="Table"
-            rowKey="id"
+            bordered={true}
+            className="custom-table"
+            columns={[
+              {
+                _unsafe_MixedSetter_width_select: 'StringSetter',
+                dataIndex: 'q',
+                key: 'q',
+                title: 'Q',
+                width: '50%',
+              },
+              {
+                _unsafe_MixedSetter_width_select: 'StringSetter',
+                dataIndex: 'a',
+                key: 'a',
+                title: 'A',
+                width: '50%',
+              },
+            ]}
             dataSource={__$$eval(() =>
               (() => {
                 console.log(this.state.cvsData?.list || []);
                 return this.state.cvsData?.list || [];
               })()
             )}
-            columns={[
-              {
-                title: 'Q',
-                dataIndex: 'q',
-                key: 'q',
-                _unsafe_MixedSetter_width_select: 'StringSetter',
-                width: '50%',
-              },
-              {
-                title: 'A',
-                dataIndex: 'a',
-                key: 'a',
-                _unsafe_MixedSetter_width_select: 'StringSetter',
-                width: '50%',
-              },
-            ]}
+            loading={__$$eval(() => this.state.cvsData.loading)}
             pagination={{
-              pageSize: 10,
-              total: __$$eval(() => this.state.cvsData?.total || 0),
               current: __$$eval(() => this.state.cvsData?.current || 1),
-              showSizeChanger: false,
-              showQuickJumper: false,
-              simple: false,
-              size: 'default',
-              pagination: { pageSize: 10 },
               onChange: function () {
                 return this.onFilePageChange.apply(
                   this,
                   Array.prototype.slice.call(arguments).concat([])
                 );
               }.bind(this),
+              pageSize: 10,
+              pagination: { pageSize: 10 },
+              showQuickJumper: false,
+              showSizeChanger: false,
+              simple: false,
+              size: 'default',
+              total: __$$eval(() => this.state.cvsData?.total || 0),
             }}
+            rowKey="id"
+            scroll={{ scrollToFirstRowOnChange: true }}
+            showCard={true}
             showHeader={true}
             size="middle"
-            scroll={{ scrollToFirstRowOnChange: true }}
-            loading={__$$eval(() => this.state.cvsData.loading)}
+            style={{}}
           />
         </Drawer>
         {!!__$$eval(() => this.state.delFileVisible) && (
           <Modal
-            mask={true}
-            onOk={function () {
-              return this.delFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
-            }.bind(this)}
-            open={true}
-            title="删除文件"
+            __component_name="Modal"
             centered={false}
+            confirmLoading={false}
+            destroyOnClose={true}
+            forceRender={false}
             keyboard={true}
+            mask={true}
+            maskClosable={false}
             onCancel={function () {
               return this.delFileCancle.apply(
                 this,
                 Array.prototype.slice.call(arguments).concat([])
               );
             }.bind(this)}
-            forceRender={false}
-            maskClosable={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            __component_name="Modal"
+            onOk={function () {
+              return this.delFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            open={true}
+            title="删除文件"
           >
             <Alert
-              type="warning"
+              __component_name="Alert"
               message={__$$eval(() => `确定删除文件：${this.state.delFileData.path} ？`)}
               showIcon={true}
-              __component_name="Alert"
+              type="warning"
             />
           </Modal>
         )}
         <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={false}
+          forceRender={false}
+          keyboard={true}
           mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.handleCancle.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
           onOk={function () {
             return this.addFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           open={__$$eval(() => this.state.addFileVisible)}
           title="新增文件"
           width="650px"
-          centered={false}
-          keyboard={true}
-          onCancel={function () {
-            return this.handleCancle.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={false}
-          destroyOnClose={false}
-          __component_name="Modal"
         >
           <FormilyForm
-            ref={this._refsManager.linkRef('add_file')}
-            formHelper={{ autoFocus: true }}
+            __component_name="FormilyForm"
             componentProps={{
               colon: false,
-              layout: 'horizontal',
-              labelCol: 4,
               labelAlign: 'left',
+              labelCol: 4,
+              layout: 'horizontal',
               wrapperCol: 20,
             }}
-            __component_name="FormilyForm"
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('add_file')}
           >
             <LccComponentQlsmm
+              __component_name="LccComponentQlsmm"
               accept=".txt,.doc,.docx,.pdf,.md"
-              bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-              setState={function () {
-                return this.setUploadState.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              contentWidth="520px"
               Authorization={__$$eval(() => this.utils.getAuthorization())}
+              bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+              contentWidth="520px"
               getBucketPath={function () {
                 return this.getBucketPath.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              handleSuccess={function () {
-                return this.handleUploadSuccess.apply(
                   this,
                   Array.prototype.slice.call(arguments).concat([])
                 );
@@ -470,94 +461,106 @@ class DatasetVersionDetail$$Page extends React.Component {
                   Array.prototype.slice.call(arguments).concat([])
                 );
               }.bind(this)}
-              __component_name="LccComponentQlsmm"
+              handleSuccess={function () {
+                return this.handleUploadSuccess.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              setState={function () {
+                return this.setUploadState.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
             />
           </FormilyForm>
         </Modal>
         <LccComponentSbva0
-          data={__$$eval(() => this.state.confirm)}
           __component_name="LccComponentSbva0"
+          data={__$$eval(() => this.state.confirm)}
         />
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} style={{ marginBottom: '16px' }} __component_name="Col">
-            <Space align="center" direction="horizontal" __component_name="Space">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24} style={{ marginBottom: '16px' }}>
+            <Space __component_name="Space" align="center" direction="horizontal">
               <Button.Back
-                type="ghost"
-                title={this.i18n('i18n-k7qioby7') /* 数据集版本详情 */}
                 __component_name="Button.Back"
+                path="/dataset"
+                title={this.i18n('i18n-k7qioby7') /* 数据集版本详情 */}
+                type="ghost"
               />
             </Space>
           </Col>
         </Row>
         <Card
-          size="default"
-          type="default"
-          style={{ marginBottom: '16px' }}
+          __component_name="Card"
           actions={[]}
-          loading={false}
           bordered={false}
           hoverable={false}
-          __component_name="Card"
+          loading={false}
+          size="default"
+          style={{ marginBottom: '16px' }}
+          type="default"
         >
           <Row __component_name="Row">
-            <Col flex="470px" __component_name="Col">
-              <Row wrap={true} __component_name="Row">
-                <Col span={4} __component_name="Col">
+            <Col __component_name="Col" flex="470px">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={4}>
                   <Image
-                    src={__$$eval(() => this.constants.DATASET_DATA.versionImg)}
-                    width={64}
+                    __component_name="Image"
+                    fallback=""
                     height={64}
                     preview={false}
-                    fallback=""
-                    __component_name="Image"
+                    src={__$$eval(() => this.constants.DATASET_DATA.versionImg)}
+                    width={64}
                   />
                 </Col>
-                <Col span={6} __component_name="Col">
-                  <Row wrap={true} __component_name="Row">
-                    <Col span={24} __component_name="Col">
+                <Col __component_name="Col" span={6}>
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={24}>
                       <Typography.Title
+                        __component_name="Typography.Title"
                         bold={true}
-                        level={1}
                         bordered={false}
                         ellipsis={true}
-                        __component_name="Typography.Title"
+                        level={1}
                       >
                         {__$$eval(() => this.data().data?.version || '-')}
                       </Typography.Title>
                     </Col>
-                    <Col flex="" span={24} __component_name="Col">
+                    <Col __component_name="Col" flex="" span={24}>
                       <Space
-                        align="center"
-                        style={{ width: '300px' }}
-                        direction="horizontal"
                         __component_name="Space"
+                        align="center"
+                        direction="horizontal"
+                        style={{ width: '300px' }}
                       >
                         <Status
+                          __component_name="Status"
                           id={__$$eval(() => this.data().data?.syncStatus)}
                           types={__$$eval(() => this.constants.DATASET_DATA.syncStatus)}
-                          __component_name="Status"
                         />
                         <Divider
-                          mode="default"
-                          type="vertical"
+                          __component_name="Divider"
                           dashed={false}
                           defaultOpen={false}
-                          __component_name="Divider"
+                          mode="default"
+                          type="vertical"
                         />
                         <Typography.Text
-                          style={{ fontSize: '', paddingBottom: '3px' }}
-                          strong={false}
+                          __component_name="Typography.Text"
                           disabled={false}
                           ellipsis={true}
-                          __component_name="Typography.Text"
+                          strong={false}
+                          style={{ fontSize: '', paddingBottom: '3px' }}
                         >
                           更新时间:
                         </Typography.Text>
                         <Typography.Time
-                          time={__$$eval(() => this.data().data?.updateTimestamp)}
+                          __component_name="Typography.Time"
                           format=""
                           relativeTime={true}
-                          __component_name="Typography.Time"
+                          time={__$$eval(() => this.data().data?.updateTimestamp)}
                         />
                       </Space>
                     </Col>
@@ -566,24 +569,24 @@ class DatasetVersionDetail$$Page extends React.Component {
               </Row>
             </Col>
             <Col
+              __component_name="Col"
               flex="auto"
               style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}
-              __component_name="Col"
             >
-              <Space align="center" direction="horizontal" __component_name="Space">
+              <Space __component_name="Space" align="center" direction="horizontal">
                 <Button
+                  __component_name="Button"
                   block={false}
-                  ghost={false}
-                  shape="default"
                   danger={false}
+                  disabled={false}
+                  ghost={false}
                   onClick={function () {
                     return this.delVerClick.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  disabled={false}
-                  __component_name="Button"
+                  shape="default"
                 >
                   删除
                 </Button>
@@ -592,150 +595,148 @@ class DatasetVersionDetail$$Page extends React.Component {
           </Row>
         </Card>
         <Card
-          size="default"
-          type="default"
+          __component_name="Card"
           actions={[]}
-          loading={false}
           bordered={false}
           hoverable={false}
-          __component_name="Card"
+          loading={false}
+          size="default"
+          type="default"
         >
           <Tabs
-            size="default"
-            type="line"
+            __component_name="Tabs"
+            activeKey=""
+            destroyInactiveTabPane="true"
             items={[
               {
-                key: 'tab-item-1',
-                label: this.i18n('i18n-1gikmooh') /* 详细信息 */,
                 children: (
                   <Descriptions
-                    id=""
-                    size="default"
+                    __component_name="Descriptions"
+                    bordered={false}
+                    borderedBottom={false}
+                    borderedBottomDashed={false}
                     colon={false}
+                    column={3}
+                    id=""
                     items={[
                       {
-                        key: '0whadic76h29',
-                        span: 24,
-                        label: '名称',
+                        _unsafe_MixedSetter_children_select: 'VariableSetter',
                         children: __$$eval(() => this.data().data?.name),
-                        _unsafe_MixedSetter_children_select: 'VariableSetter',
+                        key: '0whadic76h29',
+                        label: '名称',
+                        span: 24,
                       },
                       {
-                        key: '2y97byqciee',
-                        span: 24,
-                        label: 'ID',
+                        _unsafe_MixedSetter_children_select: 'VariableSetter',
                         children: __$$eval(() => this.data().data?.id || '-'),
-                        _unsafe_MixedSetter_children_select: 'VariableSetter',
+                        key: '2y97byqciee',
+                        label: 'ID',
+                        span: 24,
                       },
                       {
-                        key: 'xvcp3obfu',
-                        span: 24,
-                        label: '同步状态',
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                         children: (
                           <Status
+                            __component_name="Status"
                             id={__$$eval(() => this.data().data?.syncStatus)}
                             types={__$$eval(() => this.constants.DATASET_DATA.syncStatus)}
-                            __component_name="Status"
                           />
                         ),
-                        _unsafe_MixedSetter_children_select: 'SlotSetter',
+                        key: 'xvcp3obfu',
+                        label: '同步状态',
+                        span: 24,
                       },
                       {
-                        key: 'er0ptk5lill',
-                        span: 24,
-                        label: this.i18n('i18n-p5qipded') /* 数据处理状态 */,
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                         children: (
                           <Status
+                            __component_name="Status"
                             id={__$$eval(() => this.data().data?.dataProcessStatus || 'no')}
                             types={__$$eval(() => this.constants.DATASET_DATA.dataProcessStatus)}
-                            __component_name="Status"
                           />
                         ),
-                        _unsafe_MixedSetter_children_select: 'SlotSetter',
+                        key: 'er0ptk5lill',
+                        label: '数据处理状态',
+                        span: 24,
                       },
                       {
-                        key: 'ww04wf6evps',
-                        span: 24,
-                        label: this.i18n('i18n-qjodl1nn') /* 创建时间 */,
+                        _unsafe_MixedSetter_children_select: 'SlotSetter',
                         children: (
                           <Typography.Time
-                            time={__$$eval(() => this.data().data?.creationTimestamp)}
+                            __component_name="Typography.Time"
                             format=""
                             relativeTime={true}
-                            __component_name="Typography.Time"
+                            time={__$$eval(() => this.data().data?.creationTimestamp)}
                           />
                         ),
-                        _unsafe_MixedSetter_children_select: 'SlotSetter',
+                        key: 'ww04wf6evps',
+                        label: this.i18n('i18n-qjodl1nn') /* 创建时间 */,
+                        span: 24,
                       },
                       {
-                        key: 'ajc9nhn140i',
-                        span: 24,
-                        label: this.i18n('i18n-sg7nu8tx') /* 创建者 */,
+                        _unsafe_MixedSetter_children_select: 'VariableSetter',
                         children: __$$eval(() => this.data().data?.creator || '-'),
-                        _unsafe_MixedSetter_children_select: 'VariableSetter',
+                        key: 'ajc9nhn140i',
+                        label: this.i18n('i18n-sg7nu8tx') /* 创建者 */,
+                        span: 24,
                       },
                       {
-                        key: '3p5bkjlrh9u',
-                        span: 24,
-                        label: this.i18n('i18n-txt5kh4m') /* 描述 */,
-                        children: __$$eval(() => this.data().data?.description || '-'),
                         _unsafe_MixedSetter_children_select: 'VariableSetter',
+                        children: __$$eval(() => this.data().data?.description || '-'),
+                        key: '3p5bkjlrh9u',
+                        label: this.i18n('i18n-txt5kh4m') /* 描述 */,
+                        span: 24,
                       },
                     ]}
-                    title=""
-                    column={3}
-                    layout="horizontal"
-                    bordered={false}
                     labelStyle={{ width: 100 }}
-                    borderedBottom={false}
-                    __component_name="Descriptions"
-                    borderedBottomDashed={false}
+                    layout="horizontal"
+                    size="default"
+                    title=""
                   />
                 ),
+                key: 'tab-item-1',
+                label: this.i18n('i18n-1gikmooh') /* 详细信息 */,
               },
               {
-                key: 'fxyz5e43ztm',
-                label: '文件',
                 children: [
-                  <Row wrap={false} __component_name="Row" key="node_oclpkviwvr1">
-                    <Col flex="270px" __component_name="Col">
+                  <Row __component_name="Row" wrap={false} key="node_oclpkviwvr1">
+                    <Col __component_name="Col" flex="270px">
                       <Space
-                        align="center"
-                        style={{}}
-                        direction="horizontal"
                         __component_name="Space"
+                        align="center"
+                        direction="horizontal"
+                        style={{}}
                       >
                         <Button
-                          type="primary"
+                          __component_name="Button"
                           block={false}
-                          ghost={false}
-                          shape="default"
                           danger={false}
+                          disabled={false}
+                          ghost={false}
                           onClick={function () {
                             return this.addFileClick.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          disabled={false}
-                          __component_name="Button"
+                          shape="default"
+                          type="primary"
                         >
                           新增文件
                         </Button>
                         <Button
+                          __component_name="Button"
                           block={false}
-                          ghost={false}
-                          shape="default"
-                          style={{}}
                           danger={false}
+                          disabled={false}
+                          ghost={false}
                           onClick={function () {
                             return this.refresh.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          disabled={false}
-                          __component_name="Button"
+                          shape="default"
                         >
                           刷新
                         </Button>
@@ -743,18 +744,16 @@ class DatasetVersionDetail$$Page extends React.Component {
                     </Col>
                   </Row>,
                   <Table
-                    size="middle"
-                    style={{}}
-                    rowKey="id"
-                    scroll={{ scrollToFirstRowOnChange: true }}
+                    __component_name="Table"
                     columns={[
                       {
+                        dataIndex: 'path',
+                        ellipsis: { showTitle: true },
                         key: 'path',
-                        title: '文件',
                         render: (text, record, index) =>
                           (__$$context => (
                             <Row
-                              wrap={true}
+                              __component_name="Row"
                               onClick={function () {
                                 return this.openFileDetail.apply(
                                   this,
@@ -765,60 +764,77 @@ class DatasetVersionDetail$$Page extends React.Component {
                                   ])
                                 );
                               }.bind(__$$context)}
-                              __component_name="Row"
+                              wrap={true}
                             >
-                              <Col span={24} __component_name="Col">
-                                <span style={{  cursor: 'pointer', color: '#4461eb' }}>
+                              <Col __component_name="Col" span={24}>
+                                <Button
+                                  __component_name="Button"
+                                  block={false}
+                                  danger={false}
+                                  disabled={false}
+                                  ghost={false}
+                                  onClick={function () {
+                                    return this.openFileDetail.apply(
+                                      this,
+                                      Array.prototype.slice.call(arguments).concat([
+                                        {
+                                          data: record,
+                                        },
+                                      ])
+                                    );
+                                  }.bind(__$$context)}
+                                  shape="default"
+                                  type="link"
+                                >
                                   {__$$eval(() => record.path || '-')}
-                                </span>
+                                </Button>
                               </Col>
                             </Row>
                           ))(__$$createChildContext(__$$context, { text, record, index })),
-                        ellipsis: { showTitle: true },
-                        dataIndex: 'path',
+                        title: '文件',
                       },
                       {
+                        dataIndex: 'fileType',
                         key: 'fileType',
+                        render: (text, record) => record.fileType || '-',
                         title: '标签',
                         width: 150,
-                        render: (text, record) => record.fileType || '-',
-                        dataIndex: 'fileType',
                       },
-                      { key: 'size', title: '文件大小', width: 150, dataIndex: 'size' },
+                      { dataIndex: 'size', key: 'size', title: '文件大小', width: 150 },
                       {
+                        dataIndex: 'count',
                         key: 'count',
+                        render: (text, record) => record.count || 0,
                         title: '数据量',
                         width: 150,
-                        render: (text, record) => record.count || 0,
-                        dataIndex: 'count',
                       },
                       {
+                        dataIndex: 'time',
                         key: 'time',
-                        title: '创建时间',
-                        width: 100,
                         render: (text, record, index) =>
                           (__$$context => (
                             <Typography.Time
-                              time={__$$eval(() => record.time)}
+                              __component_name="Typography.Time"
                               format=""
                               relativeTime={true}
-                              __component_name="Typography.Time"
+                              time={__$$eval(() => record.time)}
                             />
                           ))(__$$createChildContext(__$$context, { text, record, index })),
-                        dataIndex: 'time',
+                        title: '创建时间',
+                        width: 100,
                       },
                       {
+                        dataIndex: '',
                         key: 'action',
-                        title: '操作',
-                        width: 150,
                         render: (text, record, index) =>
                           (__$$context => (
                             <Button
-                              icon=""
+                              __component_name="Button"
                               block={false}
-                              ghost={false}
-                              shape="default"
                               danger={false}
+                              disabled={false}
+                              ghost={false}
+                              icon=""
                               onClick={function () {
                                 return this.delFileClick.apply(
                                   this,
@@ -829,36 +845,40 @@ class DatasetVersionDetail$$Page extends React.Component {
                                   ])
                                 );
                               }.bind(__$$context)}
-                              disabled={false}
-                              __component_name="Button"
+                              shape="default"
                             >
                               删除
                             </Button>
                           ))(__$$createChildContext(__$$context, { text, record, index })),
-                        dataIndex: '',
+                        title: '操作',
+                        width: 150,
                       },
                     ]}
                     dataSource={__$$eval(() => this.data().data?.files?.nodes || [])}
                     pagination={{
-                      size: 'default',
-                      simple: false,
                       pageSize: 10,
                       pagination: { pageSize: 10 },
                       showQuickJumper: false,
                       showSizeChanger: false,
+                      simple: false,
+                      size: 'default',
                     }}
+                    rowKey="id"
+                    scroll={{ scrollToFirstRowOnChange: true }}
                     showHeader={true}
-                    __component_name="Table"
+                    size="middle"
+                    style={{}}
                     key="node_oclpktaw526"
                   />,
                 ],
+                key: 'fxyz5e43ztm',
+                label: '文件',
               },
             ]}
+            size="default"
             style={{ marginTop: '-20px' }}
-            activeKey=""
             tabPosition="top"
-            __component_name="Tabs"
-            destroyInactiveTabPane="true"
+            type="line"
           />
         </Card>
       </Page>
@@ -940,9 +960,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
     get state() {
-      return oldContext.state
-    }
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
