@@ -43,7 +43,7 @@ export const setQueryConversationId = (conversationId?: string) => {
   } else {
     url.searchParams.delete('conversationId');
   }
-  getUnifiedHistory().replace(url.toString());
+  getUnifiedHistory().replace(url.pathname + url.search + url.hash);
 };
 
 type IUseConversationList = (newConversationId?: string) => {
