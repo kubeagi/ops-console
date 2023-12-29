@@ -1,7 +1,7 @@
 {
-  "name": "kubeagi-portal",
+  "name": "ops-console",
   "version": "0.1.0",
-  "description": "KubeAGI 的前端 portal",
+  "description": "Operations console for KubeAGI",
   "scripts": {
     "analyze": "cross-env ANALYZE=1 UMI_ENV=prod max build --max_old_space_size=4096",
     "build": "cross-env UMI_ENV=prod max build --max_old_space_size=4096 && npm run build:menu",

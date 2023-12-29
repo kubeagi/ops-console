@@ -1,6 +1,6 @@
-# KubeAGI 前端 portal kubeagi-portal
+# ops-console
 
-KubeAGI 的前端 portal
+Operations console for KubeAGI
 
 ---
 
@@ -11,7 +11,7 @@ KubeAGI 的前端 portal
 克隆项目:
 
 ```bash
-git clone https://github.com/kubeagi/portal.git
+git clone https://github.com/kubeagi/ops-console.git
 # 如果还没有 git 地址，可以先在项目中执行 git init --initial-branch=main 后再初始化 submodule
 git submodule add https://github.com/kubebb/portal-contrib.git
 ```
@@ -58,7 +58,7 @@ chmod +x ./build.sh ./update_base_image.sh
 运行镜像：
 
 ```bash
-docker run -d -p 8000:80 kubeagi:portal:main
+docker run -d -p 8000:80 kubeagi/ops-console
 ```
 
 然后浏览器中打开 http://localhost:8000/kubeagi-portal/test 即可访问 portal。

@@ -5,9 +5,9 @@ on:
     branches: [main]
 env:
   REGISTRY: docker.io
-  BASE_IMAGE_NAME: kubeagi/portal-base
-  DIST_IMAGE_NAME: kubeagi/portal-dist
-  IMAGE_NAME: kubeagi/portal
+  BASE_IMAGE_NAME: kubeagi/ops-console-base
+  DIST_IMAGE_NAME: kubeagi/ops-console-dist
+  IMAGE_NAME: kubeagi/ops-console
   DOCKER_USER: kubeagi
 
 jobs:

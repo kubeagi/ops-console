@@ -1,4 +1,4 @@
-FROM kubeagi/portal-base:main as builder
+FROM kubeagi/ops-console-base:main as builder
 COPY . /usr/src/app/
 RUN cp config/api.sample.ts config/api.ts && \
   npm run build && \
