@@ -441,9 +441,9 @@ class Dataset$$Page extends React.Component {
                 __component_name="FormilyFormItem"
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
-                  name: 'FormilyFormItem',
-                  title: '数据集版本',
-                  type: 'object',
+                  'name': 'FormilyFormItem',
+                  'title': '数据集版本',
+                  'type': 'object',
                   'x-component': 'FormilyFormItem',
                   'x-validator': [],
                 }}
@@ -466,8 +466,8 @@ class Dataset$$Page extends React.Component {
                 componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
-                  name: 'description',
-                  title: '版本描述',
+                  'name': 'description',
+                  'title': '版本描述',
                   'x-component': 'Input.TextArea',
                   'x-validator': [],
                 }}
@@ -477,8 +477,8 @@ class Dataset$$Page extends React.Component {
                 componentProps={{ 'x-component-props': { disabled: false, loading: false } }}
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
-                  name: 'inheritedFromSwitch',
-                  title: '继承历史版本',
+                  'name': 'inheritedFromSwitch',
+                  'title': '继承历史版本',
                   'x-validator': [],
                 }}
               />
@@ -495,16 +495,16 @@ class Dataset$$Page extends React.Component {
                 }}
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
-                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                  enum: __$$eval(() =>
+                  '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                  'enum': __$$eval(() =>
                     this.state.addVersion.data?.versions.nodes.map(v => ({
                       label: v.version,
                       value: v.version,
                     }))
                   ),
-                  name: 'inheritedFrom',
-                  required: true,
-                  title: '历史版本',
+                  'name': 'inheritedFrom',
+                  'required': true,
+                  'title': '历史版本',
                   'x-display': "{{ $form.values?.inheritedFromSwitch ? 'visible' : 'hidden' }}",
                   'x-validator': [],
                 }}

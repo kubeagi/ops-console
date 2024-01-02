@@ -18,7 +18,6 @@ constants.IS_QIAN_KUN = function applyThis() {
 }.apply(constants);
 export const IS_QIAN_KUN = constants.IS_QIAN_KUN;
 
-
 /** 数据集常量, 使用方式： this.props.appHelper.constants.DATASET_DATA?.typeIcons?.text */
 constants.DATASET_DATA = function applyThis() {
   return {
@@ -77,26 +76,31 @@ constants.DATASET_DATA = function applyThis() {
     ],
     syncStatus: [
       {
-        children: '同步中',
+        children: '导入中',
         id: 'FileSyncing',
         type: 'info',
       },
       {
-        children: '同步失败',
+        children: '导入失败',
         id: 'FileSyncFailed',
         type: 'error',
       },
       {
-        children: '同步成功',
+        children: '导入成功',
         id: 'FileSyncSuccess',
         type: 'success',
+      },
+      {
+        children: '未导入',
+        id: 'no',
+        type: 'disabled',
       },
     ],
     released: [
       {
         children: '未发布',
         id: 0,
-        type: 'info',
+        type: 'disabled',
       },
       {
         children: '已发布',
@@ -121,9 +125,9 @@ constants.DATASET_DATA = function applyThis() {
         type: 'info',
       },
       {
-        children: '未处理',
+        children: '未导入',
         id: 'no',
-        type: 'info',
+        type: 'disabled',
       },
     ],
   };

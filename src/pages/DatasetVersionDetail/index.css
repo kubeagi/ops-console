@@ -7,5 +7,5 @@ body {
 }
 
 .custom-table .tenx-ui-materials-table-thead {
-  background-color: #f8f8f8;
+  background-color: var(--menu-item-color);
 }
