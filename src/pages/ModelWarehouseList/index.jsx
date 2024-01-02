@@ -354,11 +354,15 @@ class ModelWarehouse$$Page extends React.Component {
               hoverable={false}
               loading={false}
               size="default"
-              style={{ paddingBottom: '16px', paddingTop: '4px' }}
+              style={{ paddingBottom: '16px' }}
               type="inner"
             >
               <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
-                <Col __component_name="Col" span={24}>
+                <Col
+                  __component_name="Col"
+                  span={24}
+                  style={{ marginBottom: '0px', paddingBottom: '0px' }}
+                >
                   <Row
                     __component_name="Row"
                     justify="space-between"
@@ -483,7 +487,7 @@ class ModelWarehouse$$Page extends React.Component {
                     pagination={false}
                     renderItem={item =>
                       (__$$context => (
-                        <List.Item extra="" style={{ marginTop: '16px' }}>
+                        <List.Item extra="" style={{ marginBlockEnd: '0px', marginBottom: '16px' }}>
                           <Card
                             actions={[]}
                             bordered={true}
@@ -500,6 +504,7 @@ class ModelWarehouse$$Page extends React.Component {
                               );
                             }.bind(__$$context)}
                             size="default"
+                            style={{}}
                             type="default"
                           >
                             <Row __component_name="Row" gutter={['', 0]} wrap={true}>
@@ -540,7 +545,7 @@ class ModelWarehouse$$Page extends React.Component {
                                           }}
                                           mark={false}
                                           strong={false}
-                                          style={{ fontSize: '12', marginTop: '8px' }}
+                                          style={{ fontSize: '12', marginTop: '4px' }}
                                           underline={false}
                                         >
                                           {__$$eval(() => item.description || '-')}
@@ -572,16 +577,20 @@ class ModelWarehouse$$Page extends React.Component {
                                           style={{}}
                                           trigger={['hover']}
                                         >
-                                          {!!__$$eval(
-                                            () =>
-                                              item.namespace ===
-                                              __$$context.utils.getAuthData()?.project
-                                          ) && (
-                                            <AntdIconSettingOutlined
-                                              __component_name="AntdIconSettingOutlined"
-                                              style={{}}
-                                            />
-                                          )}
+                                          <Button
+                                            __component_name="Button"
+                                            block={false}
+                                            children=""
+                                            danger={false}
+                                            disabled={false}
+                                            ghost={false}
+                                            icon={
+                                              <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
+                                            }
+                                            shape="default"
+                                            size="small"
+                                            style={{ borderColor: 'rgba(34,25,77,0)' }}
+                                          />
                                         </Dropdown>
                                       </Col>
                                     </Row>
@@ -600,7 +609,12 @@ class ModelWarehouse$$Page extends React.Component {
                                   defaultOpen={false}
                                   mode="line"
                                   orientationMargin=""
-                                  style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
+                                  style={{
+                                    marginBottom: '0px',
+                                    marginLeft: '-24px',
+                                    marginTop: '24px',
+                                    width: 'calc(100% + 48px)',
+                                  }}
                                 />
                                 <Descriptions
                                   __component_name="Descriptions"
@@ -616,64 +630,89 @@ class ModelWarehouse$$Page extends React.Component {
                                       children: (
                                         <Row
                                           __component_name="Row"
-                                          justify="space-between"
-                                          wrap={false}
+                                          gutter={[0, 0]}
+                                          justify="start"
+                                          wrap={true}
                                         >
-                                          <Col
-                                            __component_name="Col"
-                                            style={{ marginRight: '40px' }}
-                                          >
-                                            <Status
-                                              __component_name="Status"
-                                              id={__$$eval(() => item.status)}
-                                              style={{}}
-                                              types={[
-                                                { children: '异常', id: 'False', type: 'error' },
-                                                { children: '正常', id: 'True', type: 'success' },
-                                              ]}
-                                            />
-                                            <Tooltip
-                                              __component_name="Tooltip"
-                                              title={__$$eval(() => item.message || '-')}
+                                          <Col __component_name="Col" span={24}>
+                                            <Row
+                                              __component_name="Row"
+                                              gutter={[0, 0]}
+                                              justify="space-between"
+                                              style={{ width: '100%' }}
+                                              wrap={false}
                                             >
-                                              {!!__$$eval(() => item.status === 'False') && (
-                                                <AntdIconInfoCircleOutlined
-                                                  __component_name="AntdIconInfoCircleOutlined"
-                                                  style={{ marginLeft: '5px' }}
+                                              <Col __component_name="Col" span={9}>
+                                                <Status
+                                                  __component_name="Status"
+                                                  id={__$$eval(() => item.status)}
+                                                  style={{}}
+                                                  types={[
+                                                    {
+                                                      children: '异常',
+                                                      id: 'False',
+                                                      type: 'error',
+                                                    },
+                                                    {
+                                                      children: '正常',
+                                                      id: 'True',
+                                                      type: 'success',
+                                                    },
+                                                  ]}
                                                 />
-                                              )}
-                                            </Tooltip>
-                                          </Col>
-                                          <Col __component_name="Col">
-                                            {__$$evalArray(() => item.types.split(',')).map(
-                                              (item, index) =>
-                                                (__$$context => (
-                                                  <Tag
-                                                    __component_name="Tag"
-                                                    closable={false}
-                                                    color="success"
-                                                    key="item"
-                                                    style={{}}
-                                                  >
-                                                    {__$$eval(() =>
-                                                      item === 'llm'
-                                                        ? 'LLM'
-                                                        : item === 'embedding'
-                                                        ? 'Embedding'
-                                                        : item
-                                                    )}
-                                                  </Tag>
-                                                ))(
-                                                  __$$createChildContext(__$$context, {
-                                                    item,
-                                                    index,
-                                                  })
-                                                )
-                                            )}
+                                                <Tooltip
+                                                  __component_name="Tooltip"
+                                                  title={__$$eval(() => item.message)}
+                                                >
+                                                  {!!__$$eval(() => item.status === 'False') && (
+                                                    <AntdIconInfoCircleOutlined
+                                                      __component_name="AntdIconInfoCircleOutlined"
+                                                      style={{ marginLeft: '20px' }}
+                                                    />
+                                                  )}
+                                                </Tooltip>
+                                              </Col>
+                                              <Col
+                                                __component_name="Col"
+                                                span={15}
+                                                style={{ textAlign: 'right' }}
+                                              >
+                                                {__$$evalArray(() => item.types.split(',')).map(
+                                                  (item, index) =>
+                                                    (__$$context => (
+                                                      <Tag
+                                                        __component_name="Tag"
+                                                        closable={false}
+                                                        color="success"
+                                                        key="item"
+                                                        style={{ marginRight: '0px' }}
+                                                      >
+                                                        {__$$eval(() =>
+                                                          item === 'llm'
+                                                            ? 'LLM'
+                                                            : item === 'embedding'
+                                                            ? 'Embedding'
+                                                            : item
+                                                        )}
+                                                      </Tag>
+                                                    ))(
+                                                      __$$createChildContext(__$$context, {
+                                                        item,
+                                                        index,
+                                                      })
+                                                    )
+                                                )}
+                                              </Col>
+                                            </Row>
                                           </Col>
                                         </Row>
                                       ),
-                                      key: '1efg6rtctqk',
+                                      contentStyle: {
+                                        display: 'block',
+                                        marginRight: '0px',
+                                        paddingRight: '0px',
+                                      },
+                                      key: 'tmnox1z1efp',
                                       label: '状态',
                                       span: 1,
                                     },
@@ -704,10 +743,10 @@ class ModelWarehouse$$Page extends React.Component {
                                       span: 1,
                                     },
                                   ]}
-                                  labelStyle={{ padding: '12px 0 0 0', width: '76' }}
+                                  labelStyle={{ padding: '12px 0 0 0', width: '60px' }}
                                   layout="horizontal"
                                   size="small"
-                                  style={{ marginTop: '-16px' }}
+                                  style={{ marginTop: '0' }}
                                   title=""
                                 >
                                   <Descriptions.Item key="1efg6rtctqk" label="状态" span={1}>
@@ -718,7 +757,12 @@ class ModelWarehouse$$Page extends React.Component {
                                   </Descriptions.Item>
                                 </Descriptions>
                               </Col>
-                              <Col __component_name="Col" flex="" span={24}>
+                              <Col
+                                __component_name="Col"
+                                flex=""
+                                span={24}
+                                style={{ marginTop: '16px' }}
+                              >
                                 <Button
                                   __component_name="Button"
                                   block={true}
@@ -790,6 +834,12 @@ class ModelWarehouse$$Page extends React.Component {
                     rowKey="id"
                     size="small"
                     split={false}
+                    style={{
+                      marginBottom: '0px',
+                      marginTop: '0px',
+                      paddingBottom: '0px',
+                      paddingTop: '0px',
+                    }}
                   />
                 </Col>
               </Row>
