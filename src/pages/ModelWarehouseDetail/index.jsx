@@ -1,5 +1,6 @@
 // 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
 // 例外：react 框架的导出名和各种组件名除外。
+import TenxUiReactMarkdownLowcodeMaterials from '@tenx-ui/react-markdown-lowcode-materials';
 import React from 'react';
 
 import {
@@ -14,9 +15,9 @@ import {
   Tag,
   Status,
   Tooltip,
+  Space,
   Tabs,
   Modal,
-  Space,
   Input,
   Table,
   Pagination,
@@ -30,8 +31,6 @@ import {
   AntdIconReloadOutlined,
   AntdIconDeleteOutlined,
 } from '@tenx-ui/icon-materials';
-
-import TenxUiReactMarkdownLowcodeMaterials from '@tenx-ui/react-markdown-lowcode-materials';
 
 import LccComponentQlsmm from 'KubeAGIUpload';
 
@@ -96,6 +95,8 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this.state = {
       currentFile: '',
       data: {},
+      deleteAppLoading: false,
+      deleteAppModalVisible: false,
       deleteFilesVisible: false,
       deleteLoading: false,
       deleteType: 'single',
@@ -235,6 +236,12 @@ class ModelWarehouseDetail$$Page extends React.Component {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  closeDeleteAppModal() {
+    this.setState({
+      deleteAppModalVisible: false,
+    });
   }
 
   closeDeleteFilesModal() {
@@ -496,6 +503,48 @@ class ModelWarehouseDetail$$Page extends React.Component {
     });
   }
 
+  onDeleteModelApp() {
+    this.setState({
+      deleteAppLoading: true,
+    });
+    const project = this.history?.query.namespace || this.utils.getAuthData()?.project;
+    const params = {
+      namespace: project,
+      name: this.match.params.name,
+    };
+    this.utils.bff
+      .deleteModels({
+        input: params,
+      })
+      .then(res => {
+        this.setState({
+          deleteAppLoading: false,
+        });
+        this.utils.notification.success({
+          message: '删除模型成功',
+        });
+        this.history.push('/model-warehouse');
+      })
+      .catch(error => {
+        this.setState({
+          deleteAppLoading: false,
+        });
+        this.utils.notification.warn({
+          message: '删除模型失败',
+        });
+      });
+  }
+
+  onEdit(item) {
+    this.history.push(`/model-warehouse/edit/${this.match.params.name}`);
+  }
+
+  onOpenDeleteAppModal() {
+    this.setState({
+      deleteAppModalVisible: true,
+    });
+  }
+
   onPageChange(page) {
     this.setState(
       {
@@ -632,7 +681,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
               <Col
                 __component_name="Col"
                 flex="auto"
-                span={23}
+                span={21}
                 style={{ alignItems: 'center', display: 'flex' }}
               >
                 <Row
@@ -728,7 +777,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   ]}
                   layout="horizontal"
                   size="default"
-                  style={{ paddingTop: '12px' }}
+                  style={{}}
                   title={
                     <Row __component_name="Row" wrap={true}>
                       <Col __component_name="Col" span={24}>
@@ -742,30 +791,77 @@ class ModelWarehouseDetail$$Page extends React.Component {
                         >
                           {__$$eval(() => this.utils.getFullName(this.state.data) || '-')}
                         </Typography.Title>
-                        <Status
-                          __component_name="Status"
-                          id={__$$eval(() => this.state.data.status)}
-                          style={{ fontSize: '12px', marginLeft: '8px' }}
-                          types={[
-                            { children: '异常', id: 'False', type: 'error' },
-                            { children: '正常', id: 'True', type: 'success' },
-                          ]}
-                        />
-                        <Tooltip
-                          __component_name="Tooltip"
-                          title={__$$eval(() => this.state.data.message)}
-                        >
-                          {!!__$$eval(() => this.state.data.status === 'False') && (
-                            <AntdIconInfoCircleOutlined
-                              __component_name="AntdIconInfoCircleOutlined"
-                              style={{ marginLeft: '8px' }}
+                        <Row __component_name="Row" wrap={true}>
+                          <Col __component_name="Col" span={24} style={{ marginTop: '8px' }}>
+                            <Status
+                              __component_name="Status"
+                              id={__$$eval(() => this.state.data.status)}
+                              style={{ fontSize: '12px', marginLeft: '8px' }}
+                              types={[
+                                { children: '异常', id: 'False', type: 'error' },
+                                { children: '正常', id: 'True', type: 'success' },
+                              ]}
                             />
-                          )}
-                        </Tooltip>
+                            <Tooltip
+                              __component_name="Tooltip"
+                              title={__$$eval(() => this.state.data.message)}
+                            >
+                              {!!__$$eval(() => this.state.data.status === 'False') && (
+                                <AntdIconInfoCircleOutlined
+                                  __component_name="AntdIconInfoCircleOutlined"
+                                  style={{ marginLeft: '20px' }}
+                                />
+                              )}
+                            </Tooltip>
+                          </Col>
+                        </Row>
                       </Col>
                     </Row>
                   }
                 />
+              </Col>
+              <Col
+                __component_name="Col"
+                flex="56px"
+                span={2}
+                style={{ height: '56px', width: '56px' }}
+              >
+                <Space __component_name="Space" align="center" direction="horizontal">
+                  <Button
+                    __component_name="Button"
+                    block={false}
+                    danger={false}
+                    disabled={false}
+                    ghost={false}
+                    onClick={function () {
+                      return this.onEdit.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    shape="default"
+                    size="small"
+                  >
+                    编辑
+                  </Button>
+                  <Button
+                    __component_name="Button"
+                    block={false}
+                    danger={false}
+                    disabled={false}
+                    ghost={false}
+                    onClick={function () {
+                      return this.onOpenDeleteAppModal.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    shape="default"
+                    size="small"
+                  >
+                    删除
+                  </Button>
+                </Space>
               </Col>
             </Row>
           </Card>
@@ -899,7 +995,13 @@ class ModelWarehouseDetail$$Page extends React.Component {
                       <Table
                         __component_name="Table"
                         columns={[
-                          { dataIndex: 'path', key: 'name', title: '名称' },
+                          {
+                            _unsafe_MixedSetter_width_select: 'StringSetter',
+                            dataIndex: 'path',
+                            key: 'name',
+                            title: '名称',
+                            width: '25%',
+                          },
                           { dataIndex: 'status', key: 'status', title: '状态' },
                           { dataIndex: 'size', key: 'size', title: '文件大小' },
                           {
@@ -994,7 +1096,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
             onChange={function () {
               return this.onTabChange.apply(this, Array.prototype.slice.call(arguments).concat([]));
             }.bind(this)}
-            size="large"
+            size="default"
             style={{ marginTop: '-24px' }}
             tabBarGutter={24}
             tabPosition="top"
@@ -1107,6 +1209,37 @@ class ModelWarehouseDetail$$Page extends React.Component {
                 Array.prototype.slice.call(arguments).concat([])
               );
             }.bind(this)}
+          />
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.deleteAppLoading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeDeleteAppModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.onDeleteModelApp.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.deleteAppModalVisible)}
+          title="弹框标题"
+        >
+          <Alert
+            __component_name="Alert"
+            message="确认删除此模型？"
+            showIcon={true}
+            type="warning"
           />
         </Modal>
       </Page>

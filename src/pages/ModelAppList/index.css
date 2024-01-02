@@ -1,3 +1,22 @@
 body {
   font-size: 12px;
 }
+
+.model-app
+  .tenx-ui-materials-upload-wrapper.tenx-ui-materials-upload-picture-card-wrapper
+  .tenx-ui-materials-upload.tenx-ui-materials-upload-select,
+.model-app
+  .tenx-ui-materials-upload-wrapper.tenx-ui-materials-upload-picture-circle-wrapper
+  .tenx-ui-materials-upload.tenx-ui-materials-upload-select {
+  height: 80px;
+  width: 80px;
+  -webkit-margin-end: 8px;
+  margin-inline-end: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+  vertical-align: top;
+  border: 1px dashed #4461eb;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}

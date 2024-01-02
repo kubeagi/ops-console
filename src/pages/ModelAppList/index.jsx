@@ -526,6 +526,7 @@ class ModelAppList$$Page extends React.Component {
         <Modal
           __component_name="Modal"
           centered={false}
+          className="model-app"
           confirmLoading={__$$eval(() => this.state.createBtnLoading)}
           destroyOnClose={true}
           forceRender={false}
@@ -564,9 +565,9 @@ class ModelAppList$$Page extends React.Component {
               componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                name: 'name',
-                required: true,
-                title: '模型应用名称',
+                'name': 'name',
+                'required': true,
+                'title': '模型应用名称',
                 'x-validator': [
                   {
                     children: '未知',
@@ -595,16 +596,16 @@ class ModelAppList$$Page extends React.Component {
               componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                name: 'displayName',
-                required: true,
-                title: '模型应用别名',
+                'name': 'displayName',
+                'required': true,
+                'title': '模型应用别名',
                 'x-validator': [],
               }}
             />
             {!!__$$eval(() => this.state.imageUrl) && (
               <Container
                 __component_name="Container"
-                style={{ left: '160px', position: 'absolute', top: '215px' }}
+                style={{ left: '152px', position: 'absolute', top: '204px' }}
               >
                 <Image
                   __component_name="Image"
@@ -644,9 +645,9 @@ class ModelAppList$$Page extends React.Component {
                 'x-decorator-props': { asterisk: true, labelEllipsis: true, size: 'default' },
               }}
               fieldProps={{
-                name: 'icon',
-                required: false,
-                title: '上传',
+                'name': 'icon',
+                'required': false,
+                'title': '上传',
                 'x-component': 'FormilyUpload',
                 'x-validator': [
                   {
@@ -668,9 +669,9 @@ class ModelAppList$$Page extends React.Component {
                 __component_name="FormilyFormItem"
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
-                  name: 'FormilyFormItem1',
-                  title: '',
-                  type: 'object',
+                  'name': 'FormilyFormItem1',
+                  'title': '',
+                  'type': 'object',
                   'x-component': 'FormilyFormItem',
                   'x-display':
                     "{{$form.values?.icon?.fileList?.length > 0 ? 'hidden' : 'visible' }}",
@@ -679,13 +680,13 @@ class ModelAppList$$Page extends React.Component {
               >
                 <AntdIconCloudUploadOutlined
                   __component_name="AntdIconCloudUploadOutlined"
-                  style={{ fontSize: 40 }}
+                  style={{ color: '#4461EB', fontSize: 40 }}
                 />
               </FormilyFormItem>
               {!!false && (
                 <AntdIconCloudUploadOutlined
                   __component_name="AntdIconCloudUploadOutlined"
-                  style={{ fontSize: 40 }}
+                  style={{ color: '#4461EB', fontSize: 40 }}
                 />
               )}
             </FormilyUpload>
@@ -694,8 +695,8 @@ class ModelAppList$$Page extends React.Component {
               componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                name: 'description',
-                title: '描述',
+                'name': 'description',
+                'title': '描述',
                 'x-component': 'Input.TextArea',
                 'x-validator': [],
               }}
@@ -809,7 +810,7 @@ class ModelAppList$$Page extends React.Component {
                     pagination={false}
                     renderItem={item =>
                       (__$$context => (
-                        <List.Item style={{ marginTop: '16px' }}>
+                        <List.Item style={{ marginBottom: '16px' }}>
                           <Card
                             actions={[]}
                             bordered={true}
@@ -828,7 +829,12 @@ class ModelAppList$$Page extends React.Component {
                             size="default"
                             type="default"
                           >
-                            <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                            <Row
+                              __component_name="Row"
+                              gutter={['', 0]}
+                              style={{ marginBottom: '0px', paddingBottom: '0px' }}
+                              wrap={true}
+                            >
                               <Col __component_name="Col" span={24}>
                                 <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
                                   <Col __component_name="Col" flex="56px">
@@ -841,7 +847,7 @@ class ModelAppList$$Page extends React.Component {
                                       width={56}
                                     />
                                   </Col>
-                                  <Col __component_name="Col" flex="auto">
+                                  <Col __component_name="Col" flex="auto" span={19}>
                                     <Row
                                       __component_name="Row"
                                       gutter={[0, 0]}
@@ -866,17 +872,17 @@ class ModelAppList$$Page extends React.Component {
                                           ellipsis={{
                                             _unsafe_MixedSetter_tooltip_select: 'BoolSetter',
                                             rows: 2,
-                                            tooltip: true,
+                                            tooltip: false,
                                           }}
                                           mark={false}
                                           strong={false}
-                                          style={{ fontSize: '12', marginTop: '8px' }}
+                                          style={{ fontSize: '12', marginTop: '4px' }}
                                           underline={false}
                                         >
                                           {__$$eval(() => item.description || '-')}
                                         </Typography.Paragraph>
                                       </Col>
-                                      <Col __component_name="Col">
+                                      <Col __component_name="Col" style={{ zIndex: 3 }}>
                                         <Dropdown
                                           __component_name="Dropdown"
                                           destroyPopupOnHide={true}
@@ -897,16 +903,36 @@ class ModelAppList$$Page extends React.Component {
                                               );
                                             }.bind(__$$context),
                                           }}
+                                          overlayStyle={{}}
                                           placement="bottomLeft"
+                                          style={{}}
                                           trigger={['hover']}
                                         >
-                                          <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
+                                          <Button
+                                            __component_name="Button"
+                                            block={false}
+                                            children=""
+                                            danger={false}
+                                            disabled={false}
+                                            ghost={false}
+                                            icon={
+                                              <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
+                                            }
+                                            shape="default"
+                                            size="small"
+                                            style={{ borderColor: 'rgba(34,25,77,0)' }}
+                                          />
                                         </Dropdown>
                                       </Col>
                                     </Row>
                                   </Col>
                                 </Row>
                               </Col>
+                              <Col
+                                __component_name="Col"
+                                span={24}
+                                style={{ display: 'inline-block', textAlign: 'left' }}
+                              />
                               <Col __component_name="Col" flex="" span={24}>
                                 <Divider
                                   __component_name="Divider"
@@ -914,7 +940,12 @@ class ModelAppList$$Page extends React.Component {
                                   defaultOpen={false}
                                   mode="line"
                                   orientationMargin=""
-                                  style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
+                                  style={{
+                                    marginBottom: '0px',
+                                    marginLeft: '-24px',
+                                    marginTop: '24px',
+                                    width: 'calc(100% + 48px)',
+                                  }}
                                 />
                                 <Descriptions
                                   __component_name="Descriptions"
@@ -928,24 +959,45 @@ class ModelAppList$$Page extends React.Component {
                                   items={[
                                     {
                                       children: (
-                                        <Status
-                                          __component_name="Status"
-                                          id={__$$eval(() => item.isPublic + '')}
-                                          types={[
-                                            { children: '未发布', id: 'false', type: 'disabled' },
-                                            { children: '发布成功', id: 'true', type: 'success' },
-                                          ]}
-                                        />
+                                        <Row __component_name="Row" wrap={true}>
+                                          <Col __component_name="Col" span={24}>
+                                            <Row
+                                              __component_name="Row"
+                                              justify="space-between"
+                                              wrap={false}
+                                            >
+                                              <Col __component_name="Col">
+                                                <Status
+                                                  __component_name="Status"
+                                                  id={__$$eval(() => item.isPublic + '')}
+                                                  types={[
+                                                    {
+                                                      children: '未部署',
+                                                      id: 'false',
+                                                      type: 'error',
+                                                    },
+                                                    {
+                                                      children: '已部署',
+                                                      id: 'true',
+                                                      type: 'info',
+                                                    },
+                                                  ]}
+                                                />
+                                              </Col>
+                                            </Row>
+                                          </Col>
+                                        </Row>
                                       ),
-                                      key: '1efg6rtctqk',
+                                      key: 'jclso8ts01b',
                                       label: '状态',
+                                      labelStyle: { marginTop: '0px' },
                                       span: 1,
                                     },
                                   ]}
-                                  labelStyle={{ padding: '12px 0 0 0', width: '76' }}
+                                  labelStyle={{ padding: '12px 0 0 0', width: '60px' }}
                                   layout="horizontal"
                                   size="small"
-                                  style={{ marginTop: '-16px' }}
+                                  style={{ marginTop: '0' }}
                                   title=""
                                 >
                                   <Descriptions.Item key="1efg6rtctqk" label="状态" span={1}>
@@ -956,7 +1008,31 @@ class ModelAppList$$Page extends React.Component {
                                   </Descriptions.Item>
                                 </Descriptions>
                               </Col>
+                              <Col
+                                __component_name="Col"
+                                flex=""
+                                span={24}
+                                style={{ marginTop: '16px' }}
+                              />
                             </Row>
+                            {!!__$$eval(() => item?.systemModel) && (
+                              <Typography.Text
+                                __component_name="Typography.Text"
+                                disabled={false}
+                                ellipsis={true}
+                                strong={false}
+                                style={{
+                                  color: '#fff',
+                                  fontSize: '',
+                                  position: 'absolute',
+                                  right: '2px',
+                                  top: '6px',
+                                  transform: 'rotate(45deg)',
+                                }}
+                              >
+                                内置
+                              </Typography.Text>
+                            )}
                           </Card>
                         </List.Item>
                       ))(__$$createChildContext(__$$context, { item }))
@@ -997,6 +1073,7 @@ class ModelAppList$$Page extends React.Component {
         <Modal
           __component_name="Modal"
           centered={false}
+          className="model-app"
           confirmLoading={__$$eval(() => this.state.editBtnLoading)}
           destroyOnClose={true}
           forceRender={false}
@@ -1032,9 +1109,9 @@ class ModelAppList$$Page extends React.Component {
               componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                name: 'name',
-                required: true,
-                title: '模型应用名称',
+                'name': 'name',
+                'required': true,
+                'title': '模型应用名称',
                 'x-pattern': 'disabled',
                 'x-validator': [],
               }}
@@ -1044,16 +1121,16 @@ class ModelAppList$$Page extends React.Component {
               componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                name: 'displayName',
-                required: true,
-                title: '模型应用别名',
+                'name': 'displayName',
+                'required': true,
+                'title': '模型应用别名',
                 'x-validator': [],
               }}
             />
             {!!__$$eval(() => this.state.imageUrl) && (
               <Container
                 __component_name="Container"
-                style={{ left: '160px', position: 'absolute', top: '215px' }}
+                style={{ left: '152px', position: 'absolute', top: '204px' }}
               >
                 <Image
                   __component_name="Image"
@@ -1093,8 +1170,8 @@ class ModelAppList$$Page extends React.Component {
                 'x-decorator-props': { asterisk: true, labelEllipsis: true, size: 'default' },
               }}
               fieldProps={{
-                name: 'icon',
-                title: '上传',
+                'name': 'icon',
+                'title': '上传',
                 'x-component': 'FormilyUpload',
                 'x-validator': [
                   {
@@ -1115,9 +1192,9 @@ class ModelAppList$$Page extends React.Component {
                 __component_name="FormilyFormItem"
                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                 fieldProps={{
-                  name: 'FormilyFormItem1',
-                  title: '',
-                  type: 'object',
+                  'name': 'FormilyFormItem1',
+                  'title': '',
+                  'type': 'object',
                   'x-component': 'FormilyFormItem',
                   'x-display':
                     "{{$form.values?.icon?.fileList?.length > 0 ? 'hidden' : 'visible' }}",
@@ -1126,13 +1203,13 @@ class ModelAppList$$Page extends React.Component {
               >
                 <AntdIconCloudUploadOutlined
                   __component_name="AntdIconCloudUploadOutlined"
-                  style={{ fontSize: 40 }}
+                  style={{ color: '#4461EB', fontSize: 40 }}
                 />
               </FormilyFormItem>
               {!!false && (
                 <AntdIconCloudUploadOutlined
                   __component_name="AntdIconCloudUploadOutlined"
-                  style={{ fontSize: 40 }}
+                  style={{ color: '#4461EB', fontSize: 40 }}
                 />
               )}
             </FormilyUpload>
@@ -1141,8 +1218,8 @@ class ModelAppList$$Page extends React.Component {
               componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                name: 'description',
-                title: '描述',
+                'name': 'description',
+                'title': '描述',
                 'x-component': 'Input.TextArea',
                 'x-validator': [],
               }}
