@@ -1,7 +1,8 @@
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { Alert, Button, Col, Modal, Page, Row, Space, Typography } from '@tenx-ui/materials';
 import { matchPath, useLocation } from '@umijs/max';
 import type { TabsProps } from 'antd';
-import { Avatar, Divider, List, Spin, Tabs, notification } from 'antd';
+import { Avatar, Divider, List, Spin, Tabs, Tooltip, notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import detail from '@/assets/img/data-handle-detail.png';
@@ -125,6 +126,16 @@ const DataHandleDetail = props => {
                       <span>
                         <Status {...statuesMap[item.status]} />
                       </span>
+
+                      {item.status === 'process_fail' ? (
+                        <span style={{ marginLeft: 20 }}>
+                          <Tooltip title={item.error_msg}>
+                            <InfoCircleOutlined />
+                          </Tooltip>
+                        </span>
+                      ) : (
+                        ''
+                      )}
                       <Divider
                         style={{
                           borderInlineStart: '1px solid rgba(5, 5, 5, 0.15)',
