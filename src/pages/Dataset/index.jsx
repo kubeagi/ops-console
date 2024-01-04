@@ -188,11 +188,21 @@ class Dataset$$Page extends React.Component {
     this.setState({
       loading: true,
     });
+    const labelSelector = (() => {
+      if (!this.state.type && !this.state.field) {
+        return undefined;
+      }
+      if (this.state.type && this.state.field) {
+        return `arcadia.kubeagi.k8s.com.cn/content-type=${this.state.type},arcadia.kubeagi.k8s.com.cn/field=${this.state.field}`;
+      }
+      return `arcadia.kubeagi.k8s.com.cn/${
+        this.state.type ? 'content-type=' + this.state.type : 'field=' + this.state.field
+      }`;
+    })();
     const res = await this.utils.bff
       .listDatasets({
         input: {
-          labelSelector: this.state.type,
-          fieldSelector: this.state.field,
+          labelSelector,
           keyword: this.state.search,
           namespace: this.appHelper.utils.getAuthData().project,
           pageSize: this.state.pageSize,

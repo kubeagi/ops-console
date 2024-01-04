@@ -55,10 +55,6 @@ constants.DATASET_DATA = function applyThis() {
         label: '法律',
         value: 'law',
       },
-      {
-        label: '其他',
-        value: 'others',
-      },
     ],
     type: [
       {
