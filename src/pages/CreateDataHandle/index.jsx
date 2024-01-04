@@ -1002,10 +1002,10 @@ class $$Page extends React.Component {
                       }}
                       decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                       fieldProps={{
-                        _unsafe_MixedSetter_default_select: 'VariableSetter',
-                        default: __$$eval(() => this.state.qaSplitHighConfig.temperature / 100),
-                        name: 'temperature',
-                        title: '',
+                        '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                        'default': __$$eval(() => this.state.qaSplitHighConfig.temperature / 100),
+                        'name': 'temperature',
+                        'title': '',
                         'x-validator': [],
                       }}
                     />
@@ -1100,10 +1100,10 @@ class $$Page extends React.Component {
                         },
                       }}
                       fieldProps={{
-                        _unsafe_MixedSetter_default_select: 'VariableSetter',
-                        default: __$$eval(() => this.state.qaSplitHighConfig.max_tokens),
-                        name: 'max_tokens',
-                        title: '',
+                        '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                        'default': __$$eval(() => this.state.qaSplitHighConfig.max_tokens),
+                        'name': 'max_tokens',
+                        'title': '',
                         'x-validator': [],
                       }}
                     />
@@ -1151,10 +1151,10 @@ class $$Page extends React.Component {
                 },
               }}
               fieldProps={{
-                _unsafe_MixedSetter_default_select: 'VariableSetter',
-                default: __$$eval(() => this.state.qaSplitHighConfig.prompt_template),
-                name: 'prompt_template',
-                title: 'QA 拆分 Prompt',
+                '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                'default': __$$eval(() => this.state.qaSplitHighConfig.prompt_template),
+                'name': 'prompt_template',
+                'title': 'QA 拆分 Prompt',
                 'x-component': 'Input.TextArea',
                 'x-validator': [],
               }}
@@ -1959,14 +1959,14 @@ class $$Page extends React.Component {
                                                   },
                                                 }}
                                                 fieldProps={{
-                                                  _unsafe_MixedSetter_default_select:
+                                                  '_unsafe_MixedSetter_default_select':
                                                     'VariableSetter',
-                                                  default: __$$eval(
+                                                  'default': __$$eval(
                                                     () =>
                                                       this.state.step3Data.CharacterRepeatFilterRate
                                                   ),
-                                                  name: null,
-                                                  title: '',
+                                                  'name': null,
+                                                  'title': '',
                                                   'x-validator': [],
                                                 }}
                                                 style={{ width: '60px' }}
@@ -2131,12 +2131,13 @@ class $$Page extends React.Component {
                                               },
                                             }}
                                             fieldProps={{
-                                              _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                              default: __$$eval(
+                                              '_unsafe_MixedSetter_default_select':
+                                                'VariableSetter',
+                                              'default': __$$eval(
                                                 () => this.state.step3Data.WordRepeatFilterRate
                                               ),
-                                              name: null,
-                                              title: '',
+                                              'name': null,
+                                              'title': '',
                                               'x-validator': [],
                                             }}
                                             style={{ width: '60px' }}
@@ -2298,12 +2299,13 @@ class $$Page extends React.Component {
                                               },
                                             }}
                                             fieldProps={{
-                                              _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                              default: __$$eval(
+                                              '_unsafe_MixedSetter_default_select':
+                                                'VariableSetter',
+                                              'default': __$$eval(
                                                 () => this.state.step3Data.SpecialCharactersRateRate
                                               ),
-                                              name: null,
-                                              title: '',
+                                              'name': null,
+                                              'title': '',
                                               'x-validator': [],
                                             }}
                                             style={{ width: '60px' }}
@@ -2468,13 +2470,14 @@ class $$Page extends React.Component {
                                               },
                                             }}
                                             fieldProps={{
-                                              _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                              default: __$$eval(
+                                              '_unsafe_MixedSetter_default_select':
+                                                'VariableSetter',
+                                              'default': __$$eval(
                                                 () =>
                                                   this.state.step3Data.PornographicViolenceRateRate
                                               ),
-                                              name: null,
-                                              title: '',
+                                              'name': null,
+                                              'title': '',
                                               'x-validator': [],
                                             }}
                                             style={{ width: '60px' }}
@@ -2663,12 +2666,13 @@ class $$Page extends React.Component {
                                               },
                                             }}
                                             fieldProps={{
-                                              _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                              default: __$$eval(
+                                              '_unsafe_MixedSetter_default_select':
+                                                'VariableSetter',
+                                              'default': __$$eval(
                                                 () => this.state.step3Data.SimhashOperatorRate
                                               ),
-                                              name: null,
-                                              title: '',
+                                              'name': null,
+                                              'title': '',
                                               'x-validator': [],
                                             }}
                                             style={{ width: '60px' }}
@@ -3149,7 +3153,7 @@ class $$Page extends React.Component {
                                               tooltip: '',
                                             },
                                           }}
-                                          fieldProps={{ name: 'Select', 'x-validator': [] }}
+                                          fieldProps={{ 'name': 'Select', 'x-validator': [] }}
                                         />
                                       )}
                                     </FormilyForm>
@@ -3229,13 +3233,13 @@ class $$Page extends React.Component {
                                       },
                                     }}
                                     fieldProps={{
-                                      _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                      default: __$$eval(
+                                      '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                                      'default': __$$eval(
                                         () => this.state.step3Data.TextSegmentationSegmentationLen
                                       ),
-                                      name: null,
-                                      required: true,
-                                      title: '分段长度',
+                                      'name': null,
+                                      'required': true,
+                                      'title': '分段长度',
                                       'x-validator': [],
                                     }}
                                     style={{
@@ -3273,14 +3277,14 @@ class $$Page extends React.Component {
                                       },
                                     }}
                                     fieldProps={{
-                                      _unsafe_MixedSetter_default_select: 'VariableSetter',
-                                      default: __$$eval(
+                                      '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                                      'default': __$$eval(
                                         () =>
                                           this.state.step3Data.TextSegmentationSegmentationRepeatLen
                                       ),
-                                      name: null,
-                                      required: true,
-                                      title: '分段重叠长度',
+                                      'name': null,
+                                      'required': true,
+                                      'title': '分段重叠长度',
                                       'x-validator': [],
                                     }}
                                     style={{ width: '80px' }}
@@ -3444,11 +3448,11 @@ class $$Page extends React.Component {
                                             },
                                           }}
                                           fieldProps={{
-                                            _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                                            '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
                                             '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
-                                            name: 'type',
-                                            required: true,
-                                            title: '模型服务',
+                                            'name': 'type',
+                                            'required': true,
+                                            'title': '模型服务',
                                             'x-validator': [],
                                           }}
                                           style={{ marginBottom: '8px' }}
@@ -3475,11 +3479,11 @@ class $$Page extends React.Component {
                                             fieldProps={{
                                               '_unsafe_MixedSetter_x-validator_select':
                                                 'ArraySetter',
-                                              name: 'model',
-                                              required: __$$eval(
+                                              'name': 'model',
+                                              'required': __$$eval(
                                                 () => this.state.showLlmModel === true
                                               ),
-                                              title: '模型版本',
+                                              'title': '模型版本',
                                               'x-display': 'visible',
                                               'x-validator': [],
                                             }}
@@ -3611,11 +3615,11 @@ class $$Page extends React.Component {
                           },
                         }}
                         fieldProps={{
-                          _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                          enum: null,
-                          name: 'pre_data_set_name',
-                          required: true,
-                          title: '处理前数据集',
+                          '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                          'enum': null,
+                          'name': 'pre_data_set_name',
+                          'required': true,
+                          'title': '处理前数据集',
                           'x-validator': [],
                         }}
                         style={{}}
@@ -3644,11 +3648,11 @@ class $$Page extends React.Component {
                           'x-decorator-props': { labelEllipsis: true, wrapperWidth: '400px' },
                         }}
                         fieldProps={{
-                          _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                          enum: null,
-                          name: 'pre_data_set_version',
-                          required: true,
-                          title: '',
+                          '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                          'enum': null,
+                          'name': 'pre_data_set_version',
+                          'required': true,
+                          'title': '',
                           'x-validator': [],
                         }}
                       />
@@ -3671,9 +3675,9 @@ class $$Page extends React.Component {
                           },
                         }}
                         fieldProps={{
-                          name: 'FormilyFormItem',
-                          title: '选择文件',
-                          type: 'object',
+                          'name': 'FormilyFormItem',
+                          'title': '选择文件',
+                          'type': 'object',
                           'x-component': 'FormilyFormItem',
                           'x-validator': [],
                         }}
@@ -3830,11 +3834,11 @@ class $$Page extends React.Component {
                           },
                         }}
                         fieldProps={{
-                          _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                          enum: null,
-                          name: 'post_data_set_name',
-                          required: false,
-                          title: '处理后数据集',
+                          '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                          'enum': null,
+                          'name': 'post_data_set_name',
+                          'required': false,
+                          'title': '处理后数据集',
                           'x-validator': [],
                         }}
                       />
@@ -3853,7 +3857,11 @@ class $$Page extends React.Component {
                         decoratorProps={{
                           'x-decorator-props': { labelEllipsis: true, wrapperWidth: '400px' },
                         }}
-                        fieldProps={{ name: 'post_data_set_version', title: '', 'x-validator': [] }}
+                        fieldProps={{
+                          'name': 'post_data_set_version',
+                          'title': '',
+                          'x-validator': [],
+                        }}
                       />
                     </Col>
                   </Row>
@@ -3899,8 +3907,8 @@ class $$Page extends React.Component {
                           },
                         }}
                         fieldProps={{
-                          name: 'name',
-                          title: '任务名称',
+                          'name': 'name',
+                          'title': '任务名称',
                           'x-validator': [
                             { children: '未知', id: 'disabled', required: true, type: 'disabled' },
                             {
@@ -3940,7 +3948,7 @@ class $$Page extends React.Component {
                           },
                         }}
                         fieldProps={{
-                          enum: [
+                          'enum': [
                             {
                               children: '',
                               id: 'disabled',
@@ -3949,9 +3957,9 @@ class $$Page extends React.Component {
                               value: 'text',
                             },
                           ],
-                          name: 'file_type',
-                          required: true,
-                          title: '文件类型',
+                          'name': 'file_type',
+                          'required': true,
+                          'title': '文件类型',
                           'x-validator': [
                             { children: '未知', id: 'disabled', required: true, type: 'disabled' },
                           ],
@@ -3991,6 +3999,7 @@ class $$Page extends React.Component {
                 <Table
                   __component_name="Table"
                   bordered={true}
+                  className="data-handle-example"
                   columns={[
                     { dataIndex: 'type', key: 'name', title: '配置内容', width: 120 },
                     {

@@ -16,10 +16,15 @@ import {
   Table,
   UnifiedLink,
   Status,
+  Tooltip,
   Pagination,
 } from '@tenx-ui/materials';
 
-import { AntdIconPlusOutlined, AntdIconReloadOutlined } from '@tenx-ui/icon-materials';
+import {
+  AntdIconPlusOutlined,
+  AntdIconReloadOutlined,
+  AntdIconInfoCircleOutlined,
+} from '@tenx-ui/icon-materials';
 
 import { default as Logs } from '@tenx-ui/logs';
 
@@ -267,7 +272,7 @@ class DataHandleList$$Page extends React.Component {
                   hoverable={false}
                   loading={false}
                   size="default"
-                  style={{ paddingBottom: '24px', paddingTop: '4px' }}
+                  style={{ paddingBottom: '16px', paddingTop: '4px' }}
                   type="inner"
                 >
                   <Row __component_name="Row" justify="space-between" wrap={false}>
@@ -391,7 +396,7 @@ class DataHandleList$$Page extends React.Component {
                             dataIndex: 'status',
                             key: 'status',
                             render: (text, record, index) =>
-                              (__$$context => (
+                              (__$$context => [
                                 <Status
                                   __component_name="Status"
                                   id={__$$eval(() => record.status)}
@@ -404,8 +409,21 @@ class DataHandleList$$Page extends React.Component {
                                     },
                                     { children: '处理失败', id: 'process_fail', type: 'error' },
                                   ]}
-                                />
-                              ))(__$$createChildContext(__$$context, { text, record, index })),
+                                  key="node_ocloo0nm9w4"
+                                />,
+                                <Tooltip
+                                  __component_name="Tooltip"
+                                  title={__$$eval(() => record.error_msg || '-')}
+                                  key="node_oclqyryfzi2"
+                                >
+                                  {!!__$$eval(() => record.status === 'process_fail') && (
+                                    <AntdIconInfoCircleOutlined
+                                      __component_name="AntdIconInfoCircleOutlined"
+                                      style={{ marginLeft: '20px' }}
+                                    />
+                                  )}
+                                </Tooltip>,
+                              ])(__$$createChildContext(__$$context, { text, record, index })),
                             title: '状态',
                           },
                           {
@@ -415,6 +433,7 @@ class DataHandleList$$Page extends React.Component {
                               (__$$context => [
                                 <UnifiedLink
                                   __component_name="UnifiedLink"
+                                  inQianKun={false}
                                   target="_self"
                                   to={__$$eval(() => '/dataset/detail/' + record.pre_data_set_name)}
                                   key="node_oclpc8ipq71"
@@ -458,6 +477,7 @@ class DataHandleList$$Page extends React.Component {
                               (__$$context => [
                                 <UnifiedLink
                                   __component_name="UnifiedLink"
+                                  inQianKun={false}
                                   target="_self"
                                   to={__$$eval(
                                     () => '/dataset/detail/' + record.post_data_set_name
@@ -586,7 +606,7 @@ class DataHandleList$$Page extends React.Component {
                         scroll={{ scrollToFirstRowOnChange: true }}
                         showHeader={true}
                         size="middle"
-                        style={{ marginTop: '28px' }}
+                        style={{ marginTop: '16px' }}
                       />
                     </Col>
                   </Row>

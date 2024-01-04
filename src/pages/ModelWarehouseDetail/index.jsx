@@ -133,6 +133,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
             return {
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
+                namespace: this.utils.getAuthData()?.project,
               },
               isCors: true,
               method: 'DELETE',
@@ -152,6 +153,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
             return {
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
+                namespace: this.utils.getAuthData()?.project,
               },
               isCors: true,
               method: 'GET',
@@ -171,6 +173,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
             return {
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
+                namespace: this.utils.getAuthData()?.project,
               },
               isCors: true,
               method: 'GET',
@@ -820,12 +823,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   }
                 />
               </Col>
-              <Col
-                __component_name="Col"
-                flex="56px"
-                span={2}
-                style={{ height: '56px', width: '56px' }}
-              >
+              <Col __component_name="Col" flex="110px" style={{ height: '56px', width: '56px' }}>
                 <Space __component_name="Space" align="center" direction="horizontal">
                   <Button
                     __component_name="Button"
@@ -886,7 +884,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   <Spin __component_name="Spin" spinning={__$$eval(() => this.state.readmeLoading)}>
                     <TenxUiReactMarkdownLowcodeMaterials
                       __component_name="TenxUiReactMarkdownLowcodeMaterials"
-                     
                     >
                       {__$$eval(() => this.state.readmeData)}
                     </TenxUiReactMarkdownLowcodeMaterials>

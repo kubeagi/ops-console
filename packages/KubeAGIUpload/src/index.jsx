@@ -107,6 +107,7 @@ class KubeAgiUpload$$Component extends React.Component {
             return {
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
+                namespace: this.props.bucket || this.state.bucket,
               },
               isCors: true,
               method: 'GET',
@@ -126,6 +127,7 @@ class KubeAgiUpload$$Component extends React.Component {
             return {
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
+                namespace: this.props.bucket || this.state.bucket,
               },
               isCors: true,
               method: 'POST',
@@ -145,6 +147,7 @@ class KubeAgiUpload$$Component extends React.Component {
             return {
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
+                namespace: this.props.bucket || this.state.bucket,
               },
               isCors: true,
               method: 'POST',
@@ -164,6 +167,7 @@ class KubeAgiUpload$$Component extends React.Component {
             return {
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
+                namespace: this.props.bucket || this.state.bucket,
               },
               isCors: true,
               method: 'PUT',
@@ -183,6 +187,7 @@ class KubeAgiUpload$$Component extends React.Component {
             return {
               headers: {
                 Authorization: this.props.Authorization || this.state.Authorization,
+                namespace: this.props.bucket || this.state.bucket,
               },
               isCors: true,
               method: 'POST',
@@ -846,9 +851,9 @@ class KubeAgiUpload$$Component extends React.Component {
             }}
             decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
             fieldProps={{
-              _unsafe_MixedSetter_title_select: 'VariableSetter',
-              name: 'Upload',
-              title: __$$eval(() => this.props.label || this.i18n('i18n-b6z34has')),
+              '_unsafe_MixedSetter_title_select': 'VariableSetter',
+              'name': 'Upload',
+              'title': __$$eval(() => this.props.label || this.i18n('i18n-b6z34has')),
               'x-component': 'FormilyUpload',
               'x-validator': [],
             }}
