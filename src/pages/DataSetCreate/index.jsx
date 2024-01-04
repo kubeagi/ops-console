@@ -80,7 +80,7 @@ class DataSetCreate$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { name: undefined, createLoading: true };
+    this.state = { createLoading: true, name: undefined };
   }
 
   $ = refName => {
@@ -97,25 +97,25 @@ class DataSetCreate$$Page extends React.Component {
       list: [
         {
           id: 'get_chunks',
-          type: 'axios',
           isInit: function () {
             return false;
           }.bind(_this),
           options: function () {
             return {
-              uri: 'https://portal.172.22.96.136.nip.io/kubeagi-apis/minio/get_chunks',
+              headers: {
+                Authorization:
+                  'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImExNDU0Y2VmNjNmNmM1ZTNhODYxYzY3YmVlZTZkYTgxYjc1ZTExMzQifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwNzIxOTYzLCJpYXQiOjE3MDA2MzU1NjMsImF0X2hhc2giOiJIbGNhalBBUDVjemNOZlI1UjBIMFl3IiwiY19oYXNoIjoiSXoyOUYtb1FTNGYyQnowX3JtUUVEdyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.t3jrC7A5d1dd8TfSTvYxoKFPAOOFM6YjmOzF_fiPgGJgUVgo575HeNKykAMOvDBRH40jnp-B6Gxg5xgtLQ5DqQSfEQNaTwsUOoMfV2Y6fP7wlV9IaSOcf-ePcQE3nT-CeeqjllucVX1hcb4PDWohh8mCJvUV30MNwnZoRNfXCWSw7JzyJ2CbsGSq1PQuXcsgQfzf_Up-28GJOgY06IZ1Y0IYxiOYPTC89mTI3uK6MvKAEKuDb8_kcfFKtTKqgK-XDOxazhfXDJkF9Mf1EdaKl0rwtMIsI2ULvJJ-3xAaH3QOrhCFQr861ioZfwk3Zm_q9akS8PuuBnN97Ew7-3h0Vg',
+              },
               isCors: true,
               method: 'GET',
               params: {
                 md5: 'test',
               },
-              headers: {
-                Authorization:
-                  'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImExNDU0Y2VmNjNmNmM1ZTNhODYxYzY3YmVlZTZkYTgxYjc1ZTExMzQifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwNzIxOTYzLCJpYXQiOjE3MDA2MzU1NjMsImF0X2hhc2giOiJIbGNhalBBUDVjemNOZlI1UjBIMFl3IiwiY19oYXNoIjoiSXoyOUYtb1FTNGYyQnowX3JtUUVEdyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.t3jrC7A5d1dd8TfSTvYxoKFPAOOFM6YjmOzF_fiPgGJgUVgo575HeNKykAMOvDBRH40jnp-B6Gxg5xgtLQ5DqQSfEQNaTwsUOoMfV2Y6fP7wlV9IaSOcf-ePcQE3nT-CeeqjllucVX1hcb4PDWohh8mCJvUV30MNwnZoRNfXCWSw7JzyJ2CbsGSq1PQuXcsgQfzf_Up-28GJOgY06IZ1Y0IYxiOYPTC89mTI3uK6MvKAEKuDb8_kcfFKtTKqgK-XDOxazhfXDJkF9Mf1EdaKl0rwtMIsI2ULvJJ-3xAaH3QOrhCFQr861ioZfwk3Zm_q9akS8PuuBnN97Ew7-3h0Vg',
-              },
               timeout: 5000,
+              uri: 'https://portal.172.22.96.136.nip.io/kubeagi-apis/minio/get_chunks',
             };
           }.bind(_this),
+          type: 'axios',
         },
       ],
     };
@@ -127,19 +127,12 @@ class DataSetCreate$$Page extends React.Component {
     return this.$(name || 'formily_create')?.formRef?.current?.form;
   }
 
-  setName(e) {
-    this.setState({
-      name: e.target.value,
-      hasCreate: false,
-    });
+  getBucketPath() {
+    return `dataset/${this.form()?.values?.name || this.state.name}/v1`;
   }
 
   handleCancle() {
     this.history.push('/dataset');
-  }
-
-  getBucketPath() {
-    return `dataset/${this.form()?.values?.name || this.state.name}/v1`;
   }
 
   handleConfirm() {
@@ -151,10 +144,10 @@ class DataSetCreate$$Page extends React.Component {
       this.setState({
         createLoading: true,
       });
-      const { name, description, contentType, filed } = v;
+      const { name, description, contentType, filed, displayName } = v;
       const params = {
         name,
-        displayName: name,
+        displayName,
         contentType,
         filed,
         description,
@@ -180,43 +173,12 @@ class DataSetCreate$$Page extends React.Component {
     });
   }
 
-  async validatorName(v) {
-    if (v) {
-      try {
-        const res = await this.props?.appHelper?.utils?.bff?.getDataset({
-          name: v,
-          namespace: this.utils.getAuthData()?.project,
-          versionsInput: {
-            namespace: this.utils.getAuthData()?.project,
-          },
-        });
-        if (res?.Dataset?.getDataset?.name) {
-          return this.i18n('i18n-w9rn8mqn');
-        }
-      } catch (error) {}
-    }
-  }
-
-  handleReUpload() {
-    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
-      this.handleCancle();
-      return;
-    }
-    this.state.uploadThis?.state?.fileList?.forEach(file => {
-      this.state.uploadThis?.computeMD5(file);
-    });
-  }
-
-  setUploadState(state) {
-    this.setState(state);
-  }
-
   async handleCreateVersionedDataset({ datasetParams, datasetRes }) {
     const params = {
       name: datasetParams.name + '-v1',
       namespace: datasetParams.namespace,
       datasetName: datasetParams.name,
-      displayName: datasetParams.name + '-v1',
+      displayName: datasetParams.displayName + '-v1',
       // description: String
       version: 'v1',
       released: 0,
@@ -243,6 +205,44 @@ class DataSetCreate$$Page extends React.Component {
     }
   }
 
+  handleReUpload() {
+    if (!(this.state.uploadThis?.state?.fileList?.length > 0)) {
+      this.handleCancle();
+      return;
+    }
+    this.state.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.uploadThis?.computeMD5(file);
+    });
+  }
+
+  setName(e) {
+    this.setState({
+      name: e.target.value,
+      hasCreate: false,
+    });
+  }
+
+  setUploadState(state) {
+    this.setState(state);
+  }
+
+  async validatorName(v) {
+    if (v) {
+      try {
+        const res = await this.props?.appHelper?.utils?.bff?.getDataset({
+          name: v,
+          namespace: this.utils.getAuthData()?.project,
+          versionsInput: {
+            namespace: this.utils.getAuthData()?.project,
+          },
+        });
+        if (res?.Dataset?.getDataset?.name) {
+          return this.i18n('i18n-w9rn8mqn');
+        }
+      } catch (error) {}
+    }
+  }
+
   componentDidMount() {
     this._dataSourceEngine.reloadDataSource();
   }
@@ -252,67 +252,42 @@ class DataSetCreate$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
-            <Space align="center" direction="horizontal" __component_name="Space">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
+            <Space __component_name="Space" align="center" direction="horizontal">
               <Button.Back
-                name={this.i18n('i18n-wourf2xg') /* 返回 */}
-                type="primary"
-                title={this.i18n('i18n-5j8juy3c') /* 新增数据集 */}
                 __component_name="Button.Back"
+                name={this.i18n('i18n-wourf2xg') /* 返回 */}
+                title={this.i18n('i18n-5j8juy3c') /* 新增数据集 */}
+                type="primary"
               />
             </Space>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="default"
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               className="datasetCreateCard"
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              type="default"
             >
               <FormilyForm
-                ref={this._refsManager.linkRef('formily_create')}
-                formHelper={{ autoFocus: true }}
+                __component_name="FormilyForm"
                 componentProps={{
                   colon: false,
-                  layout: 'horizontal',
                   labelAlign: 'left',
                   labelWidth: '120px',
+                  layout: 'horizontal',
                   wrapperWidth: '600px',
                 }}
-                __component_name="FormilyForm"
+                formHelper={{ autoFocus: true }}
+                ref={this._refsManager.linkRef('formily_create')}
               >
                 <FormilyInput
-                  fieldProps={{
-                    name: 'name',
-                    title: this.i18n('i18n-g9s3q1i6') /* 数据集名称 */,
-                    required: true,
-                    'x-validator': [
-                      {
-                        id: 'disabled',
-                        type: 'disabled',
-                        message: this.i18n('i18n-585k83dk') /* 数据集名称由 0 ~ 50 字符组成 */,
-                        pattern: '^.{0,50}$',
-                        children: '未知',
-                      },
-                      {
-                        id: 'disabled',
-                        type: 'disabled',
-                        children: '未知',
-                        validator: function () {
-                          return this.validatorName.apply(
-                            this,
-                            Array.prototype.slice.call(arguments).concat([])
-                          );
-                        }.bind(this),
-                        triggerType: 'onBlur',
-                      },
-                    ],
-                  }}
+                  __component_name="FormilyInput"
                   componentProps={{
                     'x-component-props': {
                       onChange: function () {
@@ -325,162 +300,215 @@ class DataSetCreate$$Page extends React.Component {
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilyInput"
-                />
-                <FormilySelect
                   fieldProps={{
-                    enum: __$$eval(() => this.utils.getDataSetTypes(this)),
-                    name: 'contentType',
-                    title: this.i18n('i18n-caequar5') /* 数据集类型 */,
-                    default: __$$eval(() => this.utils.getDataSetTypes(this)?.[0]?.value),
-                    required: true,
-                    'x-validator': [],
-                    _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                    _unsafe_MixedSetter_default_select: 'VariableSetter',
+                    'name': 'name',
+                    'required': true,
+                    'title': this.i18n('i18n-g9s3q1i6') /* 数据集名称 */,
+                    'x-validator': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message: this.i18n('i18n-585k83dk') /* 数据集名称由 0 ~ 50 字符组成 */,
+                        pattern: '^.{0,50}$',
+                        type: 'disabled',
+                      },
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message:
+                          '只能包含小写字母、数字、连字符（-）和点号（.），且必须以字母或数字开头',
+                        pattern:
+                          '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$',
+                        type: 'disabled',
+                      },
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        triggerType: 'onBlur',
+                        type: 'disabled',
+                        validator: function () {
+                          return this.validatorName.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
+                        }.bind(this),
+                      },
+                    ],
                   }}
+                />
+                <FormilyInput
+                  __component_name="FormilyInput"
                   componentProps={{
                     'x-component-props': {
-                      disabled: false,
-                      allowClear: false,
-                      placeholder: this.i18n('i18n-xddfp5fl') /* 请选择数据集类型 */,
-                      _sdkSwrGetFunc: {},
+                      onChange: function () {
+                        return this.setName.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
+                      placeholder: '请输入数据集别名',
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilySelect"
+                  fieldProps={{
+                    'name': 'displayName',
+                    'required': true,
+                    'title': '数据集别名',
+                    'x-validator': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message: '数据集别名由 0 ~ 50 字符组成，可以为中文',
+                        pattern: '^.{0,50}$',
+                        type: 'disabled',
+                        whitespace: false,
+                      },
+                    ],
+                  }}
                 />
                 <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: {},
+                      allowClear: false,
+                      disabled: false,
+                      placeholder: this.i18n('i18n-xddfp5fl') /* 请选择数据集类型 */,
+                    },
+                  }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    enum: __$$eval(() => this.utils.getDataSetApplicationScenario(this)),
-                    name: 'filed',
-                    title: this.i18n('i18n-qw5ig9gm') /* 应用场景 */,
-                    default: __$$eval(
+                    '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                    '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                    'default': __$$eval(() => this.utils.getDataSetTypes(this)?.[0]?.value),
+                    'enum': __$$eval(() => this.utils.getDataSetTypes(this)),
+                    'name': 'contentType',
+                    'required': true,
+                    'title': this.i18n('i18n-caequar5') /* 数据集类型 */,
+                    'x-validator': [],
+                  }}
+                />
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: {},
+                      allowClear: false,
+                      disabled: false,
+                      placeholder: this.i18n('i18n-q7wryol4') /* 请选择应用场景 */,
+                    },
+                  }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                    '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                    'default': __$$eval(
                       () => this.utils.getDataSetApplicationScenario(this)?.[0]?.value
                     ),
-                    required: true,
+                    'enum': __$$eval(() => this.utils.getDataSetApplicationScenario(this)),
+                    'name': 'filed',
+                    'required': true,
+                    'title': this.i18n('i18n-qw5ig9gm') /* 应用场景 */,
                     'x-validator': [],
-                    _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                    _unsafe_MixedSetter_default_select: 'VariableSetter',
                   }}
-                  componentProps={{
-                    'x-component-props': {
-                      disabled: false,
-                      allowClear: false,
-                      placeholder: this.i18n('i18n-q7wryol4') /* 请选择应用场景 */,
-                      _sdkSwrGetFunc: {},
-                    },
-                  }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilySelect"
                 />
                 <Divider
-                  mode="default"
-                  dashed={true}
-                  content={[null]}
-                  defaultOpen={true}
-                  orientation="left"
                   __component_name="Divider"
+                  content={[null]}
+                  dashed={true}
+                  defaultOpen={true}
+                  mode="default"
+                  orientation="left"
                   orientationMargin={0}
                 >
                   <Typography.Text
-                    style={{ fontSize: '14px' }}
-                    strong={true}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={true}
+                    style={{ fontSize: '14px' }}
                   >
                     {this.i18n('i18n-0hlfubp3') /* 数据集配置 */}
                   </Typography.Text>
                 </Divider>
                 <FormilyFormItem
+                  __component_name="FormilyFormItem"
+                  decoratorProps={{
+                    'x-decorator-props': { labelEllipsis: true, style: { marginBottom: '16px' } },
+                  }}
                   fieldProps={{
-                    name: 'version',
-                    title: this.i18n('i18n-mi1s7ntp') /* 数据集版本 */,
+                    'name': 'version',
+                    'title': this.i18n('i18n-mi1s7ntp') /* 数据集版本 */,
                     'x-component': 'FormilyFormItem',
                     'x-validator': [],
                   }}
-                  decoratorProps={{
-                    'x-decorator-props': { style: { marginBottom: '16px' }, labelEllipsis: true },
-                  }}
-                  __component_name="FormilyFormItem"
                 >
                   <Typography.Text
-                    style={{ fontSize: '' }}
-                    strong={false}
+                    __component_name="Typography.Text"
                     disabled={false}
                     ellipsis={true}
-                    __component_name="Typography.Text"
+                    strong={false}
+                    style={{ fontSize: '' }}
                   >
                     v1
                   </Typography.Text>
                 </FormilyFormItem>
                 <FormilyTextArea
-                  fieldProps={{
-                    name: 'description',
-                    title: this.i18n('i18n-45qn5g3j') /* 版本描述 */,
-                    'x-component': 'Input.TextArea',
-                    'x-validator': [
-                      {
-                        id: 'disabled',
-                        type: 'disabled',
-                        message: this.i18n('i18n-idhz6qcw') /* 版本描述由 0 ~ 200 字符组成 */,
-                        pattern: __$$eval(() => this.constants.DESCRIPTION_LENGTH_REG),
-                        children: '未知',
-                      },
-                    ],
-                  }}
+                  __component_name="FormilyTextArea"
                   componentProps={{
                     'x-component-props': {
                       placeholder: this.i18n('i18n-3m6syxvd') /* 请输入版本描述 */,
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  __component_name="FormilyTextArea"
+                  fieldProps={{
+                    'name': 'description',
+                    'title': this.i18n('i18n-45qn5g3j') /* 版本描述 */,
+                    'x-component': 'Input.TextArea',
+                    'x-validator': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message: this.i18n('i18n-idhz6qcw') /* 版本描述由 0 ~ 200 字符组成 */,
+                        pattern: __$$eval(() => this.constants.DESCRIPTION_LENGTH_REG),
+                        type: 'disabled',
+                      },
+                    ],
+                  }}
                 />
                 {!!false && (
                   <FormilySelect
-                    fieldProps={{
-                      enum: __$$eval(() => this.utils.getDataSetFileTypes(this)),
-                      name: 'filetype',
-                      title: this.i18n('i18n-y2kflhdo') /* 文件类型 */,
-                      default: __$$eval(() => this.utils.getDataSetFileTypes(this)?.[0]?.value),
-                      'x-validator': [],
-                      _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                      _unsafe_MixedSetter_default_select: 'VariableSetter',
-                    }}
+                    __component_name="FormilySelect"
                     componentProps={{
                       'x-component-props': {
-                        disabled: false,
-                        allowClear: false,
-                        placeholder: this.i18n('i18n-6gwgta6g') /* 请选择文件类型 */,
                         _sdkSwrGetFunc: {},
+                        allowClear: false,
+                        disabled: false,
+                        placeholder: this.i18n('i18n-6gwgta6g') /* 请选择文件类型 */,
                       },
                     }}
                     decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                    __component_name="FormilySelect"
+                    fieldProps={{
+                      '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                      '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                      'default': __$$eval(() => this.utils.getDataSetFileTypes(this)?.[0]?.value),
+                      'enum': __$$eval(() => this.utils.getDataSetFileTypes(this)),
+                      'name': 'filetype',
+                      'title': this.i18n('i18n-y2kflhdo') /* 文件类型 */,
+                      'x-validator': [],
+                    }}
                   />
                 )}
               </FormilyForm>
               {!!false && (
                 <LccComponentQlsmm
+                  __component_name="LccComponentQlsmm"
                   accept=".txt,.doc,.docx,.pdf,.md"
-                  bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-                  setState={function () {
-                    return this.setUploadState.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this)}
-                  bucket_path=""
                   Authorization={__$$eval(() => this.utils.getAuthorization())}
+                  bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+                  bucket_path=""
                   getBucketPath={function () {
                     return this.getBucketPath.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this)}
-                  handleSuccess={function () {
-                    return this.handleCancle.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
@@ -491,50 +519,61 @@ class DataSetCreate$$Page extends React.Component {
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this)}
-                  __component_name="LccComponentQlsmm"
+                  handleSuccess={function () {
+                    return this.handleCancle.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  setState={function () {
+                    return this.setUploadState.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
                 />
               )}
               <Divider
-                mode="line"
-                style={{ width: 'calc(100% + 48px)', marginLeft: '-24px' }}
+                __component_name="Divider"
                 dashed={false}
                 defaultOpen={false}
-                __component_name="Divider"
+                mode="line"
+                style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
               />
-              <Row wrap={true} __component_name="Row">
-                <Col flex="120px" __component_name="Col" />
-                <Col span={20} __component_name="Col">
-                  <Space align="center" direction="horizontal" __component_name="Space">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" flex="120px" />
+                <Col __component_name="Col" span={20}>
+                  <Space __component_name="Space" align="center" direction="horizontal">
                     <Button
+                      __component_name="Button"
                       block={false}
-                      ghost={false}
-                      shape="default"
                       danger={false}
+                      disabled={false}
+                      ghost={false}
                       onClick={function () {
                         return this.handleCancle.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      disabled={false}
-                      __component_name="Button"
+                      shape="default"
                     >
                       {this.i18n('i18n-tg2scz4v') /* 取消 */}
                     </Button>
                     <Button
-                      type="primary"
+                      __component_name="Button"
                       block={false}
-                      ghost={false}
-                      shape="default"
                       danger={false}
+                      disabled={false}
+                      ghost={false}
                       onClick={function () {
                         return this.handleConfirm.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      disabled={false}
-                      __component_name="Button"
+                      shape="default"
+                      type="primary"
                     >
                       {this.i18n('i18n-mq4to9og') /* 确定 */}
                     </Button>
@@ -557,6 +596,7 @@ const PageWrapper = (props = {}) => {
   history.query = qs.parse(location.search);
   const appHelper = {
     utils,
+    constants: __$$constants,
     location,
     match,
     history,
@@ -570,7 +610,6 @@ const PageWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
@@ -597,6 +636,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
