@@ -69,7 +69,9 @@ class DatasetVersionDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      addFileLoading: false,
       addFileVisible: false,
+      clearFile: false,
       confirm: {},
       cvsData: {
         current: 1,
@@ -81,6 +83,8 @@ class DatasetVersionDetail$$Page extends React.Component {
       openFile: false,
       upload: {},
     };
+
+    this.fileUploadSuccessList = [];
   }
 
   $ = refName => {
@@ -112,6 +116,11 @@ class DatasetVersionDetail$$Page extends React.Component {
   }
 
   addFileOk() {
+    if (this.state.upload.uploadThis?.state?.fileList?.length) {
+      this.setState({
+        addFileLoading: true,
+      });
+    }
     const fetch = async () => {
       try {
         this.handleReUpload();
@@ -121,10 +130,24 @@ class DatasetVersionDetail$$Page extends React.Component {
     this.form()?.submit(fetch);
   }
 
+  clearFileBuffer() {
+    this.setState(
+      {
+        clearFile: true,
+      },
+      () => {
+        this.setState({
+          clearFile: false,
+        });
+      }
+    );
+  }
+
   data() {
+    const data = this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset;
     return {
       ...this.props.useGetVersionedDataset,
-      data: this.state.versionDetail || {},
+      data: data?.version ? data : this.state.versionDetail || {},
     };
   }
 
@@ -145,6 +168,7 @@ class DatasetVersionDetail$$Page extends React.Component {
               },
               headers: {
                 Authorization: this.utils.getAuthorization(),
+                namespace: this.utils.getAuthData?.()?.project,
               },
             })
             .then(res => {
@@ -219,6 +243,7 @@ class DatasetVersionDetail$$Page extends React.Component {
       {
         headers: {
           Authorization: this.utils.getAuthorization(),
+          namespace: this.utils.getAuthData?.()?.project,
         },
       }
     );
@@ -252,7 +277,7 @@ class DatasetVersionDetail$$Page extends React.Component {
   }
 
   handleUploadFinished(file, res) {
-    console.log('handleUploadFinished,', file, res);
+    this.setFileUploadStatus(file);
   }
 
   handleUploadSuccess() {
@@ -291,6 +316,14 @@ class DatasetVersionDetail$$Page extends React.Component {
     );
   }
 
+  onFileUploaded(file) {
+    this.setFileUploadStatus(file);
+    this.utils.notification.success({
+      message: `文件 ${file.name} 已经存在，无需再次上传`,
+    });
+    this.handleCancle();
+  }
+
   openFileDetail(e, { data }) {
     this.setState(
       {
@@ -307,6 +340,24 @@ class DatasetVersionDetail$$Page extends React.Component {
       namespace: this.utils.getAuthData?.()?.project,
       _: new Date().getTime(),
     });
+  }
+
+  setFileUploadStatus(file) {
+    this.fileUploadSuccessList.push(file);
+    this.refresh();
+    if (
+      this.state.upload.uploadThis?.state?.fileList?.length === this.fileUploadSuccessList.length
+    ) {
+      this.fileUploadSuccessList = [];
+      this.state.upload.uploadThis?.state?.fileList?.length >= 2 &&
+      this.utils.notification.success({
+        message: '所有文件上传完成',
+      });
+      this.clearFileBuffer();
+      this.setState({
+        addFileLoading: false,
+      });
+    }
   }
 
   setUploadState(state) {
@@ -418,76 +469,87 @@ class DatasetVersionDetail$$Page extends React.Component {
             />
           </Modal>
         )}
-        <Modal
-          __component_name="Modal"
-          centered={false}
-          confirmLoading={false}
-          destroyOnClose={false}
-          forceRender={false}
-          keyboard={true}
-          mask={true}
-          maskClosable={false}
-          onCancel={function () {
-            return this.handleCancle.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          onOk={function () {
-            return this.addFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          open={__$$eval(() => this.state.addFileVisible)}
-          title="新增文件"
-          width="650px"
-        >
-          <FormilyForm
-            __component_name="FormilyForm"
-            componentProps={{
-              colon: false,
-              labelAlign: 'left',
-              labelCol: 4,
-              layout: 'horizontal',
-              wrapperCol: 20,
-            }}
-            formHelper={{ autoFocus: true }}
-            ref={this._refsManager.linkRef('add_file')}
+        {!!__$$eval(() => !this.state.clearFile) && (
+          <Modal
+            __component_name="Modal"
+            centered={false}
+            confirmLoading={__$$eval(() => this.state.addFileLoading)}
+            destroyOnClose={false}
+            forceRender={false}
+            keyboard={true}
+            mask={true}
+            maskClosable={false}
+            onCancel={function () {
+              return this.handleCancle.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            onOk={function () {
+              return this.addFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            open={__$$eval(() => this.state.addFileVisible)}
+            title="新增文件"
+            width="650px"
           >
-            <LccComponentQlsmm
-              __component_name="LccComponentQlsmm"
-              accept=".txt,.doc,.docx,.pdf,.md"
-              Authorization={__$$eval(() => this.utils.getAuthorization())}
-              bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-              contentWidth="520px"
-              getBucketPath={function () {
-                return this.getBucketPath.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              handleFinished={function () {
-                return this.handleUploadFinished.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              handleReUpload={function () {
-                return this.handleReUpload.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              handleSuccess={function () {
-                return this.handleUploadSuccess.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              setState={function () {
-                return this.setUploadState.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-            />
-          </FormilyForm>
-        </Modal>
+            <FormilyForm
+              __component_name="FormilyForm"
+              componentProps={{
+                colon: false,
+                labelAlign: 'left',
+                labelCol: 4,
+                layout: 'horizontal',
+                wrapperCol: 20,
+              }}
+              formHelper={{ autoFocus: true }}
+              ref={this._refsManager.linkRef('add_file')}
+            >
+              <LccComponentQlsmm
+                __component_name="LccComponentQlsmm"
+                accept=".txt,.doc,.docx,.pdf,.md"
+                Authorization={__$$eval(() => this.utils.getAuthorization())}
+                bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+                calcUploadedFile={function () {
+                  return this.onFileUploaded.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                contentWidth="520px"
+                getBucketPath={function () {
+                  return this.getBucketPath.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                handleFinished={function () {
+                  return this.handleUploadFinished.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                handleReUpload={function () {
+                  return this.handleReUpload.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                handleSuccess={function () {
+                  return this.handleUploadSuccess.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                setState={function () {
+                  return this.setUploadState.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+              />
+            </FormilyForm>
+          </Modal>
+        )}
         <LccComponentSbva0
           __component_name="LccComponentSbva0"
           data={__$$eval(() => this.state.confirm)}
