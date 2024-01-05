@@ -133,6 +133,7 @@ class DatasetVersionDetail$$Page extends React.Component {
               },
               headers: {
                 Authorization: this.utils.getAuthorization(),
+                namespace: this.utils.getAuthData?.()?.project,
               },
             })
             .then(res => {
@@ -207,6 +208,7 @@ class DatasetVersionDetail$$Page extends React.Component {
       {
         headers: {
           Authorization: this.utils.getAuthorization(),
+          namespace: this.utils.getAuthData?.()?.project,
         },
       }
     );

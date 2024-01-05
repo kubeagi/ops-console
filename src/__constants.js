@@ -55,10 +55,6 @@ constants.DATASET_DATA = function applyThis() {
         label: '法律',
         value: 'law',
       },
-      {
-        label: '其他',
-        value: 'others',
-      },
     ],
     type: [
       {
@@ -81,12 +77,12 @@ constants.DATASET_DATA = function applyThis() {
         type: 'info',
       },
       {
-        children: '导入失败',
+        children: '异常',
         id: 'FileSyncFailed',
         type: 'error',
       },
       {
-        children: '导入成功',
+        children: '正常',
         id: 'FileSyncSuccess',
         type: 'success',
       },
