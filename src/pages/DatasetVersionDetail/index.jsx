@@ -91,6 +91,18 @@ class DatasetVersionDetail$$Page extends React.Component {
     return this._refsManager.getAll(refName);
   };
 
+  componentDidUpdate(preProps) {
+    if (
+      this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset?.version &&
+      !this.state.versionDetail?.version
+    ) {
+      this.setState({
+        versionDetail:
+        this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset,
+      });
+    }
+  }
+
   componentWillUnmount() {}
 
   addFileClick(event) {
@@ -112,7 +124,7 @@ class DatasetVersionDetail$$Page extends React.Component {
   data() {
     return {
       ...this.props.useGetVersionedDataset,
-      data: this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset || {},
+      data: this.state.versionDetail || {},
     };
   }
 
@@ -133,7 +145,6 @@ class DatasetVersionDetail$$Page extends React.Component {
               },
               headers: {
                 Authorization: this.utils.getAuthorization(),
-                namespace: this.utils.getAuthData?.()?.project,
               },
             })
             .then(res => {
@@ -208,7 +219,6 @@ class DatasetVersionDetail$$Page extends React.Component {
       {
         headers: {
           Authorization: this.utils.getAuthorization(),
-          namespace: this.utils.getAuthData?.()?.project,
         },
       }
     );
