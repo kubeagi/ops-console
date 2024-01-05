@@ -540,6 +540,7 @@ class DatasetVersionDetail$$Page extends React.Component {
                     Array.prototype.slice.call(arguments).concat([])
                   );
                 }.bind(this)}
+                multiple={true}
                 setState={function () {
                   return this.setUploadState.apply(
                     this,

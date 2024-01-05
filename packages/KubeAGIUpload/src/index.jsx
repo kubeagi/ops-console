@@ -340,12 +340,12 @@ class KubeAgiUpload$$Component extends React.Component {
       pageThis
         .getDataSourceMap()
         .get_chunks.load({
-          md5: file.uniqueIdentifier,
-          etag: file.etag,
-          bucket: pageThis.getBucket(),
-          bucketPath: pageThis.getBucketPath(),
-          fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
-        })
+        md5: file.uniqueIdentifier,
+        etag: file.etag,
+        bucket: pageThis.getBucket(),
+        bucketPath: pageThis.getBucketPath(),
+        fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
+      })
         .then(function (response) {
           file.done = response?.done;
           file.uploadID = response?.uploadID || '';
@@ -413,14 +413,14 @@ class KubeAgiUpload$$Component extends React.Component {
         pageThis
           .getDataSourceMap()
           .get_multipart_url.load({
-            md5: file.uniqueIdentifier,
-            uploadID: file.uploadID,
-            size: partSize,
-            partNumber: currentChunk + 1,
-            bucket: pageThis.getBucket(),
-            bucketPath: pageThis.getBucketPath(),
-            fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
-          })
+          md5: file.uniqueIdentifier,
+          uploadID: file.uploadID,
+          size: partSize,
+          partNumber: currentChunk + 1,
+          bucket: pageThis.getBucket(),
+          bucketPath: pageThis.getBucketPath(),
+          fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
+        })
           .then(function (response) {
             urls[currentChunk] = response?.url;
             resolve(response);
@@ -503,12 +503,12 @@ class KubeAgiUpload$$Component extends React.Component {
         pageThis
           .getDataSourceMap()
           .complete_multipart.load({
-            uploadID: file.uploadID,
-            fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
-            bucket: pageThis.getBucket(),
-            bucketPath: pageThis.getBucketPath(),
-            md5: file.uniqueIdentifier,
-          })
+          uploadID: file.uploadID,
+          fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
+          bucket: pageThis.getBucket(),
+          bucketPath: pageThis.getBucketPath(),
+          md5: file.uniqueIdentifier,
+        })
           .then(function (response) {
             resolve(response);
             pageThis.props?.handleFinished && pageThis.props.handleFinished(file, response);
@@ -584,13 +584,13 @@ class KubeAgiUpload$$Component extends React.Component {
       pageThis
         .getDataSourceMap()
         .new_multipart.load({
-          chunkCount: file.totalChunkCounts,
-          md5: file.uniqueIdentifier,
-          size: file.size,
-          fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
-          bucket: pageThis.getBucket(),
-          bucketPath: pageThis.getBucketPath(),
-        })
+        chunkCount: file.totalChunkCounts,
+        md5: file.uniqueIdentifier,
+        size: file.size,
+        fileName: pageThis.props?.isSupportFolder ? file.webkitRelativePath : file.name,
+        bucket: pageThis.getBucket(),
+        bucketPath: pageThis.getBucketPath(),
+      })
         .then(function (response) {
           file.uploadID = response?.uploadID;
           resolve(response);
@@ -622,7 +622,7 @@ class KubeAgiUpload$$Component extends React.Component {
       });
     } else {
       this.setState({
-        fileList: [...(this.state.fileList || []), file],
+        fileList: [...(this.state.fileList || []), ...fileAllList],
       });
     }
     this.props?.setState({
@@ -841,6 +841,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 }.bind(this),
                 directory: __$$eval(() => this.props.isSupportFolder),
                 disabled: false,
+                multiple: __$$eval(() => this.props.multiple),
                 onRemove: function () {
                   return this.handleDelete.apply(
                     this,
