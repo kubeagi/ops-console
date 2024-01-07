@@ -156,6 +156,12 @@ class DataHandleList$$Page extends React.Component {
         {
           delModalvisible: false,
           currentRecord: null,
+          // 如果是删除了临界的数据，页数要向前翻一页，比如pageSize=10，一共有11挑数据，删掉第十一条，则currentPage需要改成1而不是2.
+          currentPage:
+            this.state.totalCount % this.state.pageSize === 1 &&
+            Number.parseInt(this.state.totalCount / this.state.pageSize) !== 0
+              ? this.state.currentPage - 1
+              : this.state.currentPage,
         },
         () => {
           this.getDataList();
@@ -539,27 +545,6 @@ class DataHandleList$$Page extends React.Component {
                                   align="center"
                                   direction="horizontal"
                                 >
-                                  <Button
-                                    __component_name="Button"
-                                    block={false}
-                                    danger={false}
-                                    disabled={false}
-                                    ghost={false}
-                                    onClick={function () {
-                                      return this.onOpenLogModal.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([
-                                          {
-                                            record: record,
-                                          },
-                                        ])
-                                      );
-                                    }.bind(__$$context)}
-                                    shape="default"
-                                    size="small"
-                                  >
-                                    查看日志
-                                  </Button>
                                   <Button
                                     __component_name="Button"
                                     block={false}

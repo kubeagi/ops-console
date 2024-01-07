@@ -235,14 +235,11 @@ class ModelAppList$$Page extends React.Component {
     });
   }
 
-  onCloseDeleteModal(e, isNeedLoad) {
+  onCloseDeleteModal() {
     this.setState({
       deleteModalVisible: false,
       currentRecord: null,
     });
-    if (isNeedLoad) {
-      this.getData();
-    }
   }
 
   onCloseEditModel() {
@@ -272,14 +269,26 @@ class ModelAppList$$Page extends React.Component {
         input: params,
       })
       .then(res => {
-        this.setState({
-          deleteLoading: false,
-        });
+        this.setState(
+          {
+            deleteLoading: false,
+            pages: {
+              ...this.state.pages,
+              currentPage:
+                this.state.pages.total % this.state.pages.pageSize === 1 &&
+                Number.parseInt(this.state.pages.total / this.state.pages.pageSize) !== 0
+                  ? this.state.pages.currentPage - 1
+                  : this.state.pages.currentPage,
+            },
+          },
+          () => {
+            this.onCloseDeleteModal();
+            this.getData();
+          }
+        );
         this.utils.notification.success({
           message: '删除应用成功',
         });
-        // 'event' 传参无意义，仅仅为了占数
-        this.onCloseDeleteModal('event', true);
       })
       .catch(error => {
         this.setState({

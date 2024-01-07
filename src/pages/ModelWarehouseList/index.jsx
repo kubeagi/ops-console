@@ -166,15 +166,11 @@ class ModelWarehouse$$Page extends React.Component {
     );
   }
 
-  onCloseDeleteModal(e, isNeedLoad) {
-    console.log('isNeedLoad', isNeedLoad);
+  onCloseDeleteModal(e) {
     this.setState({
       deleteModalVisible: false,
       currentRecord: null,
     });
-    if (isNeedLoad) {
-      this.getData();
-    }
   }
 
   onCreateClick(event) {
@@ -196,14 +192,29 @@ class ModelWarehouse$$Page extends React.Component {
         input: params,
       })
       .then(res => {
-        this.setState({
-          deleteLoading: false,
-        });
+        // 如果是删除了临界的数据，页数要向前翻一页，比如pageSize=10，一共有11挑数据，删掉第十一条，则currentPage需要改成1而不是2.
+        this.setState(
+          {
+            deleteLoading: false,
+            pages: {
+              ...this.state.pages,
+              currentPage:
+                this.state.pages.total % this.state.pages.pageSize === 1 &&
+                Number.parseInt(this.state.pages.total / this.state.pages.pageSize) !== 0
+                  ? this.state.pages.currentPage - 1
+                  : this.state.pages.currentPage,
+            },
+          },
+          () => {
+            this.getData();
+          }
+        );
         this.utils.notification.success({
           message: '删除模型成功',
         });
+        this.onCloseDeleteModal();
+
         // 'event' 传参无意义，仅仅为了占数
-        this.onCloseDeleteModal('event', true);
       })
       .catch(error => {
         this.setState({
