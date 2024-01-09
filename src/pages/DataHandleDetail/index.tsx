@@ -1,9 +1,10 @@
 import { InfoCircleOutlined } from '@ant-design/icons';
+import { default as Logs } from '@tenx-ui/logs';
 import { Alert, Button, Col, Modal, Page, Row, Space, Typography } from '@tenx-ui/materials';
 import { matchPath, useLocation } from '@umijs/max';
 import type { TabsProps } from 'antd';
 import { Avatar, Divider, List, Spin, Tabs, Tooltip, notification } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import detail from '@/assets/img/data-handle-detail.png';
 
@@ -29,9 +30,12 @@ const DataHandleDetail = props => {
     },
   };
   const [detailData, setDetailData] = useState({});
+  const [logData, setLogData] = useState('');
   const [loading, setLoading] = useState(false);
   const [deleteVisible, setDelevisible] = useState(false);
+  const [logVisible, setLogvisible] = useState(false);
   const location = useLocation();
+  const logRef = useRef();
 
   useEffect(() => {
     getData();
@@ -85,9 +89,31 @@ const DataHandleDetail = props => {
     },
   ];
 
+  const getLogInfo = () => {
+    const match = matchPath({ path: '/data-handle/detail/:id' }, location.pathname);
+    const id = match.params.id;
+    const params = {
+      input: {
+        id,
+      },
+    };
+    utils.bff
+      .getLogInfo(params)
+      .then(res => {
+        setLogData(res?.dataProcess?.getLogInfo?.data || '暂无数据');
+      })
+      .catch(error => {
+        console.warn(error);
+      });
+  };
+  const onShowLog = () => {
+    setLogvisible(true);
+    getLogInfo();
+  };
   const onDel = () => {
     setDelevisible(true);
   };
+
   return (
     <Page style={{ marginBottom: '0px', paddingBottom: '0px' }}>
       <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
@@ -106,6 +132,7 @@ const DataHandleDetail = props => {
           </Typography.Title>
         </Col>
       </Row>
+
       <Spin spinning={loading}>
         <div className={styles.info}>
           <List
@@ -114,7 +141,10 @@ const DataHandleDetail = props => {
             renderItem={(item, index) => (
               <List.Item
                 actions={[
-                  <Button key={index} onClick={onDel}>
+                  <Button key={index} onClick={onShowLog} size="small">
+                    查看日志
+                  </Button>,
+                  <Button key={index} onClick={onDel} size="small">
                     删除
                   </Button>,
                 ]}
@@ -185,6 +215,30 @@ const DataHandleDetail = props => {
         >
           <Alert message="确认删除任务？" showIcon={true} type="warning" />
         </Modal>
+        {logVisible && (
+          <Modal
+            __component_name="Modal"
+            footer={null}
+            onCancel={() => {
+              setLogvisible(false);
+            }}
+            open={logVisible}
+            title="日志"
+          >
+            <div>
+              <Logs
+                getComponentRef={e => {
+                  if (e) {
+                    e.writelns(logData);
+                    setTimeout(() => {
+                      e.handleWindowResize();
+                    });
+                  }
+                }}
+              />
+            </div>
+          </Modal>
+        )}
       </Spin>
     </Page>
   );

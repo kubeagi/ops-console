@@ -4,6 +4,7 @@ import React from 'react';
 
 import {
   Page,
+  Modal,
   Row,
   Col,
   Typography,
@@ -12,7 +13,6 @@ import {
   Space,
   Button,
   Input,
-  Modal,
   Table,
   UnifiedLink,
   Status,
@@ -20,13 +20,13 @@ import {
   Pagination,
 } from '@tenx-ui/materials';
 
+import { default as Logs } from '@tenx-ui/logs';
+
 import {
   AntdIconPlusOutlined,
   AntdIconReloadOutlined,
   AntdIconInfoCircleOutlined,
 } from '@tenx-ui/icon-materials';
-
-import { default as Logs } from '@tenx-ui/logs';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -87,6 +87,12 @@ class DataHandleList$$Page extends React.Component {
 
   componentWillUnmount() {
     console.log('will unmount');
+  }
+
+  getComponentRef(ref) {
+    console.log(ref, 'ffffffffffff1');
+    // this.logRef = ref;
+    // this.logRef && this.logRef.writelns('加载中...');
   }
 
   async getDataList() {
@@ -248,6 +254,35 @@ class DataHandleList$$Page extends React.Component {
         pagePaddingTop={24}
         style={{ marginBottom: '0px', paddingBottom: '24px' }}
       >
+        <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.onCloseLogModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.logModalVisible)}
+          title="弹框标题"
+        >
+          <Logs
+            __component_name="Logs"
+            getComponentRef={function () {
+              return this.getComponentRef.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            logs="123"
+          />
+        </Modal>
         <Row __component_name="Row" wrap={true}>
           <Col __component_name="Col" span={24}>
             <Typography.Title
@@ -620,70 +655,39 @@ class DataHandleList$$Page extends React.Component {
             </Row>
           </Col>
         </Row>
-        {!!__$$eval(() => this.state.logModalVisible) && (
-          <Modal
-            __component_name="Modal"
-            centered={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            footer=""
-            forceRender={false}
-            keyboard={true}
-            mask={true}
-            maskClosable={false}
-            onCancel={function () {
-              return this.onCloseLogModal.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            open={true}
-            title="日志"
-          >
-            <Logs
-              __component_name="Logs"
-              getComponentRef={function e(t) {
-                return t;
-              }}
-              logs="123"
-            />
-          </Modal>
-        )}
-        {!!__$$eval(() => this.state.delModalvisible) && (
-          <Modal
-            __component_name="Modal"
-            cancelButtonProps={{ disabled: false }}
-            centered={false}
-            confirmLoading={false}
-            destroyOnClose={true}
-            forceRender={false}
-            keyboard={true}
-            mask={true}
-            maskClosable={false}
-            okButtonProps={{ disabled: false }}
-            onCancel={function () {
-              return this.onCancelDelModal.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            onOk={function () {
-              return this.onCloseDelModal.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            open={true}
-            title="删除"
-          >
-            <Alert
-              __component_name="Alert"
-              message="确认删除此任务？"
-              showIcon={true}
-              type="warning"
-            />
-          </Modal>
-        )}
+        <Modal
+          __component_name="Modal"
+          cancelButtonProps={{ disabled: false }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          okButtonProps={{ disabled: false }}
+          onCancel={function () {
+            return this.onCancelDelModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.onCloseDelModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.delModalvisible)}
+          title="删除"
+        >
+          <Alert
+            __component_name="Alert"
+            message="确认删除此任务？"
+            showIcon={true}
+            type="warning"
+          />
+        </Modal>
       </Page>
     );
   }
