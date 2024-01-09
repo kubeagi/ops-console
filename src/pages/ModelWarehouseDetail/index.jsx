@@ -1,6 +1,5 @@
 // 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
 // 例外：react 框架的导出名和各种组件名除外。
-import TenxUiReactMarkdownLowcodeMaterials from '@tenx-ui/react-markdown-lowcode-materials';
 import React from 'react';
 
 import {
@@ -31,6 +30,8 @@ import {
   AntdIconReloadOutlined,
   AntdIconDeleteOutlined,
 } from '@tenx-ui/icon-materials';
+
+import ReactMarkdownLowcode from '@yuntijs/react-markdown-lowcode-materials';
 
 import LccComponentQlsmm from 'KubeAGIUpload';
 
@@ -882,11 +883,9 @@ class ModelWarehouseDetail$$Page extends React.Component {
               {
                 children: (
                   <Spin __component_name="Spin" spinning={__$$eval(() => this.state.readmeLoading)}>
-                    <TenxUiReactMarkdownLowcodeMaterials
-                      __component_name="TenxUiReactMarkdownLowcodeMaterials"
-                    >
+                    <ReactMarkdownLowcode __component_name="ReactMarkdownLowcode">
                       {__$$eval(() => this.state.readmeData)}
-                    </TenxUiReactMarkdownLowcodeMaterials>
+                    </ReactMarkdownLowcode>
                   </Spin>
                 ),
                 key: 'detail',
