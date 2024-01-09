@@ -74,7 +74,7 @@ class ModelServiceDetail$$Page extends React.Component {
   $$ = () => [];
 
   componentWillUnmount() {
-
+    // console.log('will unmount');
   }
 
   async deleteModelServiceItemReq() {
@@ -119,7 +119,7 @@ class ModelServiceDetail$$Page extends React.Component {
   getBaseInfo() {
     const name = this.match.params?.name;
     const type = this.history.query?.type;
-    const namespace = this.appHelper.utils.getAuthData().project || 'system-tce';
+    const namespace = this.appHelper.utils.getAuthData().project;
     return {
       name,
       type,
@@ -164,7 +164,7 @@ class ModelServiceDetail$$Page extends React.Component {
         namespace,
       });
       const detail = res?.Worker?.getWorker || {};
-      const isOffFlag = detail?.status?.toLowerCase() === 'offline';
+      const isOffFlag = ['offline', 'offlineinprogress'].includes(detail?.status?.toLowerCase());
       this.setState({
         detail,
         isOffFlag,
@@ -295,13 +295,13 @@ class ModelServiceDetail$$Page extends React.Component {
       onOrOffLoading: true,
     });
     try {
-      res = await this.utils.bff.updateWorker({
+      const res = await this.utils.bff.updateWorker({
         input,
       });
       this.utils.notification.success({
         message: `${label}成功`,
       });
-      setTimeout(this.initServiceDetailData, 500);
+      setTimeout(this.initServiceDetailData.bind(this), 500);
     } catch (err) {
       const description = err?.response?.errors?.[0]?.message || '未知错误';
       this.utils.notification.warn({
@@ -316,6 +316,7 @@ class ModelServiceDetail$$Page extends React.Component {
   }
 
   componentDidMount() {
+    // console.log('did mount');
     this.initServiceDetailData();
   }
 
@@ -477,7 +478,7 @@ class ModelServiceDetail$$Page extends React.Component {
                                 {
                                   _unsafe_MixedSetter_children_select: 'StringSetter',
                                   children: '下线中',
-                                  id: 'OfflineInProgress ',
+                                  id: 'OfflineInProgress',
                                   type: 'info',
                                 },
                                 {
