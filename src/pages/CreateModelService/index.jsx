@@ -16,10 +16,10 @@ import {
   FormilyRadio,
   FormilyTextArea,
   FormilySelect,
-  FormilyCheckbox,
   FormilyFormItem,
   FormilySlider,
   FormilyNumberPicker,
+  FormilyCheckbox,
 } from '@tenx-ui/materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -83,6 +83,8 @@ class CreateModelService$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      apiType: undefined,
+      configType: [],
       createLoading: true,
       gpuMarks: {
         0: '0',
@@ -104,6 +106,7 @@ class CreateModelService$$Page extends React.Component {
       },
       modelSource: 'worker',
       modelTypes: '-',
+      workerTypes: '-',
     };
   }
 
@@ -186,6 +189,42 @@ class CreateModelService$$Page extends React.Component {
     }
   }
 
+  async getListRayClusters() {
+    try {
+      const res = await this.props.appHelper.utils.bff?.listRayClusters({
+        input: {
+          namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+        },
+      });
+      const list = res.RayCluster.listRayClusters.nodes.map(v => ({
+        label: v.name,
+        value: v.index,
+      }));
+      this.form()?.setFieldState('RAY_CLUSTER_INDEX', {
+        dataSource: list,
+      });
+      this.form()?.setValues({
+        RAY_CLUSTER_INDEX: list[0]?.value,
+      });
+    } catch {
+      // console.log(error, '===> err')
+    }
+  }
+
+  async getListWorker() {
+    try {
+      const namespace = this.utils.getAuthData().project || 'system-tce';
+      const input = {
+        pageSize: -1,
+        namespace,
+        providerType: 'worker',
+      };
+      const res = await this.props.appHelper.utils.bff?.listModelServices({
+        input,
+      });
+    } catch {}
+  }
+
   handleCancle() {
     this.history?.go(-1);
   }
@@ -209,7 +248,8 @@ class CreateModelService$$Page extends React.Component {
               namespace: listModels.find(item => item.name === v.model)?.namespace,
               kind: 'Model',
             },
-            type: v.type && v.type.length > 0 ? 'fastchat-vllm' : 'fastchat',
+            type:
+              v.configType && v.configType.includes('fastchat-vllm') ? 'fastchat-vllm' : 'fastchat',
             namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
             resources: {
               cpu: resources.customCPU || marks[resources.cpu],
@@ -224,6 +264,13 @@ class CreateModelService$$Page extends React.Component {
                   : gpuMarks[resources.nvidiaGPU],
             },
           };
+          if (v.configType.includes('ray')) {
+            params.additionalEnvs = {
+              CUDA_VISIBLE_DEVICES: v.CUDA_VISIBLE_DEVICES,
+              RAY_CLUSTER_INDEX: v.RAY_CLUSTER_INDEX,
+              NUMBER_GPUS: v.NUMBER_GPUS,
+            };
+          }
           res = await this.props.appHelper.utils.bff?.createWorker({
             input: params,
           });
@@ -263,6 +310,15 @@ class CreateModelService$$Page extends React.Component {
     });
   }
 
+  onChangeApiType(e) {
+    if (e === 'worker') {
+      this.getListWorker();
+    }
+    this.setState({
+      apiType: e,
+    });
+  }
+
   onChangeModel(e) {
     const { listModels } = this.state;
     this.setState({
@@ -274,6 +330,22 @@ class CreateModelService$$Page extends React.Component {
     this.setState({
       modelSource: e.target.value,
     });
+  }
+
+  onChangeType(e) {
+    if (e.includes('ray')) {
+      this.getListRayClusters();
+      this.setState({
+        configType: ['fastchat-vllm', 'ray'],
+      });
+      this.form()?.setValues({
+        configType: ['fastchat-vllm', 'ray'],
+      });
+    } else {
+      this.setState({
+        configType: e,
+      });
+    }
   }
 
   onClickCheck(event) {
@@ -355,7 +427,8 @@ class CreateModelService$$Page extends React.Component {
                 createFormProps={{
                   initialValues: {
                     modelSource: 'worker',
-                    resources: { cpu: 0, memory: 0, nvidiaGPU: 0 },
+                    NUMBER_GPUS: 2,
+                    resources: { cpu: 3, memory: 5, nvidiaGPU: 1 },
                   },
                 }}
                 formHelper={{ autoFocus: true }}
@@ -385,10 +458,18 @@ class CreateModelService$$Page extends React.Component {
                   componentProps={{ 'x-component-props': { placeholder: '请输入模型服务名称' } }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    name: 'name',
-                    required: true,
-                    title: '模型服务名称',
-                    'x-validator': [],
+                    'name': 'name',
+                    'required': true,
+                    'title': '模型服务名称',
+                    'x-validator': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message: '请输入模型服务名称',
+                        required: true,
+                        type: 'disabled',
+                      },
+                    ],
                   }}
                 />
                 <FormilyInput
@@ -396,8 +477,8 @@ class CreateModelService$$Page extends React.Component {
                   componentProps={{ 'x-component-props': { placeholder: '请输入模型类型' } }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    name: 'displayName',
-                    title: '模型服务别名',
+                    'name': 'displayName',
+                    'title': '模型服务别名',
                     'x-pattern': 'editable',
                     'x-validator': [],
                   }}
@@ -417,12 +498,12 @@ class CreateModelService$$Page extends React.Component {
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    enum: [
+                    'enum': [
                       { label: '本地模型', value: 'worker' },
                       { label: '外部模型', value: '3rd_party' },
                     ],
-                    name: 'modelSource',
-                    title: '模型来源',
+                    'name': 'modelSource',
+                    'title': '模型来源',
                     'x-validator': [],
                   }}
                 />
@@ -435,8 +516,8 @@ class CreateModelService$$Page extends React.Component {
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    name: 'description',
-                    title: this.i18n('i18n-il4b7wme') /* 描述 */,
+                    'name': 'description',
+                    'title': this.i18n('i18n-il4b7wme') /* 描述 */,
                     'x-component': 'Input.TextArea',
                     'x-validator': [
                       {
@@ -484,14 +565,22 @@ class CreateModelService$$Page extends React.Component {
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    _unsafe_MixedSetter_enum_select: 'ArraySetter',
-                    enum: [],
-                    name: 'model',
-                    required: true,
-                    title: '模型',
+                    '_unsafe_MixedSetter_enum_select': 'ArraySetter',
+                    'enum': [],
+                    'name': 'model',
+                    'required': true,
+                    'title': '模型',
                     'x-display':
                       "{{ $form.values?.modelSource === 'worker' ? 'visible' : 'hidden' }}",
-                    'x-validator': [],
+                    'x-validator': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message: '请选择模型',
+                        required: true,
+                        type: 'disabled',
+                      },
+                    ],
                   }}
                 />
                 {!!__$$eval(() => this.state.modelSource === 'worker') && (
@@ -525,26 +614,47 @@ class CreateModelService$$Page extends React.Component {
                     </Col>
                   </Row>
                 )}
-                <FormilyCheckbox
-                  __component_name="FormilyCheckbox"
-                  componentProps={{ 'x-component-props': { _sdkSwrGetFunc: {} } }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  fieldProps={{
-                    enum: [{ label: '启用 VLLM 加速', value: 'fastchat-vllm' }],
-                    name: 'type',
-                    title: 'VLLM 加速',
-                    'x-display':
-                      "{{ $form.values?.modelSource === 'worker' ? 'visible' : 'hidden' }}",
-                    'x-validator': [],
-                  }}
-                />
+                {!!__$$eval(
+                  () => this.state.modelSource === '3rd_party' && this.state.apiType === 'worker'
+                ) && (
+                  <Row
+                    __component_name="Row"
+                    gutter={[0, 0]}
+                    style={{ marginBottom: '24px' }}
+                    wrap={false}
+                  >
+                    <Col __component_name="Col" flex="" span={4} style={{ paddingLeft: '10px' }}>
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        {' '}
+                        模型服务类型
+                      </Typography.Text>
+                    </Col>
+                    <Col __component_name="Col" flex="auto">
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '', height: '16px' }}
+                      >
+                        {__$$eval(() => this.state.workerTypes)}
+                      </Typography.Text>
+                    </Col>
+                  </Row>
+                )}
                 <FormilyFormItem
                   __component_name="FormilyFormItem"
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    name: 'resources',
-                    title: this.i18n('i18n-n55cj6ks') /* 服务规格 */,
-                    type: 'object',
+                    'name': 'resources',
+                    'title': this.i18n('i18n-n55cj6ks') /* 服务规格 */,
+                    'type': 'object',
                     'x-component': 'FormilyFormItem',
                     'x-display':
                       "{{ $form.values?.modelSource === 'worker' ? 'visible' : 'hidden' }}",
@@ -582,34 +692,32 @@ class CreateModelService$$Page extends React.Component {
                                 componentProps={{
                                   'x-component-props': {
                                     _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                    defaultValue: 0,
+                                    defaultValue: 3,
                                     marks: __$$eval(() => this.state.marks),
                                     max: 5,
                                     min: 0,
                                     step: 1,
                                   },
                                 }}
-                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                                decoratorProps={{
+                                  'x-decorator-props': { colon: false, labelEllipsis: true },
+                                }}
                                 fieldProps={{
-                                  name: 'cpu',
-                                  title: '',
+                                  'name': 'cpu',
+                                  'title': '',
                                   'x-component': 'FormilySlider',
                                   'x-validator': [],
                                 }}
                                 style={{ marginBottom: '0' }}
                               />
                             </Col>
-                            <Col
-                              __component_name="Col"
-                              span={1}
-                              style={{ display: 'flex', justifyContent: 'center' }}
-                            >
+                            <Col __component_name="Col" span={1} style={{ textAlign: 'center' }}>
                               <Typography.Text
                                 __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
                                 strong={false}
-                                style={{ alignItems: 'center', display: 'flex', fontSize: '' }}
+                                style={{ fontSize: '' }}
                               >
                                 {this.i18n('i18n-k56nh13q') /* 其他 */}
                               </Typography.Text>
@@ -631,15 +739,11 @@ class CreateModelService$$Page extends React.Component {
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                fieldProps={{ name: 'customCPU', title: '', 'x-validator': [] }}
+                                fieldProps={{ 'name': 'customCPU', 'title': '', 'x-validator': [] }}
                                 style={{}}
                               />
                             </Col>
-                            <Col
-                              __component_name="Col"
-                              span={1}
-                              style={{ alignItems: 'center', display: 'flex' }}
-                            >
+                            <Col __component_name="Col" span={1} style={{}}>
                               <Typography.Text
                                 __component_name="Typography.Text"
                                 disabled={false}
@@ -682,7 +786,7 @@ class CreateModelService$$Page extends React.Component {
                                 componentProps={{
                                   'x-component-props': {
                                     _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                    defaultValue: 0,
+                                    defaultValue: 5,
                                     marks: __$$eval(() => this.state.marks),
                                     max: 5,
                                     min: 0,
@@ -691,8 +795,8 @@ class CreateModelService$$Page extends React.Component {
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                                 fieldProps={{
-                                  name: 'memory',
-                                  title: '',
+                                  'name': 'memory',
+                                  'title': '',
                                   'x-component': 'FormilySlider',
                                   'x-validator': [],
                                 }}
@@ -702,14 +806,14 @@ class CreateModelService$$Page extends React.Component {
                             <Col
                               __component_name="Col"
                               span={1}
-                              style={{ display: 'flex', justifyContent: 'center' }}
+                              style={{ lineHeight: '32px', textAlign: 'center' }}
                             >
                               <Typography.Text
                                 __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
                                 strong={false}
-                                style={{ alignItems: 'center', display: 'flex', fontSize: '' }}
+                                style={{ fontSize: '' }}
                               >
                                 {this.i18n('i18n-k56nh13q') /* 其他 */}
                               </Typography.Text>
@@ -726,14 +830,14 @@ class CreateModelService$$Page extends React.Component {
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                fieldProps={{ name: 'customMemory', title: '', 'x-validator': [] }}
+                                fieldProps={{
+                                  'name': 'customMemory',
+                                  'title': '',
+                                  'x-validator': [],
+                                }}
                               />
                             </Col>
-                            <Col
-                              __component_name="Col"
-                              span={1}
-                              style={{ alignItems: 'center', display: 'flex' }}
-                            >
+                            <Col __component_name="Col" span={1} style={{}}>
                               <Typography.Text
                                 __component_name="Typography.Text"
                                 disabled={false}
@@ -776,7 +880,7 @@ class CreateModelService$$Page extends React.Component {
                                 componentProps={{
                                   'x-component-props': {
                                     _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                    defaultValue: 0,
+                                    defaultValue: 1,
                                     marks: __$$eval(() => this.state.gpuMarks),
                                     max: 6,
                                     min: 0,
@@ -785,8 +889,8 @@ class CreateModelService$$Page extends React.Component {
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                                 fieldProps={{
-                                  name: 'nvidiaGPU',
-                                  title: '',
+                                  'name': 'nvidiaGPU',
+                                  'title': '',
                                   'x-component': 'FormilySlider',
                                   'x-validator': [],
                                 }}
@@ -829,7 +933,7 @@ class CreateModelService$$Page extends React.Component {
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                fieldProps={{ name: 'customGPU', title: '', 'x-validator': [] }}
+                                fieldProps={{ 'name': 'customGPU', 'title': '', 'x-validator': [] }}
                               />
                             </Col>
                             <Col
@@ -857,6 +961,163 @@ class CreateModelService$$Page extends React.Component {
                     </Col>
                   </Row>
                 </FormilyFormItem>
+                {!!__$$eval(() => this.state.modelSource === 'worker') && (
+                  <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
+                    <Col __component_name="Col" flex="" span={4} />
+                    <Col __component_name="Col" flex="auto" span={7}>
+                      <FormilyInput
+                        __component_name="FormilyInput"
+                        componentProps={{
+                          'x-component-props': {
+                            placeholder: '请输入指定使用的 GPU 序号，多个用英文逗号隔开，如：0,3',
+                          },
+                        }}
+                        decoratorProps={{
+                          'x-decorator-props': { colon: false, labelEllipsis: true },
+                        }}
+                        fieldProps={{
+                          'name': 'CUDA_VISIBLE_DEVICES',
+                          'title': '指定 GPU',
+                          'x-display': null,
+                          'x-validator': [],
+                        }}
+                        style={{}}
+                      />
+                    </Col>
+                  </Row>
+                )}
+                {!!__$$eval(() => this.state.modelSource === 'worker') && (
+                  <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
+                    <Col __component_name="Col" flex="" span={4} />
+                    <Col __component_name="Col" flex="auto">
+                      <Divider
+                        __component_name="Divider"
+                        content={[
+                          <Row __component_name="Row" gutter={[0, 16]} style={{}} wrap={true}>
+                            <Col __component_name="Col" span={10}>
+                              <FormilyCheckbox
+                                __component_name="FormilyCheckbox"
+                                componentProps={{
+                                  'x-component-props': {
+                                    _sdkSwrGetFunc: {},
+                                    onChange: function () {
+                                      return Reflect.apply(this.onChangeType, this, [...Array.prototype.slice.call(arguments)]);
+                                    }.bind(this),
+                                  },
+                                }}
+                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                                fieldProps={{
+                                  '_unsafe_MixedSetter_default_select': 'I18nSetter',
+                                  'default': '',
+                                  'enum': [
+                                    { label: '启用 VLLM 加速', value: 'fastchat-vllm' },
+                                    { label: '启用 Ray 分布式推理', value: 'ray' },
+                                  ],
+                                  'name': 'configType',
+                                  'x-validator': [],
+                                }}
+                              />
+                              <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                                <Col __component_name="Col" span={24}>
+                                  <FormilySelect
+                                    __component_name="FormilySelect"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        _sdkSwrGetFunc: {},
+                                        allowClear: false,
+                                        disabled: false,
+                                        placeholder: '请选择集群',
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': { labelEllipsis: true },
+                                    }}
+                                    fieldProps={{
+                                      'name': 'RAY_CLUSTER_INDEX',
+                                      'required': true,
+                                      'title': '集群',
+                                      'x-display':
+                                        "{{ $form.values?.configType?.includes('ray') ? 'visible' : 'hidden' }}",
+                                      'x-validator': [],
+                                    }}
+                                  />
+                                </Col>
+                                <Col __component_name="Col" span={24}>
+                                  {!!__$$eval(() => this.state.configType.includes('ray')) && (
+                                    <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                                      <Col
+                                        __component_name="Col"
+                                        span={4}
+                                        style={{ lineHeight: '32px', paddingLeft: '12px' }}
+                                      >
+                                        <Typography.Text
+                                          __component_name="Typography.Text"
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                        >
+                                          GPU 数量
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col
+                                        __component_name="Col"
+                                        span={8}
+                                        style={{ marginRight: '12px' }}
+                                      >
+                                        <FormilyNumberPicker
+                                          __component_name="FormilyNumberPicker"
+                                          componentProps={{
+                                            'x-component-props': {
+                                              min: 2,
+                                              placeholder: '请输入',
+                                              precision: 0,
+                                            },
+                                          }}
+                                          decoratorProps={{
+                                            'x-decorator-props': { labelEllipsis: true },
+                                          }}
+                                          fieldProps={{
+                                            'name': 'NUMBER_GPUS',
+                                            'title': '',
+                                            'x-validator': [],
+                                          }}
+                                          style={{}}
+                                        />
+                                      </Col>
+                                      <Col
+                                        __component_name="Col"
+                                        span={6}
+                                        style={{ lineHeight: '32px' }}
+                                      >
+                                        <Typography.Text
+                                          __component_name="Typography.Text"
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                        >
+                                          颗
+                                        </Typography.Text>
+                                      </Col>
+                                    </Row>
+                                  )}
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>,
+                        ]}
+                        dashed={true}
+                        defaultOpen={true}
+                        mode="expanded"
+                        orientation="left"
+                        orientationMargin={0}
+                      >
+                        高级配置
+                      </Divider>
+                    </Col>
+                  </Row>
+                )}
                 <FormilySelect
                   __component_name="FormilySelect"
                   componentProps={{
@@ -865,14 +1126,26 @@ class CreateModelService$$Page extends React.Component {
                       allowClear: false,
                       disabled: false,
                       notFoundContent: '',
+                      onChange: function () {
+                        return Reflect.apply(this.onChangeApiType, this, [...Array.prototype.slice.call(arguments)]);
+                      }.bind(this),
                       placeholder: '请选择模型服务供应商',
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { asterisk: true, labelEllipsis: true } }}
                   fieldProps={{
-                    _unsafe_MixedSetter_enum_select: 'ArraySetter',
+                    '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                    '_unsafe_MixedSetter_enum_select': 'ArraySetter',
                     '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
-                    enum: [
+                    'default': __$$eval(() => this.state.apiType),
+                    'enum': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        label: '本地模型',
+                        type: 'disabled',
+                        value: 'worker',
+                      },
                       {
                         children: '未知',
                         id: 'disabled',
@@ -888,11 +1161,31 @@ class CreateModelService$$Page extends React.Component {
                         value: 'openai',
                       },
                     ],
-                    name: 'apiType',
-                    required: true,
-                    title: '模型服务供应商',
+                    'name': 'apiType',
+                    'required': true,
+                    'title': '模型服务供应商',
                     'x-display':
                       "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                    'x-validator': [],
+                  }}
+                />
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: {},
+                      allowClear: false,
+                      disabled: false,
+                      placeholder: '请选择',
+                    },
+                  }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    'name': 'workerModel',
+                    'required': true,
+                    'title': '本地模型服务',
+                    'x-display':
+                      "{{ $form.values?.modelSource === '3rd_party' && $form.values?.apiType === 'worker' ? 'visible' : 'hidden' }}",
                     'x-validator': [],
                   }}
                 />
@@ -901,11 +1194,11 @@ class CreateModelService$$Page extends React.Component {
                   componentProps={{ 'x-component-props': { placeholder: '请输入模型服务地址' } }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    name: 'baseUrl',
-                    required: true,
-                    title: '模型服务地址',
+                    'name': 'baseUrl',
+                    'required': true,
+                    'title': '模型服务地址',
                     'x-display':
-                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                      "{{ $form.values?.modelSource === '3rd_party' && $form.values?.apiType && $form.values?.apiType !== 'worker' ? 'visible' : 'hidden' }}",
                     'x-validator': [],
                   }}
                 />
@@ -914,16 +1207,21 @@ class CreateModelService$$Page extends React.Component {
                   componentProps={{ 'x-component-props': { placeholder: '请输入Token' } }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    name: 'endpoint',
-                    required: true,
-                    title: 'Token',
+                    'name': 'endpoint',
+                    'required': true,
+                    'title': 'Token',
                     'x-display':
-                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                      "{{ $form.values?.modelSource === '3rd_party' && $form.values?.apiType && $form.values?.apiType !== 'worker' ? 'visible' : 'hidden' }}",
                     'x-validator': [],
                   }}
                   style={{}}
                 />
-                {!!__$$eval(() => this.state.modelSource === '3rd_party') && (
+                {!!__$$eval(
+                  () =>
+                    this.state.modelSource === '3rd_party' &&
+                    this.state.apiType &&
+                    this.state.apiType !== 'worker'
+                ) && (
                   <Row
                     __component_name="Row"
                     gutter={[0, 0]}
@@ -955,15 +1253,15 @@ class CreateModelService$$Page extends React.Component {
                   componentProps={{ 'x-component-props': { _sdkSwrGetFunc: {} } }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
-                    enum: [
+                    'enum': [
                       { label: 'LLM', value: 'llm' },
                       { label: 'Embedding', value: 'embedding' },
                     ],
-                    name: 'types',
-                    required: true,
-                    title: '模型服务类型',
+                    'name': 'types',
+                    'required': true,
+                    'title': '模型服务类型',
                     'x-display':
-                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                      "{{ $form.values?.modelSource === '3rd_party' && $form.values?.apiType && $form.values?.apiType !== 'worker' ? 'visible' : 'hidden' }}",
                     'x-validator': [],
                   }}
                 />
@@ -975,7 +1273,7 @@ class CreateModelService$$Page extends React.Component {
                 mode="line"
                 style={{ marginLeft: '-24px', width: 'calc(100% + 48px)' }}
               />
-              <Row __component_name="Row" wrap={true}>
+              <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
                 <Col __component_name="Col" span={4} />
                 <Col __component_name="Col" span={20}>
                   <Space __component_name="Space" align="center" direction="horizontal">
