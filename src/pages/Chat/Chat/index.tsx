@@ -180,9 +180,7 @@ const Chat: React.FC<IChat> = props => {
           conversation_id: conversation?.id || '',
           app_name: props.appName,
           app_namespace: props.appNamespace,
-          // TODO: 防止每次都生成新的对话, 暂时设为true; 引入历史会话后,再修改回来
-          debug: true,
-          // debug: Boolean(props.debug),
+          debug: Boolean(props.debug),
         }),
         async onopen(response) {
           shouldUpdateConversationId = false;
