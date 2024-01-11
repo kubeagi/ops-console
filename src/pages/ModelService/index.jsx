@@ -618,7 +618,7 @@ class ModelService$$Page extends React.Component {
                                               {
                                                 children: '已下线',
                                                 id: 'Offline',
-                                                type: 'success',
+                                                type: 'warning',
                                               },
                                               { children: '正常', id: 'True', type: 'success' },
                                               {
@@ -678,7 +678,7 @@ class ModelService$$Page extends React.Component {
                                   span: 1,
                                 },
                               ]}
-                              labelStyle={{ width: 100 }}
+                              labelStyle={{ width: 60 }}
                               layout="horizontal"
                               size="default"
                               title=""
@@ -690,6 +690,7 @@ class ModelService$$Page extends React.Component {
                     rowKey="id"
                     size="small"
                     split={false}
+                    style={{}}
                   />
                 </Col>
               </Row>
