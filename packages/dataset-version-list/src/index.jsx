@@ -62,7 +62,7 @@ class DatasetVersionList$$Component extends React.Component {
       confirm: {
         id: new Date().getTime(),
         title: '删除数据集版本',
-        content: `确定删除数据集：${params.dataset.name} - ${params.version.version}？`,
+        content: `确定删除数据集版本：${params.dataset.name} - ${params.version.version}？`,
         onOk: async () => {
           const res = await this.utils.bff
             .deleteVersionedDatasets({

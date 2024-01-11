@@ -718,7 +718,7 @@ class DatasetVersionDetail$$Page extends React.Component {
                           />
                         ),
                         key: 'xvcp3obfu',
-                        label: '同步状态',
+                        label: '导入状态',
                         span: 24,
                       },
                       {
