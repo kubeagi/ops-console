@@ -86,8 +86,8 @@ const DataHandle: React.FC<Iprops> = props => {
         render(text, record) {
           return (
             <>
-              <p>Q: {text.pre}</p>
-              <p>A: {text.post}</p>
+              <p>Q：{text.pre}</p>
+              <p>A：{text.post}</p>
             </>
           );
         },
@@ -190,7 +190,7 @@ const DataHandle: React.FC<Iprops> = props => {
               <Row gutter={16}>{_data}</Row>
               <div style={{ padding: '8px 0', color: '#000' }}>
                 {' '}
-                对 {sourceItem.file_num} 个文件进行了{type}，处理进度:{progressPrecent.length}/
+                对 {sourceItem.file_num} 个文件进行了{type}，处理进度：{progressPrecent.length}/
                 {fileProgress.length}
               </div>
               {fileProgress.map((item, index) => {

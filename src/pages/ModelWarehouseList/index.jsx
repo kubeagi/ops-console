@@ -515,7 +515,7 @@ class ModelWarehouse$$Page extends React.Component {
                               );
                             }.bind(__$$context)}
                             size="default"
-                            style={{}}
+                            style={{ marginBottom: '16px' }}
                             type="default"
                           >
                             <Row __component_name="Row" gutter={['', 0]} wrap={true}>
@@ -527,14 +527,18 @@ class ModelWarehouse$$Page extends React.Component {
                                       style={{ color: '#4a90e2', fontSize: 56 }}
                                     />
                                   </Col>
-                                  <Col __component_name="Col" flex="auto" span={19}>
+                                  <Col __component_name="Col" flex="1">
                                     <Row
                                       __component_name="Row"
                                       gutter={[0, 0]}
                                       justify="space-between"
                                       wrap={false}
                                     >
-                                      <Col __component_name="Col" style={{ paddingLeft: '20px' }}>
+                                      <Col
+                                        __component_name="Col"
+                                        flex="1"
+                                        style={{ paddingLeft: '20px' }}
+                                      >
                                         <Typography.Title
                                           __component_name="Typography.Title"
                                           bold={true}
@@ -562,7 +566,7 @@ class ModelWarehouse$$Page extends React.Component {
                                           {__$$eval(() => item.description || '-')}
                                         </Typography.Paragraph>
                                       </Col>
-                                      <Col __component_name="Col" style={{ zIndex: 3 }}>
+                                      <Col __component_name="Col" flex="24px" style={{ zIndex: 3 }}>
                                         <Dropdown
                                           __component_name="Dropdown"
                                           destroyPopupOnHide={true}
