@@ -742,7 +742,7 @@ class Dataset$$Page extends React.Component {
                                   style={{
                                     alignItems: 'center',
                                     display: 'flex',
-                                    justifyContent: 'flex-end',
+                                    justifyContent: 'flex-start',
                                   }}
                                 >
                                   <Tag __component_name="Tag" closable={false} color="warning">
@@ -756,17 +756,28 @@ class Dataset$$Page extends React.Component {
                                         )?.label || '未知'
                                     )}
                                   </Tag>
-                                  <Tag __component_name="Tag" closable={false} color="processing">
-                                    {__$$eval(
-                                      () =>
-                                        __$$context.utils._.find(
-                                          __$$context.constants.DATASET_DATA.fields,
-                                          {
-                                            value: item.field,
-                                          }
-                                        )?.label || '未知'
-                                    )}
-                                  </Tag>
+                                  {!!__$$eval(() =>
+                                    Boolean(
+                                      __$$context.utils._.find(
+                                        __$$context.constants.DATASET_DATA.fields,
+                                        {
+                                          value: item.field,
+                                        }
+                                      )?.label
+                                    )
+                                  ) && (
+                                    <Tag __component_name="Tag" closable={false} color="processing">
+                                      {__$$eval(
+                                        () =>
+                                          __$$context.utils._.find(
+                                            __$$context.constants.DATASET_DATA.fields,
+                                            {
+                                              value: item.field,
+                                            }
+                                          )?.label || '未知'
+                                      )}
+                                    </Tag>
+                                  )}
                                 </Col>
                                 <Col
                                   __component_name="Col"
