@@ -111,8 +111,7 @@ class CreateModelWarehouse$$Page extends React.Component {
                 name: name,
               });
               this.utils.notification.success({
-                message: '成功',
-                description: '正在跳转到详情页',
+                message: '新增模型成功',
               });
               this.linkToDetail(res?.Model?.createModel.name);
             }
@@ -201,9 +200,9 @@ class CreateModelWarehouse$$Page extends React.Component {
                 }}
                 fieldProps={{
                   '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
-                  name: 'name',
-                  required: true,
-                  title: '模型名称',
+                  'name': 'name',
+                  'required': true,
+                  'title': '模型名称',
                   'x-validator': [
                     {
                       children: '未知',
@@ -223,9 +222,9 @@ class CreateModelWarehouse$$Page extends React.Component {
                   'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
                 }}
                 fieldProps={{
-                  name: 'displayName',
-                  required: true,
-                  title: '模型别名',
+                  'name': 'displayName',
+                  'required': true,
+                  'title': '模型别名',
                   'x-validator': [],
                 }}
                 style={{ width: '500px' }}
@@ -242,13 +241,13 @@ class CreateModelWarehouse$$Page extends React.Component {
                   },
                 }}
                 fieldProps={{
-                  enum: [
+                  'enum': [
                     { label: 'LLM', value: 'llm' },
                     { label: 'Embedding', value: 'embedding' },
                   ],
-                  name: 'types',
-                  required: true,
-                  title: '模型类型',
+                  'name': 'types',
+                  'required': true,
+                  'title': '模型类型',
                   'x-validator': [],
                 }}
               />
@@ -259,8 +258,8 @@ class CreateModelWarehouse$$Page extends React.Component {
                   'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
                 }}
                 fieldProps={{
-                  name: 'description',
-                  title: '描述',
+                  'name': 'description',
+                  'title': '描述',
                   'x-component': 'Input.TextArea',
                   'x-validator': [],
                 }}

@@ -1,3 +1,4 @@
+import { Typography } from '@tenx-ui/materials';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Descriptions } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -79,7 +80,14 @@ const Info: React.FC<Iprops> = props => {
       },
       {
         label: '创建时间',
-        children: data.start_time,
+        children: (
+          <Typography.Time
+            __component_name="Typography.Time"
+            format="YYYY-MM-DD HH:mm:ss"
+            relativeTime={false}
+            time={data.start_time}
+          />
+        ),
       },
     ];
     setItems(_items);

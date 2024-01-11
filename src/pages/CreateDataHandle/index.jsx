@@ -210,7 +210,7 @@ class $$Page extends React.Component {
         max_tokens: 2048,
         prompt_template: `{text}
 
-请将上述内容按照问答的方式，提出不超过 25 个问题，并给出每个问题的答案，每个问题必须有 Q 和对应的 A，并严格按照以下方式展示： Q1: 问题。\n A1: 答案。\n Q2: 问题 \n A2: 答案\n  注意，尽可能多的提出问题，但是 Q 不要重复，也不要出现只有 Q 没有 A 的情况。`,
+请将上述内容按照问答的方式，提出不超过 25 个问题，并给出每个问题的答案，每个问题必须有 Q 和对应的 A，并严格按照以下方式展示：\n Q1: 问题。\n A1: 答案。\n Q2: 问题 \n A2: 答案\n  注意，尽可能多的提出问题，但是 Q 不要重复，也不要出现只有 Q 没有 A 的情况。`,
       },
       selectedFileList: [],
       showLlmModel: false,
@@ -3767,7 +3767,23 @@ class $$Page extends React.Component {
                         bordered={false}
                         columns={[
                           { dataIndex: 'path', key: 'name', title: '文件名称' },
-                          { dataIndex: 'label', title: '标签', width: 120 },
+                          {
+                            dataIndex: 'fileType',
+                            render: (text, record, index) =>
+                              (__$$context => (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => text || '-')}
+                                </Typography.Text>
+                              ))(__$$createChildContext(__$$context, { text, record, index })),
+                            title: '标签',
+                            width: 120,
+                          },
                           { dataIndex: 'size', key: 'size', title: '文件大小', width: 100 },
                           { dataIndex: 'count', title: '数据量' },
                         ]}

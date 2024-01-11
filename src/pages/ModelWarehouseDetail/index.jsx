@@ -656,7 +656,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(this)}
           path=""
           style={{ opacity: '0' }}
-          title="模型仓库详情"
+          title="模型详情"
           type="ghost"
         />
         <Spin __component_name="Spin" spinning={__$$eval(() => this.state.loading)}>
@@ -684,6 +684,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
               </Col>
               <Col
                 __component_name="Col"
+                className="model-ware-detail"
                 flex="auto"
                 span={21}
                 style={{ alignItems: 'center', display: 'flex' }}
@@ -783,8 +784,8 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   size="default"
                   style={{}}
                   title={
-                    <Row __component_name="Row" wrap={true}>
-                      <Col __component_name="Col" span={24}>
+                    <Row __component_name="Row" style={{ marginBottom: '0px' }} wrap={true}>
+                      <Col __component_name="Col" span={24} style={{ marginBottom: '0px' }}>
                         <Typography.Title
                           __component_name="Typography.Title"
                           bold={true}

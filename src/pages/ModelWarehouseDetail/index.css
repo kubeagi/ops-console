@@ -1,3 +1,7 @@
 body {
   font-size: 12px;
 }
+
+.model-ware-detail .tenx-ui-materials-descriptions-header {
+  margin-bottom: 4px;
+}
