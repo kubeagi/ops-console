@@ -83,7 +83,6 @@ class CreateModelService$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      apiType: undefined,
       configType: [],
       createLoading: true,
       gpuMarks: {
@@ -184,7 +183,7 @@ class CreateModelService$$Page extends React.Component {
           }
         }
       );
-    } catch {
+    } catch (error) {
       // console.log(error, '===> err')
     }
   }
@@ -206,7 +205,7 @@ class CreateModelService$$Page extends React.Component {
       this.form()?.setValues({
         RAY_CLUSTER_INDEX: list[0]?.value,
       });
-    } catch {
+    } catch (error) {
       // console.log(error, '===> err')
     }
   }
@@ -222,7 +221,7 @@ class CreateModelService$$Page extends React.Component {
       const res = await this.props.appHelper.utils.bff?.listModelServices({
         input,
       });
-    } catch {}
+    } catch (error) {}
   }
 
   handleCancle() {
@@ -240,6 +239,9 @@ class CreateModelService$$Page extends React.Component {
         if (modelSource === 'worker') {
           const { resources = {} } = v;
           const params = {
+            additionalEnvs: {
+              CUDA_VISIBLE_DEVICES: v.CUDA_VISIBLE_DEVICES,
+            },
             name: v.name,
             displayName: v.displayName,
             description: v.description,
@@ -266,7 +268,7 @@ class CreateModelService$$Page extends React.Component {
           };
           if (v.configType.includes('ray')) {
             params.additionalEnvs = {
-              CUDA_VISIBLE_DEVICES: v.CUDA_VISIBLE_DEVICES,
+              ...params.additionalEnvs,
               RAY_CLUSTER_INDEX: v.RAY_CLUSTER_INDEX,
               NUMBER_GPUS: v.NUMBER_GPUS,
             };
@@ -281,7 +283,7 @@ class CreateModelService$$Page extends React.Component {
             displayName: v.displayName,
             description: v.description,
             types: v.types.join(','),
-            apiType: v.apiType,
+            apiType: v.apiType === 'kubeagi' ? 'openai' : v.apiType,
             endpoint: {
               auth: {
                 apiKey: v.endpoint,
@@ -290,6 +292,14 @@ class CreateModelService$$Page extends React.Component {
             },
             namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
           };
+          if (v.apiType === 'kubeagi') {
+            params.llmModels =
+              v.llmModels && v.llmModels?.split(',').length ? v.llmModels.split(',') : [];
+            params.embeddingModels =
+              v.embeddingModels && v.embeddingModels?.split(',')?.length
+                ? v.embeddingModels.split(',')
+                : [];
+          }
           res = await this.props.appHelper.utils.bff?.createModelService({
             input: params,
           });
@@ -299,6 +309,7 @@ class CreateModelService$$Page extends React.Component {
         });
         this.handleCancle();
       } catch (error) {
+        console.log(error, '===> error');
         this.utils.notification.warnings({
           message: '新增模型服务失败',
           errors: error?.response?.errors,
@@ -307,15 +318,6 @@ class CreateModelService$$Page extends React.Component {
           createLoading: false,
         });
       }
-    });
-  }
-
-  onChangeApiType(e) {
-    if (e === 'worker') {
-      this.getListWorker();
-    }
-    this.setState({
-      apiType: e,
     });
   }
 
@@ -356,7 +358,7 @@ class CreateModelService$$Page extends React.Component {
           displayName: v.displayName,
           description: v.description,
           types: v.types.join(','),
-          apiType: v.apiType,
+          apiType: v.apiType === 'kubeagi' ? 'openai' : v.apiType,
           endpoint: {
             auth: {
               apiKey: v.endpoint,
@@ -365,6 +367,14 @@ class CreateModelService$$Page extends React.Component {
           },
           namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
         };
+        if (v.apiType === 'kubeagi') {
+          params.llmModels =
+            v.llmModels && v.llmModels?.split(',').length ? v.llmModels.split(',') : [];
+          params.embeddingModels =
+            v.embeddingModels && v.embeddingModels?.split(',')?.length
+              ? v.embeddingModels.split(',')
+              : [];
+        }
         const res = await this.props.appHelper.utils.bff?.checkModelService({
           input: params,
         });
@@ -400,7 +410,7 @@ class CreateModelService$$Page extends React.Component {
               <Button.Back
                 __component_name="Button.Back"
                 name={this.i18n('i18n-wourf2xg') /* 返回 */}
-                title="新增本地模型服务"
+                title="新增模型服务"
                 type="primary"
               />
             </Space>
@@ -428,7 +438,7 @@ class CreateModelService$$Page extends React.Component {
                   initialValues: {
                     modelSource: 'worker',
                     NUMBER_GPUS: 2,
-                    resources: { cpu: 3, memory: 5, nvidiaGPU: 1 },
+                    resources: { customCPU: '4', customGPU: '1', customMemory: '16' },
                   },
                 }}
                 formHelper={{ autoFocus: true }}
@@ -491,7 +501,10 @@ class CreateModelService$$Page extends React.Component {
                       buttonStyle: 'outline',
                       disabled: false,
                       onChange: function () {
-                        return Reflect.apply(this.onChangeModelSource, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.onChangeModelSource.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this),
                       size: 'middle',
                     },
@@ -558,7 +571,10 @@ class CreateModelService$$Page extends React.Component {
                       disabled: false,
                       mode: 'single',
                       onChange: function () {
-                        return Reflect.apply(this.onChangeModel, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.onChangeModel.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this),
                       placeholder: '请选择模型',
                     },
@@ -692,7 +708,7 @@ class CreateModelService$$Page extends React.Component {
                                 componentProps={{
                                   'x-component-props': {
                                     _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                    defaultValue: 3,
+                                    defaultValue: 0,
                                     marks: __$$eval(() => this.state.marks),
                                     max: 5,
                                     min: 0,
@@ -786,7 +802,7 @@ class CreateModelService$$Page extends React.Component {
                                 componentProps={{
                                   'x-component-props': {
                                     _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                    defaultValue: 5,
+                                    defaultValue: 0,
                                     marks: __$$eval(() => this.state.marks),
                                     max: 5,
                                     min: 0,
@@ -880,7 +896,7 @@ class CreateModelService$$Page extends React.Component {
                                 componentProps={{
                                   'x-component-props': {
                                     _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
-                                    defaultValue: 1,
+                                    defaultValue: 0,
                                     marks: __$$eval(() => this.state.gpuMarks),
                                     max: 6,
                                     min: 0,
@@ -978,7 +994,6 @@ class CreateModelService$$Page extends React.Component {
                         fieldProps={{
                           'name': 'CUDA_VISIBLE_DEVICES',
                           'title': '指定 GPU',
-                          'x-display': null,
                           'x-validator': [],
                         }}
                         style={{}}
@@ -1001,7 +1016,10 @@ class CreateModelService$$Page extends React.Component {
                                   'x-component-props': {
                                     _sdkSwrGetFunc: {},
                                     onChange: function () {
-                                      return Reflect.apply(this.onChangeType, this, [...Array.prototype.slice.call(arguments)]);
+                                      return this.onChangeType.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([])
+                                      );
                                     }.bind(this),
                                   },
                                 }}
@@ -1126,25 +1144,21 @@ class CreateModelService$$Page extends React.Component {
                       allowClear: false,
                       disabled: false,
                       notFoundContent: '',
-                      onChange: function () {
-                        return Reflect.apply(this.onChangeApiType, this, [...Array.prototype.slice.call(arguments)]);
-                      }.bind(this),
                       placeholder: '请选择模型服务供应商',
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { asterisk: true, labelEllipsis: true } }}
                   fieldProps={{
-                    '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                    '_unsafe_MixedSetter_default_select': 'I18nSetter',
                     '_unsafe_MixedSetter_enum_select': 'ArraySetter',
                     '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
-                    'default': __$$eval(() => this.state.apiType),
                     'enum': [
                       {
                         children: '未知',
                         id: 'disabled',
-                        label: '本地模型',
+                        label: 'kubeagi',
                         type: 'disabled',
-                        value: 'worker',
+                        value: 'kubeagi',
                       },
                       {
                         children: '未知',
@@ -1169,26 +1183,6 @@ class CreateModelService$$Page extends React.Component {
                     'x-validator': [],
                   }}
                 />
-                <FormilySelect
-                  __component_name="FormilySelect"
-                  componentProps={{
-                    'x-component-props': {
-                      _sdkSwrGetFunc: {},
-                      allowClear: false,
-                      disabled: false,
-                      placeholder: '请选择',
-                    },
-                  }}
-                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                  fieldProps={{
-                    'name': 'workerModel',
-                    'required': true,
-                    'title': '本地模型服务',
-                    'x-display':
-                      "{{ $form.values?.modelSource === '3rd_party' && $form.values?.apiType === 'worker' ? 'visible' : 'hidden' }}",
-                    'x-validator': [],
-                  }}
-                />
                 <FormilyInput
                   __component_name="FormilyInput"
                   componentProps={{ 'x-component-props': { placeholder: '请输入模型服务地址' } }}
@@ -1198,7 +1192,7 @@ class CreateModelService$$Page extends React.Component {
                     'required': true,
                     'title': '模型服务地址',
                     'x-display':
-                      "{{ $form.values?.modelSource === '3rd_party' && $form.values?.apiType && $form.values?.apiType !== 'worker' ? 'visible' : 'hidden' }}",
+                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
                     'x-validator': [],
                   }}
                 />
@@ -1211,17 +1205,12 @@ class CreateModelService$$Page extends React.Component {
                     'required': true,
                     'title': 'Token',
                     'x-display':
-                      "{{ $form.values?.modelSource === '3rd_party' && $form.values?.apiType && $form.values?.apiType !== 'worker' ? 'visible' : 'hidden' }}",
+                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
                     'x-validator': [],
                   }}
                   style={{}}
                 />
-                {!!__$$eval(
-                  () =>
-                    this.state.modelSource === '3rd_party' &&
-                    this.state.apiType &&
-                    this.state.apiType !== 'worker'
-                ) && (
+                {!!__$$eval(() => this.state.modelSource !== 'worker') && (
                   <Row
                     __component_name="Row"
                     gutter={[0, 0]}
@@ -1237,7 +1226,10 @@ class CreateModelService$$Page extends React.Component {
                         disabled={false}
                         ghost={false}
                         onClick={function () {
-                          return Reflect.apply(this.onClickCheck, this, [...Array.prototype.slice.call(arguments)]);
+                          return this.onClickCheck.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
                         }.bind(this)}
                         shape="default"
                         size="small"
@@ -1254,14 +1246,42 @@ class CreateModelService$$Page extends React.Component {
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
                     'enum': [
-                      { label: 'LLM', value: 'llm' },
-                      { label: 'Embedding', value: 'embedding' },
+                      { label: '支持的LLM模型', value: 'llm' },
+                      { label: '支持的Embedding模型', value: 'embedding' },
                     ],
                     'name': 'types',
                     'required': true,
                     'title': '模型服务类型',
                     'x-display':
-                      "{{ $form.values?.modelSource === '3rd_party' && $form.values?.apiType && $form.values?.apiType !== 'worker' ? 'visible' : 'hidden' }}",
+                      "{{ $form.values?.modelSource === '3rd_party' ? 'visible' : 'hidden' }}",
+                    'x-validator': [],
+                  }}
+                />
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{ 'x-component-props': { placeholder: '请输入LLM模型列表' } }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    'name': 'llmModels',
+                    'required': false,
+                    'title': 'LLM模型列表',
+                    'x-display':
+                      "{{ ($form.values?.modelSource === '3rd_party') && ($form.values?.apiType === 'kubeagi') && $form.values?.types?.includes('llm')  ? 'visible' : 'hidden' }}",
+                    'x-validator': [],
+                  }}
+                />
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{
+                    'x-component-props': { placeholder: '请输入Embedding模型列表' },
+                  }}
+                  decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                  fieldProps={{
+                    'name': 'embeddingModels',
+                    'required': false,
+                    'title': 'Embedding模型列表',
+                    'x-display':
+                      "{{ ($form.values?.modelSource === '3rd_party') && ($form.values?.apiType === 'kubeagi') && $form.values?.types?.includes('embedding')  ? 'visible' : 'hidden' }}",
                     'x-validator': [],
                   }}
                 />
@@ -1284,7 +1304,10 @@ class CreateModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return Reflect.apply(this.handleCancle, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.handleCancle.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this)}
                       shape="default"
                     >
@@ -1297,7 +1320,10 @@ class CreateModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return Reflect.apply(this.handleConfirm, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.handleConfirm.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this)}
                       shape="default"
                       type="primary"
@@ -1334,15 +1360,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      render={dataProps => (
-        <CreateModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
-      )}
+      self={self}
       sdkInitFunc={{
         enabled: undefined,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      self={self}
+      render={dataProps => (
+        <CreateModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+      )}
     />
   );
 };
@@ -1351,7 +1377,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch {}
+  } catch (error) {}
 }
 
 function __$$evalArray(expr) {
