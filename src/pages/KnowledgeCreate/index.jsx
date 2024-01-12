@@ -163,7 +163,7 @@ class KnowledgeCreate$$Page extends React.Component {
           files: i.files.nodes,
         }));
         return {
-          label: item.name,
+          label: this.utils.getFullName(item),
           value: item.name,
           contentType: item.contentType,
           versions: versions,
@@ -460,9 +460,9 @@ class KnowledgeCreate$$Page extends React.Component {
                         }}
                         decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                         fieldProps={{
-                          name: 'name',
-                          required: true,
-                          title: '知识库名称',
+                          'name': 'name',
+                          'required': true,
+                          'title': '知识库名称',
                           'x-validator': [
                             {
                               children: '未知',
@@ -490,10 +490,10 @@ class KnowledgeCreate$$Page extends React.Component {
                           },
                         }}
                         fieldProps={{
-                          description: '',
-                          name: 'displayName',
-                          required: false,
-                          title: '知识库别名',
+                          'description': '',
+                          'name': 'displayName',
+                          'required': false,
+                          'title': '知识库别名',
                           'x-validator': [],
                         }}
                       />
@@ -509,12 +509,12 @@ class KnowledgeCreate$$Page extends React.Component {
                         }}
                         decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                         fieldProps={{
-                          _unsafe_MixedSetter_enum_select: 'ArraySetter',
-                          description: '',
-                          enum: [],
-                          name: 'embedder',
-                          required: true,
-                          title: '向量化模型',
+                          '_unsafe_MixedSetter_enum_select': 'ArraySetter',
+                          'description': '',
+                          'enum': [],
+                          'name': 'embedder',
+                          'required': true,
+                          'title': '向量化模型',
                           'x-validator': [],
                         }}
                       />
@@ -523,8 +523,8 @@ class KnowledgeCreate$$Page extends React.Component {
                         componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
                         decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                         fieldProps={{
-                          name: 'description',
-                          title: '描述',
+                          'name': 'description',
+                          'title': '描述',
                           'x-component': 'Input.TextArea',
                           'x-validator': [],
                         }}
@@ -533,9 +533,9 @@ class KnowledgeCreate$$Page extends React.Component {
                         __component_name="FormilyFormItem"
                         decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                         fieldProps={{
-                          name: 'dataSetContain',
-                          required: true,
-                          title: '处理数据集',
+                          'name': 'dataSetContain',
+                          'required': true,
+                          'title': '处理数据集',
                           'x-component': 'FormilyFormItem',
                           'x-validator': [],
                         }}
@@ -556,14 +556,15 @@ class KnowledgeCreate$$Page extends React.Component {
                                     );
                                   }.bind(this),
                                   placeholder: '请选择数据集',
+                                  showSearch: true,
                                 },
                               }}
                               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                               fieldProps={{
-                                description: '',
-                                name: 'dataset',
-                                required: true,
-                                title: '',
+                                'description': '',
+                                'name': 'dataset',
+                                'required': true,
+                                'title': '',
                                 'x-validator': [],
                               }}
                             />
@@ -584,16 +585,16 @@ class KnowledgeCreate$$Page extends React.Component {
                                     );
                                   }.bind(this),
                                   placeholder: '请选择版本',
-                                  showSearch: false,
+                                  showSearch: true,
                                 },
                               }}
                               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                               fieldProps={{
-                                _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                                '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
                                 '_unsafe_MixedSetter_x-validator_select': 'ExpressionSetter',
-                                name: 'version',
-                                required: true,
-                                title: '',
+                                'name': 'version',
+                                'required': true,
+                                'title': '',
                               }}
                             />
                           </Col>
@@ -694,7 +695,9 @@ class KnowledgeCreate$$Page extends React.Component {
                       </Typography.Text>
                     </Col>
                     <Col __component_name="Col">
-                      <Input.Search __component_name="Input.Search" placeholder="请输入" />
+                      {!!false && (
+                        <Input.Search __component_name="Input.Search" placeholder="请输入" />
+                      )}
                     </Col>
                   </Row>
                   {__$$evalArray(() => this.state.nextFileList).map((item, index) =>
