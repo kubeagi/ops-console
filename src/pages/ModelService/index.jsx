@@ -77,6 +77,7 @@ class ModelService$$Page extends React.Component {
       keyword: '',
       loading: true,
       modelTypes: '',
+      offlineModal: false,
       page: 1,
       pageSize: 12,
       providerType: '',
@@ -96,7 +97,7 @@ class ModelService$$Page extends React.Component {
     });
     try {
       const { keyword, pageSize, page, modelTypes, providerType } = this.state;
-      const namespace = this.utils.getAuthData().project || 'system-tce';
+      const namespace = this.utils.getAuthData().project || 'abc';
       const input = {
         pageSize,
         page,
@@ -128,30 +129,10 @@ class ModelService$$Page extends React.Component {
     e.domEvent.stopPropagation();
     switch (e.key) {
       case 'offline': {
-        try {
-          const params = {
-            name: item.name,
-            namespace: item.namespace,
-            displayName: item.displayName,
-            description: item.description,
-            resources: item.resources,
-            replicas: item.status === 'Offline' ? '1' : '0',
-          };
-          const res = await this.props.appHelper.utils.bff?.updateWorker({
-            input: params,
-          });
-          this.utils.notification.success({
-            message: `${item.status === 'Offline' ? '上线' : '下线'}成功`,
-          });
-          setTimeout(() => {
-            this.getListWorkers();
-          }, 500);
-        } catch (error) {
-          this.utils.notification.warnings({
-            message: `${item.status === 'Offline' ? '上线' : '下线'}失败`,
-            errors: error?.response?.errors,
-          });
-        }
+        this.setState({
+          currentModel: item,
+          offlineModal: true,
+        });
         break;
       }
       case 'edit': {
@@ -216,7 +197,7 @@ class ModelService$$Page extends React.Component {
   async onDelOk() {
     try {
       const { currentModel } = this.state;
-      const namespace = this.utils.getAuthData().project || 'system-tce';
+      const namespace = this.utils.getAuthData().project || 'abc';
       const input = {
         namespace,
         name: this.state.currentModel.name,
@@ -229,17 +210,52 @@ class ModelService$$Page extends React.Component {
       this.utils.notification.success({
         message: '删除成功',
       });
-      this.getListWorkers();
+      setTimeout(() => {
+        this.getListWorkers();
+      }, 500);
     } catch (error) {
       this.utils.notification.warnings({
         message: '删除失败',
         errors: error?.response?.errors,
       });
     }
+    this.onDelCancel();
+  }
+
+  onOfflineCancel() {
     this.setState({
-      delVisible: false,
+      offlineModal: false,
       currentModel: {},
     });
+  }
+
+  async onOfflineOk() {
+    try {
+      const { currentModel } = this.state;
+      const params = {
+        name: currentModel.name,
+        namespace: currentModel.namespace,
+        displayName: currentModel.displayName,
+        description: currentModel.description,
+        resources: currentModel.resources,
+        replicas: currentModel.status === 'Offline' ? '1' : '0',
+      };
+      const res = await this.props.appHelper.utils.bff?.updateWorker({
+        input: params,
+      });
+      this.utils.notification.success({
+        message: `${currentModel.status === 'Offline' ? '上线' : '下线'}成功`,
+      });
+      setTimeout(() => {
+        this.getListWorkers();
+      }, 500);
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: `${currentModel.status === 'Offline' ? '上线' : '下线'}失败`,
+        errors: error?.response?.errors,
+      });
+    }
+    this.onOfflineCancel();
   }
 
   onRefresh(event) {
@@ -258,6 +274,11 @@ class ModelService$$Page extends React.Component {
       },
       this.getListWorkers
     );
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   componentDidMount() {
@@ -413,6 +434,9 @@ class ModelService$$Page extends React.Component {
                       position: 'bottom',
                       showQuickJumper: false,
                       showSizeChanger: false,
+                      showTotal: function () {
+                        return Reflect.apply(this.showTotal, this, [...Array.prototype.slice.call(arguments)]);
+                      }.bind(this),
                       simple: false,
                       size: 'default',
                       total: __$$eval(() => this.state.totalCount),
@@ -535,7 +559,7 @@ class ModelService$$Page extends React.Component {
                                     >
                                       <Col
                                         __component_name="Col"
-                                        span={24}
+                                        span={22}
                                         style={{ marginBottom: '10px' }}
                                       >
                                         <Typography.Title
@@ -624,7 +648,7 @@ class ModelService$$Page extends React.Component {
                                               {
                                                 children: '下线中',
                                                 id: 'OfflineInProgress',
-                                                type: 'warning',
+                                                type: 'info',
                                               },
                                               { children: '异常', id: 'False', type: 'error' },
                                             ]}
@@ -720,6 +744,40 @@ class ModelService$$Page extends React.Component {
             __component_name="Alert"
             bordered="dashed"
             message={__$$eval(() => `确定删除${this.state.currentModel.displayName || ''}吗？`)}
+            showIcon={true}
+            type="warning"
+          />
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return Reflect.apply(this.onOfflineCancel, this, [...Array.prototype.slice.call(arguments)]);
+          }.bind(this)}
+          onOk={function () {
+            return Reflect.apply(this.onOfflineOk, this, [...Array.prototype.slice.call(arguments)]);
+          }.bind(this)}
+          open={__$$eval(() => this.state.offlineModal)}
+          style={{}}
+          title={__$$eval(() =>
+            this.state.currentModel.status === 'Offline' ? '上线模型服务' : '下线模型服务'
+          )}
+        >
+          <Alert
+            __component_name="Alert"
+            bordered="dashed"
+            message={__$$eval(
+              () =>
+                `确定${this.state.currentModel.status === 'Offline' ? '上线' : '下线'}${
+                  this.state.currentModel.displayName || ''
+                }吗？`
+            )}
             showIcon={true}
             type="warning"
           />
