@@ -156,13 +156,14 @@ class EditModelService$$Page extends React.Component {
       const res = await this.props.appHelper.utils.bff?.listModels({
         input: {
           systemModel: true,
-          namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+          namespace: this.appHelper.utils.getAuthData().project || 'abc',
         },
       });
       const _listModels = res.Model.listModels.nodes
         .filter(v => v.status === 'True')
         .map(v => ({
-          label: `${v.name}${v.systemModel ? `（${v.namespace}）` : ''}`,
+          // label: `${v.name}${v.systemModel ? `（${v.namespace}）` : ''}`,
+          label: v.name,
           value: v.name,
         }));
       this.form()?.setFieldState('model', {
@@ -171,7 +172,7 @@ class EditModelService$$Page extends React.Component {
       this.setState({
         listModels: res.Model.listModels.nodes,
       });
-    } catch (error) {
+    } catch {
       // console.log(error, '===> err')
     }
   }
@@ -180,7 +181,7 @@ class EditModelService$$Page extends React.Component {
     try {
       const res = await this.props.appHelper.utils.bff?.listRayClusters({
         input: {
-          namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+          namespace: this.appHelper.utils.getAuthData().project || 'abc',
         },
       });
       const list = res.RayCluster.listRayClusters.nodes.map(v => ({
@@ -195,7 +196,7 @@ class EditModelService$$Page extends React.Component {
           RAY_CLUSTER_INDEX: list[0]?.value,
         });
       }
-    } catch (error) {
+    } catch {
       // console.log(error, '===> err')
     }
   }
@@ -211,7 +212,7 @@ class EditModelService$$Page extends React.Component {
     try {
       if (type === 'worker') {
         const res = await this.props?.appHelper?.utils?.bff?.getWorker({
-          namespace: this.appHelper?.utils?.getAuthData()?.project || 'system-tce',
+          namespace: this.appHelper?.utils?.getAuthData()?.project || 'abc',
           name: this.history?.query?.name,
         });
         const {
@@ -240,7 +241,7 @@ class EditModelService$$Page extends React.Component {
           RAY_CLUSTER_INDEX: Number(getWorker.additionalEnvs?.RAY_CLUSTER_INDEX),
           NUMBER_GPUS: getWorker.additionalEnvs?.NUMBER_GPUS,
           resources: {
-            cpu: isMarksCpu ? Object.values(marks).findIndex(v => v === resources.cpu) : 0,
+            cpu: isMarksCpu ? Object.values(marks).indexOf(resources.cpu) : 0,
             memory: isMarksMemory
               ? Object.values(marks).findIndex(v => v === resources.memory?.split('Gi')[0])
               : 0,
@@ -250,7 +251,7 @@ class EditModelService$$Page extends React.Component {
               !isMarksMemory && resources.memory !== '512Mi'
                 ? resources.memory?.split('Gi')[0]
                 : undefined,
-            customGPU: !gpuMarks[resources.nvidiaGPU] ? resources.nvidiaGPU : undefined,
+            customGPU: gpuMarks[resources.nvidiaGPU] ? undefined : resources.nvidiaGPU,
           },
         });
         this.setState({
@@ -261,7 +262,7 @@ class EditModelService$$Page extends React.Component {
       }
       if (type === '3rd_party') {
         const res = await this.props?.appHelper?.utils?.bff?.getModelService({
-          namespace: this.appHelper?.utils?.getAuthData()?.project || 'system-tce',
+          namespace: this.appHelper?.utils?.getAuthData()?.project || 'abc',
           name: this.history?.query?.name,
         });
         const {
@@ -286,7 +287,7 @@ class EditModelService$$Page extends React.Component {
               : undefined,
         });
       }
-    } catch (error) {
+    } catch {
       // console.log(error, '===> error')
     }
   }
@@ -312,7 +313,7 @@ class EditModelService$$Page extends React.Component {
             name: v.name,
             displayName: v.displayName,
             description: v.description,
-            namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+            namespace: this.appHelper.utils.getAuthData().project || 'abc',
             type:
               v.configType && v.configType.includes('fastchat-vllm') ? 'fastchat-vllm' : 'fastchat',
             resources: {
@@ -352,7 +353,7 @@ class EditModelService$$Page extends React.Component {
               },
               url: v.baseUrl,
             },
-            namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+            namespace: this.appHelper.utils.getAuthData().project || 'abc',
           };
           if (v.apiType === 'kubeagi') {
             params.llmModels =
@@ -420,7 +421,7 @@ class EditModelService$$Page extends React.Component {
             },
             url: v.baseUrl,
           },
-          namespace: this.appHelper.utils.getAuthData().project || 'system-tce',
+          namespace: this.appHelper.utils.getAuthData().project || 'abc',
         };
         if (v.apiType === 'kubeagi') {
           params.llmModels =
@@ -528,8 +529,15 @@ class EditModelService$$Page extends React.Component {
                       {
                         children: '未知',
                         id: 'disabled',
-                        message: this.i18n('i18n-585k83dk') /* 模型服务名称由 0 ~ 50 字符组成 */,
-                        pattern: '^.{0,50}$',
+                        message: '请输入正确的模型服务名称',
+                        pattern: '^[a-z]([-a-z0-9]*[a-z0-9])?$',
+                        type: 'disabled',
+                      },
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        message: '请输入正确的模型服务名称',
+                        pattern: '^[a-z]([-a-z0-9]*[a-z0-9])?$',
                         type: 'disabled',
                       },
                     ],
@@ -537,10 +545,11 @@ class EditModelService$$Page extends React.Component {
                 />
                 <FormilyInput
                   __component_name="FormilyInput"
-                  componentProps={{ 'x-component-props': { placeholder: '请输入模型类型' } }}
+                  componentProps={{ 'x-component-props': { placeholder: '请输入模型服务别名' } }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
                     'name': 'displayName',
+                    'required': true,
                     'title': '模型服务别名',
                     'x-pattern': 'editable',
                     'x-validator': [],
@@ -597,12 +606,10 @@ class EditModelService$$Page extends React.Component {
                       disabled: false,
                       mode: 'single',
                       onChange: function () {
-                        return this.onChangeModel.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.onChangeModel, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this),
                       placeholder: '请选择模型',
+                      showSearch: true,
                     },
                   }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -737,7 +744,7 @@ class EditModelService$$Page extends React.Component {
                                     max: 64,
                                     min: 1,
                                     placeholder: '请输入',
-                                    precision: 0,
+                                    precision: 2,
                                     step: 1,
                                   },
                                 }}
@@ -980,56 +987,121 @@ class EditModelService$$Page extends React.Component {
                     wrap={false}
                   >
                     <Col __component_name="Col" flex="" span={4} />
-                    <Col __component_name="Col" flex="" span={7}>
-                      <FormilyInput
-                        __component_name="FormilyInput"
-                        componentProps={{
-                          'x-component-props': {
-                            placeholder: '请输入指定使用的 GPU 序号，多个用英文逗号隔开，如：0,3',
-                          },
-                        }}
-                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                        fieldProps={{
-                          'name': 'CUDA_VISIBLE_DEVICES',
-                          'title': '指定 GPU',
-                          'x-validator': [],
-                        }}
-                      />
+                    <Col __component_name="Col" flex="" span={24}>
+                      <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                        <Col __component_name="Col" span={20}>
+                          <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
+                            <Col __component_name="Col" flex="" span={2}>
+                              <Typography.Text
+                                __component_name="Typography.Text"
+                                disabled={false}
+                                ellipsis={true}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                              >
+                                指定 GPU
+                              </Typography.Text>
+                            </Col>
+                            <Col __component_name="Col" flex="auto" span={8}>
+                              <FormilyInput
+                                __component_name="FormilyInput"
+                                componentProps={{
+                                  'x-component-props': {
+                                    placeholder:
+                                      '请输入指定使用的 GPU 序号，多个用英文逗号隔开，如：0,3',
+                                  },
+                                }}
+                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                                fieldProps={{
+                                  'name': 'CUDA_VISIBLE_DEVICES',
+                                  'title': '',
+                                  'x-validator': [
+                                    {
+                                      children: '未知',
+                                      id: 'disabled',
+                                      message: '仅支持输入数字、英文逗号，且以数字开头',
+                                      pattern: '^\\d[\\d,]*$',
+                                      type: 'disabled',
+                                    },
+                                  ],
+                                }}
+                              />
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col __component_name="Col" span={20}>
+                          <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
+                            <Col __component_name="Col" flex="" span={2} />
+                            <Col __component_name="Col" flex="auto">
+                              <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                                <Col __component_name="Col" span={24}>
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ color: '#AAAAAA', fontSize: '10' }}
+                                  >
+                                    输入 GPU 序号，平台将会使用指定的
+                                    GPU，若未全部指定或为空，则按照顺序使用。
+                                  </Typography.Text>
+                                </Col>
+                                <Col __component_name="Col" span={24}>
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ color: '#AAAAAA', fontSize: '10' }}
+                                  >
+                                    如：服务规格 GPU 配置为 4 颗，指定 GPU 配置为：5,6，那么在调度
+                                    GPU 时，将会调度序号为 0,1,5,6 的 GPU。
+                                  </Typography.Text>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
                     </Col>
                   </Row>
                 )}
                 {!!__$$eval(() => this.state.modelSource === 'worker') && (
                   <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
-                    <Col __component_name="Col" flex="" span={4} />
-                    <Col __component_name="Col" flex="auto">
+                    <Col __component_name="Col" flex="" span={0} />
+                    <Col __component_name="Col" flex="auto" style={{ marginTop: '24px' }}>
                       <Divider
                         __component_name="Divider"
                         content={[
                           <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
-                            <Col __component_name="Col" span={10}>
-                              <FormilyCheckbox
-                                __component_name="FormilyCheckbox"
-                                componentProps={{
-                                  'x-component-props': {
-                                    _sdkSwrGetFunc: {},
-                                    onChange: function () {
-                                      return this.onChangeType.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([])
-                                      );
-                                    }.bind(this),
-                                  },
-                                }}
-                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                                fieldProps={{
-                                  'enum': [
-                                    { label: '启用 VLLM 加速', value: 'fastchat-vllm' },
-                                    { label: '启用 Ray 分布式推理', value: 'ray' },
-                                  ],
-                                  'name': 'configType',
-                                  'x-validator': [],
-                                }}
-                              />
+                            <Col __component_name="Col" span={24}>
+                              <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
+                                <Col __component_name="Col" flex="" span={4} />
+                                <Col __component_name="Col" flex="auto">
+                                  <FormilyCheckbox
+                                    __component_name="FormilyCheckbox"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        _sdkSwrGetFunc: {},
+                                        onChange: function () {
+                                          return Reflect.apply(this.onChangeType, this, [...Array.prototype.slice.call(arguments)]);
+                                        }.bind(this),
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': { labelEllipsis: true },
+                                    }}
+                                    fieldProps={{
+                                      'enum': [
+                                        { label: '启用 VLLM 加速', value: 'fastchat-vllm' },
+                                        { label: '启用 Ray 分布式推理', value: 'ray' },
+                                      ],
+                                      'name': 'configType',
+                                      'x-validator': [],
+                                    }}
+                                  />
+                                </Col>
+                              </Row>
                               <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
                                 <Col __component_name="Col" span={24}>
                                   <FormilySelect
@@ -1073,7 +1145,7 @@ class EditModelService$$Page extends React.Component {
                                       </Col>
                                       <Col
                                         __component_name="Col"
-                                        span={8}
+                                        span={2}
                                         style={{ marginRight: '12px' }}
                                       >
                                         <FormilyNumberPicker
@@ -1213,10 +1285,7 @@ class EditModelService$$Page extends React.Component {
                         disabled={false}
                         ghost={false}
                         onClick={function () {
-                          return this.onClickCheck.apply(
-                            this,
-                            Array.prototype.slice.call(arguments).concat([])
-                          );
+                          return Reflect.apply(this.onClickCheck, this, [...Array.prototype.slice.call(arguments)]);
                         }.bind(this)}
                         shape="default"
                         size="small"
@@ -1289,10 +1358,7 @@ class EditModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return this.handleCancle.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleCancle, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this)}
                       shape="default"
                     >
@@ -1305,10 +1371,7 @@ class EditModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return this.handleConfirm.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleConfirm, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this)}
                       shape="default"
                       type="primary"
@@ -1345,15 +1408,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      self={self}
+      render={dataProps => (
+        <EditModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
+      )}
       sdkInitFunc={{
         enabled: undefined,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      render={dataProps => (
-        <EditModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
-      )}
+      self={self}
     />
   );
 };
@@ -1362,7 +1425,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch {}
 }
 
 function __$$evalArray(expr) {
