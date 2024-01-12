@@ -68,7 +68,7 @@ const Knowledge: React.FC<KnowledgeProps> = props => {
                 </span>
                 <Typography.Text
                   ellipsis={{ tooltip: item?.name }}
-                  style={{ position: 'relative', top: -2, width: 98 }}
+                  style={{ position: 'relative', top: -2, width: 97 }}
                 >
                   {item?.name}
                 </Typography.Text>

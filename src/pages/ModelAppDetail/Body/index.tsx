@@ -41,6 +41,7 @@ const Body: React.FC<BodyProps> = props => {
                   ...data,
                   name: data?.metadata?.name,
                   namespace: data?.metadata?.namespace,
+                  knowledgebase: form.getFieldsValue()?.knowledgebase || undefined,
                   ...form.getFieldsValue(),
                 };
                 delete input.metadata;
