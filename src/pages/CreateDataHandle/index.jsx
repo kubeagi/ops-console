@@ -396,20 +396,30 @@ class $$Page extends React.Component {
       })
       .then(res => {
         const nodes = res.LLM.listLLMs?.nodes || [];
-        const _list = nodes.map(item => {
-          return {
-            models: item.models?.map(i => ({
-              label: i,
-              value: i,
-            })),
-            _models: item.models,
-            label: this.utils.getFullName(item),
-            value: item.name,
-            provider: item.provider,
-            baseUrl: item.baseUrl,
-            namespace: item.namespace,
-          };
-        });
+        const _list = nodes
+          .filter(item => item.status === 'True')
+          .map(item => {
+            return {
+              models: item.models?.map(i => ({
+                label: i,
+                value: i,
+              })),
+              _models: item.models,
+              label: this.utils.getFullName(item),
+              value: item.name,
+              provider: item.provider,
+              baseUrl: item.baseUrl,
+              namespace: item.namespace,
+            };
+          });
+        if (this.state.step3Data?.QAsplitForm?.type) {
+          const cur = _list.find(i => i.value === this.state.step3Data.QAsplitForm.type);
+          if (cur.provider !== 'worker') {
+            this.form('qa_split').setFieldState('model', {
+              dataSource: cur.models,
+            });
+          }
+        }
         this.setState({
           llmList: _list,
         });

@@ -331,7 +331,7 @@ const DataHandle: React.FC<Iprops> = props => {
       ) : (
         ''
       )}
-      <Steps direction="vertical" items={items} size="small" />
+      <Steps direction="vertical" items={items} progressDot size="small" />
       <Modal footer={null} onCancel={closeHighConfig} open={highConfigVisible} title="模型配置">
         <Form labelAlign="right" {...layout}>
           <Form.Item label="温度">{highConfig?.temperature || '-'}</Form.Item>
