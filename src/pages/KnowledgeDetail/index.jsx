@@ -87,7 +87,7 @@ class KnowledgeDetail$$Page extends React.Component {
   $$ = () => [];
 
   componentWillUnmount() {
-    console.log('will unmount');
+    // console.log('will unmount');
   }
 
   countFileGroupDetail() {
@@ -173,9 +173,9 @@ class KnowledgeDetail$$Page extends React.Component {
       namespace: knowledge.namespace,
       fileGroups,
     };
-    console.log('input', input);
-    console.log('knowledge', knowledge);
-    console.log('modalFilesSelectedKeys', this.state.modalFilesSelectedKeys);
+    // console.log('input', input)
+    // console.log('knowledge', knowledge)
+    // console.log('modalFilesSelectedKeys', this.state.modalFilesSelectedKeys)
     this.setState({
       addFilesModalConfirmBtnLoading: true,
     });
@@ -223,7 +223,7 @@ class KnowledgeDetail$$Page extends React.Component {
   }
 
   onFileModalSelectionChange(selectedRowKeys, selectedRows) {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     this.setState({
       modalFilesSelectedKeys: selectedRowKeys,
     });
@@ -254,9 +254,7 @@ class KnowledgeDetail$$Page extends React.Component {
     this.props.useGetKnowledgeBase?.mutate();
   }
 
-  componentDidMount() {
-    console.log('did mount');
-  }
+  componentDidMount() {}
 
   render() {
     const __$$context = this._context || this;
@@ -542,8 +540,9 @@ class KnowledgeDetail$$Page extends React.Component {
                                 children: (
                                   <Typography.Text
                                     __component_name="Typography.Text"
+                                    copyable={true}
                                     disabled={false}
-                                    ellipsis={true}
+                                    ellipsis={false}
                                     strong={false}
                                     style={{ fontSize: '' }}
                                   >
