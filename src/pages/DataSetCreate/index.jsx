@@ -179,7 +179,7 @@ class DataSetCreate$$Page extends React.Component {
       namespace: datasetParams.namespace,
       datasetName: datasetParams.name,
       displayName: datasetParams.displayName + '-v1',
-      // description: String
+      description: datasetParams.description,
       version: 'v1',
       released: 0,
       // inheritedFrom: String
