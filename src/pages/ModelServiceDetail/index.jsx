@@ -65,6 +65,7 @@ class ModelServiceDetail$$Page extends React.Component {
       isOffFlag: undefined,
       loading: false,
       okLoading: false,
+      onAndOffModalVisible: false,
       onOrOffLoading: false,
     };
   }
@@ -231,7 +232,7 @@ class ModelServiceDetail$$Page extends React.Component {
         this.openDelModal();
         break;
       default:
-        this.updateWorkerReq();
+        this.openOnAndOffModal();
         break;
     }
   }
@@ -247,6 +248,16 @@ class ModelServiceDetail$$Page extends React.Component {
       return result;
     }
     return '-';
+  }
+
+  handleOnOrOffModalCancelClick() {
+    this.setState({
+      onAndOffModalVisible: false,
+    });
+  }
+
+  handleOnOrOffModalOkClick() {
+    this.updateWorkerReq();
   }
 
   initServiceDetailData() {
@@ -269,6 +280,12 @@ class ModelServiceDetail$$Page extends React.Component {
   openDelModal() {
     this.setState({
       delModalVisible: true,
+    });
+  }
+
+  openOnAndOffModal() {
+    this.setState({
+      onAndOffModalVisible: true,
     });
   }
 
@@ -301,7 +318,14 @@ class ModelServiceDetail$$Page extends React.Component {
       this.utils.notification.success({
         message: `${label}成功`,
       });
-      setTimeout(this.initServiceDetailData.bind(this), 500);
+      this.setState(
+        {
+          onAndOffModalVisible: false,
+        },
+        () => {
+          setTimeout(this.initServiceDetailData.bind(this), 500);
+        }
+      );
     } catch (err) {
       const description = err?.response?.errors?.[0]?.message || '未知错误';
       this.utils.notification.warn({
@@ -316,7 +340,6 @@ class ModelServiceDetail$$Page extends React.Component {
   }
 
   componentDidMount() {
-    // console.log('did mount');
     this.initServiceDetailData();
   }
 
@@ -359,6 +382,47 @@ class ModelServiceDetail$$Page extends React.Component {
             type="warning"
           />
         </Modal>
+        {!!__$$eval(() => this.state.onAndOffModalVisible) && (
+          <Modal
+            __component_name="Modal"
+            cancelButtonProps={{ disabled: false }}
+            centered={false}
+            confirmLoading={__$$eval(() => this.state.onOrOffLoading)}
+            destroyOnClose={true}
+            forceRender={false}
+            keyboard={true}
+            mask={true}
+            maskClosable={false}
+            okButtonProps={{ disabled: false }}
+            onCancel={function () {
+              return this.handleOnOrOffModalCancelClick.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            onOk={function () {
+              return this.handleOnOrOffModalOkClick.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            open={__$$eval(() => this.state.onAndOffModalVisible)}
+            title={__$$eval(() => (this.state.isOffFlag ? '上线' : '下线'))}
+          >
+            <Alert
+              __component_name="Alert"
+              bordered="dashed"
+              message={__$$eval(
+                () =>
+                  `确定${this.state.isOffFlag ? '上线' : '下线'} ${
+                    this.state.detail?.displayName
+                  } 模型服务吗？`
+              )}
+              showIcon={true}
+              type="warning"
+            />
+          </Modal>
+        )}
         <Button.Back
           __component_name="Button.Back"
           style={{ fontSize: '14px', lineHeight: '15px' }}
@@ -473,7 +537,7 @@ class ModelServiceDetail$$Page extends React.Component {
                                   _unsafe_MixedSetter_children_select: 'StringSetter',
                                   children: '已下线',
                                   id: 'Offline',
-                                  type: 'success',
+                                  type: 'warning',
                                 },
                                 {
                                   _unsafe_MixedSetter_children_select: 'StringSetter',
@@ -650,8 +714,9 @@ class ModelServiceDetail$$Page extends React.Component {
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
+                        copyable={true}
                         disabled={false}
-                        ellipsis={true}
+                        ellipsis={false}
                         strong={false}
                         style={{ fontSize: '' }}
                       >
@@ -671,6 +736,7 @@ class ModelServiceDetail$$Page extends React.Component {
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
+                        copyable={false}
                         disabled={false}
                         ellipsis={true}
                         strong={false}
@@ -736,7 +802,7 @@ class ModelServiceDetail$$Page extends React.Component {
                       >
                         {__$$eval(() =>
                           this.getFullDescribe({
-                            key: 'providerType',
+                            key: 'apiType',
                           })
                         )}
                       </Typography.Text>
@@ -854,8 +920,9 @@ class ModelServiceDetail$$Page extends React.Component {
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
+                        copyable={true}
                         disabled={false}
-                        ellipsis={true}
+                        ellipsis={false}
                         strong={false}
                         style={{ fontSize: '' }}
                       >
@@ -877,8 +944,9 @@ class ModelServiceDetail$$Page extends React.Component {
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
+                        copyable={true}
                         disabled={false}
-                        ellipsis={true}
+                        ellipsis={false}
                         strong={false}
                         style={{ fontSize: '' }}
                       >
