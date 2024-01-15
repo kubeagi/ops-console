@@ -125,4 +125,10 @@ const routes = [
   },
 ];
 
-export default routes;
+const filterNameInProduction = routes => routes.map(route => ({
+  ...route,
+  name: process.env.NODE_ENV === 'production' ?  undefined : route.name,
+  routes: route.routes ? filterNameInProduction(route.routes) : undefined,
+}))
+
+export default filterNameInProduction(routes)

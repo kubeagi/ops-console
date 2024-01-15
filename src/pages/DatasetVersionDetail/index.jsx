@@ -267,6 +267,9 @@ class DatasetVersionDetail$$Page extends React.Component {
   }
 
   handleReUpload() {
+    this.setState({
+      addFileLoading: false,
+    });
     if (!(this.state.upload?.uploadThis?.state?.fileList?.length > 0)) {
       this.handleCancle();
       return;
@@ -324,6 +327,12 @@ class DatasetVersionDetail$$Page extends React.Component {
     this.handleCancle();
   }
 
+  onShowTrustModal() {
+    this.setState({
+      addFileLoading: false,
+    });
+  }
+
   openFileDetail(e, { data }) {
     this.setState(
       {
@@ -362,7 +371,10 @@ class DatasetVersionDetail$$Page extends React.Component {
 
   setUploadState(state) {
     this.setState({
-      upload: state,
+      upload: {
+        ...this.state.upload,
+        ...state,
+      },
     });
   }
 
@@ -541,6 +553,12 @@ class DatasetVersionDetail$$Page extends React.Component {
                   );
                 }.bind(this)}
                 multiple={true}
+                onShowTrustModal={function () {
+                  return this.onShowTrustModal.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
                 setState={function () {
                   return this.setUploadState.apply(
                     this,

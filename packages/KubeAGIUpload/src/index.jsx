@@ -70,6 +70,7 @@ class KubeAgiUpload$$Component extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      allowReupload: false,
       Authorization:
         'bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImI1MmViYzk1NWRiYjYyNzBiN2YyZDZiNzQ5YWQ0M2RlNmExNTg0MjYifQ.eyJpc3MiOiJodHRwczovL3BvcnRhbC4xNzIuMjIuOTYuMTM2Lm5pcC5pby9vaWRjIiwic3ViIjoiQ2dWaFpHMXBiaElHYXpoelkzSmsiLCJhdWQiOiJiZmYtY2xpZW50IiwiZXhwIjoxNzAwODEwNDY0LCJpYXQiOjE3MDA3MjQwNjQsImF0X2hhc2giOiJNWFpoRGhrVGVNOGg2OVYyT193Vl93IiwiY19oYXNoIjoiWHFfQXFKSllsN3VrQ1ZRWVFqak5IZyIsImVtYWlsIjoiYWRtaW5AdGVueGNsb3VkLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJncm91cHMiOlsic3lzdGVtOm1hc3RlcnMiLCJpYW0udGVueGNsb3VkLmNvbSIsIm9ic2VydmFiaWxpdHkiLCJyZXNvdXJjZS1yZWFkZXIiLCJvYnNldmFiaWxpdHkiXSwibmFtZSI6ImFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJwaG9uZSI6IiIsInVzZXJpZCI6ImFkbWluIn0.p5r2XN0Jl19FsHv85meDrFExu-TneS7i5_ENsWMMa5ziAxJjC_mLjgeN-4CzdM9flN3U931mSO29H-b2lifLdf7bYwtSOuIMiwoBkklOEa2MQVGDybkgH4QTlaClYYNSVYL4o4ZLmt5CFL7t0cf8UTapeUZTynL1ZPPgLMepPoqvteuNx4rsXXPjmywMK_o8jMRVxPLSdpxAV0e75lEW6wjq-0kqg8j2BFXbIeiftKzlRwAUa6NYAQZxsQGhS7_C3zIymyndoqzK5rAflwiHOZRX_CgQS0MIym1uNkauuH7MekRB2y5h0PMwGZ6tVwvF_h8by8RgjS7lVOb8rxMDcg',
       bucket: 'xxyy',
@@ -457,6 +458,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 modalVisible: true,
                 modalLink: url?.split('?')?.[0],
               });
+              pageThis.props.onShowTrustModal?.();
             } else {
               pageThis.handleBack();
               pageThis.utils.notification.warnings({
@@ -631,6 +633,13 @@ class KubeAgiUpload$$Component extends React.Component {
     return false;
   }
 
+  onTrustBtnClick(event) {
+    // 点击按钮时的回调
+    this.setState({
+      allowReupload: true,
+    });
+  }
+
   startUpload() {
     this.setState({
       ids: [...this.state.ids, file.uid],
@@ -683,7 +692,7 @@ class KubeAgiUpload$$Component extends React.Component {
                 __component_name="Button"
                 block={false}
                 danger={false}
-                disabled={false}
+                disabled={__$$eval(() => !this.state.allowReupload)}
                 ghost={false}
                 icon=""
                 onClick={function () {
@@ -739,35 +748,18 @@ class KubeAgiUpload$$Component extends React.Component {
                 disabled={false}
                 ghost={false}
                 href={__$$eval(() => this.state.modalLink || '-')}
-                icon=""
+                icon={<TenxIconLinkTo __component_name="TenxIconLinkTo" />}
+                onClick={function () {
+                  return this.onTrustBtnClick.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
                 shape="default"
-                style={{
-                  paddingBottom: '0px',
-                  paddingLeft: '0px',
-                  paddingRight: '0px',
-                  paddingTop: '0px',
-                }}
                 target="_blank"
-                type="link"
+                type="primary"
               >
-                {[
-                  <Typography.Text
-                    __component_name="Typography.Text"
-                    disabled={false}
-                    ellipsis={true}
-                    strong={false}
-                    style={{ fontSize: '' }}
-                    type="colorPrimary"
-                    key="node_oclpuxu40yg"
-                  >
-                    {this.i18n('i18n-ymkxjalg') /* 点击信任证书 */}
-                  </Typography.Text>,
-                  <TenxIconLinkTo
-                    __component_name="TenxIconLinkTo"
-                    color="#4461EB"
-                    key="node_oclpuxu40yb"
-                  />,
-                ]}
+                点击信任证书
               </Button>
             </Col>
             <Col __component_name="Col" span={24}>
