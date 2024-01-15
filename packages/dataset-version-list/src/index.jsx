@@ -222,7 +222,7 @@ class DatasetVersionList$$Component extends React.Component {
               dataIndex: 'files',
               key: 'files',
               render: (text, record) => text.totalCount,
-              title: '数据量',
+              title: '文件数量',
             },
             {
               dataIndex: 'updateTimestamp',
