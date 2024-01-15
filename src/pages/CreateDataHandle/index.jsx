@@ -301,6 +301,9 @@ class $$Page extends React.Component {
                   namespace: this.state.llmList.find(
                     item => item.value === this.state.step3Data.QAsplitForm.type
                   ).namespace,
+                  provider: this.state.llmList.find(
+                    item => item.value === this.state.step3Data.QAsplitForm.type
+                  ).provider,
                   model:
                     this.state.llmList.find(
                       item => item.value === this.state.step3Data.QAsplitForm.type

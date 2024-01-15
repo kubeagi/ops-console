@@ -234,6 +234,27 @@ class DataHandleList$$Page extends React.Component {
     );
   }
 
+  onRetry(e, { record }) {
+    this.utils.bff
+      .dataProcessRetry({
+        input: {
+          id: record.id,
+          creator: this.utils.getAuthData()?.user?.name,
+        },
+      })
+      .then(res => {
+        this.utils.notification.success({
+          message: res.dataProcess.dataProcessRetry.message,
+        });
+        this.getDataList();
+      })
+      .catch(err => {
+        this.utils.notification.warn({
+          message: '重试失败',
+        });
+      });
+  }
+
   showTotal(total, range) {
     // 用于格式化显示表格数据总量
     return `共 ${total} 条`;
@@ -580,6 +601,29 @@ class DataHandleList$$Page extends React.Component {
                                   align="center"
                                   direction="horizontal"
                                 >
+                                  {!!__$$eval(() => record.status === 'process_fail') && (
+                                    <Button
+                                      __component_name="Button"
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      onClick={function () {
+                                        return this.onRetry.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([
+                                            {
+                                              record: record,
+                                            },
+                                          ])
+                                        );
+                                      }.bind(__$$context)}
+                                      shape="default"
+                                      size="small"
+                                    >
+                                      重试
+                                    </Button>
+                                  )}
                                   <Button
                                     __component_name="Button"
                                     block={false}
