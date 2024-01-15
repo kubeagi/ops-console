@@ -36,7 +36,7 @@ importers:
         version: 2.2.30(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)(typescript@5.0.4)
       '@lobehub/tts':
         specifier: ^1.23.4
-        version: 1.23.4(@lobehub/ui@1.124.0)(antd-style@3.6.1)(antd@5.12.3)(lucide-react@0.307.0)(react-dom@18.2.0)(react-layout-kit@1.7.4)(react@18.2.0)
+        version: 1.23.4(@lobehub/ui@1.124.0)(antd-style@3.6.1)(antd@5.12.3)(lucide-react@0.308.0)(react-dom@18.2.0)(react-layout-kit@1.7.4)(react@18.2.0)
       '@lobehub/ui':
         specifier: ^1.124.0
         version: 1.124.0(@types/react-dom@18.2.14)(@types/react@18.2.30)(antd-style@3.6.1)(antd@5.12.3)(react-dom@18.2.0)(react@18.2.0)
@@ -74,8 +74,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.0.65
-        version: 1.0.65(@tenx-ui/materials@1.5.28)(antd@5.12.3)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.0.66
+        version: 1.0.66(@tenx-ui/materials@1.5.28)(antd@5.12.3)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/react-markdown-lowcode-materials':
         specifier: 1.0.1
         version: 1.0.1(@types/react@18.2.30)(lodash@4.17.21)(react-dom@18.2.0)(react@18.2.0)
@@ -4551,7 +4551,7 @@ packages:
     resolution: {integrity: sha512-s9KnjaPjsEefaNv150G3aifvB+J3P4eEKG+epY9zDPS2BeB6+V2jELWqAZll+nkogMaVovjEE813z3V751QwGw==}
     dev: false
 
-  /@lobehub/tts@1.23.4(@lobehub/ui@1.124.0)(antd-style@3.6.1)(antd@5.12.3)(lucide-react@0.307.0)(react-dom@18.2.0)(react-layout-kit@1.7.4)(react@18.2.0):
+  /@lobehub/tts@1.23.4(@lobehub/ui@1.124.0)(antd-style@3.6.1)(antd@5.12.3)(lucide-react@0.308.0)(react-dom@18.2.0)(react-layout-kit@1.7.4)(react@18.2.0):
     resolution: {integrity: sha512-7xaxhNkdNbbNNOdFrWzksstitpMCejkNJ7eVvMx++yft/I5sFu/76yCOzlfDnGZ53D3YMoEXMhv2TPtQndASjg==}
     peerDependencies:
       '@lobehub/ui': '>=1'
@@ -4567,7 +4567,7 @@ packages:
       antd: 5.12.3(react-dom@18.2.0)(react@18.2.0)
       antd-style: 3.6.1(@types/react@18.2.30)(antd@5.12.3)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.307.0(react@18.2.0)
+      lucide-react: 0.308.0(react@18.2.0)
       openai: 4.23.0
       query-string: 8.1.0
       react: 18.2.0
@@ -4617,7 +4617,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.14)(@types/react@18.2.30)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.308.0(react@18.2.0)
+      lucide-react: 0.309.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.0(react@18.2.0)
       query-string: 8.1.0
@@ -7533,7 +7533,7 @@ packages:
       axios: 0.27.2
       babel-plugin-import: 1.13.8
       dayjs: 1.11.10
-      dva-core: 2.0.4(redux@3.7.2)
+      dva-core: 2.0.4(redux@4.2.1)
       dva-immer: 1.0.1(dva@2.5.0-beta.2)
       dva-loading: 3.0.24(dva-core@2.0.4)
       event-emitter: 0.3.5
@@ -7917,8 +7917,8 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.0.65(@tenx-ui/materials@1.5.28)(antd@5.12.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-RBEIzPibaNYaSfypEr+h0akJeSHQdYbJKcQnguoPNw+OoZnsDU/AHyaYFkf/ZBVgvumxpbgoLNfhoOnpSGK6pA==}
+  /@yuntijs/arcadia-bff-sdk@1.0.66(@tenx-ui/materials@1.5.28)(antd@5.12.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-cUVZWaenilkO6b+6dQ2alpFxYDWMsxtIVrHvpRb2aoFtZUxKd1Dr7rKanmNFWSdv7tzCO0ast5T2GU0yCUeNUg==}
     peerDependencies:
       '@tenx-ui/materials': '>=1.5.8'
       antd: '>=5.4.0'
@@ -10330,7 +10330,7 @@ packages:
       warning: 3.0.0
     dev: false
 
-  /dva-core@2.0.4(redux@3.7.2):
+  /dva-core@2.0.4(redux@4.2.1):
     resolution: {integrity: sha1-CGZl0dX2hOCJxb+sm6OI2RzJBQo=}
     peerDependencies:
       redux: 4.x
@@ -10340,7 +10340,7 @@ packages:
       global: 4.4.0
       invariant: 2.2.4
       is-plain-object: 2.0.4
-      redux: 3.7.2
+      redux: 4.2.1
       redux-saga: 0.16.2
       warning: 3.0.0
     dev: false
@@ -10361,7 +10361,7 @@ packages:
       dva-core: ^1.1.0 || ^1.5.0-0 || ^1.6.0-0
     dependencies:
       '@babel/runtime': 7.23.5
-      dva-core: 2.0.4(redux@3.7.2)
+      dva-core: 2.0.4(redux@4.2.1)
     dev: false
 
   /dva@2.5.0-beta.2(react-dom@18.2.0)(react@18.2.0):
@@ -14334,16 +14334,16 @@ packages:
     dependencies:
       yallist: 4.0.0
 
-  /lucide-react@0.307.0(react@18.2.0):
-    resolution: {integrity: sha512-+vZ+vUiWPZTMnLHURg4aoIaz6NHOWXVVcVd8iLROu1k4LbyjcnHIKmbjXHCmulz7XAYLWRVXzhJJgIr+Aq3vOg==}
+  /lucide-react@0.308.0(react@18.2.0):
+    resolution: {integrity: sha512-QC3S4Qi6s5y/w4bhS7sauDG29MsPwV0C5g9/mKkY7/gm3tPpg9tyRQG33g597Q5M3vmE0APcPuOjyQKsF8gnIg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
       react: 18.2.0
     dev: false
 
-  /lucide-react@0.308.0(react@18.2.0):
-    resolution: {integrity: sha512-QC3S4Qi6s5y/w4bhS7sauDG29MsPwV0C5g9/mKkY7/gm3tPpg9tyRQG33g597Q5M3vmE0APcPuOjyQKsF8gnIg==}
+  /lucide-react@0.309.0(react@18.2.0):
+    resolution: {integrity: sha512-zNVPczuwFrCfksZH3zbd1UDE6/WYhYAdbe2k7CImVyPAkXLgIwbs6eXQ4loigqDnUFjyFYCI5jZ1y10Kqal0dg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -19236,6 +19236,7 @@ packages:
       object-assign: 4.1.1
       prop-types: 15.8.1
     dev: false
+    bundledDependencies: false
 
   /react@18.1.0:
     resolution: {integrity: sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ==}
