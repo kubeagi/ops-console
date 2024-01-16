@@ -21,7 +21,7 @@ const Info: React.FC<Iprops> = props => {
         children: data.id,
       },
       {
-        label: '任务类型',
+        label: '文件类型',
         children: data.file_type === 'text' ? '普通文本' : 'QA文本',
       },
       {
