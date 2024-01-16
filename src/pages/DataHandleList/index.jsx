@@ -102,7 +102,7 @@ class DataHandleList$$Page extends React.Component {
       });
       const res = await this.utils.bff.allDataProcessListByPage({
         input: {
-          pageIndex: (this.state.currentPage - 1) * this.state.pageSize,
+          pageIndex: Math.max(this.state.currentPage - 1, 0) * this.state.pageSize,
           pageSize: this.state.pageSize,
           keyword: this.state.keyword,
           namespace: this.utils.getAuthData().project,

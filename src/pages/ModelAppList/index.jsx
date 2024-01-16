@@ -25,6 +25,7 @@ import {
   Divider,
   Descriptions,
   Status,
+  Tooltip,
   Pagination,
 } from '@tenx-ui/materials';
 
@@ -33,6 +34,7 @@ import {
   AntdIconPlusOutlined,
   AntdIconReloadOutlined,
   AntdIconSettingOutlined,
+  AntdIconInfoCircleOutlined,
 } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
@@ -287,7 +289,7 @@ class ModelAppList$$Page extends React.Component {
           }
         );
         this.utils.notification.success({
-          message: '删除应用成功',
+          message: '删除智能体成功',
         });
       })
       .catch(error => {
@@ -295,7 +297,7 @@ class ModelAppList$$Page extends React.Component {
           deleteLoading: false,
         });
         this.utils.notification.warn({
-          message: '删除应用失败',
+          message: '删除智能体失败',
         });
       });
   }
@@ -516,7 +518,7 @@ class ModelAppList$$Page extends React.Component {
           namespace: this.utils.getAuthData()?.project,
         });
         if (res?.Application?.getApplication?.metadata?.name) {
-          return '应用名称重复';
+          return '智能体名称重复';
         }
       } catch (error) {}
     }
@@ -555,7 +557,7 @@ class ModelAppList$$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(() => this.state.createModalVisible)}
-          title="新增应用"
+          title="新增智能体"
         >
           <FormilyForm
             __component_name="FormilyForm"
@@ -576,7 +578,7 @@ class ModelAppList$$Page extends React.Component {
               fieldProps={{
                 'name': 'name',
                 'required': true,
-                'title': '模型应用名称',
+                'title': '智能体名称',
                 'x-validator': [
                   {
                     children: '未知',
@@ -607,7 +609,7 @@ class ModelAppList$$Page extends React.Component {
               fieldProps={{
                 'name': 'displayName',
                 'required': true,
-                'title': '模型应用别名',
+                'title': '智能体别名',
                 'x-validator': [],
               }}
             />
@@ -721,13 +723,13 @@ class ModelAppList$$Page extends React.Component {
               ellipsis={true}
               level={1}
             >
-              模型应用管理
+              AI 智能体管理
             </Typography.Title>
           </Col>
           <Col __component_name="Col" span={24}>
             <Alert
               __component_name="Alert"
-              message="模型应用全生命周期管理，支持应用编排、计费定价、查看对话记录及用户反馈"
+              message="AI 智能体全生命周期管理，支持应用编排、计费定价、查看对话记录及用户反馈"
               showIcon={true}
               type="info"
             />
@@ -771,7 +773,7 @@ class ModelAppList$$Page extends React.Component {
                           target="_self"
                           type="primary"
                         >
-                          新增模型应用
+                          新增智能体
                         </Button>
                         <Button
                           __component_name="Button"
@@ -983,7 +985,7 @@ class ModelAppList$$Page extends React.Component {
                                                     {
                                                       children: '未部署',
                                                       id: 'false',
-                                                      type: 'error',
+                                                      type: 'disabled',
                                                     },
                                                     {
                                                       children: '已部署',
@@ -992,6 +994,15 @@ class ModelAppList$$Page extends React.Component {
                                                     },
                                                   ]}
                                                 />
+                                                <Tooltip
+                                                  __component_name="Tooltip"
+                                                  title={__$$eval(() => item.message || '-')}
+                                                >
+                                                  <AntdIconInfoCircleOutlined
+                                                    __component_name="AntdIconInfoCircleOutlined"
+                                                    style={{ marginLeft: '20px' }}
+                                                  />
+                                                </Tooltip>
                                               </Col>
                                             </Row>
                                           </Col>
@@ -1099,7 +1110,7 @@ class ModelAppList$$Page extends React.Component {
             return this.onEdit.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           open={__$$eval(() => this.state.editModalVisible)}
-          title="编辑应用"
+          title="编辑智能体"
         >
           <FormilyForm
             __component_name="FormilyForm"
@@ -1120,7 +1131,7 @@ class ModelAppList$$Page extends React.Component {
               fieldProps={{
                 'name': 'name',
                 'required': true,
-                'title': '模型应用名称',
+                'title': '智能体名称',
                 'x-pattern': 'disabled',
                 'x-validator': [],
               }}
@@ -1132,7 +1143,7 @@ class ModelAppList$$Page extends React.Component {
               fieldProps={{
                 'name': 'displayName',
                 'required': true,
-                'title': '模型应用别名',
+                'title': '智能体别名',
                 'x-validator': [],
               }}
             />
@@ -1256,11 +1267,11 @@ class ModelAppList$$Page extends React.Component {
             return this.onDelete.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           open={__$$eval(() => this.state.deleteModalVisible)}
-          title="删除模型"
+          title="删除智能体"
         >
           <Alert
             __component_name="Alert"
-            message="确认删除此模型应用？"
+            message="确认删除此智能体？"
             showIcon={true}
             type="warning"
           />
