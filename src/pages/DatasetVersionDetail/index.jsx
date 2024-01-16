@@ -17,6 +17,7 @@ import {
   Image,
   Typography,
   Status,
+  Tooltip,
   Divider,
   Tabs,
   Descriptions,
@@ -25,6 +26,8 @@ import {
 import LccComponentQlsmm from 'KubeAGIUpload';
 
 import LccComponentSbva0 from 'confirm';
+
+import { AntdIconInfoCircleOutlined } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -633,6 +636,18 @@ class DatasetVersionDetail$$Page extends React.Component {
                           id={__$$eval(() => this.data().data?.syncStatus)}
                           types={__$$eval(() => this.constants.DATASET_DATA.syncStatus)}
                         />
+                        {!!__$$eval(() => this.data().data?.syncMsg) && (
+                          <Tooltip
+                            __component_name="Tooltip"
+                            style={{}}
+                            title={__$$eval(() => this.data().data?.syncMsg || '-')}
+                          >
+                            <AntdIconInfoCircleOutlined
+                              __component_name="AntdIconInfoCircleOutlined"
+                              style={{ marginLeft: '-4px' }}
+                            />
+                          </Tooltip>
+                        )}
                         <Divider
                           __component_name="Divider"
                           dashed={false}
@@ -728,26 +743,52 @@ class DatasetVersionDetail$$Page extends React.Component {
                       },
                       {
                         _unsafe_MixedSetter_children_select: 'SlotSetter',
-                        children: (
+                        children: [
                           <Status
                             __component_name="Status"
                             id={__$$eval(() => this.data().data?.syncStatus)}
                             types={__$$eval(() => this.constants.DATASET_DATA.syncStatus)}
-                          />
-                        ),
+                            key="node_oclpwcoa482"
+                          />,
+                          !!__$$eval(() => this.data().data?.syncMsg) && (
+                            <Tooltip
+                              __component_name="Tooltip"
+                              title={__$$eval(() => this.data().data?.syncMsg || '-')}
+                              key="node_oclrfrjnot1"
+                            >
+                              <AntdIconInfoCircleOutlined
+                                __component_name="AntdIconInfoCircleOutlined"
+                                style={{ marginLeft: '4px' }}
+                              />
+                            </Tooltip>
+                          ),
+                        ],
                         key: 'xvcp3obfu',
                         label: '导入状态',
                         span: 24,
                       },
                       {
                         _unsafe_MixedSetter_children_select: 'SlotSetter',
-                        children: (
+                        children: [
                           <Status
                             __component_name="Status"
                             id={__$$eval(() => this.data().data?.dataProcessStatus || 'no')}
                             types={__$$eval(() => this.constants.DATASET_DATA.dataProcessStatus)}
-                          />
-                        ),
+                            key="node_oclpwcoa484"
+                          />,
+                          !!__$$eval(() => this.data().data?.dataProcessMsg) && (
+                            <Tooltip
+                              __component_name="Tooltip"
+                              title={__$$eval(() => this.data().data?.dataProcessMsg || '-')}
+                              key="node_oclrfrjk2q1"
+                            >
+                              <AntdIconInfoCircleOutlined
+                                __component_name="AntdIconInfoCircleOutlined"
+                                style={{ marginLeft: '4px' }}
+                              />
+                            </Tooltip>
+                          ),
+                        ],
                         key: 'er0ptk5lill',
                         label: '数据处理状态',
                         span: 24,
