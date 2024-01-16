@@ -2,9 +2,11 @@
 // 例外：react 框架的导出名和各种组件名除外。
 import React from 'react';
 
-import { Component, Table, Status, Typography, Dropdown } from '@tenx-ui/materials';
+import { Component, Table, Status, Tooltip, Typography, Dropdown } from '@tenx-ui/materials';
 
 import LccComponentSbva0 from 'confirm';
+
+import { AntdIconInfoCircleOutlined } from '@tenx-ui/icon-materials';
 
 import { DataProvider } from 'shared-components';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
@@ -196,26 +198,52 @@ class DatasetVersionList$$Component extends React.Component {
               dataIndex: 'syncStatus',
               key: 'syncStatus',
               render: (text, record, index) =>
-                (__$$context => (
+                (__$$context => [
                   <Status
                     __component_name="Status"
                     id={__$$eval(() => record.syncStatus || 'no')}
                     types={__$$eval(() => __$$context.constants.DATASET_DATA.syncStatus)}
-                  />
-                ))(__$$createChildContext(__$$context, { text, record, index })),
+                    key="node_oclq0j0t8v2"
+                  />,
+                  !!__$$eval(() => Boolean(record.syncMsg)) && (
+                    <Tooltip
+                      __component_name="Tooltip"
+                      title={__$$eval(() => record.syncMsg)}
+                      key="node_oclrfqj3ub5"
+                    >
+                      <AntdIconInfoCircleOutlined
+                        __component_name="AntdIconInfoCircleOutlined"
+                        style={{ marginLeft: '4px' }}
+                      />
+                    </Tooltip>
+                  ),
+                ])(__$$createChildContext(__$$context, { text, record, index })),
               title: '导入状态',
             },
             {
               dataIndex: 'dataProcessStatus',
               key: 'dataProcessStatus',
               render: (text, record, index) =>
-                (__$$context => (
+                (__$$context => [
                   <Status
                     __component_name="Status"
                     id={__$$eval(() => record.dataProcessStatus || 'no')}
                     types={__$$eval(() => __$$context.constants.DATASET_DATA.dataProcessStatus)}
-                  />
-                ))(__$$createChildContext(__$$context, { text, record, index })),
+                    key="node_oclq0j0wvo2"
+                  />,
+                  !!__$$eval(() => Boolean(record.dataProcessMsg)) && (
+                    <Tooltip
+                      __component_name="Tooltip"
+                      title={__$$eval(() => record.dataProcessMsg)}
+                      key="node_oclrfqj3ub2"
+                    >
+                      <AntdIconInfoCircleOutlined
+                        __component_name="AntdIconInfoCircleOutlined"
+                        style={{ marginLeft: '4px' }}
+                      />
+                    </Tooltip>
+                  ),
+                ])(__$$createChildContext(__$$context, { text, record, index })),
               title: '数据处理状态',
             },
             {
