@@ -47,6 +47,16 @@
         position: unset !important;
         background: @background-color;
       }
+      section > div:last-child > div:last-child {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        padding-right: 16px;
+        div:first-child {
+          display: flex;
+          align-items: center;
+        }
+      }
     }
   }
   .chatDebug {
