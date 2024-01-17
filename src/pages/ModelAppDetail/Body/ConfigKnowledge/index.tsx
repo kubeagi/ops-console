@@ -27,7 +27,7 @@ interface KnowledgeProps {
   canSelect?: boolean;
   multi?: boolean;
 }
-const Knowledge: React.FC<KnowledgeProps> = props => {
+export const Knowledge: React.FC<KnowledgeProps> = props => {
   const { items, canDelete, canSelect, multi } = props;
   const [checkedIds, setCheckedIds] = useState([]);
   useEffect(() => {
