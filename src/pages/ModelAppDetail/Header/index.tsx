@@ -114,7 +114,7 @@ const Header: React.FC<HeaderProps> = props => {
                     描述：
                   </Typography.Text>
                   <Typography.Text
-                    ellipsis={{ tooltip: 1 }}
+                    ellipsis={{ tooltip: data?.metadata?.description || '-' }}
                     strong={false}
                     style={{ maxWidth: 200 }}
                   >
