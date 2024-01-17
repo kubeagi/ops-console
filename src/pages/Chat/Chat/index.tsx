@@ -22,7 +22,7 @@ import {
 import { getAuthData } from '@tenx-ui/auth-utils';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
-import { Spin } from 'antd';
+import { Spin, message } from 'antd';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -144,6 +144,7 @@ const Chat: React.FC<IChat> = props => {
   );
   const setLastCvsErr = useCallback(
     (err: Error) => {
+      message.warning('系统异常，请稍后重试');
       setConversation(_conversation => {
         const [first, ...rest] = _conversation.data.reverse();
         return {
