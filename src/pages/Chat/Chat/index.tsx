@@ -250,7 +250,8 @@ const Chat: React.FC<IChat> = props => {
     };
   }, []);
   const onSend = useCallback(() => {
-    if (!input) return;
+    const _input = input.trim();
+    if (!_input) return;
     setConversation(conversation => {
       const userMsgId = Date.now().toString();
       const assistantMsgId = (Date.now() + 10).toString();
@@ -259,13 +260,13 @@ const Chat: React.FC<IChat> = props => {
         loadingMsgId: assistantMsgId,
         data: [
           ...conversation.data,
-          getCvsMeta(input, userMsgId, true),
+          getCvsMeta(_input, userMsgId, true),
           getCvsMeta('', assistantMsgId, false),
         ],
       };
     });
     scrollToBottom();
-    fetchConversation(input);
+    fetchConversation(_input);
     setInput('');
   }, [input, setInput, setConversation, fetchConversation]);
   return (
