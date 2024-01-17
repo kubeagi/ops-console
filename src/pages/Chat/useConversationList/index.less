@@ -34,18 +34,23 @@
       width: calc(100% - 16px);
       margin: 0 8px;
     }
-    .cvTitle {
+    .cvsList {
+      overflow-y: auto;
       display: inline-flex;
-      width: 150px !important;
-    }
-    .time {
-      display: inline-flex;
-      justify-content: flex-end;
+      height: calc(100vh - 250px);
+      .cvTitle {
+        display: inline-flex;
+        width: 150px !important;
+      }
+      .time {
+        display: inline-flex;
+        justify-content: flex-end;
 
-      width: 35px;
+        width: 35px;
 
-      font-size: 11px;
-      color: @font-color-4;
+        font-size: 11px;
+        color: @font-color-4;
+      }
     }
   }
 }

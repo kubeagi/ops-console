@@ -113,27 +113,29 @@ const useConversationList: IUseConversationList = newConversationId => {
           新建对话
         </Button>
         {conversations.length > 0 ? (
-          <Menu
-            items={conversations.map(cv => ({
-              key: cv.id,
-              label: (
-                <span>
-                  <span className="cvTitle">
-                    <Typography.Text ellipsis>{cv.messages?.[0]?.query}</Typography.Text>
+          <span className="cvsList">
+            <Menu
+              items={conversations.map(cv => ({
+                key: cv.id,
+                label: (
+                  <span>
+                    <span className="cvTitle">
+                      <Typography.Text ellipsis>{cv.messages?.[0]?.query}</Typography.Text>
+                    </span>
+                    <span className="time">
+                      {dayjs(cv.updated_at).isSame(dayjs(), 'day')
+                        ? '今天'
+                        : dayjs(cv.updated_at).format('HH:mm')}
+                    </span>
                   </span>
-                  <span className="time">
-                    {dayjs(cv.updated_at).isSame(dayjs(), 'day')
-                      ? '今天'
-                      : dayjs(cv.updated_at).format('HH:mm')}
-                  </span>
-                </span>
-              ),
-              title: cv.messages?.[0]?.query,
-              icon: <MessageWarn />,
-            }))}
-            onClick={onCvsClick}
-            selectedKeys={selected ? [selected] : []}
-          />
+                ),
+                title: cv.messages?.[0]?.query,
+                icon: <MessageWarn />,
+              }))}
+              onClick={onCvsClick}
+              selectedKeys={selected ? [selected] : []}
+            />
+          </span>
         ) : (
           <Spin spinning={conversationsLoading}>
             <Empty />
