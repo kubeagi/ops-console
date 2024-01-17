@@ -315,10 +315,8 @@ class DataSetCreate$$Page extends React.Component {
                       {
                         children: '未知',
                         id: 'disabled',
-                        message:
-                          '只能包含小写字母、数字、连字符（-）和点号（.），且必须以字母或数字开头',
-                        pattern:
-                          '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$',
+                        message: '只能包含小写字母、数字、连字符（-），且必须以字母或数字开头',
+                        pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?([a-z0-9]([-a-z0-9]*[a-z0-9])?)*$',
                         type: 'disabled',
                       },
                       {

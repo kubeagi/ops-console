@@ -5,7 +5,7 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import { KubeagiKnowledge } from '@tenx-ui/icon';
-import { Flex, Form, Input, Space, Tooltip, Typography } from 'antd';
+import { Empty, Flex, Form, Input, Space, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import utils from '../../../../utils/__utils';
@@ -125,6 +125,9 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
             refresh: () => {},
             type: 'edit',
             renderChildren: form => {
+              if (!(knowledges?.length > 0)) {
+                return <Empty />;
+              }
               return (
                 <>
                   <Form.Item name="knowledgebase" style={{ display: 'none' }}></Form.Item>
