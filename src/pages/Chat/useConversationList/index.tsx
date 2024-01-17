@@ -15,6 +15,7 @@ import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Button, Menu, Space, Spin, Typography } from 'antd';
+import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import useGetCommonData from '@/components/hooks/useGetCommonData';
@@ -72,7 +73,8 @@ const useConversationList: IUseConversationList = newConversationId => {
     },
     refresh: newConversationId,
     initValue: [],
-    format: data => data.reverse(),
+    format: data =>
+      data.sort((a, b) => dayjs(b.updated_at).valueOf() - dayjs(a.updated_at).valueOf()),
   });
   const selectedConversation = useMemo(() => {
     return conversations.find(cv => cv.id === selected);
@@ -114,7 +116,18 @@ const useConversationList: IUseConversationList = newConversationId => {
           <Menu
             items={conversations.map(cv => ({
               key: cv.id,
-              label: cv.messages?.[0]?.query,
+              label: (
+                <span>
+                  <span className="cvTitle">
+                    <Typography.Text ellipsis>{cv.messages?.[0]?.query}</Typography.Text>
+                  </span>
+                  <span className="time">
+                    {dayjs(cv.updated_at).isSame(dayjs(), 'day')
+                      ? '今天'
+                      : dayjs(cv.updated_at).format('HH:mm')}
+                  </span>
+                </span>
+              ),
               title: cv.messages?.[0]?.query,
               icon: <MessageWarn />,
             }))}
