@@ -593,7 +593,6 @@ class $$Page extends React.Component {
       version_data_set_name: versionName,
       data_process_config_info: list,
       file_names: files,
-      bucket_name: this.utils.getAuthData().project,
       namespace: this.utils.getAuthData().project,
       creator: this.utils.getAuthData().user?.name,
     };
