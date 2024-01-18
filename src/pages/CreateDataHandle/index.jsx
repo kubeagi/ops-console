@@ -400,7 +400,7 @@ class $$Page extends React.Component {
       .then(res => {
         const nodes = res.LLM.listLLMs?.nodes || [];
         const _list = nodes
-          .filter(item => item.status === 'True')
+          .filter(item => item.status === 'True' || item.status === 'Running')
           .map(item => {
             return {
               models: item.models?.map(i => ({
