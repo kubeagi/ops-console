@@ -306,7 +306,16 @@ const Chat: React.FC<IChat> = props => {
         </div>
         <div className="inputArea">
           <ChatInputArea
-            bottomAddons={<ChatSendButton onSend={onSend} />}
+            bottomAddons={
+              <ChatSendButton
+                onSend={onSend}
+                texts={{
+                  send: '发送',
+                  warp: '换行',
+                  stop: '停止',
+                }}
+              />
+            }
             onInput={setInput}
             onSend={onSend}
             placeholder="请输入问题，可通过 shift+回车换行"
