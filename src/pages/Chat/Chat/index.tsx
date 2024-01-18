@@ -9,12 +9,12 @@
  * @date 2023-12-18
  */
 import {
-  ActionsBar,
   ChatInputArea,
   ChatList as ChatItemsList,
   ChatListProps,
   ChatMessage,
   ChatSendButton,
+  CopyButton,
   Highlighter,
   useControls,
   useCreateStore,
@@ -24,7 +24,7 @@ import { getAuthData } from '@tenx-ui/auth-utils';
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin, message } from 'antd';
 import classNames from 'classnames';
-import { debounce } from 'lodash';
+import { throttle } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
@@ -50,9 +50,9 @@ const safeAreaId = 'safe-area-id-not-use-in-your-code';
 class RetriableError extends Error {}
 class FatalError extends Error {}
 
-const scrollToBottom = debounce(() => {
+const scrollToBottom = throttle(() => {
   document.querySelector(`#${safeAreaId}`)?.scrollIntoView();
-}, 100);
+}, 200);
 let scrollToBottomTimeout;
 let shouldUpdateConversationId: boolean = false;
 const ctrl = new AbortController();
@@ -281,7 +281,9 @@ const Chat: React.FC<IChat> = props => {
           <ChatItemsList
             data={conversation?.data}
             loadingId={conversation.loadingMsgId}
-            renderActions={ActionsBar}
+            renderActions={{
+              default: item => <CopyButton content={item.content} size="small" />,
+            }}
             renderErrorMessages={{
               error: {
                 Render: error => {
@@ -306,7 +308,16 @@ const Chat: React.FC<IChat> = props => {
         </div>
         <div className="inputArea">
           <ChatInputArea
-            bottomAddons={<ChatSendButton onSend={onSend} />}
+            bottomAddons={
+              <ChatSendButton
+                onSend={onSend}
+                texts={{
+                  send: '发送',
+                  warp: '换行',
+                  stop: '停止',
+                }}
+              />
+            }
             onInput={setInput}
             onSend={onSend}
             placeholder="请输入问题，可通过 shift+回车换行"
