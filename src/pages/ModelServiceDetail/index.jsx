@@ -426,9 +426,7 @@ class ModelServiceDetail$$Page extends React.Component {
         <Button.Back
           __component_name="Button.Back"
           style={{ fontSize: '14px', lineHeight: '15px' }}
-          title={__$$eval(
-            () => `${['外部', '本地'][Number(this.history.query?.type === 'local')]}模型服务详情`
-          )}
+          title="模型服务详情"
           type="ghost"
         />
         <Spin
@@ -733,6 +731,23 @@ class ModelServiceDetail$$Page extends React.Component {
                     span: 1,
                   },
                   {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        外部模型
+                      </Typography.Text>
+                    ),
+                    key: 'b1p31grk7v7',
+                    label: '模型服务类型',
+                    span: 1,
+                  },
+                  {
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
@@ -936,6 +951,23 @@ class ModelServiceDetail$$Page extends React.Component {
                     key: 'lrm3jnlf8pf',
                     label: this.i18n('i18n-4hvq7ssv') /* ID */,
                     labelStyle: null,
+                    span: 1,
+                  },
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        本地模型
+                      </Typography.Text>
+                    ),
+                    key: 'fzj9h513jac',
+                    label: '模型服务类型',
                     span: 1,
                   },
                   {
