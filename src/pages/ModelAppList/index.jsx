@@ -613,6 +613,7 @@ class ModelAppList$$Page extends React.Component {
           }.bind(this)}
           open={__$$eval(() => this.state.createModalVisible)}
           title="新增智能体"
+          width="550px"
         >
           <FormilyForm
             __component_name="FormilyForm"
@@ -671,7 +672,7 @@ class ModelAppList$$Page extends React.Component {
             {!!__$$eval(() => this.state.imageUrl) && (
               <Container
                 __component_name="Container"
-                style={{ left: '152px', position: 'absolute', top: '204px' }}
+                style={{ left: '159px', position: 'absolute', top: '204px' }}
               >
                 <Image
                   __component_name="Image"
@@ -857,7 +858,7 @@ class ModelAppList$$Page extends React.Component {
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
-                          placeholder="请输入模型应用名称搜索"
+                          placeholder="请输入智能体名称搜索"
                           style={{ width: '240px' }}
                         />
                       </Space>
@@ -942,7 +943,11 @@ class ModelAppList$$Page extends React.Component {
                                           }}
                                           mark={false}
                                           strong={false}
-                                          style={{ fontSize: '12', marginTop: '4px' }}
+                                          style={{
+                                            fontSize: '12',
+                                            marginTop: '4px',
+                                            minHeight: '40px',
+                                          }}
                                           underline={false}
                                         >
                                           {__$$eval(() => item.description || '-')}
@@ -1068,6 +1073,19 @@ class ModelAppList$$Page extends React.Component {
                                       labelStyle: { marginTop: '0px' },
                                       span: 1,
                                     },
+                                    {
+                                      children: (
+                                        <Typography.Time
+                                          __component_name="Typography.Time"
+                                          format="YYYY-MM-DD HH:mm:ss"
+                                          relativeTime={false}
+                                          time={__$$eval(() => item.updateTimestamp)}
+                                        />
+                                      ),
+                                      key: '9xu6y1xb06v',
+                                      label: '更新时间',
+                                      span: 1,
+                                    },
                                   ]}
                                   labelStyle={{ padding: '12px 0 0 0', width: '60px' }}
                                   layout="horizontal"
@@ -1166,6 +1184,7 @@ class ModelAppList$$Page extends React.Component {
           }.bind(this)}
           open={__$$eval(() => this.state.editModalVisible)}
           title="编辑智能体"
+          width="550px"
         >
           <FormilyForm
             __component_name="FormilyForm"
@@ -1205,7 +1224,7 @@ class ModelAppList$$Page extends React.Component {
             {!!__$$eval(() => this.state.imageUrl) && (
               <Container
                 __component_name="Container"
-                style={{ left: '152px', position: 'absolute', top: '204px' }}
+                style={{ left: '159px', position: 'absolute', top: '204px' }}
               >
                 <Image
                   __component_name="Image"
