@@ -22,7 +22,7 @@ import {
 import { getAuthData } from '@tenx-ui/auth-utils';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
-import { Spin } from 'antd';
+import { Spin, message } from 'antd';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -144,6 +144,7 @@ const Chat: React.FC<IChat> = props => {
   );
   const setLastCvsErr = useCallback(
     (err: Error) => {
+      message.warning('系统异常，请稍后重试');
       setConversation(_conversation => {
         const [first, ...rest] = _conversation.data.reverse();
         return {
@@ -250,7 +251,8 @@ const Chat: React.FC<IChat> = props => {
     };
   }, []);
   const onSend = useCallback(() => {
-    if (!input) return;
+    const _input = input.trim();
+    if (!_input) return;
     setConversation(conversation => {
       const userMsgId = Date.now().toString();
       const assistantMsgId = (Date.now() + 10).toString();
@@ -259,13 +261,13 @@ const Chat: React.FC<IChat> = props => {
         loadingMsgId: assistantMsgId,
         data: [
           ...conversation.data,
-          getCvsMeta(input, userMsgId, true),
+          getCvsMeta(_input, userMsgId, true),
           getCvsMeta('', assistantMsgId, false),
         ],
       };
     });
     scrollToBottom();
-    fetchConversation(input);
+    fetchConversation(_input);
     setInput('');
   }, [input, setInput, setConversation, fetchConversation]);
   return (
