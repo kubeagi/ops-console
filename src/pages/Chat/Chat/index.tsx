@@ -9,12 +9,12 @@
  * @date 2023-12-18
  */
 import {
-  ActionsBar,
   ChatInputArea,
   ChatList as ChatItemsList,
   ChatListProps,
   ChatMessage,
   ChatSendButton,
+  CopyButton,
   Highlighter,
   useControls,
   useCreateStore,
@@ -281,7 +281,9 @@ const Chat: React.FC<IChat> = props => {
           <ChatItemsList
             data={conversation?.data}
             loadingId={conversation.loadingMsgId}
-            renderActions={ActionsBar}
+            renderActions={{
+              default: item => <CopyButton content={item.content} size="small" />,
+            }}
             renderErrorMessages={{
               error: {
                 Render: error => {
