@@ -24,7 +24,7 @@ import { getAuthData } from '@tenx-ui/auth-utils';
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin, message } from 'antd';
 import classNames from 'classnames';
-import { debounce } from 'lodash';
+import { throttle } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
@@ -50,9 +50,9 @@ const safeAreaId = 'safe-area-id-not-use-in-your-code';
 class RetriableError extends Error {}
 class FatalError extends Error {}
 
-const scrollToBottom = debounce(() => {
+const scrollToBottom = throttle(() => {
   document.querySelector(`#${safeAreaId}`)?.scrollIntoView();
-}, 100);
+}, 200);
 let scrollToBottomTimeout;
 let shouldUpdateConversationId: boolean = false;
 const ctrl = new AbortController();
