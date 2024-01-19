@@ -303,6 +303,11 @@ class ModelAppList$$Page extends React.Component {
       });
   }
 
+  onDeployment(e) {
+    // 事件的 handler
+    e.stopPropagation();
+  }
+
   onDetailClick(e, extParams) {
     // 事件的 handler
 
@@ -990,11 +995,6 @@ class ModelAppList$$Page extends React.Component {
                                   </Col>
                                 </Row>
                               </Col>
-                              <Col
-                                __component_name="Col"
-                                span={24}
-                                style={{ display: 'inline-block', textAlign: 'left' }}
-                              />
                               <Col __component_name="Col" flex="" span={24}>
                                 <Divider
                                   __component_name="Divider"
@@ -1092,31 +1092,33 @@ class ModelAppList$$Page extends React.Component {
                                   </Descriptions.Item>
                                 </Descriptions>
                               </Col>
-                              <Col
-                                __component_name="Col"
-                                flex=""
-                                span={24}
-                                style={{ marginTop: '16px' }}
-                              />
+                              <Col __component_name="Col" span={24} style={{ marginTop: '16px' }}>
+                                <Button
+                                  __component_name="Button"
+                                  block={true}
+                                  danger={false}
+                                  disabled={false}
+                                  ghost={true}
+                                  hoverColor="primary"
+                                  href={__$$eval(
+                                    () =>
+                                      `/chat?appNamespace=${item.namespace}&appName=${item.name}`
+                                  )}
+                                  onClick={function () {
+                                    return this.onDeployment.apply(
+                                      this,
+                                      Array.prototype.slice.call(arguments).concat([])
+                                    );
+                                  }.bind(__$$context)}
+                                  shape="default"
+                                  size="small"
+                                  style={{}}
+                                  type="primary"
+                                >
+                                  对话
+                                </Button>
+                              </Col>
                             </Row>
-                            {!!__$$eval(() => item?.systemModel) && (
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{
-                                  color: '#fff',
-                                  fontSize: '',
-                                  position: 'absolute',
-                                  right: '2px',
-                                  top: '6px',
-                                  transform: 'rotate(45deg)',
-                                }}
-                              >
-                                内置
-                              </Typography.Text>
-                            )}
                           </Card>
                         </List.Item>
                       ))(__$$createChildContext(__$$context, { item }))
