@@ -592,20 +592,26 @@ class ModelWarehouse$$Page extends React.Component {
                                           style={{}}
                                           trigger={['hover']}
                                         >
-                                          <Button
-                                            __component_name="Button"
-                                            block={false}
-                                            children=""
-                                            danger={false}
-                                            disabled={false}
-                                            ghost={false}
-                                            icon={
-                                              <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
-                                            }
-                                            shape="default"
-                                            size="small"
-                                            style={{ borderColor: 'rgba(34,25,77,0)' }}
-                                          />
+                                          {!!__$$eval(
+                                            () =>
+                                              __$$context.utils.getAuthData()?.project ===
+                                              item.namespace
+                                          ) && (
+                                            <Button
+                                              __component_name="Button"
+                                              block={false}
+                                              children=""
+                                              danger={false}
+                                              disabled={false}
+                                              ghost={false}
+                                              icon={
+                                                <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
+                                              }
+                                              shape="default"
+                                              size="small"
+                                              style={{ borderColor: 'rgba(34,25,77,0)' }}
+                                            />
+                                          )}
                                         </Dropdown>
                                       </Col>
                                     </Row>
@@ -782,7 +788,7 @@ class ModelWarehouse$$Page extends React.Component {
                                   __component_name="Button"
                                   block={true}
                                   danger={false}
-                                  disabled={false}
+                                  disabled={__$$eval(() => item.status === 'False')}
                                   ghost={true}
                                   hoverColor="primary"
                                   href={__$$eval(
@@ -860,26 +866,41 @@ class ModelWarehouse$$Page extends React.Component {
               </Row>
               <Row __component_name="Row" wrap={true}>
                 <Col __component_name="Col" span={24}>
-                  <Pagination
-                    __component_name="Pagination"
-                    current={__$$eval(() => this.state.pages.currentPage)}
-                    onChange={function () {
-                      return this.onChange.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    pageSize={__$$eval(() => this.state.pages.pageSize)}
-                    showTotal={function () {
-                      return this.showTotal.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    simple={false}
-                    style={{ textAlign: 'right' }}
-                    total={__$$eval(() => this.state.pages.total)}
-                  />
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={24}>
+                      <Row __component_name="Row" justify="space-between" wrap={false}>
+                        <Col __component_name="Col" />
+                        <Col __component_name="Col">
+                          <Pagination
+                            __component_name="Pagination"
+                            current={__$$eval(() => this.state.pages.currentPage)}
+                            onChange={function () {
+                              return this.onChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            onShowSizeChange={function () {
+                              return this.onChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            pageSize={__$$eval(() => this.state.pages.pageSize)}
+                            showTotal={function () {
+                              return this.showTotal.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            simple={false}
+                            style={{ textAlign: 'right' }}
+                            total={__$$eval(() => this.state.pages.total)}
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Card>

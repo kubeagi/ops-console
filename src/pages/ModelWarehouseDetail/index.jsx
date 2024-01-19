@@ -104,6 +104,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
       fileSearchParams: {
         keyword: '',
         currentPage: 1,
+        pageSize: 10,
       },
       isLoadedReadme: false,
       loading: false,
@@ -311,7 +312,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
       name,
       filesInput: {
         keyword: this.state.fileSearchParams.keyword,
-        pageSize: 10,
+        pageSize: this.state.fileSearchParams.pageSize,
         page: this.state.fileSearchParams.currentPage,
       },
     };
@@ -421,6 +422,21 @@ class ModelWarehouseDetail$$Page extends React.Component {
       {
         submitLoading: false,
         uploadModalVisible: false,
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  handlePaginationChange(page, size) {
+    this.setState(
+      {
+        fileSearchParams: {
+          ...this.state.fileSearchParams,
+          currentPage: page,
+          pageSize: size,
+        },
       },
       () => {
         this.getData();
@@ -547,20 +563,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this.setState({
       deleteAppModalVisible: true,
     });
-  }
-
-  onPageChange(page) {
-    this.setState(
-      {
-        fileSearchParams: {
-          ...this.state.fileSearchParams,
-          currentPage: page,
-        },
-      },
-      () => {
-        this.getData();
-      }
-    );
   }
 
   onRowSelectedChange(keys) {
@@ -1061,26 +1063,47 @@ class ModelWarehouseDetail$$Page extends React.Component {
                       />
                       <Row __component_name="Row" gutter={['', '']} wrap={true}>
                         <Col __component_name="Col" span={24}>
-                          <Pagination
-                            __component_name="Pagination"
-                            current={__$$eval(() => this.state.fileSearchParams.currentPage)}
-                            onChange={function () {
-                              return this.onPageChange.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([])
-                              );
-                            }.bind(this)}
-                            pageSize={10}
-                            showTotal={function () {
-                              return this.showTotal.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([])
-                              );
-                            }.bind(this)}
-                            simple={false}
-                            style={{ marginBottom: '24px', marginTop: '16px', textAlign: 'right' }}
-                            total={__$$eval(() => this.state.data?.files?.totalCount || 0)}
-                          />
+                          <Row __component_name="Row" wrap={true}>
+                            <Col __component_name="Col" span={24}>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col" />
+                                <Col __component_name="Col">
+                                  <Pagination
+                                    __component_name="Pagination"
+                                    current={__$$eval(
+                                      () => this.state.fileSearchParams.currentPage
+                                    )}
+                                    onChange={function () {
+                                      return this.handlePaginationChange.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([])
+                                      );
+                                    }.bind(this)}
+                                    onShowSizeChange={function () {
+                                      return this.handlePaginationChange.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([])
+                                      );
+                                    }.bind(this)}
+                                    pageSize={__$$eval(() => this.state.fileSearchParams.pageSize)}
+                                    showTotal={function () {
+                                      return this.showTotal.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([])
+                                      );
+                                    }.bind(this)}
+                                    simple={false}
+                                    style={{
+                                      marginBottom: '24px',
+                                      marginTop: '16px',
+                                      textAlign: 'right',
+                                    }}
+                                    total={__$$eval(() => this.state.data?.files?.totalCount || 0)}
+                                  />
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
                         </Col>
                       </Row>
                     </Col>

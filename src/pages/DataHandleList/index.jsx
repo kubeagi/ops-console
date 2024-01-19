@@ -132,6 +132,16 @@ class DataHandleList$$Page extends React.Component {
     }
   }
 
+  handlePaginationChange(c, s) {
+    this.setState(
+      {
+        pageSize: s,
+        currentPage: c,
+      },
+      this.getDataList
+    );
+  }
+
   handleSearchValueChange(event) {
     // 输入框内容变化时的回调
     this.setState(
@@ -674,26 +684,41 @@ class DataHandleList$$Page extends React.Component {
                       />
                     </Col>
                   </Row>
-                  <Pagination
-                    __component_name="Pagination"
-                    current={__$$eval(() => this.state.currentPage)}
-                    onChange={function () {
-                      return this.onCurrentPageChange.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    pageSize={__$$eval(() => this.state.pageSize)}
-                    showTotal={function () {
-                      return this.showTotal.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    simple={false}
-                    style={{ marginTop: '12px', textAlign: 'right' }}
-                    total={__$$eval(() => this.state.totalCount)}
-                  />
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={24}>
+                      <Row __component_name="Row" justify="space-between" wrap={false}>
+                        <Col __component_name="Col" />
+                        <Col __component_name="Col">
+                          <Pagination
+                            __component_name="Pagination"
+                            current={__$$eval(() => this.state.currentPage)}
+                            onChange={function () {
+                              return this.onCurrentPageChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            onShowSizeChange={function () {
+                              return this.handlePaginationChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            pageSize={__$$eval(() => this.state.pageSize)}
+                            showTotal={function () {
+                              return this.showTotal.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            simple={false}
+                            style={{ marginTop: '12px', textAlign: 'right' }}
+                            total={__$$eval(() => this.state.totalCount)}
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
                 </Card>
               </Col>
             </Row>
