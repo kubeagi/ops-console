@@ -257,7 +257,7 @@ const Chat: React.FC<IChat> = props => {
         ],
       };
     });
-    scrollToBottom();
+    scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
     fetchConversation(_input);
     setInput('');
   }, [input, setInput, setConversation, fetchConversation]);
