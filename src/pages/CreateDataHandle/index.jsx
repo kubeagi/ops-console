@@ -194,6 +194,7 @@ class $$Page extends React.Component {
       dataSetFileSearchParams: {
         keyword: '',
         currentPage: 1,
+        pageSize: 10,
       },
       dataSetFileTotal: '0',
       fileSelectCheckErrorFlag: false,
@@ -356,7 +357,7 @@ class $$Page extends React.Component {
       },
       filesInput: {
         keyword: this.state.dataSetFileSearchParams.keyword,
-        pageSize: 10,
+        pageSize: this.state.dataSetFileSearchParams.pageSize,
         page: this.state.dataSetFileSearchParams.currentPage,
       },
     });
@@ -368,7 +369,7 @@ class $$Page extends React.Component {
         namespace: i.namespace,
       }));
       return {
-        label: item.name,
+        label: this.utils.getFullName(item),
         value: item.name,
         versions: versions,
         namespace: item.namespace,
@@ -512,7 +513,7 @@ class $$Page extends React.Component {
       namespace: this.utils.getAuthData().project,
       fileInput: {
         keyword: this.state.dataSetFileSearchParams.keyword,
-        pageSize: 10,
+        pageSize: this.state.dataSetFileSearchParams.pageSize,
         page: this.state.dataSetFileSearchParams.currentPage,
       },
     });
@@ -742,12 +743,13 @@ class $$Page extends React.Component {
     });
   }
 
-  onPageChange(page) {
+  onPageChange(page, pageSize) {
     this.setState(
       {
         dataSetFileSearchParams: {
           ...this.state.dataSetFileSearchParams,
           currentPage: page,
+          pageSize,
         },
       },
       () => {
@@ -789,6 +791,7 @@ class $$Page extends React.Component {
     this.setState(
       {
         dataSetFileSearchParams: {
+          ...this.state.dataSetFileSearchParams,
           keyword: value,
           currentPage: 1,
         },
@@ -858,6 +861,11 @@ class $$Page extends React.Component {
         max_tokens: value,
       });
     }
+  }
+
+  showTotal(total, range) {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
   }
 
   updateStep3State(value, event, extraParams = {}) {
@@ -3721,35 +3729,6 @@ class $$Page extends React.Component {
                             <Col __component_name="Col">
                               <Space __component_name="Space" align="center" direction="horizontal">
                                 <Row __component_name="Row" justify="space-between" wrap={false}>
-                                  <Col __component_name="Col" style={{ paddingTop: '6px' }}>
-                                    <Typography.Text
-                                      __component_name="Typography.Text"
-                                      disabled={false}
-                                      ellipsis={true}
-                                      strong={false}
-                                      style={{ fontSize: '' }}
-                                    >
-                                      共
-                                    </Typography.Text>
-                                    <Typography.Text
-                                      __component_name="Typography.Text"
-                                      disabled={false}
-                                      ellipsis={true}
-                                      strong={false}
-                                      style={{ fontSize: '' }}
-                                    >
-                                      {__$$eval(() => this.state.dataSetFileTotal)}
-                                    </Typography.Text>
-                                    <Typography.Text
-                                      __component_name="Typography.Text"
-                                      disabled={false}
-                                      ellipsis={true}
-                                      strong={false}
-                                      style={{ fontSize: '' }}
-                                    >
-                                      条数据
-                                    </Typography.Text>
-                                  </Col>
                                   <Col __component_name="Col">
                                     <Pagination
                                       __component_name="Pagination"
@@ -3762,7 +3741,19 @@ class $$Page extends React.Component {
                                           Array.prototype.slice.call(arguments).concat([])
                                         );
                                       }.bind(this)}
+                                      onShowSizeChange={function () {
+                                        return this.onPageChange.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([])
+                                        );
+                                      }.bind(this)}
                                       pageSize={10}
+                                      showTotal={function () {
+                                        return this.showTotal.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([])
+                                        );
+                                      }.bind(this)}
                                       simple={false}
                                       style={{ textAlign: 'right' }}
                                       total={__$$eval(() => this.state.dataSetFileTotal)}

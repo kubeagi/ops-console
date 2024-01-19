@@ -113,7 +113,17 @@ class ModelAppList$$Page extends React.Component {
     console.log('will unmount');
   }
 
-  beforeUpload() {}
+  beforeUpload(file) {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('仅支持 JPG/PNG 文件!');
+    }
+    const isLt1M = file.size / 1024 / 1024 < 1;
+    if (!isLt1M) {
+      message.error('图片最大不超过1M!');
+    }
+    return isJpgOrPng && isLt2M;
+  }
 
   form(name) {
     return this.$(name || 'formily_create')?.formRef?.current?.form;
@@ -192,15 +202,6 @@ class ModelAppList$$Page extends React.Component {
         imageUrl: res,
       });
       this.imageUrl = res;
-    });
-  }
-
-  handlePageSizeChange(size) {
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
     });
   }
 
@@ -433,16 +434,6 @@ class ModelAppList$$Page extends React.Component {
         this.getData();
       }
     );
-  }
-
-  onShowSizeChange(current, size) {
-    // pageSize 变化的回调
-    this.setState({
-      pages: {
-        ...this.state.pages,
-        pageSize: size,
-      },
-    });
   }
 
   onSubmitCreate() {
@@ -1138,26 +1129,41 @@ class ModelAppList$$Page extends React.Component {
               </Row>
               <Row __component_name="Row" wrap={true}>
                 <Col __component_name="Col" span={24}>
-                  <Pagination
-                    __component_name="Pagination"
-                    current={__$$eval(() => this.state.pages.currentPage)}
-                    onChange={function () {
-                      return this.onChange.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    pageSize={__$$eval(() => this.state.pages.pageSize)}
-                    showTotal={function () {
-                      return this.showTotal.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    simple={false}
-                    style={{ textAlign: 'right' }}
-                    total={__$$eval(() => this.state.pages.total)}
-                  />
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={24}>
+                      <Row __component_name="Row" justify="space-between" wrap={false}>
+                        <Col __component_name="Col" />
+                        <Col __component_name="Col">
+                          <Pagination
+                            __component_name="Pagination"
+                            current={__$$eval(() => this.state.pages.currentPage)}
+                            onChange={function () {
+                              return this.onChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            onShowSizeChange={function () {
+                              return this.onChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            pageSize={__$$eval(() => this.state.pages.pageSize)}
+                            showTotal={function () {
+                              return this.showTotal.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            simple={false}
+                            style={{ textAlign: 'right' }}
+                            total={__$$eval(() => this.state.pages.total)}
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Card>
