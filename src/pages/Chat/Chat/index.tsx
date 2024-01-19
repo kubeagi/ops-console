@@ -89,43 +89,34 @@ const Chat: React.FC<IChat> = props => {
   });
   useEffect(() => {
     if (conversation.data?.length) return;
+    const app = application?.data?.Application?.getApplication;
+    let cvList = [
+      getCvsMeta(
+        app?.prologue ||
+          `##### 您好，我是${app?.metadata.displayName || app?.metadata.name}${
+            app?.metadata.description ? `\n\n${app?.metadata.description}` : ''
+          }`,
+        props.conversationId || Date.now().toString(),
+        false
+      ),
+    ];
     // 存在会话id, 展示历史聊天内容
     if (props.conversationId) {
       if (messagesLoading || !messages?.length) return;
-      setConversation({
-        ...conversation,
-        data: messages?.reduce(
-          (pre, cur) => [
-            ...pre,
-            getCvsMeta(cur.query, cur.id + '_query', true),
-            getCvsMeta(cur.answer, cur.id + '_answer', false),
-          ],
-          []
-        ),
-      });
-      scrollToBottom();
-      return;
-    }
-    // 不存在会话id, 展示欢迎语
-    const app = application?.data?.Application?.getApplication;
-    const meta = app?.metadata;
-    const prologue = app?.prologue;
-    if (meta?.name) {
-      setConversation({
-        ...conversation,
-        data: [
-          getCvsMeta(
-            prologue ||
-              `##### 您好，我是${meta.displayName || meta.name}${
-                meta.description ? `\n\n${meta.description}` : ''
-              }`,
-            props.conversationId || Date.now().toString(),
-            false
-          ),
+      cvList = messages?.reduce(
+        (pre, cur) => [
+          ...pre,
+          getCvsMeta(cur.query, cur.id + '_query', true),
+          getCvsMeta(cur.answer, cur.id + '_answer', false),
         ],
-      });
-      scrollToBottom();
+        cvList
+      );
     }
+    setConversation({
+      ...conversation,
+      data: cvList,
+    });
+    scrollToBottom();
   }, [conversation, application, props.conversationId, messages, messagesLoading]);
   useEffect(() => {
     application.mutate();
@@ -266,7 +257,7 @@ const Chat: React.FC<IChat> = props => {
         ],
       };
     });
-    scrollToBottom();
+    scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
     fetchConversation(_input);
     setInput('');
   }, [input, setInput, setConversation, fetchConversation]);
