@@ -33,30 +33,26 @@ const Publish: React.FC<PublishProps> = props => {
         });
       }}
       open={open}
-      title={`${title}应用`}
+      title={`${title}智能体`}
     >
       <FormHelper>
         <Form className={styles.form} form={form} labelAlign="left" labelCol={{ span: 5 }}>
           <Form.Item
-            label="模型应用名称"
+            label="智能体名称"
             name="name"
             required
             rules={[
               {
                 validator: (_, value, callback) => {
                   if (!value) {
-                    return callback('请输入模型应用名称');
+                    return callback('请输入智能体名称');
                   }
                   return callback();
                 },
               },
             ]}
           >
-            <Input
-              disabled={type === 'edit'}
-              onBlur={handelBlur}
-              placeholder="请输入模型应用名称"
-            />
+            <Input disabled={type === 'edit'} onBlur={handelBlur} placeholder="请输入智能体名称" />
           </Form.Item>
         </Form>
       </FormHelper>

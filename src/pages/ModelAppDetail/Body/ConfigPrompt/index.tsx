@@ -105,7 +105,7 @@ const PROMPTS_MAP: Prompt[] = [
     id: 'TextQuestionAndAnswer',
     name: '文本问答',
     prompt:
-      '现在你是一个阅读理解机器人，你会阅读并深度理解我给你的文本内容并据此回答我所提出的问题。注意，我给出的问题是：{{.question}} 你需要阅读理解的文本是：{{context}}',
+      '现在你是一个问答机器人，你会阅读并深度理解我给你的上下文内容并据此回答我所提出的问题。我给出的问题是：{{.question}} 你需要阅读理解的文本是：{{.context}}',
   },
   { icon, id: 'DocumentAbstract', name: '文档摘要', prompt: '生成以下内容的摘要：{{.context}}' },
   {
@@ -126,7 +126,7 @@ const PROMPTS_MAP: Prompt[] = [
     id: 'LegalAdviser',
     name: '法律顾问',
     prompt:
-      '我想让你做我的法律顾问。我将描述一种法律情况，您将就如何处理它提供建议。你应该只回复你的建议，而不是其他。不要写解释。我的第一个请求是{{.question}}。',
+      '你现在是我的法律顾问。我将描述一种法律问题，你需要提供如何处理这个问题的建议。你只需要回复你的建议，而不是其他。不要写解释。我的问题是{{.question}}。',
   },
   {
     icon,
@@ -157,7 +157,8 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
               width: 593,
               refresh: () => {},
               type: 'edit',
-              renderChildren: form => {
+              footer: false,
+              renderChildren: (form, forceUpdate, setOpen) => {
                 return (
                   <>
                     <Alert
@@ -182,6 +183,7 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
                     />
 
                     <Knowledge
+                      callback={() => setOpen(false)}
                       canDelete={false}
                       canSelect={true}
                       checkedIds={[]}
@@ -191,6 +193,13 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
                         if (userPrompt) {
                           form.setFieldsValue({
                             userPrompt,
+                          });
+                          setConfigs({
+                            ...configs,
+                            ConfigPrompt: {
+                              ...configs?.ConfigPrompt,
+                              userPrompt,
+                            },
                           });
                         }
                       }}

@@ -38,6 +38,7 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
         temperature: Application?.temperature,
         maxLength: Application?.maxLength,
         conversionWindowSize: Application?.conversionWindowSize,
+        maxTokens: Application?.maxTokens,
       },
       ConfigKnowledge: {
         knowledgebase: Application?.knowledgebase || undefined,
@@ -76,7 +77,7 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
         <Row wrap={true}>
           <Col span={24}>
             <Space align="center" direction="horizontal">
-              <Button.Back title="模型应用详情" type="primary" />
+              <Button.Back title="智能体详情" type="primary" />
             </Space>
           </Col>
           <Col span={24}>

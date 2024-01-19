@@ -1,6 +1,6 @@
 import FormHelper from '@tenx-ui/form-helper';
 import { Modal } from '@tenx-ui/materials';
-import { Form, InputNumber, Slider, Space, notification } from 'antd';
+import { Modal as AntdModal, Form, InputNumber, Slider, Space, notification } from 'antd';
 import React, { useReducer } from 'react';
 
 import { useModalAppDetailContext } from '../../index';
@@ -12,37 +12,46 @@ export interface SliderProps {
   Config: {
     initialValue: number;
     min: number;
-    max: number;
+    max?: number;
     precision: number;
     minMark?: string;
     maxMark?: string;
+    minAlias?: string;
   };
+  noSlider?: boolean;
+  forceUpdate?: () => void;
 }
 export const SliderItem: React.FC<SliderProps> = props => {
-  const { label, name, Config } = props;
+  const { form } = useModalAppDetailContext();
+  const { label, name, Config, noSlider, forceUpdate } = props;
   const marginBottom = 0;
   const sliderWidth = '260px';
+  const min = Config?.minAlias ? form.getFieldValue(Config?.minAlias) : Config?.min;
   return (
-    <Form.Item label={label} style={{ marginBottom }}>
+    <Form.Item label={label} style={{ marginBottom: noSlider ? 20 : 0 }}>
       <Space>
-        <Form.Item
-          initialValue={Config.initialValue}
-          name={name}
-          required
-          rules={[{ required: true, message: `请输入` }]}
-          style={{ marginBottom }}
-        >
-          <Slider
-            marks={{
-              [Config.min]: Config.minMark || [Config.min],
-              [Config.max]: Config.maxMark || [Config.max],
-            }}
-            max={Config.max}
-            min={Config.min}
-            step={1 / Math.pow(10, Config.precision)}
-            style={{ width: sliderWidth }}
-          />
-        </Form.Item>
+        {!noSlider && (
+          <Form.Item
+            initialValue={Config.initialValue}
+            name={name}
+            required
+            style={{ marginBottom }}
+          >
+            <Slider
+              marks={{
+                [Config.min]: Config.minMark || [Config.min],
+                [Config.max]: Config.maxMark || [Config.max],
+              }}
+              max={Config.max}
+              min={min}
+              onChange={() => {
+                forceUpdate && forceUpdate();
+              }}
+              step={1 / Math.pow(10, Config.precision)}
+              style={{ width: sliderWidth }}
+            />
+          </Form.Item>
+        )}
         <Form.Item
           initialValue={Config.initialValue}
           name={name}
@@ -52,7 +61,10 @@ export const SliderItem: React.FC<SliderProps> = props => {
         >
           <InputNumber
             max={Config.max}
-            min={Config.min}
+            min={min}
+            onChange={() => {
+              forceUpdate && forceUpdate();
+            }}
             placeholder={`请输入`}
             precision={Config.precision}
           />
@@ -74,7 +86,7 @@ export interface SettingProps {
   handleSave?: (values: any) => void;
   form?: any;
   configKey: string;
-  renderChildren?: (form, forceUpdate) => React.ReactElement;
+  renderChildren?: (form, forceUpdate, setOpen) => React.ReactElement;
 }
 const Setting: React.FC<SettingProps> = props => {
   const { configs, setConfigs } = useModalAppDetailContext();
@@ -94,8 +106,9 @@ const Setting: React.FC<SettingProps> = props => {
     ...otherProps
   } = props;
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+  const Component = props.footer === false ? AntdModal : Modal;
   return (
-    <Modal
+    <Component
       {...otherProps}
       onCancel={() => {
         setOpen(false);
@@ -130,10 +143,10 @@ const Setting: React.FC<SettingProps> = props => {
       <FormHelper>
         <Form className={styles.form} form={curForm} labelAlign="left" labelCol={{ span: 5 }}>
           {children}
-          {renderChildren && renderChildren(curForm, forceUpdate)}
+          {renderChildren && renderChildren(curForm, forceUpdate, setOpen)}
         </Form>
       </FormHelper>
-    </Modal>
+    </Component>
   );
 };
 
