@@ -34,18 +34,18 @@ const Publish: React.FC<PublishProps> = props => {
           });
           setOpen(false);
           notification.success({
-            message: '删除应用成功',
+            message: '删除智能体成功',
           });
           history.go(-1);
         } catch (error) {
           notification.warnings({
-            message: '删除应用失败',
+            message: '删除智能体失败',
             errors: error?.response?.errors,
           });
         }
       }}
       open={open}
-      title={`${title}应用`}
+      title={`${title}智能体`}
     >
       <Alert
         message={

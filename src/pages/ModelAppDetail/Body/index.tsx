@@ -29,8 +29,8 @@ const Body: React.FC<BodyProps> = props => {
   return (
     <Card bordered={false} className={styles.card} loading={cardLoading} type="inner">
       <Flex className={styles.action} justify="space-between">
-        <Typography.Title level={1}>应用配置</Typography.Title>
-        <Tooltip title={isEqual(initConfigs, configs) && '请先修改应用配置'}>
+        <Typography.Title level={1}>智能体配置</Typography.Title>
+        <Tooltip title={isEqual(initConfigs, configs) && '请先修改智能体配置'}>
           <Button
             disabled={isEqual(initConfigs, configs)}
             loading={loading}
@@ -41,8 +41,11 @@ const Body: React.FC<BodyProps> = props => {
                   ...data,
                   name: data?.metadata?.name,
                   namespace: data?.metadata?.namespace,
-                  knowledgebase: form.getFieldsValue()?.knowledgebase || undefined,
                   ...form.getFieldsValue(),
+                  knowledgebase:
+                    form.getFieldsValue()?.knowledgebase === 'undefined'
+                      ? undefined
+                      : form.getFieldsValue()?.knowledgebase || data?.knowledgebase,
                 };
                 delete input.metadata;
                 await utils.bff.updateApplicationConfig({
@@ -50,14 +53,14 @@ const Body: React.FC<BodyProps> = props => {
                 });
                 refresh && refresh();
                 notification.success({
-                  message: '保存应用配置成功',
+                  message: '保存智能体配置成功',
                 });
                 setLoading(false);
                 setSaveIng(!saveIng);
               } catch (error) {
                 setLoading(false);
                 notification.warnings({
-                  message: '保存应用配置失败',
+                  message: '保存智能体配置失败',
                   errors: error?.response?.errors,
                 });
               }

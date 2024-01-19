@@ -71,62 +71,58 @@ const Edit: React.FC<EditProps> = props => {
             setImageUrl();
             refresh && refresh();
             notification.success({
-              message: '编辑应用成功',
+              message: '编辑智能体成功',
             });
           } catch (error) {
             notification.warnings({
-              message: '编辑应用失败',
+              message: '编辑智能体失败',
               errors: error?.response?.errors,
             });
           }
         });
       }}
       open={open}
-      title={`${title}应用`}
+      title={`${title}智能体`}
     >
       <FormHelper>
         <Form className={styles.form} form={form} labelAlign="left" labelCol={{ span: 5 }}>
           <Form.Item
-            label="模型应用名称"
+            label="智能体名称"
             name="name"
             required
             rules={[
               {
                 validator: (_, value, callback) => {
                   if (!value) {
-                    return callback('请输入模型应用名称');
+                    return callback('请输入智能体名称');
                   }
                   return callback();
                 },
               },
             ]}
           >
-            <Input
-              disabled={type === 'edit'}
-              onBlur={handelBlur}
-              placeholder="请输入模型应用名称"
-            />
+            <Input disabled={type === 'edit'} onBlur={handelBlur} placeholder="请输入智能体名称" />
           </Form.Item>
           <Form.Item
-            label="模型应用别名"
+            label="智能体别名"
             name="displayName"
             required
             rules={[
               {
                 validator: (_, value, callback) => {
                   if (!value) {
-                    return callback('请输入模型应用别名');
+                    return callback('请输入智能体别名');
                   }
                   return callback();
                 },
               },
             ]}
           >
-            <Input onBlur={handelBlur} placeholder="请输入模型应用别名" />
+            <Input onBlur={handelBlur} placeholder="请输入智能体别名" />
           </Form.Item>
           <Form.Item
             className={styles.uploadItem}
-            label="应用头像"
+            label="智能体头像"
             name="icon"
             required
             rules={[

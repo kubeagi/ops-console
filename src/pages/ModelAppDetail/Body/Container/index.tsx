@@ -22,7 +22,7 @@ interface ContainerProps {
   actions?: Action[];
   configKey: string;
   changeConfig?: boolean;
-  renderChildren?: (form, forceUpdate) => React.ReactElement;
+  renderChildren?: (form, forceUpdate, setModalOpen) => React.ReactElement;
   style?: any;
 }
 
@@ -80,7 +80,7 @@ const Container: React.FC<ContainerProps> = props => {
         </Space>
       </Flex>
       {children}
-      {renderChildren && renderChildren(form, forceUpdate)}
+      {renderChildren && renderChildren(form, forceUpdate, setModalOpen)}
     </div>
   );
 };

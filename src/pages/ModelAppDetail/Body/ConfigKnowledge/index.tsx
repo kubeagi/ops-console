@@ -26,9 +26,10 @@ interface KnowledgeProps {
   canDelete?: boolean;
   canSelect?: boolean;
   multi?: boolean;
+  callback?: () => void;
 }
 export const Knowledge: React.FC<KnowledgeProps> = props => {
-  const { items, canDelete, canSelect, multi } = props;
+  const { items, canDelete, canSelect, multi, callback } = props;
   const [checkedIds, setCheckedIds] = useState([]);
   useEffect(() => {
     setCheckedIds(props.checkedIds);
@@ -50,16 +51,19 @@ export const Knowledge: React.FC<KnowledgeProps> = props => {
                 if (!multi) {
                   setCheckedIds([item?.id]);
                   props.setCheckedIds && props.setCheckedIds([item?.id]);
+                  callback && callback();
                   return;
                 }
                 if (checkedIds.includes(item?.id)) {
                   setCheckedIds(checkedIds?.filter(id => id !== item?.id));
                   props.setCheckedIds &&
                     props.setCheckedIds(checkedIds?.filter(id => id !== item?.id));
+                  callback && callback();
                   return;
                 }
                 setCheckedIds([...checkedIds, item?.id]);
                 props.setCheckedIds && props.setCheckedIds([...checkedIds, item?.id]);
+                callback && callback();
               }}
             >
               <div>
@@ -138,7 +142,14 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                     items={knowledges}
                     setCheckedIds={v => {
                       form.setFieldsValue({
-                        knowledgebase: v?.[0],
+                        knowledgebase: v?.[0] || 'undefined',
+                      });
+                      setConfigs({
+                        ...configs,
+                        ConfigKnowledge: {
+                          ...configs?.ConfigKnowledge,
+                          knowledgebase: v?.[0],
+                        },
                       });
                     }}
                   />
@@ -239,7 +250,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
         setCheckedIds={v => {
           form.setFieldsValue({
             ...configs?.ConfigKnowledge,
-            knowledgebase: v?.[0],
+            knowledgebase: v?.[0] || 'undefined',
           });
           setConfigs({
             ...configs,
