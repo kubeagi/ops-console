@@ -126,7 +126,7 @@ class DatasetVersionDetail$$Page extends React.Component {
     }
     const fetch = async () => {
       try {
-        this.handleReUpload();
+        this.doUpload();
       } catch (e) {}
     };
     // 点击确定回调
@@ -220,6 +220,12 @@ class DatasetVersionDetail$$Page extends React.Component {
     });
   }
 
+  doUpload() {
+    this.state.upload?.uploadThis?.state?.fileList?.forEach(file => {
+      this.state.upload?.uploadThis?.computeMD5(file);
+    });
+  }
+
   form(name) {
     return this.$(name || 'add_file')?.formRef?.current?.form;
   }
@@ -277,23 +283,21 @@ class DatasetVersionDetail$$Page extends React.Component {
       this.handleCancle();
       return;
     }
-    this.state.upload?.uploadThis?.state?.fileList?.forEach(file => {
-      this.state.upload?.uploadThis?.computeMD5(file);
-    });
+    this.doUpload();
   }
 
   handleUploadFinished(file, res) {
     this.setFileUploadStatus(file);
+    this.utils.notification.success({
+      message: '新增文件成功',
+    });
+    this.refresh();
   }
 
   handleUploadSuccess() {
     this.setState({
       addFileVisible: false,
     });
-    this.utils.notification.success({
-      message: '新增文件成功',
-    });
-    this.refresh();
   }
 
   onFileClose(event) {
