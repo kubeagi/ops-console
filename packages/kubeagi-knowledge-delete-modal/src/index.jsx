@@ -43,39 +43,6 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
 
   $$ = () => [];
 
-  componentWillUnmount() {
-    console.log('will unmount');
-  }
-
-  async onOk() {
-    // 点击确定回调
-    console.log('onOk');
-    console.log('this.props', this.props);
-    this.setState({
-      confirmLoading: true,
-    });
-    const { name, namespace } = this.props;
-    try {
-      const res = await this.utils.bff.deleteKnowledgeBase({
-        input: {
-          name,
-          namespace,
-        },
-      });
-      this.props.onOk?.(res);
-    } catch {
-      //
-    } finally {
-      this.setState({
-        confirmLoading: false,
-      });
-    }
-  }
-
-  onCancel() {
-    this.props.onCancel?.();
-  }
-
   getFullName() {
     const { name, displayName } = this.props;
     if (!name) {
@@ -87,17 +54,38 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
     return `${displayName} (${name})`;
   }
 
-  componentDidMount() {
-    console.log('did mount');
+  onCancel() {
+    this.props.onCancel?.();
   }
 
-  componentWillUnmount() {
-    console.log('will unmount');
+  async onOk() {
+    this.setState({
+      confirmLoading: true,
+    });
+    const { name, namespace } = this.props;
+    try {
+      const res = await this.utils.bff.deleteKnowledgeBase({
+        input: {
+          name,
+          namespace,
+        },
+      });
+      this.utils.notification.success({
+        message: `知识库 ${name} 删除成功`,
+      });
+      this.props.onOk?.(res);
+    } catch {
+      this.utils.notification.warning({
+        message: `知识库 ${name} 删除失败`,
+      });
+    } finally {
+      this.setState({
+        confirmLoading: false,
+      });
+    }
   }
 
-  componentDidMount() {
-    console.log('did mount');
-  }
+  componentDidMount() {}
 
   render() {
     const __$$context = this._context || this;
@@ -105,28 +93,28 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
     return (
       <Component>
         <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.confirmLoading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
           mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.onCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
           onOk={function () {
             return this.onOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           open={true}
           title="删除知识库"
-          centered={false}
-          keyboard={true}
-          onCancel={function () {
-            return this.onCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={__$$eval(() => this.state.confirmLoading)}
-          destroyOnClose={true}
-          __component_name="Modal"
         >
           <Alert
-            type="warning"
+            __component_name="Alert"
             message={__$$eval(() => `确定删除知识库 "${this.getFullName()}" ？`)}
             showIcon={true}
-            __component_name="Alert"
+            type="warning"
           />
         </Modal>
       </Component>
@@ -134,10 +122,11 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
   }
 }
 
-const ComponentWrapper = (props = {}) => {
+const ComponentWrapper = React.forwardRef((props = {}, ref) => {
   const history = getUnifiedHistory();
   const appHelper = {
     utils,
+    constants: __$$constants,
     history,
   };
   const self = {
@@ -149,12 +138,12 @@ const ComponentWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
       render={dataProps => (
         <KubeAgiKnowledgeEditModal$$Component
+          ref={ref}
           {...props}
           {...dataProps}
           self={self}
@@ -163,7 +152,7 @@ const ComponentWrapper = (props = {}) => {
       )}
     />
   );
-};
+});
 export default ComponentWrapper;
 
 function __$$eval(expr) {
@@ -181,6 +170,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;

@@ -1,10 +1,14 @@
 import { sdk as bff } from '@yuntijs/arcadia-bff-sdk';
 
+import { notification } from '@tenx-ui/materials';
+
 import { createRef } from 'react';
 
 const utils = {};
 
 utils.bff = bff;
+
+utils.notification = notification;
 
 export class RefsManager {
   constructor() {
@@ -51,4 +55,6 @@ utils.RefsManager = RefsManager;
 
 export default {
   bff,
+
+  notification,
 };

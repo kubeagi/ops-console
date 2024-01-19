@@ -18,8 +18,8 @@ import {
   Divider,
   Descriptions,
   Status,
-  Tag,
   Tooltip,
+  Tag,
   Pagination,
 } from '@tenx-ui/materials';
 
@@ -237,7 +237,6 @@ class Knowledge$$Page extends React.Component {
     this.setState({
       currentItem: extParams.data,
     });
-    console.log('extParams.data', extParams.data);
     switch (key) {
       case 'edit':
         {
@@ -288,7 +287,6 @@ class Knowledge$$Page extends React.Component {
   }
 
   showTotal(total, range) {
-    // 用于格式化显示表格数据总量
     return `共 ${total} 条`;
   }
 
@@ -550,7 +548,10 @@ class Knowledge$$Page extends React.Component {
                                         style={{ cursor: 'pointer', paddingLeft: '20px' }}
                                         wrap={true}
                                       >
-                                        <Col __component_name="Col">
+                                        <Col
+                                          __component_name="Col"
+                                          style={{ paddingRight: '32px' }}
+                                        >
                                           <Typography.Title
                                             __component_name="Typography.Title"
                                             bold={true}
@@ -567,7 +568,7 @@ class Knowledge$$Page extends React.Component {
                                             delete={false}
                                             disabled={false}
                                             editable={false}
-                                            ellipsis={{ rows: 2 }}
+                                            ellipsis={{ rows: 1 }}
                                             mark={false}
                                             strong={false}
                                             style={{ fontSize: '' }}
@@ -612,6 +613,7 @@ class Knowledge$$Page extends React.Component {
                                             __component_name="Space"
                                             align="center"
                                             direction="horizontal"
+                                            size={2}
                                             key="node_oclqalnx4r2"
                                           >
                                             <Status
@@ -622,28 +624,32 @@ class Knowledge$$Page extends React.Component {
                                                 __$$context.getDataStatus(__$$context, true)
                                               )}
                                             />
-                                            <Tag
-                                              __component_name="Tag"
-                                              closable={false}
-                                              color="default"
-                                            >
-                                              {__$$eval(() => item.embedder?.name)}
-                                            </Tag>
+                                            {!!__$$eval(
+                                              () => item.status !== 'True' && item.message
+                                            ) && (
+                                              <Tooltip
+                                                __component_name="Tooltip"
+                                                title={__$$eval(() => item.message)}
+                                              >
+                                                <AntdIconInfoCircleOutlined
+                                                  __component_name="AntdIconInfoCircleOutlined"
+                                                  style={{ color: '#9b9b9b', marginLeft: '4px' }}
+                                                />
+                                              </Tooltip>
+                                            )}
                                           </Space>,
-                                          !!__$$eval(
-                                            () => item.status !== 'True' && item.message
-                                          ) && (
-                                            <Tooltip
-                                              __component_name="Tooltip"
-                                              title={__$$eval(() => item.message)}
-                                              key="node_oclpvzqlpa2"
-                                            >
-                                              <AntdIconInfoCircleOutlined
-                                                __component_name="AntdIconInfoCircleOutlined"
-                                                style={{ color: '#9b9b9b', marginLeft: '4px' }}
-                                              />
-                                            </Tooltip>
-                                          ),
+                                          <Tag
+                                            __component_name="Tag"
+                                            closable={false}
+                                            color="default"
+                                            style={{ marginLeft: '12px' }}
+                                            key="node_oclqalnx4r1"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                item.embedder?.displayName || item.embedder?.name
+                                            )}
+                                          </Tag>,
                                         ],
                                         key: 'ssfd772g2sk',
                                         label: '状态',
@@ -702,7 +708,12 @@ class Knowledge$$Page extends React.Component {
                     }.bind(this)}
                     pageSize={__$$eval(() => this.state.pages.pageSize)}
                     pageSizeOptions={null}
-                    showTotal={null}
+                    showTotal={function () {
+                      return this.showTotal.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
                     simple={false}
                     style={{ display: 'flex', marginTop: '8px' }}
                     total={__$$eval(() => this.state.pages.total)}

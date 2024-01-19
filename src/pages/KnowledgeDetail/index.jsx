@@ -615,7 +615,12 @@ class KnowledgeDetail$$Page extends React.Component {
                                         }`
                                     )}
                                   >
-                                    {__$$eval(() => this.getKnowledge()?.embedder?.name)}
+                                    {__$$eval(() =>
+                                      (() => {
+                                        const embedder = this.getKnowledge()?.embedder;
+                                        return embedder?.displayName || embedder?.name;
+                                      })()
+                                    )}
                                   </UnifiedLink>
                                 ),
                                 key: '9n2j21coq6',

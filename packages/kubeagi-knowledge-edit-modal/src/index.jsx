@@ -49,17 +49,18 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
     return this._refsManager.getAll(refName);
   };
 
-  componentWillUnmount() {
-    console.log('will unmount');
+  getForm() {
+    return this.$('knowledgeEditForm')?.formRef?.current?.form;
+  }
+
+  onCancel() {
+    this.props.onCancel?.();
   }
 
   onOk() {
     // 点击确定回调
-    console.log('onOk');
     const form = this.getForm();
     form.submit(async values => {
-      console.log('values', values);
-      console.log('this.props', this.props);
       this.setState({
         confirmLoading: true,
       });
@@ -74,9 +75,14 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
             description,
           },
         });
+        this.utils.notification.success({
+          message: `知识库 ${name} 编辑成功`,
+        });
         this.props.onOk?.(res);
       } catch {
-        //
+        this.utils.notification.warning({
+          message: `知识库 ${name} 编辑失败`,
+        });
       } finally {
         this.setState({
           confirmLoading: false,
@@ -85,25 +91,7 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
     });
   }
 
-  getForm() {
-    return this.$('knowledgeEditForm')?.formRef?.current?.form;
-  }
-
-  onCancel() {
-    this.props.onCancel?.();
-  }
-
-  componentDidMount() {
-    console.log('did mount');
-  }
-
-  componentWillUnmount() {
-    console.log('will unmount');
-  }
-
-  componentDidMount() {
-    console.log('did mount');
-  }
+  componentDidMount() {}
 
   render() {
     const __$$context = this._context || this;
@@ -111,57 +99,57 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
     return (
       <Component>
         <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.confirmLoading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
           mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.onCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
           onOk={function () {
             return this.onOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           open={true}
           title="编辑"
-          centered={false}
-          keyboard={true}
-          onCancel={function () {
-            return this.onCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={__$$eval(() => this.state.confirmLoading)}
-          destroyOnClose={true}
-          __component_name="Modal"
         >
           <FormilyForm
-            ref={this._refsManager.linkRef('knowledgeEditForm')}
-            formHelper={{ autoFocus: true }}
+            __component_name="FormilyForm"
             componentProps={{
               colon: false,
-              layout: 'horizontal',
-              labelCol: 6,
               labelAlign: 'left',
+              labelCol: 6,
+              layout: 'horizontal',
               wrapperCol: 18,
             }}
             createFormProps={{ initialValues: __$$eval(() => this.props.initialValues) }}
-            __component_name="FormilyForm"
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('knowledgeEditForm')}
           >
             <FormilyInput
-              fieldProps={{
-                name: 'displayName',
-                title: '知识库别名',
-                required: true,
-                'x-validator': [],
-              }}
+              __component_name="FormilyInput"
               componentProps={{ 'x-component-props': { placeholder: '请输入知识库别名' } }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyInput"
+              fieldProps={{
+                'name': 'displayName',
+                'required': true,
+                'title': '知识库别名',
+                'x-validator': [],
+              }}
             />
             <FormilyTextArea
+              __component_name="FormilyTextArea"
+              componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                name: 'description',
-                title: '描述',
+                'name': 'description',
+                'title': '描述',
                 'x-component': 'Input.TextArea',
                 'x-validator': [],
               }}
-              componentProps={{ 'x-component-props': { placeholder: '请输入描述' } }}
-              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyTextArea"
             />
           </FormilyForm>
         </Modal>
@@ -170,10 +158,11 @@ class KubeAgiKnowledgeEditModal$$Component extends React.Component {
   }
 }
 
-const ComponentWrapper = (props = {}) => {
+const ComponentWrapper = React.forwardRef((props = {}, ref) => {
   const history = getUnifiedHistory();
   const appHelper = {
     utils,
+    constants: __$$constants,
     history,
   };
   const self = {
@@ -185,12 +174,12 @@ const ComponentWrapper = (props = {}) => {
       self={self}
       sdkInitFunc={{
         enabled: undefined,
-        func: 'undefined',
         params: undefined,
       }}
       sdkSwrFuncs={[]}
       render={dataProps => (
         <KubeAgiKnowledgeEditModal$$Component
+          ref={ref}
           {...props}
           {...dataProps}
           self={self}
@@ -199,7 +188,7 @@ const ComponentWrapper = (props = {}) => {
       )}
     />
   );
-};
+});
 export default ComponentWrapper;
 
 function __$$eval(expr) {
@@ -217,6 +206,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;
