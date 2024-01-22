@@ -1,4 +1,4 @@
-import { Card, Typography, notification } from '@tenx-ui/materials';
+import { Card, Divider, Typography, notification } from '@tenx-ui/materials';
 import { Button, Col, Flex, Form, Row, Tooltip } from 'antd';
 import { isEqual } from 'lodash';
 import React, { useState } from 'react';
@@ -8,8 +8,11 @@ import { useModalAppDetailContext } from '../index';
 import ConfigConversationStarter from './ConfigConversationStarter';
 import ConfigKnowledge from './ConfigKnowledge';
 import ConfigModelService from './ConfigModelService';
+import ConfigNext from './ConfigNext';
 import ConfigPrompt from './ConfigPrompt';
 import Dialogue from './Dialogue';
+import ViewReference from './ViewReference';
+import ViewResInfo from './ViewResInfo';
 import styles from './index.less';
 
 interface BodyProps {}
@@ -78,9 +81,26 @@ const Body: React.FC<BodyProps> = props => {
               <ConfigConversationStarter />
               <ConfigModelService />
               <ConfigKnowledge />
+              {/* <RealTimeSearch/> */}
               <ConfigPrompt />
               {/* <ConfigAudio /> */}
-              {/* <ConfigNext /> */}
+              <Divider
+                __component_name="Divider"
+                content={
+                  <>
+                    <ConfigNext />
+                    <ViewReference />
+                    <ViewResInfo />
+                  </>
+                }
+                dashed={true}
+                defaultOpen={false}
+                mode="expanded"
+                orientation="left"
+                orientationMargin={0}
+              >
+                个性化配置
+              </Divider>
             </Form>
           </Card>
         </Col>

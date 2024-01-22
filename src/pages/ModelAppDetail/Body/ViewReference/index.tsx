@@ -1,13 +1,13 @@
-import { KubeagiNextLead } from '@tenx-ui/icon';
+import { KubeagiQuote } from '@tenx-ui/icon';
 import { Form, Switch } from 'antd';
 import React from 'react';
 
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 
-interface ConfigNextProps {}
+interface ViewReferenceProps {}
 
-const ConfigNext: React.FC<ConfigNextProps> = props => {
+const ViewReference: React.FC<ViewReferenceProps> = props => {
   const { configs, setConfigs } = useModalAppDetailContext();
   return (
     <Container
@@ -15,14 +15,14 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
         {
           key: 'switch',
           children: (
-            <Form.Item name="showNextGuide" style={{ marginBottom: 0 }}>
+            <Form.Item name="showRetrievalInfo" style={{ marginBottom: 0 }}>
               <Switch
                 onChange={v => {
                   setConfigs({
                     ...configs,
-                    ConfigNext: {
-                      ...configs?.ConfigNext,
-                      showNextGuide: v,
+                    ViewReference: {
+                      ...configs?.ViewReference,
+                      showRetrievalInfo: v,
                     },
                   });
                 }}
@@ -33,11 +33,11 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
         },
       ]}
       changeConfig
-      configKey="ConfigNext"
-      icon={<KubeagiNextLead />}
-      title={'问题引导'}
+      configKey="ViewReference"
+      icon={<KubeagiQuote />}
+      title={'查看引用'}
     ></Container>
   );
 };
 
-export default ConfigNext;
+export default ViewReference;
