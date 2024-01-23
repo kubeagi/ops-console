@@ -182,10 +182,14 @@ class CreateModelService$$Page extends React.Component {
               queryName: true,
             });
             this.onChangeModel(this.history?.query?.name);
+          } else {
+            this.form()?.setValues({
+              queryName: false,
+            });
           }
         }
       );
-    } catch {
+    } catch (error) {
       // console.log(error, '===> err')
     }
   }
@@ -207,7 +211,7 @@ class CreateModelService$$Page extends React.Component {
       this.form()?.setValues({
         RAY_CLUSTER_INDEX: list[0]?.value,
       });
-    } catch {
+    } catch (error) {
       // console.log(error, '===> err')
     }
   }
@@ -506,7 +510,10 @@ class CreateModelService$$Page extends React.Component {
                       buttonStyle: 'outline',
                       disabled: '{{ $form.values?.queryName }}',
                       onChange: function () {
-                        return Reflect.apply(this.onChangeModelSource, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.onChangeModelSource.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this),
                       size: 'middle',
                     },
@@ -574,7 +581,10 @@ class CreateModelService$$Page extends React.Component {
                       disabled: '{{ $form.values?.queryName }}',
                       mode: 'single',
                       onChange: function () {
-                        return Reflect.apply(this.onChangeModel, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.onChangeModel.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this),
                       placeholder: '请选择模型',
                       showSearch: true,
@@ -1115,7 +1125,10 @@ class CreateModelService$$Page extends React.Component {
                                       'x-component-props': {
                                         _sdkSwrGetFunc: {},
                                         onChange: function () {
-                                          return Reflect.apply(this.onChangeType, this, [...Array.prototype.slice.call(arguments)]);
+                                          return this.onChangeType.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([])
+                                          );
                                         }.bind(this),
                                       },
                                     }}
@@ -1326,7 +1339,10 @@ class CreateModelService$$Page extends React.Component {
                         disabled={false}
                         ghost={false}
                         onClick={function () {
-                          return Reflect.apply(this.onClickCheck, this, [...Array.prototype.slice.call(arguments)]);
+                          return this.onClickCheck.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
                         }.bind(this)}
                         shape="default"
                         size="small"
@@ -1401,7 +1417,10 @@ class CreateModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return Reflect.apply(this.handleCancle, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.handleCancle.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this)}
                       shape="default"
                     >
@@ -1414,7 +1433,10 @@ class CreateModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return Reflect.apply(this.handleConfirm, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.handleConfirm.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this)}
                       shape="default"
                       type="primary"
@@ -1451,15 +1473,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      render={dataProps => (
-        <CreateModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
-      )}
+      self={self}
       sdkInitFunc={{
         enabled: undefined,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      self={self}
+      render={dataProps => (
+        <CreateModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+      )}
     />
   );
 };
@@ -1468,7 +1490,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch {}
+  } catch (error) {}
 }
 
 function __$$evalArray(expr) {
