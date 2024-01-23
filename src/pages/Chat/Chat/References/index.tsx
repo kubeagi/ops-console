@@ -74,7 +74,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
         loading={loading}
         onMouseLeaveCallback={onRefContentMouseLeave}
         open={Boolean(clear)}
-        reference={_item?.item || {}}
+        reference={_item?.item || ({} as Reference)}
       >
         <Space
           direction="horizontal"
