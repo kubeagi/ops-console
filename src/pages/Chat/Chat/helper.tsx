@@ -6,19 +6,28 @@ import { ChatMessage } from '@lobehub/ui';
 import { ChatAssistant, ChatUser } from '@tenx-ui/icon';
 import React from 'react';
 
+import { Reference } from '@/pages/Chat/Chat/References';
+
 /**
  * helper
  * @author zggmd
  * @date 2023-12-20
  */
 
-export const getCvsMeta = (content: string, id: string, isUser?: boolean): ChatMessage => {
+export const getCvsMeta = (
+  content: string,
+  id: string,
+  extra: {
+    references?: Reference[];
+  } = {},
+  isUser?: boolean
+): ChatMessage => {
   const Icon = isUser ? ChatUser : ChatAssistant;
   return {
+    extra,
     content,
     createAt: 1_686_437_950_084, // 暂时没用
     updateAt: 1_686_437_950_084,
-    extra: {},
     id,
     meta: {
       avatar: (
