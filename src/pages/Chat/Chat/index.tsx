@@ -32,6 +32,7 @@ import useGetCommonData from '@/components/hooks/useGetCommonData';
 import RenderReferences, { Reference } from '@/pages/Chat/Chat/References';
 import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
 import Retry from '@/pages/Chat/Chat/retry';
+import request from '@/utils/request';
 
 import './index.less';
 
@@ -88,6 +89,41 @@ const Chat: React.FC<IChat> = props => {
     resStr: 'messages',
     notFetch: !props.conversationId,
   });
+  const fetchLastReference = useCallback(async (cId, mId) => {
+    if (!mId || !cId) return;
+    const res = await request
+      .post({
+        url: `${window.location.origin}/kubeagi-apis/chat/messages/${mId}/references`,
+        options: {
+          body: {
+            app_name: props.appName,
+            app_namespace: props.appNamespace,
+            conversation_id: cId,
+            message_id: mId,
+          },
+        },
+      })
+      .catch(error => {
+        //
+      });
+    res?.length &&
+      setConversation(_conversation => {
+        const [first, ...rest] = _conversation.data.reverse();
+        return {
+          ..._conversation,
+          loadingMsgId: undefined,
+          data: [
+            ...rest.reverse(),
+            {
+              ...first,
+              extra: {
+                references: res,
+              },
+            },
+          ],
+        };
+      });
+  }, []);
   useEffect(() => {
     if (conversation.data?.length) return;
     const app = application?.data?.Application?.getApplication;
@@ -201,6 +237,7 @@ const Chat: React.FC<IChat> = props => {
                 const last = _conversation.data.at(-1);
                 return {
                   ...last,
+                  id: parsedData.message_id || last.id,
                   content: last.content + (parsedData?.message || ''),
                 };
               }),
@@ -223,6 +260,11 @@ const Chat: React.FC<IChat> = props => {
               shouldUpdateConversationId = false;
               props.onNewChat?.(_conversation.id);
             }
+            fetchLastReference(
+              _conversation.id,
+              // "791d25a6-7102-4f7c-afcd-29eee3624250" ||
+              _conversation.data.at(-1)?.id
+            );
             return {
               ..._conversation,
               loadingMsgId: undefined,
