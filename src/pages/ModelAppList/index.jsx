@@ -1034,12 +1034,12 @@ class ModelAppList$$Page extends React.Component {
                                                   id={__$$eval(() => item.isPublic + '')}
                                                   types={[
                                                     {
-                                                      children: '未部署',
+                                                      children: '未发布',
                                                       id: 'false',
                                                       type: 'disabled',
                                                     },
                                                     {
-                                                      children: '已部署',
+                                                      children: '已发布',
                                                       id: 'true',
                                                       type: 'info',
                                                     },
@@ -1049,10 +1049,12 @@ class ModelAppList$$Page extends React.Component {
                                                   __component_name="Tooltip"
                                                   title={__$$eval(() => item.message || '-')}
                                                 >
-                                                  <AntdIconInfoCircleOutlined
-                                                    __component_name="AntdIconInfoCircleOutlined"
-                                                    style={{ marginLeft: '20px' }}
-                                                  />
+                                                  {!!__$$eval(() => item.isPublic === 'error') && (
+                                                    <AntdIconInfoCircleOutlined
+                                                      __component_name="AntdIconInfoCircleOutlined"
+                                                      style={{ marginLeft: '20px' }}
+                                                    />
+                                                  )}
                                                 </Tooltip>
                                               </Col>
                                             </Row>
