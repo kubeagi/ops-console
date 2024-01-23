@@ -29,6 +29,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
 import useGetCommonData from '@/components/hooks/useGetCommonData';
+import RenderReferences, { Reference } from '@/pages/Chat/Chat/References';
 import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
 import Retry from '@/pages/Chat/Chat/retry';
 
@@ -72,7 +73,7 @@ const Chat: React.FC<IChat> = props => {
     namespace: props.appNamespace,
   });
   const [messages, messagesLoading] = useGetCommonData<
-    { id: string; query: string; answer: string }[]
+    { id: string; query: string; answer: string; references: Reference[] }[]
   >({
     url: '/kubeagi-apis/chat/messages',
     method: 'post',
@@ -97,6 +98,7 @@ const Chat: React.FC<IChat> = props => {
             app?.metadata.description ? `\n\n${app?.metadata.description}` : ''
           }`,
         props.conversationId || Date.now().toString(),
+        null,
         false
       ),
     ];
@@ -106,8 +108,8 @@ const Chat: React.FC<IChat> = props => {
       cvList = messages?.reduce(
         (pre, cur) => [
           ...pre,
-          getCvsMeta(cur.query, cur.id + '_query', true),
-          getCvsMeta(cur.answer, cur.id + '_answer', false),
+          getCvsMeta(cur.query, cur.id + '_query', null, true),
+          getCvsMeta(cur.answer, cur.id + '_answer', { references: cur.references }, false),
         ],
         cvList
       );
@@ -252,8 +254,8 @@ const Chat: React.FC<IChat> = props => {
         loadingMsgId: assistantMsgId,
         data: [
           ...conversation.data,
-          getCvsMeta(_input, userMsgId, true),
-          getCvsMeta('', assistantMsgId, false),
+          getCvsMeta(_input, userMsgId, null, true),
+          getCvsMeta('', assistantMsgId, null, false),
         ],
       };
     });
@@ -292,6 +294,9 @@ const Chat: React.FC<IChat> = props => {
             }}
             renderMessages={{
               default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
+            }}
+            renderMessagesExtra={{
+              default: chat => <RenderReferences chat={chat} debug={props.debug} />,
             }}
             {...control}
           />
