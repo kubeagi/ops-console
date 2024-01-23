@@ -165,7 +165,7 @@ class CreateModelService$$Page extends React.Component {
         .filter(v => v.status === 'True')
         .map(v => ({
           // label: `${v.name}${v.systemModel ? `（${v.namespace}）` : ''}`,
-          label: v.name,
+          label: `${v.name}${v.systemModel ? '（内置）' : ''}`,
           value: v.name,
         }));
       this.form()?.setFieldState('model', {
@@ -213,7 +213,7 @@ class CreateModelService$$Page extends React.Component {
   }
 
   handleCancle() {
-    this.history?.go(-1);
+    this.history.push('/model-service');
   }
 
   handleConfirm() {
@@ -571,7 +571,7 @@ class CreateModelService$$Page extends React.Component {
                     'x-component-props': {
                       _sdkSwrGetFunc: { label: '', params: [], value: '' },
                       allowClear: false,
-                      disabled: '{{ $form.values?.queryName ? true : false }}',
+                      disabled: '{{ $form.values?.queryName }}',
                       mode: 'single',
                       onChange: function () {
                         return Reflect.apply(this.onChangeModel, this, [...Array.prototype.slice.call(arguments)]);
@@ -715,6 +715,20 @@ class CreateModelService$$Page extends React.Component {
                                     max: 5,
                                     min: 0,
                                     step: 1,
+                                    tooltip: {
+                                      formatter: value =>
+                                        (__$$context => (
+                                          <Typography.Text
+                                            __component_name="Typography.Text"
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ color: '#ffffff', fontSize: '' }}
+                                          >
+                                            {__$$eval(() => __$$context.state.marks[value])}
+                                          </Typography.Text>
+                                        ))(__$$createChildContext(__$$context, { value })),
+                                    },
                                   },
                                 }}
                                 decoratorProps={{
@@ -809,6 +823,20 @@ class CreateModelService$$Page extends React.Component {
                                     max: 5,
                                     min: 0,
                                     step: 1,
+                                    tooltip: {
+                                      formatter: value =>
+                                        (__$$context => (
+                                          <Typography.Text
+                                            __component_name="Typography.Text"
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ color: '#ffffff', fontSize: '' }}
+                                          >
+                                            {__$$eval(() => __$$context.state.marks[value])}
+                                          </Typography.Text>
+                                        ))(__$$createChildContext(__$$context, { value })),
+                                    },
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -1021,7 +1049,8 @@ class CreateModelService$$Page extends React.Component {
                                     {
                                       children: '未知',
                                       id: 'disabled',
-                                      pattern: '^\\d[\\d,]*$',
+                                      message: '仅支持数字和英文逗号，不能以逗号开头',
+                                      pattern: '^\\d+(?:,\\d+)*$',
                                       type: 'disabled',
                                     },
                                   ],
@@ -1097,7 +1126,7 @@ class CreateModelService$$Page extends React.Component {
                                       '_unsafe_MixedSetter_default_select': 'I18nSetter',
                                       'default': '',
                                       'enum': [
-                                        { label: '启用 VLLM 加速', value: 'fastchat-vllm' },
+                                        { label: '启用 vLLM 加速', value: 'fastchat-vllm' },
                                         { label: '启用 Ray 分布式推理', value: 'ray' },
                                       ],
                                       'name': 'configType',
@@ -1314,8 +1343,8 @@ class CreateModelService$$Page extends React.Component {
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
                     'enum': [
-                      { label: '支持的LLM模型', value: 'llm' },
-                      { label: '支持的Embedding模型', value: 'embedding' },
+                      { label: '支持LLM模型', value: 'llm' },
+                      { label: '支持Embedding模型', value: 'embedding' },
                     ],
                     'name': 'types',
                     'required': true,

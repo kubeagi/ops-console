@@ -163,7 +163,7 @@ class EditModelService$$Page extends React.Component {
         .filter(v => v.status === 'True')
         .map(v => ({
           // label: `${v.name}${v.systemModel ? `（${v.namespace}）` : ''}`,
-          label: v.name,
+          label: `${v.name}${v.systemModel ? '（内置）' : ''}`,
           value: v.name,
         }));
       this.form()?.setFieldState('model', {
@@ -202,7 +202,7 @@ class EditModelService$$Page extends React.Component {
   }
 
   async getWorkersDetail() {
-    const type = this.history?.query?.type === 'local' ? 'worker' : '3rd_party';
+    const type = this.history?.query?.type === 'local' ? 'worker' : 'worker';
     this.form().setValues({
       modelSource: type,
     });
@@ -273,8 +273,8 @@ class EditModelService$$Page extends React.Component {
           displayName: getModelService.displayName,
           description: getModelService.description,
           apiType:
-            (getModelService.apiType === 'openai' && getModelService.embeddingModels) ||
-            getModelService.llmModels
+            getModelService.apiType === 'openai' &&
+            (getModelService.embeddingModels || getModelService.llmModels)
               ? 'kubeagi'
               : getModelService.apiType,
           baseUrl: getModelService.baseUrl,
@@ -700,11 +700,27 @@ class EditModelService$$Page extends React.Component {
                                 componentProps={{
                                   'x-component-props': {
                                     _unsafe_MixedSetter_marks_select: 'ExpressionSetter',
+                                    _unsafe_MixedSetter_tooltip_select: 'ObjectSetter',
                                     defaultValue: 0,
                                     marks: __$$eval(() => this.state.marks),
                                     max: 5,
                                     min: 0,
                                     step: 1,
+                                    tooltip: {
+                                      _unsafe_MixedSetter_title_select: 'I18nSetter',
+                                      formatter: value =>
+                                        (__$$context => (
+                                          <Typography.Text
+                                            __component_name="Typography.Text"
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ color: '#ffffff', fontSize: '' }}
+                                          >
+                                            {__$$eval(() => __$$context.state.marks[value])}
+                                          </Typography.Text>
+                                        ))(__$$createChildContext(__$$context, { value })),
+                                    },
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -805,6 +821,20 @@ class EditModelService$$Page extends React.Component {
                                     max: 5,
                                     min: 0,
                                     step: 1,
+                                    tooltip: {
+                                      formatter: value =>
+                                        (__$$context => (
+                                          <Typography.Text
+                                            __component_name="Typography.Text"
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ color: '#ffffff', fontSize: '' }}
+                                          >
+                                            {__$$eval(() => __$$context.state.marks[value])}
+                                          </Typography.Text>
+                                        ))(__$$createChildContext(__$$context, { value })),
+                                    },
                                   },
                                 }}
                                 decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
@@ -1019,8 +1049,8 @@ class EditModelService$$Page extends React.Component {
                                     {
                                       children: '未知',
                                       id: 'disabled',
-                                      message: '仅支持输入数字、英文逗号，且以数字开头',
-                                      pattern: '^\\d[\\d,]*$',
+                                      message: '仅支持数字和英文逗号，不能以逗号开头',
+                                      pattern: '^\\d+(?:,\\d+)*$',
                                       type: 'disabled',
                                     },
                                   ],
@@ -1093,7 +1123,7 @@ class EditModelService$$Page extends React.Component {
                                     }}
                                     fieldProps={{
                                       'enum': [
-                                        { label: '启用 VLLM 加速', value: 'fastchat-vllm' },
+                                        { label: '启用 vLLM 加速', value: 'fastchat-vllm' },
                                         { label: '启用 Ray 分布式推理', value: 'ray' },
                                       ],
                                       'name': 'configType',
@@ -1302,8 +1332,8 @@ class EditModelService$$Page extends React.Component {
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
                     'enum': [
-                      { label: '支持的LLM模型', value: 'llm' },
-                      { label: '支持的Embedding模型', value: 'embedding' },
+                      { label: '支持LLM模型', value: 'llm' },
+                      { label: '支持Embedding模型', value: 'embedding' },
                     ],
                     'name': 'types',
                     'required': true,
