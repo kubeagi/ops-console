@@ -53,27 +53,31 @@ const RefContent: FC<IRefContent> = props => {
           '-'
         )}
         <Divider className="divider" />
-        <Typography.Title level={5}>知识库</Typography.Title>
-        <Space>
-          <FileTextOutlined />
-          <Typography.Text code ellipsis strong>
-            {reference.qa_file_path}
-          </Typography.Text>
-        </Space>
-        <Space className="relLine">
-          <FieldNumberOutlined />
-          <Tag color={getRelColor(reference.score)}>
-            相似度: {(reference.score * 100).toFixed(2)}%
-          </Tag>
-        </Space>
-        <div>
-          <Typography.Text className="q" strong>
-            {reference.question}
-          </Typography.Text>
-          <Button icon={<EditOutlined />} type="text" />
-        </div>
-        <Typography.Paragraph italic>{reference.answer}</Typography.Paragraph>
-        <Divider className="divider" dashed />
+        {Boolean(debug) && (
+          <>
+            <Typography.Title level={5}>知识库</Typography.Title>
+            <Space>
+              <FileTextOutlined />
+              <Typography.Text code ellipsis strong>
+                {reference.qa_file_path}
+              </Typography.Text>
+            </Space>
+            <Space className="relLine">
+              <FieldNumberOutlined />
+              <Tag color={getRelColor(reference.score)}>
+                相似度: {(reference.score * 100).toFixed(2)}%
+              </Tag>
+            </Space>
+            <div>
+              <Typography.Text className="q" strong>
+                {reference.question}
+              </Typography.Text>
+              <Button icon={<EditOutlined />} type="text" />
+            </div>
+            <Typography.Paragraph italic>{reference.answer}</Typography.Paragraph>
+            <Divider className="divider" dashed />
+          </>
+        )}
         <Typography.Title level={5}>原文</Typography.Title>
         <Typography.Paragraph italic>{reference.content}</Typography.Paragraph>
         <Space>
