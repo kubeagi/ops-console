@@ -608,11 +608,17 @@ class KnowledgeDetail$$Page extends React.Component {
                                     __component_name="UnifiedLink"
                                     inQianKun={false}
                                     target="_blank"
-                                    to={__$$eval(
-                                      () =>
-                                        `/kubeagi-portal/model-service/detail/${
-                                          this.getKnowledge()?.embedder?.name
-                                        }`
+                                    to={__$$eval(() =>
+                                      (() => {
+                                        const knowledge = this.getKnowledge();
+                                        return `/kubeagi-portal/model-service/detail/${
+                                          knowledge?.embedder?.name
+                                        }?type=${
+                                          knowledge?.embedderType === '3rd_party'
+                                            ? 'external'
+                                            : 'local'
+                                        }`;
+                                      })()
                                     )}
                                   >
                                     {__$$eval(() =>
