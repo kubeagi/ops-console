@@ -50,8 +50,8 @@ importers:
         specifier: ^0.0.2
         version: 0.0.2(react@18.2.0)
       '@tenx-ui/icon':
-        specifier: ^2.4.36
-        version: 2.4.36(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^2.4.40
+        version: 2.4.40(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@tenx-ui/icon-materials':
         specifier: ^0.1.7
         version: 0.1.7(react-dom@18.2.0)(react@18.2.0)
@@ -6221,8 +6221,8 @@ packages:
       react-dom: 17.0.2(react@18.2.0)
     dev: false
 
-  /@tenx-ui/icon@2.4.36(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-XW9YSCZzJy+t3m1uQyVd3fnK0H8znVdSfLhaCyCgWCNms3/l2Jy00wUo8NVk2b8SFbHUOIsXdcAungcVfMgQzw==}
+  /@tenx-ui/icon@2.4.40(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-DjvC9Fmbn69WzLTewpPkIFTaXJcJtSGyFODLzKB5ZUfSP9obrte2lObvT0LTuB95CjSybs9xfGwyBtyhQmu7YA==}
     peerDependencies:
       classnames: '>=2.2.5'
       prop-types: '>=15.6.1'
@@ -14376,6 +14376,14 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+
+  /lucide-react@0.314.0(react@18.2.0):
+    resolution: {integrity: sha512-c2zOW7TOyKxPCaSs1og2lFdoI3SR4iii3yrZJU2Zpdc78nOw4fUmrcFNultaCiwZcr4CyiKdzjMdvKNlBBk+UQ==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /lucide-react@0.314.0(react@18.2.0):
     resolution: {integrity: sha512-c2zOW7TOyKxPCaSs1og2lFdoI3SR4iii3yrZJU2Zpdc78nOw4fUmrcFNultaCiwZcr4CyiKdzjMdvKNlBBk+UQ==}

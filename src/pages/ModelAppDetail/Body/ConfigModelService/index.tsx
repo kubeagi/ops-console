@@ -100,7 +100,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
                     label={
                       <Space size={3}>
                         最大响应长度
-                        <Tooltip title="控制 AI 回复的最大字段长度，范围为[10，+∞],较小的值可以一定程度上减少 AI 的废话，但也可能导致 AI 回复不完整。">
+                        <Tooltip title="控制 AI 回复的最大字段长度，范围为[10，+∞),较小的值可以一定程度上减少 AI 的废话，但也可能导致 AI 回复不完整。">
                           <QuestionCircleOutlined className={styles.tooltip} />
                         </Tooltip>
                       </Space>
@@ -113,7 +113,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
                     label={
                       <Space size={3}>
                         最大 Token
-                        <Tooltip title="控制 AI 对话最大 Token，范围为[10，+∞]。Token 涵盖了输入和输出的总 Token 数，这意味着如果用户的输入很长，模型可用于生成回应的 Token 数量会相应减少。">
+                        <Tooltip title="控制 AI 对话最大 Token，范围为[10，+∞)。Token 涵盖了输入和输出的总 Token 数，这意味着如果用户的输入很长，模型可用于生成回应的 Token 数量会相应减少。">
                           <QuestionCircleOutlined className={styles.tooltip} />
                         </Tooltip>
                       </Space>

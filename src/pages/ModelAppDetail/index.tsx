@@ -51,7 +51,16 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
       },
       ConfigAudio: {},
       ConfigNext: {
-        showNextGuid: Application?.showNextGuid,
+        showNextGuide: Application?.showNextGuide,
+      },
+      ViewResInfo: {
+        showRespInfo: Application?.showRespInfo,
+      },
+      ViewReference: {
+        showRetrievalInfo: Application?.showRetrievalInfo,
+      },
+      RealTimeSearch: {
+        // @todo
       },
     };
     setConfigs(Config);
