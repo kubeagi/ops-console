@@ -47,7 +47,11 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
   });
 
   const llmList = useMemo(() => {
-    return llms?.LLM?.listLLMs?.nodes || [];
+    return (
+      llms?.LLM?.listLLMs?.nodes?.filter(
+        (item: any) => item.status === 'True' || item.status === 'Running'
+      ) || []
+    );
   }, [llms]);
 
   return (
