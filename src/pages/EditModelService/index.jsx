@@ -172,7 +172,7 @@ class EditModelService$$Page extends React.Component {
       this.setState({
         listModels: res.Model.listModels.nodes,
       });
-    } catch (error) {
+    } catch {
       // console.log(error, '===> err')
     }
   }
@@ -196,13 +196,13 @@ class EditModelService$$Page extends React.Component {
           RAY_CLUSTER_INDEX: list[0]?.value,
         });
       }
-    } catch (error) {
+    } catch {
       // console.log(error, '===> err')
     }
   }
 
   async getWorkersDetail() {
-    const type = this.history?.query?.type === 'local' ? 'worker' : 'worker';
+    const type = this.history?.query?.type === 'local' ? 'worker' : '3rd_party';
     this.form().setValues({
       modelSource: type,
     });
@@ -213,7 +213,7 @@ class EditModelService$$Page extends React.Component {
       if (type === 'worker') {
         const res = await this.props?.appHelper?.utils?.bff?.getWorker({
           namespace: this.appHelper?.utils?.getAuthData()?.project || 'abc',
-          name: this.history?.query?.name,
+          name: this.history?.query?.name || 'test2',
         });
         const {
           Worker: { getWorker },
@@ -242,7 +242,7 @@ class EditModelService$$Page extends React.Component {
           RAY_CLUSTER_INDEX: Number(getWorker.additionalEnvs?.RAY_CLUSTER_INDEX),
           NUMBER_GPUS: getWorker.additionalEnvs?.NUMBER_GPUS,
           resources: {
-            cpu: isMarksCpu ? Object.values(marks).findIndex(v => v === resources.cpu) : 0,
+            cpu: isMarksCpu ? Object.values(marks).indexOf(resources.cpu) : 0,
             memory: isMarksMemory
               ? Object.values(marks).findIndex(v => v === resources.memory?.split('Gi')[0])
               : 0,
@@ -252,7 +252,7 @@ class EditModelService$$Page extends React.Component {
               !isMarksMemory && resources.memory !== '512Mi'
                 ? resources.memory?.split('Gi')[0]
                 : undefined,
-            customGPU: !gpuMarks[resources.nvidiaGPU] ? resources.nvidiaGPU : undefined,
+            customGPU: gpuMarks[resources.nvidiaGPU] ? undefined : resources.nvidiaGPU,
           },
         });
         this.setState({
@@ -288,7 +288,7 @@ class EditModelService$$Page extends React.Component {
               : undefined,
         });
       }
-    } catch (error) {
+    } catch {
       // console.log(error, '===> error')
     }
   }
@@ -608,10 +608,7 @@ class EditModelService$$Page extends React.Component {
                       disabled: false,
                       mode: 'single',
                       onChange: function () {
-                        return this.onChangeModel.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.onChangeModel, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this),
                       placeholder: '请选择模型',
                       showSearch: true,
@@ -1119,10 +1116,7 @@ class EditModelService$$Page extends React.Component {
                                       'x-component-props': {
                                         _sdkSwrGetFunc: {},
                                         onChange: function () {
-                                          return this.onChangeType.apply(
-                                            this,
-                                            Array.prototype.slice.call(arguments).concat([])
-                                          );
+                                          return Reflect.apply(this.onChangeType, this, [...Array.prototype.slice.call(arguments)]);
                                         }.bind(this),
                                       },
                                     }}
@@ -1323,10 +1317,7 @@ class EditModelService$$Page extends React.Component {
                         disabled={false}
                         ghost={false}
                         onClick={function () {
-                          return this.onClickCheck.apply(
-                            this,
-                            Array.prototype.slice.call(arguments).concat([])
-                          );
+                          return Reflect.apply(this.onClickCheck, this, [...Array.prototype.slice.call(arguments)]);
                         }.bind(this)}
                         shape="default"
                         size="small"
@@ -1399,10 +1390,7 @@ class EditModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return this.handleCancle.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleCancle, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this)}
                       shape="default"
                     >
@@ -1415,10 +1403,7 @@ class EditModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return this.handleConfirm.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleConfirm, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this)}
                       shape="default"
                       type="primary"
@@ -1455,15 +1440,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      self={self}
+      render={dataProps => (
+        <EditModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
+      )}
       sdkInitFunc={{
         enabled: undefined,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      render={dataProps => (
-        <EditModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
-      )}
+      self={self}
     />
   );
 };
@@ -1472,7 +1457,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch {}
 }
 
 function __$$evalArray(expr) {
