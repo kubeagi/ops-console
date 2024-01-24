@@ -106,23 +106,24 @@ const Chat: React.FC<IChat> = props => {
       .catch(error => {
         //
       });
-    res?.length &&
-      setConversation(_conversation => {
-        const [first, ...rest] = _conversation.data.reverse();
-        return {
-          ..._conversation,
-          loadingMsgId: undefined,
-          data: [
-            ...rest.reverse(),
-            {
-              ...first,
-              extra: {
-                references: res,
-              },
+    if (!res?.length) return;
+    setConversation(_conversation => {
+      const [first, ...rest] = _conversation.data.reverse();
+      return {
+        ..._conversation,
+        loadingMsgId: undefined,
+        data: [
+          ...rest.reverse(),
+          {
+            ...first,
+            extra: {
+              references: res,
             },
-          ],
-        };
-      });
+          },
+        ],
+      };
+    });
+    scrollToBottom();
   }, []);
   useEffect(() => {
     if (conversation.data?.length) return;

@@ -9,16 +9,18 @@
  * @date 2023-12-26
  */
 import { history } from '@@/core/history';
+import { DeleteOutlined } from '@ant-design/icons';
 import MessageWarn from '@tenx-ui/icon/lib/MessageWarn.js';
 import { Empty } from '@tenx-ui/materials';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
-import { Button, Menu, Space, Spin, Typography } from 'antd';
+import { Button, Menu, Popconfirm, Space, Spin, Typography, message } from 'antd';
 import dayjs from 'dayjs';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 
 import useGetCommonData from '@/components/hooks/useGetCommonData';
+import request from '@/utils/request';
 
 import './index.less';
 
@@ -51,6 +53,7 @@ type IUseConversationList = (newConversationId?: string) => {
   dom: React.ReactNode;
   selected: string;
 };
+let sureDel;
 const useConversationList: IUseConversationList = newConversationId => {
   const { appName, appNamespace, conversationId } = history.location.query as {
     appName?: string;
@@ -61,6 +64,7 @@ const useConversationList: IUseConversationList = newConversationId => {
     name: appName,
     namespace: appNamespace,
   });
+  const [forceUpdate, setForceUpdate] = useReducer(x => x + 1, 0);
   const [selected, setSelected] = useState<string>(conversationId);
   useEffect(() => {
     newConversationId && setSelected(newConversationId);
@@ -71,7 +75,7 @@ const useConversationList: IUseConversationList = newConversationId => {
     options: {
       body: { app_name: appName, app_namespace: appNamespace },
     },
-    refresh: newConversationId,
+    refresh: `${newConversationId}-${forceUpdate}`,
     initValue: [],
     format: data =>
       data.sort((a, b) => dayjs(b.updated_at).valueOf() - dayjs(a.updated_at).valueOf()),
@@ -91,10 +95,29 @@ const useConversationList: IUseConversationList = newConversationId => {
     setSelected('');
     setQueryConversationId('');
   }, [setSelected]);
+  const del = useCallback(
+    async id => {
+      const res = await request
+        .delete({
+          url: `${window.location.origin}/kubeagi-apis/chat/conversations/${id}`,
+        })
+        .catch(error => {
+          //
+        });
+      if (res?.message === 'ok') {
+        message.success('删除成功');
+        setForceUpdate();
+        if (id === conversationId) {
+          addConversation();
+        }
+      }
+    },
+    [conversationId, addConversation]
+  );
+  const [currentMenu, setCurrentMenu] = useState<IConversation | undefined>();
   const dom = (
     <div className="conversationList">
       <Space className="space" direction="vertical">
-        <div></div>
         <div className="header">
           <img
             className="avatar"
@@ -118,14 +141,39 @@ const useConversationList: IUseConversationList = newConversationId => {
               items={conversations.map(cv => ({
                 key: cv.id,
                 label: (
-                  <span>
+                  <span
+                    onMouseEnter={setCurrentMenu.bind('', cv)}
+                    onMouseLeave={() => !sureDel && setCurrentMenu()}
+                  >
                     <span className="cvTitle">
                       <Typography.Text ellipsis>{cv.messages?.[0]?.query}</Typography.Text>
                     </span>
                     <span className="time">
-                      {dayjs(cv.updated_at).isSame(dayjs(), 'day')
-                        ? '今天'
-                        : dayjs(cv.updated_at).format('HH:mm')}
+                      {currentMenu?.id === cv.id ? (
+                        <Popconfirm
+                          cancelText="取消"
+                          description="确定删除对话吗?"
+                          okText="确定"
+                          onConfirm={del.bind('', cv.id)}
+                          onOpenChange={open => (sureDel = open)}
+                          onPopupClick={e => e.stopPropagation()}
+                          title="删除对话"
+                        >
+                          <DeleteOutlined
+                            className="del"
+                            onClick={e => {
+                              e.stopPropagation();
+                              sureDel = true;
+                            }}
+                          />
+                        </Popconfirm>
+                      ) : (
+                        <>
+                          {dayjs(cv.updated_at).isSame(dayjs(), 'day')
+                            ? '今天'
+                            : dayjs(cv.updated_at).format('HH:mm')}
+                        </>
+                      )}
                     </span>
                   </span>
                 ),
