@@ -8,6 +8,7 @@
  * @author zggmd
  * @date 2023-12-18
  */
+import { useModel } from '@@/exports';
 import {
   ChatInputArea,
   ChatList as ChatItemsList,
@@ -60,6 +61,8 @@ let shouldUpdateConversationId: boolean = false;
 const ctrl = new AbortController();
 const retry = new Retry(ctrl, 3);
 const Chat: React.FC<IChat> = props => {
+  const { qiankun }: { qiankun: Record<string, any> } = useModel('qiankun');
+  const isDark = qiankun?.theme?.isDark;
   const [conversation, setConversation] = useState<{
     id?: string;
     loadingMsgId?: string;
@@ -311,6 +314,7 @@ const Chat: React.FC<IChat> = props => {
       <div
         className={classNames('chatColumn', {
           chatDebug: props.debug,
+          chatDark: isDark,
         })}
       >
         <div className="chatList">
