@@ -9,7 +9,7 @@
  * @date 2023-12-26
  */
 import { history } from '@@/core/history';
-import { DeleteOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import MessageWarn from '@tenx-ui/icon/lib/MessageWarn.js';
 import { Empty } from '@tenx-ui/materials';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
@@ -70,7 +70,7 @@ const useConversationList: IUseConversationList = newConversationId => {
     newConversationId && setSelected(newConversationId);
   }, [setSelected, newConversationId]);
   const [conversations, conversationsLoading] = useGetCommonData<IConversation[]>({
-    url: '/kubeagi-apis/chat/conversations',
+    url: '/chat/conversations',
     method: 'post',
     options: {
       body: { app_name: appName, app_namespace: appNamespace },
@@ -99,7 +99,7 @@ const useConversationList: IUseConversationList = newConversationId => {
     async id => {
       const res = await request
         .delete({
-          url: `${window.location.origin}/kubeagi-apis/chat/conversations/${id}`,
+          url: `/chat/conversations/${id}`,
         })
         .catch(error => {
           //
@@ -118,7 +118,16 @@ const useConversationList: IUseConversationList = newConversationId => {
   const dom = (
     <div className="conversationList">
       <Space className="space" direction="vertical">
+        <div />
+        {/*add padding*/}
         <div className="header">
+          <Button
+            ghost
+            icon={<ArrowLeftOutlined />}
+            onClick={getUnifiedHistory().go.bind('', -1)}
+            size="small"
+            type="primary"
+          />
           <img
             className="avatar"
             src={application?.data?.Application?.getApplication?.metadata?.icon}

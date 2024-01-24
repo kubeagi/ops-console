@@ -76,7 +76,7 @@ const Chat: React.FC<IChat> = props => {
   const [messages, messagesLoading] = useGetCommonData<
     { id: string; query: string; answer: string; references: Reference[] }[]
   >({
-    url: '/kubeagi-apis/chat/messages',
+    url: '/chat/messages',
     method: 'post',
     options: {
       body: {
@@ -93,7 +93,7 @@ const Chat: React.FC<IChat> = props => {
     if (!mId || !cId) return;
     const res = await request
       .post({
-        url: `${window.location.origin}/kubeagi-apis/chat/messages/${mId}/references`,
+        url: `/chat/messages/${mId}/references`,
         options: {
           body: {
             app_name: props.appName,
