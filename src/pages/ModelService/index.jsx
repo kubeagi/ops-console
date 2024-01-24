@@ -17,7 +17,6 @@ import {
   Dropdown,
   Divider,
   Descriptions,
-  Tooltip,
   Status,
   Tag,
   Modal,
@@ -619,47 +618,37 @@ class ModelService$$Page extends React.Component {
                                   children: (
                                     <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
                                       <Col __component_name="Col" flex="60px">
-                                        <Tooltip
-                                          __component_name="Tooltip"
-                                          title={__$$eval(() =>
-                                            item.status === 'Error' || item.status === 'False'
-                                              ? item.message
-                                              : ''
-                                          )}
-                                          trigger="hover"
-                                        >
-                                          <Status
-                                            __component_name="Status"
-                                            id={__$$eval(() => item?.status)}
-                                            types={[
-                                              {
-                                                children: '运行中',
-                                                id: 'Running',
-                                                type: 'success',
-                                              },
-                                              { children: '部署中', id: 'Pending', type: 'info' },
-                                              { children: '异常', id: 'Error', type: 'error' },
-                                              { children: '未知', id: 'Unknown', type: 'disabled' },
-                                              {
-                                                children: '删除中',
-                                                id: 'Deleting',
-                                                type: 'warning',
-                                              },
-                                              {
-                                                children: '已下线',
-                                                id: 'Offline',
-                                                type: 'warning',
-                                              },
-                                              { children: '正常', id: 'True', type: 'success' },
-                                              {
-                                                children: '下线中',
-                                                id: 'OfflineInProgress',
-                                                type: 'info',
-                                              },
-                                              { children: '异常', id: 'False', type: 'error' },
-                                            ]}
-                                          />
-                                        </Tooltip>
+                                        <Status
+                                          __component_name="Status"
+                                          id={__$$eval(() => item?.status)}
+                                          types={[
+                                            { children: '运行中', id: 'Running', type: 'success' },
+                                            { children: '部署中', id: 'Pending', type: 'info' },
+                                            {
+                                              _unsafe_MixedSetter_tooltip_select: 'VariableSetter',
+                                              children: '异常',
+                                              id: 'Error',
+                                              tooltip: __$$eval(() => item.message || ''),
+                                              type: 'error',
+                                            },
+                                            { children: '未知', id: 'Unknown', type: 'disabled' },
+                                            { children: '删除中', id: 'Deleting', type: 'warning' },
+                                            { children: '已下线', id: 'Offline', type: 'warning' },
+                                            { children: '正常', id: 'True', type: 'success' },
+                                            {
+                                              children: '下线中',
+                                              id: 'OfflineInProgress',
+                                              type: 'info',
+                                            },
+                                            {
+                                              _unsafe_MixedSetter_tooltip_select: 'VariableSetter',
+                                              children: '异常',
+                                              id: 'False',
+                                              tooltip: __$$eval(() => item.message || ''),
+                                              type: 'error',
+                                            },
+                                          ]}
+                                        />
                                       </Col>
                                       <Col
                                         __component_name="Col"
