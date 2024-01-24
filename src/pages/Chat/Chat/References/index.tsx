@@ -65,9 +65,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
   }
   return (
     <div className="references">
-      <Divider className="referencesTxt" dashed orientation="left">
-        引用
-      </Divider>
+      <Divider className="referencesTxt" dashed orientation="left" />
       <RefContent
         debug={debug}
         index={_item?.index + 1 || 0}
@@ -77,6 +75,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
         reference={_item?.item || ({} as Reference)}
       >
         <Space
+          className="referencesList"
           direction="horizontal"
           onMouseEnter={() => {
             setClear(2);
@@ -85,6 +84,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
             setClear(clear => clear - 1);
           }}
         >
+          引用：
           {chat.extra.references.map((item, index) => {
             return (
               <>
