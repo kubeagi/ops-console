@@ -38,35 +38,37 @@ const Body: React.FC<BodyProps> = props => {
                   disabled={isEqual(initConfigs, configs)}
                   loading={loading}
                   onClick={async () => {
-                    try {
-                      setLoading(true);
-                      const input = {
-                        ...data,
-                        name: data?.metadata?.name,
-                        namespace: data?.metadata?.namespace,
-                        ...form.getFieldsValue(),
-                        knowledgebase:
-                          form.getFieldsValue()?.knowledgebase === 'undefined'
-                            ? undefined
-                            : form.getFieldsValue()?.knowledgebase || data?.knowledgebase,
-                      };
-                      delete input.metadata;
-                      await utils.bff.updateApplicationConfig({
-                        input,
-                      });
-                      refresh && refresh();
-                      notification.success({
-                        message: '保存智能体配置成功',
-                      });
-                      setLoading(false);
-                      setSaveIng(!saveIng);
-                    } catch (error) {
-                      setLoading(false);
-                      notification.warnings({
-                        message: '保存智能体配置失败',
-                        errors: error?.response?.errors,
-                      });
-                    }
+                    form.validateFields().then(async () => {
+                      try {
+                        setLoading(true);
+                        const input = {
+                          ...data,
+                          name: data?.metadata?.name,
+                          namespace: data?.metadata?.namespace,
+                          ...form.getFieldsValue(),
+                          knowledgebase:
+                            form.getFieldsValue()?.knowledgebase === 'undefined'
+                              ? undefined
+                              : form.getFieldsValue()?.knowledgebase || data?.knowledgebase,
+                        };
+                        delete input.metadata;
+                        await utils.bff.updateApplicationConfig({
+                          input,
+                        });
+                        refresh && refresh();
+                        notification.success({
+                          message: '保存智能体配置成功',
+                        });
+                        setLoading(false);
+                        setSaveIng(!saveIng);
+                      } catch (error) {
+                        setLoading(false);
+                        notification.warnings({
+                          message: '保存智能体配置失败',
+                          errors: error?.response?.errors,
+                        });
+                      }
+                    });
                   }}
                   type="primary"
                 >

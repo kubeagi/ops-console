@@ -158,7 +158,7 @@ const Header: React.FC<HeaderProps> = props => {
                     }
                     case 'assessment': {
                       history.push(
-                        `/ai-agent-assessment??appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
+                        `/ai-agent-assessment?appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
                       );
 
                       break;
