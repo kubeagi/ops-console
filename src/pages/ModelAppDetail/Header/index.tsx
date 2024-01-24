@@ -132,6 +132,10 @@ const Header: React.FC<HeaderProps> = props => {
               menu={{
                 items: [
                   {
+                    key: 'assessment',
+                    label: '智能体评估',
+                  },
+                  {
                     key: 'edit',
                     label: '编辑',
                   },
@@ -141,10 +145,25 @@ const Header: React.FC<HeaderProps> = props => {
                   },
                 ],
                 onClick: ({ key }) => {
-                  if (key === 'edit') {
-                    handleEdit();
-                  } else if (key === 'delete') {
-                    handleDelete();
+                  switch (key) {
+                    case 'edit': {
+                      handleEdit();
+
+                      break;
+                    }
+                    case 'delete': {
+                      handleDelete();
+
+                      break;
+                    }
+                    case 'assessment': {
+                      history.push(
+                        `/ai-agent-assessment??appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
+                      );
+
+                      break;
+                    }
+                    // No default
                   }
                 },
               }}
