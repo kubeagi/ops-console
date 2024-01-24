@@ -50,7 +50,7 @@ const useGetCommonData = <T>(data: Data<T>) => {
     if (notFetch) return setList(initValue);
     setLoading(true);
     const res = await request[method]({
-      url: `${window.location.origin}${url}`,
+      url,
       options,
     }).catch(
       onError ||
