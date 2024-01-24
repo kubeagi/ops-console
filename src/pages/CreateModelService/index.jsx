@@ -189,7 +189,7 @@ class CreateModelService$$Page extends React.Component {
           }
         }
       );
-    } catch (error) {
+    } catch {
       // console.log(error, '===> err')
     }
   }
@@ -211,7 +211,7 @@ class CreateModelService$$Page extends React.Component {
       this.form()?.setValues({
         RAY_CLUSTER_INDEX: list[0]?.value,
       });
-    } catch (error) {
+    } catch {
       // console.log(error, '===> err')
     }
   }
@@ -510,10 +510,7 @@ class CreateModelService$$Page extends React.Component {
                       buttonStyle: 'outline',
                       disabled: '{{ $form.values?.queryName }}',
                       onChange: function () {
-                        return this.onChangeModelSource.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.onChangeModelSource, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this),
                       size: 'middle',
                     },
@@ -581,10 +578,7 @@ class CreateModelService$$Page extends React.Component {
                       disabled: '{{ $form.values?.queryName }}',
                       mode: 'single',
                       onChange: function () {
-                        return this.onChangeModel.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.onChangeModel, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this),
                       placeholder: '请选择模型',
                       showSearch: true,
@@ -1125,10 +1119,7 @@ class CreateModelService$$Page extends React.Component {
                                       'x-component-props': {
                                         _sdkSwrGetFunc: {},
                                         onChange: function () {
-                                          return this.onChangeType.apply(
-                                            this,
-                                            Array.prototype.slice.call(arguments).concat([])
-                                          );
+                                          return Reflect.apply(this.onChangeType, this, [...Array.prototype.slice.call(arguments)]);
                                         }.bind(this),
                                       },
                                     }}
@@ -1301,6 +1292,9 @@ class CreateModelService$$Page extends React.Component {
                   componentProps={{ 'x-component-props': { placeholder: '请输入模型服务地址' } }}
                   decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
                   fieldProps={{
+                    '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                    'default':
+                      "{{ $form.values?.apiType ? ($form.values?.apiType === 'zhipuai' ? 'https://open.bigmodel.cn/api/paas/v3/model-api' : 'https://api.openai.com/v1') : undefined }}",
                     'name': 'baseUrl',
                     'required': true,
                     'title': '模型服务地址',
@@ -1339,10 +1333,7 @@ class CreateModelService$$Page extends React.Component {
                         disabled={false}
                         ghost={false}
                         onClick={function () {
-                          return this.onClickCheck.apply(
-                            this,
-                            Array.prototype.slice.call(arguments).concat([])
-                          );
+                          return Reflect.apply(this.onClickCheck, this, [...Array.prototype.slice.call(arguments)]);
                         }.bind(this)}
                         shape="default"
                         size="small"
@@ -1417,10 +1408,7 @@ class CreateModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return this.handleCancle.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleCancle, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this)}
                       shape="default"
                     >
@@ -1433,10 +1421,7 @@ class CreateModelService$$Page extends React.Component {
                       disabled={false}
                       ghost={false}
                       onClick={function () {
-                        return this.handleConfirm.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.handleConfirm, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this)}
                       shape="default"
                       type="primary"
@@ -1473,15 +1458,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      self={self}
+      render={dataProps => (
+        <CreateModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
+      )}
       sdkInitFunc={{
         enabled: undefined,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      render={dataProps => (
-        <CreateModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
-      )}
+      self={self}
     />
   );
 };
@@ -1490,7 +1475,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch {}
 }
 
 function __$$evalArray(expr) {

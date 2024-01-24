@@ -17,7 +17,6 @@ import {
   Dropdown,
   Divider,
   Descriptions,
-  Tooltip,
   Status,
   Tag,
   Modal,
@@ -128,25 +127,28 @@ class ModelService$$Page extends React.Component {
   async localMenuOnClick(e, item) {
     e.domEvent.stopPropagation();
     switch (e.key) {
-      case 'offline':
+      case 'offline': {
         this.setState({
           currentModel: item,
           offlineModal: true,
         });
         break;
-      case 'edit':
+      }
+      case 'edit': {
         this.history.push(
           `/model-service/editModelService?name=${item.name}&type=${
             item.providerType === 'worker' ? 'local' : 'external'
           }`
         );
         break;
-      case 'delete':
+      }
+      case 'delete': {
         this.setState({
           currentModel: item,
           delVisible: true,
         });
         break;
+      }
     }
   }
 
@@ -199,15 +201,11 @@ class ModelService$$Page extends React.Component {
         namespace,
         name: this.state.currentModel.name,
       };
-      if (currentModel.providerType === 'worker') {
-        await this.props.appHelper.utils.bff?.deleteWorkers({
+      await (currentModel.providerType === 'worker' ? this.props.appHelper.utils.bff?.deleteWorkers({
           input,
-        });
-      } else {
-        await this.props.appHelper.utils.bff?.deleteModelServices({
+        }) : this.props.appHelper.utils.bff?.deleteModelServices({
           input,
-        });
-      }
+        }));
       this.utils.notification.success({
         message: '删除成功',
       });
@@ -337,10 +335,7 @@ class ModelService$$Page extends React.Component {
                           ghost={false}
                           icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
                           onClick={function () {
-                            return this.onClickCreatModel.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
+                            return Reflect.apply(this.onClickCreatModel, this, [...Array.prototype.slice.call(arguments)]);
                           }.bind(this)}
                           shape="default"
                           type="primary"
@@ -355,10 +350,7 @@ class ModelService$$Page extends React.Component {
                           ghost={false}
                           icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
                           onClick={function () {
-                            return this.onRefresh.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
+                            return Reflect.apply(this.onRefresh, this, [...Array.prototype.slice.call(arguments)]);
                           }.bind(this)}
                           shape="default"
                         >
@@ -367,16 +359,10 @@ class ModelService$$Page extends React.Component {
                         <Input.Search
                           __component_name="Input.Search"
                           onChange={function () {
-                            return this.onChangeKeyword.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
+                            return Reflect.apply(this.onChangeKeyword, this, [...Array.prototype.slice.call(arguments)]);
                           }.bind(this)}
                           onSearch={function () {
-                            return this.onSearch.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
+                            return Reflect.apply(this.onSearch, this, [...Array.prototype.slice.call(arguments)]);
                           }.bind(this)}
                           placeholder={this.i18n('i18n-f591ezbf') /* 请输入模型服务名称搜索 */}
                           value={__$$eval(() => this.state.keyword)}
@@ -393,10 +379,7 @@ class ModelService$$Page extends React.Component {
                               allowClear={true}
                               disabled={false}
                               onChange={function () {
-                                return this.onChangeProviderType.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
+                                return Reflect.apply(this.onChangeProviderType, this, [...Array.prototype.slice.call(arguments)]);
                               }.bind(this)}
                               options={[
                                 { label: '全部来源', value: '' },
@@ -414,10 +397,7 @@ class ModelService$$Page extends React.Component {
                               allowClear={true}
                               disabled={false}
                               onChange={function () {
-                                return this.onChangeModelTypes.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
+                                return Reflect.apply(this.onChangeModelTypes, this, [...Array.prototype.slice.call(arguments)]);
                               }.bind(this)}
                               options={[
                                 { label: '全部类型', value: '' },
@@ -446,10 +426,7 @@ class ModelService$$Page extends React.Component {
                     loading={__$$eval(() => this.state.loading)}
                     pagination={{
                       onChange: function () {
-                        return this.paginationOnChange.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.paginationOnChange, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this),
                       pageSize: 12,
                       pagination: { pageSize: 5 },
@@ -457,10 +434,7 @@ class ModelService$$Page extends React.Component {
                       showQuickJumper: false,
                       showSizeChanger: false,
                       showTotal: function () {
-                        return this.showTotal.apply(
-                          this,
-                          Array.prototype.slice.call(arguments).concat([])
-                        );
+                        return Reflect.apply(this.showTotal, this, [...Array.prototype.slice.call(arguments)]);
                       }.bind(this),
                       simple: false,
                       size: 'default',
@@ -476,15 +450,12 @@ class ModelService$$Page extends React.Component {
                             hoverable={true}
                             loading={false}
                             onClick={function () {
-                              return this.onClickToDetail.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([
+                              return Reflect.apply(this.onClickToDetail, this, [...Array.prototype.slice.call(arguments), 
                                   {
                                     id: item?.name,
                                     type: item?.providerType,
                                   },
-                                ])
-                              );
+                                ]);
                             }.bind(__$$context)}
                             size="default"
                             style={{}}
@@ -515,7 +486,10 @@ class ModelService$$Page extends React.Component {
                                           {
                                             _unsafe_MixedSetter_label_select: 'VariableSetter',
                                             disabled: __$$eval(
-                                              () => item.providerType !== 'worker'
+                                              () =>
+                                                item.providerType !== 'worker' ||
+                                                item.status === 'OfflineInProgress' ||
+                                                item.status === 'Pending'
                                             ),
                                             key: 'offline',
                                             label: __$$eval(() =>
@@ -532,14 +506,11 @@ class ModelService$$Page extends React.Component {
                                           },
                                         ],
                                         onClick: function () {
-                                          return this.localMenuOnClick.apply(
-                                            this,
-                                            Array.prototype.slice.call(arguments).concat([
+                                          return Reflect.apply(this.localMenuOnClick, this, [...Array.prototype.slice.call(arguments), 
                                               {
                                                 ...item,
                                               },
-                                            ])
-                                          );
+                                            ]);
                                         }.bind(__$$context),
                                       }}
                                       placement="bottomLeft"
@@ -647,46 +618,37 @@ class ModelService$$Page extends React.Component {
                                   children: (
                                     <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
                                       <Col __component_name="Col" flex="60px">
-                                        <Tooltip
-                                          __component_name="Tooltip"
-                                          title={__$$eval(() =>
-                                            item.status === 'Error' || item.status === 'False'
-                                              ? item.message
-                                              : ''
-                                          )}
-                                        >
-                                          <Status
-                                            __component_name="Status"
-                                            id={__$$eval(() => item?.status)}
-                                            types={[
-                                              {
-                                                children: '运行中',
-                                                id: 'Running',
-                                                type: 'success',
-                                              },
-                                              { children: '部署中', id: 'Pending', type: 'info' },
-                                              { children: '异常', id: 'Error', type: 'error' },
-                                              { children: '未知', id: 'Unknown', type: 'disabled' },
-                                              {
-                                                children: '删除中',
-                                                id: 'Deleting',
-                                                type: 'warning',
-                                              },
-                                              {
-                                                children: '已下线',
-                                                id: 'Offline',
-                                                type: 'warning',
-                                              },
-                                              { children: '正常', id: 'True', type: 'success' },
-                                              {
-                                                children: '下线中',
-                                                id: 'OfflineInProgress',
-                                                type: 'info',
-                                              },
-                                              { children: '异常', id: 'False', type: 'error' },
-                                            ]}
-                                          />
-                                        </Tooltip>
+                                        <Status
+                                          __component_name="Status"
+                                          id={__$$eval(() => item?.status)}
+                                          types={[
+                                            { children: '运行中', id: 'Running', type: 'success' },
+                                            { children: '部署中', id: 'Pending', type: 'info' },
+                                            {
+                                              _unsafe_MixedSetter_tooltip_select: 'VariableSetter',
+                                              children: '异常',
+                                              id: 'Error',
+                                              tooltip: __$$eval(() => item.message || ''),
+                                              type: 'error',
+                                            },
+                                            { children: '未知', id: 'Unknown', type: 'disabled' },
+                                            { children: '删除中', id: 'Deleting', type: 'warning' },
+                                            { children: '已下线', id: 'Offline', type: 'warning' },
+                                            { children: '正常', id: 'True', type: 'success' },
+                                            {
+                                              children: '下线中',
+                                              id: 'OfflineInProgress',
+                                              type: 'info',
+                                            },
+                                            {
+                                              _unsafe_MixedSetter_tooltip_select: 'VariableSetter',
+                                              children: '异常',
+                                              id: 'False',
+                                              tooltip: __$$eval(() => item.message || ''),
+                                              type: 'error',
+                                            },
+                                          ]}
+                                        />
                                       </Col>
                                       <Col
                                         __component_name="Col"
@@ -769,10 +731,10 @@ class ModelService$$Page extends React.Component {
           mask={true}
           maskClosable={false}
           onCancel={function () {
-            return this.onDelCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            return Reflect.apply(this.onDelCancel, this, [...Array.prototype.slice.call(arguments)]);
           }.bind(this)}
           onOk={function () {
-            return this.onDelOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            return Reflect.apply(this.onDelOk, this, [...Array.prototype.slice.call(arguments)]);
           }.bind(this)}
           open={__$$eval(() => this.state.delVisible)}
           style={{}}
@@ -799,13 +761,10 @@ class ModelService$$Page extends React.Component {
           mask={true}
           maskClosable={false}
           onCancel={function () {
-            return this.onOfflineCancel.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
+            return Reflect.apply(this.onOfflineCancel, this, [...Array.prototype.slice.call(arguments)]);
           }.bind(this)}
           onOk={function () {
-            return this.onOfflineOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            return Reflect.apply(this.onOfflineOk, this, [...Array.prototype.slice.call(arguments)]);
           }.bind(this)}
           open={__$$eval(() => this.state.offlineModal)}
           style={{}}
@@ -850,15 +809,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      self={self}
+      render={dataProps => (
+        <ModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
+      )}
       sdkInitFunc={{
         enabled: false,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      render={dataProps => (
-        <ModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
-      )}
+      self={self}
     />
   );
 };
@@ -867,7 +826,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch (error) {}
+  } catch {}
 }
 
 function __$$evalArray(expr) {
