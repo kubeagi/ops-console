@@ -9,7 +9,7 @@
  * @date 2023-12-26
  */
 import { history } from '@@/core/history';
-import { ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, LeftOutlined } from '@ant-design/icons';
 import MessageWarn from '@tenx-ui/icon/lib/MessageWarn.js';
 import { Empty } from '@tenx-ui/materials';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
@@ -121,13 +121,7 @@ const useConversationList: IUseConversationList = newConversationId => {
         <div />
         {/*add padding*/}
         <div className="header">
-          <Button
-            ghost
-            icon={<ArrowLeftOutlined />}
-            onClick={getUnifiedHistory().go.bind('', -1)}
-            size="small"
-            type="primary"
-          />
+          <LeftOutlined className="back" onClick={getUnifiedHistory().go.bind('', -1)} />
           <img
             className="avatar"
             src={application?.data?.Application?.getApplication?.metadata?.icon}
