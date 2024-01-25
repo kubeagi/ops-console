@@ -35,6 +35,7 @@ const ViewReference: React.FC<ViewReferenceProps> = props => {
       changeConfig
       configKey="ViewReference"
       icon={<KubeagiQuote />}
+      style={{ paddingTop: 0, marginBottom: -8 }}
       title={'查看引用'}
     ></Container>
   );

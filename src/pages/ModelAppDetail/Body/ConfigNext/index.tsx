@@ -35,6 +35,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
       changeConfig
       configKey="ConfigNext"
       icon={<KubeagiNextLead />}
+      style={{ paddingTop: 0, marginBottom: -8, marginTop: -10 }}
       title={'问题引导'}
     ></Container>
   );
