@@ -105,35 +105,40 @@ const PROMPTS_MAP: Prompt[] = [
     id: 'TextQuestionAndAnswer',
     name: '文本问答',
     prompt:
-      '现在你是一个问答机器人，你会阅读并深度理解我给你的上下文内容并据此回答我所提出的问题。我给出的问题是：{{.question}} 你需要阅读理解的文本是：{{.context}}',
+      '现在你是一个问答机器人，你会阅读并深度理解我给你的上下文内容并据此回答我所提出的问题。我给出的问题是：{{.question}} 你需要阅读理解的文本是：{{.context}} \r\n{{.history}}',
   },
-  { icon, id: 'DocumentAbstract', name: '文档摘要', prompt: '生成以下内容的摘要：{{.context}}' },
+  {
+    icon,
+    id: 'DocumentAbstract',
+    name: '文档摘要',
+    prompt: '生成以下内容的摘要：{{.context}} {{.question}}  \r\n{{.history}}',
+  },
   {
     icon,
     id: 'CodeDebug',
     name: '代码 Debug',
     prompt:
-      '现在你是一位精通go的资深IT开发工程师，你会对我给出的代码进行Debug。注意你需要给出代码中的具体Bug，并且通过代码块的形式提供修改后的代码。接下来你需要进行Debug的代码为:{{.question}}',
+      '现在你是一位精通go的资深IT开发工程师，你会对我给出的代码进行Debug。注意你需要给出代码中的具体Bug，并且通过代码块的形式提供修改后的代码。接下来你需要进行Debug的代码为:{{.question}}\r\n{{.history}}',
   },
   {
     icon,
     id: 'PersonnelSupervisor',
     name: '人事主管',
-    prompt: '请根据上下文内容:{{.context}}回答用户提问:{{.question}}',
+    prompt: '请根据上下文内容:{{.context}}回答用户提问:{{.question}}\r\n{{.history}}',
   },
   {
     icon,
     id: 'LegalAdviser',
     name: '法律顾问',
     prompt:
-      '你现在是我的法律顾问。我将描述一种法律问题，你需要提供如何处理这个问题的建议。你只需要回复你的建议，而不是其他。不要写解释。我的问题是{{.question}}。',
+      '你现在是我的法律顾问。我将描述一种法律问题，你需要提供如何处理这个问题的建议。你只需要回复你的建议，而不是其他。不要写解释。我的问题是{{.question}}。\r\n{{.history}}',
   },
   {
     icon,
     id: 'PPTFrame',
     name: 'PPT 框架',
     prompt:
-      '现在你需要制作一份PPT，你需要按照我给出的主题来准备这份PPT的内容。 最终你需要给出： 【目录】根据我给出的主题和内容撰写的PPT目录 【内容】根据目录中的标题一一撰写对应的内容大纲 接下来，你需要制作的PPT主题是{{.question}}',
+      '现在你需要制作一份PPT，你需要按照我给出的主题来准备这份PPT的内容。 最终你需要给出： 【目录】根据我给出的主题和内容撰写的PPT目录 【内容】根据目录中的标题一一撰写对应的内容大纲 接下来，你需要制作的PPT主题是{{.question}}\r\n{{.history}}',
   },
 ];
 interface ConfigPromptProps {}
