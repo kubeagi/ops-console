@@ -215,7 +215,10 @@ class $$Page extends React.Component {
       },
       selectedFileList: [],
       showLlmModel: false,
-      step1FormData: {},
+      step1FormData: {
+        name: undefined,
+        file_type: 'text',
+      },
       step2FormData: {},
       step3Data: {
         QAsplitChecked: true,
@@ -908,6 +911,15 @@ class $$Page extends React.Component {
 
   componentDidMount() {
     this.getDataSet();
+    const paheThis = this;
+    setTimeout(() => {
+      if (paheThis.form('createDataHandleStep1')) {
+        paheThis.form('createDataHandleStep1').setValues({
+          name: paheThis.state.step1FormData.name || undefined,
+          file_type: paheThis.state.step1FormData.file_type || undefined,
+        });
+      }
+    });
   }
 
   render() {
@@ -3967,6 +3979,7 @@ class $$Page extends React.Component {
                           },
                         }}
                         fieldProps={{
+                          'default': '',
                           'enum': [
                             {
                               children: '',
