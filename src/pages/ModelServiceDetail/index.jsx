@@ -843,8 +843,9 @@ class ModelServiceDetail$$Page extends React.Component {
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
+                        copyable={true}
                         disabled={false}
-                        ellipsis={true}
+                        ellipsis={false}
                         strong={false}
                         style={{ fontSize: '14px' }}
                       >
