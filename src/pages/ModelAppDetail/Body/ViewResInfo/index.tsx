@@ -35,6 +35,7 @@ const ViewResInfo: React.FC<ViewResInfoProps> = props => {
       changeConfig
       configKey="ViewResInfo"
       icon={<KubeagiRes />}
+      style={{ paddingTop: 0, marginBottom: 0 }}
       title={'查看响应信息'}
     ></Container>
   );

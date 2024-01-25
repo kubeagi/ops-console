@@ -1,3 +1,4 @@
+import { CaretDownOutlined, CaretRightOutlined } from '@ant-design/icons';
 import { Card, Divider, Typography, notification } from '@tenx-ui/materials';
 import { Button, Col, Flex, Form, Row, Tooltip } from 'antd';
 import { isEqual } from 'lodash';
@@ -88,6 +89,7 @@ const Body: React.FC<BodyProps> = props => {
               {/* <ConfigAudio /> */}
               <Divider
                 __component_name="Divider"
+                closeIcon={<CaretDownOutlined />}
                 content={
                   <>
                     <ConfigNext />
@@ -97,7 +99,9 @@ const Body: React.FC<BodyProps> = props => {
                 }
                 dashed={true}
                 defaultOpen={false}
+                iconPlacement="right"
                 mode="expanded"
+                openIcon={<CaretRightOutlined />}
                 orientation="left"
                 orientationMargin={0}
               >
@@ -106,7 +110,7 @@ const Body: React.FC<BodyProps> = props => {
             </Form>
           </Card>
         </Col>
-        <Col span={14}>
+        <Col className={styles.dialogue} span={14}>
           <Dialogue saveIng={saveIng} />
         </Col>
       </Row>
