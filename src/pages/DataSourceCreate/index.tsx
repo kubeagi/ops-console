@@ -66,7 +66,7 @@ class DataSourceCreate$$Page extends React.Component {
       this.setState({
         modalLoading: true,
       });
-      const params = {
+      let params = {
         input: {
           name: v?.name,
           displayName: v?.displayName,
@@ -86,6 +86,22 @@ class DataSourceCreate$$Page extends React.Component {
           },
         },
       };
+      if (this.state?.createThis?.getType() === 'onLine') {
+        params = {
+          input: {
+            name: v?.name,
+            displayName: v?.displayName,
+            namespace: this.utils.getAuthData()?.project,
+            description: v?.description,
+            endpointinput: {
+              url: v?.serverAddress,
+            },
+            webinput: {
+              recommendIntervalTime: +v?.recommendIntervalTime,
+            },
+          },
+        };
+      }
       const api = {
         create: {
           name: 'createDatasource',

@@ -1,8 +1,8 @@
 {
-  "private": true,
   "name": "CreateDataSource",
+  "version": "0.0.5",
+  "private": true,
   "description": "AIGC 创建数据源",
-  "version": "0.0.1",
   "keywords": [],
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -18,16 +18,16 @@
     "pub": "npm run prepublishOnly && npm publish --registry http://dev-npm.tenxcloud.net"
   },
   "dependencies": {
+    "@alilc/lowcode-datasource-engine": "^1.0.0",
     "@formily/antd": "^2.1.4",
     "@formily/core": "^2.1.4",
     "@formily/react": "^2.1.4",
-    "@tenx-ui/icon": "^2.4.17",
     "@tenx-ui/form-helper": "^0.0.2",
+    "@tenx-ui/icon": "^2.4.17",
+    "SelectCard": "workspace:*",
     "babel-runtime": "^6.26.0",
     "react-sortable-hoc": "^2.0.0",
-    "shared-components": "workspace:*",
-    "@alilc/lowcode-datasource-engine": "^1.0.0",
-    "SelectCard": "workspace:*"
+    "shared-components": "workspace:*"
   },
   "devDependencies": {
     "react": "^18.0.0"
