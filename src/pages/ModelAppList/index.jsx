@@ -11,6 +11,7 @@ import {
   Image,
   FormilyUpload,
   FormilyFormItem,
+  FormilySelect,
   FormilyTextArea,
   Row,
   Col,
@@ -80,6 +81,20 @@ class ModelAppList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      cateList: [
+        '游戏动漫',
+        '通用对话',
+        '工作学习',
+        '内容创作',
+        'AI绘画',
+        '影音生成',
+        '角色扮演',
+        '生活趣味',
+        '其他',
+      ].map(item => ({
+        label: item,
+        value: item,
+      })),
       createBtnLoading: false,
       createModalVisible: false,
       currentRecord: null,
@@ -331,6 +346,7 @@ class ModelAppList$$Page extends React.Component {
               displayName: values.displayName,
               description: values.description,
               icon: res,
+              category: values.category,
             };
             this.utils.bff
               .updateApplication({
@@ -355,6 +371,7 @@ class ModelAppList$$Page extends React.Component {
             displayName: values.displayName,
             description: values.description,
             icon: this.state.fileList[0].url,
+            category: values.category,
           };
           this.utils.bff
             .updateApplication({
@@ -458,6 +475,7 @@ class ModelAppList$$Page extends React.Component {
               displayName: values.displayName,
               icon: res,
               description: values.description,
+              category: values.category,
             };
             this.utils.bff
               .createApplication({
@@ -482,6 +500,7 @@ class ModelAppList$$Page extends React.Component {
             displayName: values.displayName,
             description: values.description,
             icon: this.state.fileList[0].url,
+            category: values.category,
           };
           this.utils.bff
             .createApplication({
@@ -534,6 +553,8 @@ class ModelAppList$$Page extends React.Component {
                 },
               ],
             },
+            category:
+              this.state.currentRecord.annotations['arcadia.kubeagi.k8s.com.cn/app-category'],
             description: this.state.currentRecord.description,
           });
         }, 500);
@@ -753,6 +774,25 @@ class ModelAppList$$Page extends React.Component {
                 />
               )}
             </FormilyUpload>
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  _sdkSwrGetFunc: {},
+                  allowClear: false,
+                  disabled: false,
+                  placeholder: '请选择',
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                'enum': __$$eval(() => this.state.cateList),
+                'name': 'category',
+                'title': '智能体分类',
+                'x-validator': [],
+              }}
+            />
             <FormilyTextArea
               __component_name="FormilyTextArea"
               componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
@@ -1317,6 +1357,25 @@ class ModelAppList$$Page extends React.Component {
                 />
               )}
             </FormilyUpload>
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  _sdkSwrGetFunc: {},
+                  allowClear: false,
+                  disabled: false,
+                  placeholder: '请选择',
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                'enum': __$$eval(() => this.state.cateList),
+                'name': 'category',
+                'title': '智能体分类',
+                'x-validator': [],
+              }}
+            />
             <FormilyTextArea
               __component_name="FormilyTextArea"
               componentProps={{ 'x-component-props': { placeholder: '请输入' } }}

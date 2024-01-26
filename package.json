@@ -67,7 +67,7 @@
     "@tenx-ui/utils": "^2.3.1",
     "@umijs/max": "^4.0.42",
     "@yunti/lowcode-datasource-axios-handler": "^1.0.1",
-    "@yuntijs/arcadia-bff-sdk": "^1.0.74",
+    "@yuntijs/arcadia-bff-sdk": "^1.0.75",
     "@yuntijs/react-markdown-lowcode-materials": "1.0.1",
     "KubeAGIUpload": "workspace:*",
     "antd": "^5.12.2",
