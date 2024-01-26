@@ -14,7 +14,6 @@ import {
   ChatList as ChatItemsList,
   ChatListProps,
   ChatMessage,
-  ChatSendButton,
   CopyButton,
   Highlighter,
   useControls,
@@ -23,9 +22,10 @@ import {
 import { getAuthData } from '@tenx-ui/auth-utils';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
-import { Spin, message } from 'antd';
+import { Button, Flex, Spin, Tooltip, message } from 'antd';
 import classNames from 'classnames';
 import { throttle } from 'lodash';
+import { ArrowBigUp, CornerDownLeft } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
@@ -76,6 +76,7 @@ const Chat: React.FC<IChat> = props => {
     name: props.appName,
     namespace: props.appNamespace,
   });
+  const appData = application?.data?.Application?.getApplication;
   const [messages, messagesLoading] = useGetCommonData<
     { id: string; query: string; answer: string; references: Reference[] }[]
   >({
@@ -92,42 +93,45 @@ const Chat: React.FC<IChat> = props => {
     resStr: 'messages',
     notFetch: !props.conversationId,
   });
-  const fetchLastReference = useCallback(async (cId, mId) => {
-    if (!mId || !cId) return;
-    const res = await request
-      .post({
-        url: `/chat/messages/${mId}/references`,
-        options: {
-          body: {
-            app_name: props.appName,
-            app_namespace: props.appNamespace,
-            conversation_id: cId,
-            message_id: mId,
-          },
-        },
-      })
-      .catch(error => {
-        //
-      });
-    if (!res?.length) return;
-    setConversation(_conversation => {
-      const [first, ...rest] = _conversation.data.reverse();
-      return {
-        ..._conversation,
-        loadingMsgId: undefined,
-        data: [
-          ...rest.reverse(),
-          {
-            ...first,
-            extra: {
-              references: res,
+  const fetchLastReference = useCallback(
+    async (cId, mId) => {
+      if (!mId || !cId || !appData?.showRetrievalInfo) return;
+      const res = await request
+        .post({
+          url: `/chat/messages/${mId}/references`,
+          options: {
+            body: {
+              app_name: props.appName,
+              app_namespace: props.appNamespace,
+              conversation_id: cId,
+              message_id: mId,
             },
           },
-        ],
-      };
-    });
-    scrollToBottom();
-  }, []);
+        })
+        .catch(error => {
+          //
+        });
+      if (!res?.length) return;
+      setConversation(_conversation => {
+        const [first, ...rest] = _conversation.data.reverse();
+        return {
+          ..._conversation,
+          loadingMsgId: undefined,
+          data: [
+            ...rest.reverse(),
+            {
+              ...first,
+              extra: {
+                references: res,
+              },
+            },
+          ],
+        };
+      });
+      scrollToBottom();
+    },
+    [setConversation, appData?.showRetrievalInfo, props.appName, props.appNamespace]
+  );
   useEffect(() => {
     if (conversation.data?.length) return;
     const app = application?.data?.Application?.getApplication;
@@ -290,7 +294,7 @@ const Chat: React.FC<IChat> = props => {
     };
   }, []);
   const onSend = useCallback(() => {
-    const _input = input.trim();
+    const _input = input?.trim();
     if (!_input) return;
     setConversation(conversation => {
       const userMsgId = Date.now().toString();
@@ -343,7 +347,10 @@ const Chat: React.FC<IChat> = props => {
               default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
             }}
             renderMessagesExtra={{
-              default: chat => <RenderReferences chat={chat} debug={props.debug} />,
+              default: chat =>
+                appData?.showRetrievalInfo ? (
+                  <RenderReferences chat={chat} debug={props.debug} />
+                ) : null,
             }}
             {...control}
           />
@@ -352,14 +359,20 @@ const Chat: React.FC<IChat> = props => {
         <div className="inputArea">
           <ChatInputArea
             bottomAddons={
-              <ChatSendButton
-                onSend={onSend}
-                texts={{
-                  send: '发送',
-                  warp: '换行',
-                  stop: '停止',
-                }}
-              />
+              <Flex align="center" className="sendAction" gap="large" justify="end">
+                <span className="keyBindings">
+                  <CornerDownLeft size={12} />
+                  <span>发送 / </span>
+                  <ArrowBigUp size={12} />
+                  <CornerDownLeft size={12} />
+                  <span>换行</span>
+                </span>
+                <Tooltip title={appData?.llm ? '' : '暂未关联模型服务，请先关联模型服务再进行对话'}>
+                  <Button disabled={!appData?.llm} onClick={onSend} type="primary">
+                    发送
+                  </Button>
+                </Tooltip>
+              </Flex>
             }
             onInput={setInput}
             onSend={onSend}
