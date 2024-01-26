@@ -74,8 +74,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.0.74
-        version: 1.0.74(@tenx-ui/materials@1.5.31)(antd@5.13.2)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.0.75
+        version: 1.0.75(@tenx-ui/materials@1.5.31)(antd@5.13.2)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/react-markdown-lowcode-materials':
         specifier: 1.0.1
         version: 1.0.1(@types/react@18.2.48)(lodash@4.17.21)(react-dom@18.2.0)(react@18.2.0)
@@ -2200,7 +2200,7 @@ packages:
       '@dnd-kit/core': ^6.0.7
       react: '>=16.8.0'
     dependencies:
-      '@dnd-kit/core': 6.1.0(react-dom@17.0.2)(react@18.2.0)
+      '@dnd-kit/core': 6.1.0(react-dom@18.2.0)(react@18.2.0)
       '@dnd-kit/utilities': 3.2.2(react@18.2.0)
       react: 18.2.0
       tslib: 2.6.2
@@ -5724,7 +5724,7 @@ packages:
       '@types/history': 4.7.11
       '@types/react': 18.2.48
       '@types/react-router': 5.1.20
-      redux: 3.7.2
+      redux: 4.2.1
     dev: false
 
   /@types/react-router@5.1.20:
@@ -6988,8 +6988,8 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.0.74(@tenx-ui/materials@1.5.31)(antd@5.13.2)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-sqvPPB6O5hkjLdSlw3N8UWIHHr9hRny/6GTa0Z7kSy9kfdkVf/BBE1ru8fTKMhs+jWZLuN5eP3g8LTgskJ4hsw==}
+  /@yuntijs/arcadia-bff-sdk@1.0.75(@tenx-ui/materials@1.5.31)(antd@5.13.2)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-vtpRfkHGcpPL144dg9rE3FGt2+R9KaR73rnfo+P5kGTAYf4h23j3oZy0iLdJtI3WUHKJu8F0vV3eMikWFncTGw==}
     peerDependencies:
       '@tenx-ui/materials': '>=1.5.8'
       antd: '>=5.4.0'
@@ -18268,6 +18268,7 @@ packages:
       object-assign: 4.1.1
       prop-types: 15.8.1
     dev: false
+    bundledDependencies: false
 
   /react@18.1.0:
     resolution: {integrity: sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ==}
