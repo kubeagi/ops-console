@@ -83,7 +83,7 @@ export interface SettingProps {
   data?: RowData;
   title?: string;
   children?: React.ReactElement;
-  handleSave?: (values: any) => void;
+  handleSave?: (values: any, configs: any) => void;
   form?: any;
   configKey: string;
   renderChildren?: (form, forceUpdate, setOpen) => React.ReactElement;
@@ -118,14 +118,15 @@ const Setting: React.FC<SettingProps> = props => {
         curForm.validateFields().then(async values => {
           try {
             setOpen(false);
-            setConfigs({
+            const newConfigs = {
               ...configs,
               [configKey]: {
                 ...(configs?.[configKey] || []),
                 ...values,
               },
-            });
-            handleSave && (await handleSave(values));
+            };
+            setConfigs(newConfigs);
+            handleSave && (await handleSave(values, newConfigs));
             // refresh && refresh();
             // notification.success({
             //   message: `${title}成功`,
