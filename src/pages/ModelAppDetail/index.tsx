@@ -5,6 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 import utils from '../../utils/__utils';
 import Body from './Body';
+import { SEARCH_TOOLS_VALUES } from './Body/RealTimeSearch';
 import Header from './Header';
 
 export const ModalAppDetailContext = createContext(null);
@@ -28,6 +29,7 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
 
   useEffect(() => {
     const Application = data?.Application?.getApplication;
+
     const Config = {
       ConfigConversationStarter: {
         prologue: Application?.prologue || undefined,
@@ -60,7 +62,12 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
         showRetrievalInfo: Application?.showRetrievalInfo,
       },
       RealTimeSearch: {
-        // @todo
+        RealTimeSearchUsed: Application?.tools?.some(item =>
+          SEARCH_TOOLS_VALUES.includes(item.name)
+        ),
+        RealTimeSearchName: Application?.tools?.find(item =>
+          SEARCH_TOOLS_VALUES.includes(item.name)
+        )?.name,
       },
     };
     setConfigs(Config);

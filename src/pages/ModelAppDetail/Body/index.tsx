@@ -12,6 +12,7 @@ import ConfigModelService from './ConfigModelService';
 import ConfigNext from './ConfigNext';
 import ConfigPrompt from './ConfigPrompt';
 import Dialogue from './Dialogue';
+import RealTimeSearch from './RealTimeSearch';
 import ViewReference from './ViewReference';
 import ViewResInfo from './ViewResInfo';
 import styles from './index.less';
@@ -42,19 +43,29 @@ const Body: React.FC<BodyProps> = props => {
                   disabled={isEqual(initConfigs, configs)}
                   loading={loading}
                   onClick={async () => {
-                    form.validateFields().then(async () => {
+                    form.validateFields().then(async values => {
                       try {
                         setLoading(true);
                         const input = {
                           ...data,
                           name: data?.metadata?.name,
                           namespace: data?.metadata?.namespace,
-                          ...form.getFieldsValue(),
+                          ...values,
                           knowledgebase:
-                            form.getFieldsValue()?.knowledgebase === 'undefined'
+                            values?.knowledgebase === 'undefined'
                               ? undefined
-                              : form.getFieldsValue()?.knowledgebase || data?.knowledgebase,
+                              : values?.knowledgebase || data?.knowledgebase,
+                          tools: [],
                         };
+                        delete input.RealTimeSearchUsed;
+                        delete input.RealTimeSearchName;
+                        if (values.RealTimeSearchUsed && values.RealTimeSearchName) {
+                          input.tools = [
+                            {
+                              name: values.RealTimeSearchName,
+                            },
+                          ];
+                        }
                         delete input.metadata;
                         await utils.bff.updateApplicationConfig({
                           input,
@@ -84,7 +95,7 @@ const Body: React.FC<BodyProps> = props => {
               <ConfigConversationStarter />
               <ConfigModelService />
               <ConfigKnowledge />
-              {/* <RealTimeSearch/> */}
+              <RealTimeSearch />
               <ConfigPrompt />
               {/* <ConfigAudio /> */}
               <Divider

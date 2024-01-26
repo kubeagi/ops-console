@@ -12,6 +12,7 @@ import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 import { SliderItem } from '../Modal';
+import { linkageReference } from '../linkage';
 import styles from './index.less';
 
 interface KnowledgeItem {
@@ -156,7 +157,9 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                 </>
               );
             },
-            handleSave: (values: any) => {},
+            handleSave: (values: any, configs) => {
+              linkageReference(form, configs);
+            },
           },
         },
         {
@@ -252,13 +255,15 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
             ...configs?.ConfigKnowledge,
             knowledgebase: v?.[0] || 'undefined',
           });
-          setConfigs({
+          const newConfigs = {
             ...configs,
             ConfigKnowledge: {
               ...configs?.ConfigKnowledge,
               knowledgebase: v?.[0],
             },
-          });
+          };
+          setConfigs(newConfigs);
+          linkageReference(form, newConfigs);
         }}
       />
     </Container>
