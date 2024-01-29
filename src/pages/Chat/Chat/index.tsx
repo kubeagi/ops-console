@@ -14,7 +14,6 @@ import {
   ChatList as ChatItemsList,
   ChatListProps,
   ChatMessage,
-  ChatSendButton,
   CopyButton,
   Highlighter,
   useControls,
@@ -23,9 +22,10 @@ import {
 import { getAuthData } from '@tenx-ui/auth-utils';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
-import { Spin, message } from 'antd';
+import { Button, Flex, Spin, Tag, Tooltip, message } from 'antd';
 import classNames from 'classnames';
 import { throttle } from 'lodash';
+import { ArrowBigUp, CornerDownLeft } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
@@ -53,6 +53,19 @@ const safeAreaId = 'safe-area-id-not-use-in-your-code';
 class RetriableError extends Error {}
 class FatalError extends Error {}
 
+const addIndexToCvs = data => {
+  return {
+    ...data,
+    data: data?.data?.map((item, index) => ({
+      ...item,
+      extra: {
+        ...item?.extra,
+        index,
+      },
+    })),
+  };
+};
+
 const scrollToBottom = throttle(() => {
   document.querySelector(`#${safeAreaId}`)?.scrollIntoView();
 }, 200);
@@ -76,8 +89,9 @@ const Chat: React.FC<IChat> = props => {
     name: props.appName,
     namespace: props.appNamespace,
   });
+  const appData = application?.data?.Application?.getApplication;
   const [messages, messagesLoading] = useGetCommonData<
-    { id: string; query: string; answer: string; references: Reference[] }[]
+    { id: string; query: string; answer: string; references: Reference[]; latency?: number }[]
   >({
     url: '/chat/messages',
     method: 'post',
@@ -92,42 +106,46 @@ const Chat: React.FC<IChat> = props => {
     resStr: 'messages',
     notFetch: !props.conversationId,
   });
-  const fetchLastReference = useCallback(async (cId, mId) => {
-    if (!mId || !cId) return;
-    const res = await request
-      .post({
-        url: `/chat/messages/${mId}/references`,
-        options: {
-          body: {
-            app_name: props.appName,
-            app_namespace: props.appNamespace,
-            conversation_id: cId,
-            message_id: mId,
-          },
-        },
-      })
-      .catch(error => {
-        //
-      });
-    if (!res?.length) return;
-    setConversation(_conversation => {
-      const [first, ...rest] = _conversation.data.reverse();
-      return {
-        ..._conversation,
-        loadingMsgId: undefined,
-        data: [
-          ...rest.reverse(),
-          {
-            ...first,
-            extra: {
-              references: res,
+  const fetchLastReference = useCallback(
+    async (cId, mId) => {
+      if (!mId || !cId || !appData?.showRetrievalInfo) return;
+      const res = await request
+        .post({
+          url: `/chat/messages/${mId}/references`,
+          options: {
+            body: {
+              app_name: props.appName,
+              app_namespace: props.appNamespace,
+              conversation_id: cId,
+              message_id: mId,
             },
           },
-        ],
-      };
-    });
-    scrollToBottom();
-  }, []);
+        })
+        .catch(error => {
+          //
+        });
+      if (!res?.length) return;
+      setConversation(_conversation => {
+        const [first, ...rest] = _conversation.data.reverse();
+        return addIndexToCvs({
+          ..._conversation,
+          loadingMsgId: undefined,
+          data: [
+            ...rest.reverse(),
+            {
+              ...first,
+              extra: {
+                ...first?.extra,
+                references: res,
+              },
+            },
+          ],
+        });
+      });
+      scrollToBottom();
+    },
+    [setConversation, appData?.showRetrievalInfo, props.appName, props.appNamespace]
+  );
   useEffect(() => {
     if (conversation.data?.length) return;
     const app = application?.data?.Application?.getApplication;
@@ -149,15 +167,22 @@ const Chat: React.FC<IChat> = props => {
         (pre, cur) => [
           ...pre,
           getCvsMeta(cur.query, cur.id + '_query', null, true),
-          getCvsMeta(cur.answer, cur.id + '_answer', { references: cur.references }, false),
+          getCvsMeta(
+            cur.answer,
+            cur.id + '_answer',
+            { references: cur.references, latency: cur.latency },
+            false
+          ),
         ],
         cvList
       );
     }
-    setConversation({
-      ...conversation,
-      data: cvList,
-    });
+    setConversation(
+      addIndexToCvs({
+        ...conversation,
+        data: cvList,
+      })
+    );
     scrollToBottom();
   }, [conversation, application, props.conversationId, messages, messagesLoading]);
   useEffect(() => {
@@ -180,7 +205,7 @@ const Chat: React.FC<IChat> = props => {
       message.warning('系统异常，请稍后重试');
       setConversation(_conversation => {
         const [first, ...rest] = _conversation.data.reverse();
-        return {
+        return addIndexToCvs({
           ..._conversation,
           loadingMsgId: undefined,
           data: [
@@ -194,7 +219,7 @@ const Chat: React.FC<IChat> = props => {
               },
             },
           ],
-        };
+        });
       });
     },
     [setConversation]
@@ -233,7 +258,7 @@ const Chat: React.FC<IChat> = props => {
             if (parsedData.conversation_id !== _conversation.id) {
               shouldUpdateConversationId = true;
             }
-            return {
+            return addIndexToCvs({
               ..._conversation,
               id: parsedData.conversation_id,
               data: _conversation.data.map((item, index) => {
@@ -243,9 +268,13 @@ const Chat: React.FC<IChat> = props => {
                   ...last,
                   id: parsedData.message_id || last.id,
                   content: last.content + (parsedData?.message || ''),
+                  extra: {
+                    ...last?.extra,
+                    latency: parsedData.latency,
+                  },
                 };
               }),
-            };
+            });
           });
           scrollToBottom();
         },
@@ -269,10 +298,10 @@ const Chat: React.FC<IChat> = props => {
               // "791d25a6-7102-4f7c-afcd-29eee3624250" ||
               _conversation.data.at(-1)?.id
             );
-            return {
+            return addIndexToCvs({
               ..._conversation,
               loadingMsgId: undefined,
-            };
+            });
           });
         },
       });
@@ -290,12 +319,12 @@ const Chat: React.FC<IChat> = props => {
     };
   }, []);
   const onSend = useCallback(() => {
-    const _input = input.trim();
+    const _input = input?.trim();
     if (!_input) return;
     setConversation(conversation => {
       const userMsgId = Date.now().toString();
       const assistantMsgId = (Date.now() + 10).toString();
-      return {
+      return addIndexToCvs({
         ...conversation,
         loadingMsgId: assistantMsgId,
         data: [
@@ -303,7 +332,7 @@ const Chat: React.FC<IChat> = props => {
           getCvsMeta(_input, userMsgId, null, true),
           getCvsMeta('', assistantMsgId, null, false),
         ],
-      };
+      });
     });
     scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
     fetchConversation(_input);
@@ -343,7 +372,26 @@ const Chat: React.FC<IChat> = props => {
               default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
             }}
             renderMessagesExtra={{
-              default: chat => <RenderReferences chat={chat} debug={props.debug} />,
+              default: (chat, s) => {
+                return (
+                  <>
+                    {conversation.loadingMsgId !== chat.id &&
+                      Boolean(chat.extra?.index) &&
+                      chat.role === 'assistant' &&
+                      Boolean(appData?.showRespInfo) && (
+                        <div className="extraMsg">
+                          {Boolean(chat.extra?.latency) && (
+                            <Tag color="green">{chat.extra?.latency}s</Tag>
+                          )}
+                          <Tag color="purple">{chat.extra?.index}条上下文</Tag>
+                        </div>
+                      )}
+                    {Boolean(appData?.showRetrievalInfo) && (
+                      <RenderReferences chat={chat} debug={props.debug} />
+                    )}
+                  </>
+                );
+              },
             }}
             {...control}
           />
@@ -352,14 +400,20 @@ const Chat: React.FC<IChat> = props => {
         <div className="inputArea">
           <ChatInputArea
             bottomAddons={
-              <ChatSendButton
-                onSend={onSend}
-                texts={{
-                  send: '发送',
-                  warp: '换行',
-                  stop: '停止',
-                }}
-              />
+              <Flex align="center" className="sendAction" gap="large" justify="end">
+                <span className="keyBindings">
+                  <CornerDownLeft size={12} />
+                  <span>发送 / </span>
+                  <ArrowBigUp size={12} />
+                  <CornerDownLeft size={12} />
+                  <span>换行</span>
+                </span>
+                <Tooltip title={appData?.llm ? '' : '暂未关联模型服务，请先关联模型服务再进行对话'}>
+                  <Button disabled={!appData?.llm} onClick={onSend} type="primary">
+                    发送
+                  </Button>
+                </Tooltip>
+              </Flex>
             }
             onInput={setInput}
             onSend={onSend}

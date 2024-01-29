@@ -19,6 +19,7 @@ export const getCvsMeta = (
   id: string,
   extra: {
     references?: Reference[];
+    latency?: number;
   } = {},
   isUser?: boolean
 ): ChatMessage => {

@@ -83,6 +83,7 @@
     "kubeagi-knowledge-delete-modal": "workspace:*",
     "kubeagi-knowledge-edit-modal": "workspace:*",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.315.0",
     "query-string": "^8.1.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
