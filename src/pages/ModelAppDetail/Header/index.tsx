@@ -136,6 +136,10 @@ const Header: React.FC<HeaderProps> = props => {
                     label: '智能体评估',
                   },
                   {
+                    key: 'publish',
+                    label: data?.metadata?.isPublic ? '撤销发布' : '发布智能体',
+                  },
+                  {
                     key: 'edit',
                     label: '编辑',
                   },
@@ -163,6 +167,11 @@ const Header: React.FC<HeaderProps> = props => {
 
                       break;
                     }
+
+                    case 'publish': {
+                      handlePublish();
+                      break;
+                    }
                     // No default
                   }
                 },
@@ -171,7 +180,6 @@ const Header: React.FC<HeaderProps> = props => {
                 history.push(
                   `/chat?appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
                 );
-                // handlePublish();
               }}
             >
               对话
