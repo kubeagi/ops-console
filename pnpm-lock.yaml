@@ -50,8 +50,8 @@ importers:
         specifier: ^0.0.2
         version: 0.0.2(react@18.2.0)
       '@tenx-ui/icon':
-        specifier: ^2.4.40
-        version: 2.4.40(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^2.4.41
+        version: 2.4.41(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@tenx-ui/icon-materials':
         specifier: ^0.1.7
         version: 0.1.7(react-dom@18.2.0)(react@18.2.0)
@@ -5212,8 +5212,8 @@ packages:
       react-dom: 17.0.2(react@18.2.0)
     dev: false
 
-  /@tenx-ui/icon@2.4.40(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-DjvC9Fmbn69WzLTewpPkIFTaXJcJtSGyFODLzKB5ZUfSP9obrte2lObvT0LTuB95CjSybs9xfGwyBtyhQmu7YA==}
+  /@tenx-ui/icon@2.4.41(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-P3kyp13DF0baRLGevBi5ZM0KQ8fTAb1ztsutQ9dY6KZiTjhWGGjiC3LbZxLTbLbST4WEvoCUp8E7UGb4PgO4ZA==}
     peerDependencies:
       classnames: '>=2.2.5'
       prop-types: '>=15.6.1'

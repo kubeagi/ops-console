@@ -9,3 +9,30 @@
     }
   }
 }
+.Panel {
+  padding: 12px 16px;
+  border: 1px solid #e2e2e2;
+  border-radius: 4px;
+  .icon {
+    margin: 0 16px;
+    font-size: 40px;
+  }
+  .content {
+    flex: 1;
+  }
+  .name {
+    color: @font-color-1;
+  }
+  .description {
+    color: @font-color-2;
+  }
+}
+.PanelChecked {
+  border: 1px solid @primary-color;
+}
+.PanelDisabled {
+  cursor: not-allowed;
+  color: @font-color-3;
+  background: #fafafa;
+  border: 1px solid #e2e2e2;
+}
