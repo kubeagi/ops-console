@@ -25,6 +25,8 @@ export type Reference = {
   qa_line_number: number;
   question: string;
   score: number;
+  title?: string;
+  url?: string;
 };
 type IRenderReferences = {
   chat: ChatMessage;

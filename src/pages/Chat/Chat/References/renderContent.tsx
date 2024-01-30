@@ -44,10 +44,10 @@ interface IRefContent {
 }
 const RefContent: FC<IRefContent> = props => {
   const { reference, index, open, loading, debug, children } = props;
-  const content = reference?.answer ? (
+  const content = reference.content ? (
     <Spin spinning={loading}>
       <div className="popContent">
-        {reference?.answer ? (
+        {reference.content ? (
           <Typography.Title level={4}>引用数据 [{index}]</Typography.Title>
         ) : (
           '-'
@@ -78,15 +78,29 @@ const RefContent: FC<IRefContent> = props => {
             <Divider className="divider" dashed />
           </>
         )}
+        {Boolean(reference.title) && (
+          <>
+            <Typography.Title level={5}>标题</Typography.Title>
+            {reference.url ? (
+              <Typography.Link href={reference.url} target="_blank">
+                {reference.title}
+              </Typography.Link>
+            ) : (
+              <Typography.Text>{reference.title}</Typography.Text>
+            )}
+          </>
+        )}
         <Typography.Title level={5}>原文</Typography.Title>
         <Typography.Paragraph italic>{reference.content}</Typography.Paragraph>
-        <Space>
-          <FileSearchOutlined />
-          <Typography.Text code ellipsis>
-            {reference.file_name}
-          </Typography.Text>{' '}
-          - 页码: {reference.page_number}
-        </Space>
+        {reference.file_name && (
+          <Space>
+            <FileSearchOutlined />
+            <Typography.Text code ellipsis>
+              {reference.file_name}
+            </Typography.Text>{' '}
+            - 页码: {reference.page_number}
+          </Space>
+        )}
       </div>
     </Spin>
   ) : (
