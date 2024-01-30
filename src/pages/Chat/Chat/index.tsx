@@ -381,7 +381,7 @@ const Chat: React.FC<IChat> = props => {
                       Boolean(appData?.showRespInfo) && (
                         <div className="extraMsg">
                           {Boolean(chat.extra?.latency) && (
-                            <Tag color="green">{chat.extra?.latency}s</Tag>
+                            <Tag color="green">{(chat.extra?.latency / 1000).toFixed(2)}s</Tag>
                           )}
                           <Tag color="purple">{chat.extra?.index}条上下文</Tag>
                         </div>
