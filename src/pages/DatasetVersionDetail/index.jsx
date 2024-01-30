@@ -436,6 +436,7 @@ class DatasetVersionDetail$$Page extends React.Component {
   }
 
   openFileDetail(e, { data }) {
+    if (data?.fileType !== 'QA') return;
     this.setState(
       {
         openFile: true,
@@ -1206,7 +1207,7 @@ class DatasetVersionDetail$$Page extends React.Component {
                                   __component_name="Button"
                                   block={false}
                                   danger={false}
-                                  disabled={false}
+                                  disabled={__$$eval(() => record.fileType !== 'QA')}
                                   ghost={false}
                                   onClick={function () {
                                     return this.openFileDetail.apply(
