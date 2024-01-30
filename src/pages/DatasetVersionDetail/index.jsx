@@ -4,18 +4,21 @@ import React from 'react';
 
 import {
   Page,
-  Drawer,
-  Table,
   Modal,
-  Alert,
   FormilyForm,
+  FormilyRadio,
+  FormilySelect,
   Row,
   Col,
+  Typography,
+  FormilyNumberPicker,
+  Drawer,
+  Table,
+  Alert,
   Space,
   Button,
   Card,
   Image,
-  Typography,
   Status,
   Tooltip,
   Divider,
@@ -72,7 +75,10 @@ class DatasetVersionDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      addFileDatasource: undefined,
+      addFileDataSourceList: [],
       addFileLoading: false,
+      addFileLocal: true,
       addFileVisible: false,
       clearFile: false,
       confirm: {},
@@ -119,6 +125,9 @@ class DatasetVersionDetail$$Page extends React.Component {
   }
 
   addFileOk() {
+    if (!this.state.addFileLocal) {
+      return this.addOnline();
+    }
     if (this.state.upload.uploadThis?.state?.fileList?.length) {
       this.setState({
         addFileLoading: true,
@@ -131,6 +140,51 @@ class DatasetVersionDetail$$Page extends React.Component {
     };
     // 点击确定回调
     this.form()?.submit(fetch);
+  }
+
+  addOnline() {
+    const fetch = async values => {
+      const res = this.utils.axios
+        .post(
+          `${this.constants.FILES_API_ORIGIN}/kubeagi-apis/bff/versioneddataset/files/webcrawler`,
+          {
+            datasource: values.datasource,
+            versioneddataset: this.data().data?.name,
+            params: {
+              interval_time: values.interval_time,
+              max_count: 1000,
+              max_depth: parseInt(values.max_depth),
+            },
+          },
+          {
+            headers: {
+              Authorization: this.utils.getAuthorization(),
+              namespace: this.utils.getAuthData?.()?.project,
+            },
+          }
+        )
+        .then(res => {
+          if (res?.data?.object) {
+            this.utils.notification.success({
+              message: '新增在线数据成功',
+            });
+            this.refresh();
+            this.setState({
+              addFileDatasource: undefined,
+              addFileLoading: false,
+              addFileVisible: false,
+              addFileLocal: true,
+            });
+            this.clearFileBuffer();
+          }
+        })
+        .catch(e => {
+          this.utils.notification.warn({
+            message: '新增在线数据失败',
+          });
+        });
+    };
+    this.form().submit(fetch);
   }
 
   clearFileBuffer() {
@@ -230,10 +284,39 @@ class DatasetVersionDetail$$Page extends React.Component {
     return this.$(name || 'add_file')?.formRef?.current?.form;
   }
 
+  getAddFileDatasourceUrl() {
+    const res =
+      this.state.addFileDataSourceList.filter(
+        item => item.value === this.state.addFileDatasource
+      ) || [];
+    return res[0].endpoint?.url;
+  }
+
   getBucketPath() {
     return `dataset/${this.props.useGetDataset.data?.Dataset?.getDataset?.name}/${
       this.data().data?.version
     }`;
+  }
+
+  async getDataSource() {
+    const res = await this.utils.bff.listDatasources({
+      input: {
+        page: 1,
+        pageSize: 10000,
+        namespace: this.utils.getAuthData().project,
+      },
+    });
+    this.setState({
+      addFileDataSourceList: res?.Datasource?.listDatasources?.nodes
+        ?.filter(item => {
+          return item.type === 'web';
+        })
+        .map(item => ({
+          ...item,
+          label: item.name,
+          value: item.name,
+        })),
+    });
   }
 
   async getFile() {
@@ -297,6 +380,18 @@ class DatasetVersionDetail$$Page extends React.Component {
   handleUploadSuccess() {
     this.setState({
       addFileVisible: false,
+    });
+  }
+
+  onAddFileTypeChange(v) {
+    this.setState({
+      addFileLocal: v.target.value === 'local',
+    });
+  }
+
+  onDatasourceChange(v) {
+    this.setState({
+      addFileDatasource: v,
     });
   }
 
@@ -385,13 +480,303 @@ class DatasetVersionDetail$$Page extends React.Component {
     });
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.getDataSource();
+  }
 
   render() {
     const __$$context = this._context || this;
     const { state } = __$$context;
     return (
       <Page>
+        {!!__$$eval(() => !this.state.clearFile) && (
+          <Modal
+            __component_name="Modal"
+            centered={false}
+            confirmLoading={__$$eval(() => this.state.addFileLoading)}
+            destroyOnClose={false}
+            forceRender={false}
+            keyboard={true}
+            mask={true}
+            maskClosable={false}
+            onCancel={function () {
+              return this.handleCancle.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            onOk={function () {
+              return this.addFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            open={__$$eval(() => this.state.addFileVisible)}
+            title="新增文件"
+            width="650px"
+          >
+            <FormilyForm
+              __component_name="FormilyForm"
+              componentProps={{
+                colon: false,
+                labelAlign: 'left',
+                labelCol: 4,
+                layout: 'horizontal',
+                wrapperCol: 20,
+              }}
+              createFormProps={{
+                initialValues: __$$eval(() => ({
+                  source: 'local',
+                  datasource: undefined,
+                })),
+              }}
+              formHelper={{ autoFocus: true }}
+              ref={this._refsManager.linkRef('add_file')}
+            >
+              <FormilyRadio
+                __component_name="FormilyRadio"
+                componentProps={{
+                  'x-component-props': {
+                    _sdkSwrGetFunc: {},
+                    buttonStyle: 'outline',
+                    disabled: false,
+                    onChange: function () {
+                      return this.onAddFileTypeChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                    optionType: 'default',
+                    size: 'middle',
+                  },
+                }}
+                decoratorProps={{ 'x-decorator-props': { labelCol: 5, labelEllipsis: true } }}
+                fieldProps={{
+                  '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                  'enum': [
+                    { label: '本地文件', value: 'local' },
+                    { label: '在线数据', value: 'online' },
+                  ],
+                  'name': 'source',
+                  'title': '文件来源',
+                  'x-validator': [],
+                }}
+              />
+              {!!__$$eval(() => this.state.addFileLocal) && (
+                <LccComponentQlsmm
+                  __component_name="LccComponentQlsmm"
+                  accept=".txt,.doc,.docx,.pdf,.md"
+                  Authorization={__$$eval(() => this.utils.getAuthorization())}
+                  bucket={__$$eval(() => this.utils.getAuthData()?.project)}
+                  calcUploadedFile={function () {
+                    return this.onFileUploaded.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  contentWidth="520px"
+                  getBucketPath={function () {
+                    return this.getBucketPath.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  handleFinished={function () {
+                    return this.handleUploadFinished.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  handleReUpload={function () {
+                    return this.handleReUpload.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  handleSuccess={function () {
+                    return this.handleUploadSuccess.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  multiple={true}
+                  onShowTrustModal={function () {
+                    return this.onShowTrustModal.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  setState={function () {
+                    return this.setUploadState.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                />
+              )}
+              {!!__$$eval(() => !this.state.addFileLocal) && (
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: {},
+                      allowClear: false,
+                      disabled: false,
+                      onChange: function () {
+                        return this.onDatasourceChange.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
+                      placeholder: '请选择数据源',
+                    },
+                  }}
+                  decoratorProps={{
+                    'x-decorator-props': {
+                      labelCol: 5,
+                      labelEllipsis: true,
+                      tooltip: '仅展示“网站”类型数据源',
+                    },
+                  }}
+                  fieldProps={{
+                    '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                    '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                    'default': undefined,
+                    'enum': __$$eval(() => this.state.addFileDataSourceList),
+                    'name': 'datasource',
+                    'required': true,
+                    'title': '数据源',
+                    'x-validator': [],
+                  }}
+                />
+              )}
+              {!!__$$eval(() => this.state.addFileDatasource && !this.state.addFileLocal) && (
+                <Row
+                  __component_name="Row"
+                  style={{ marginBottom: '8px', marginTop: '-18px' }}
+                  wrap={false}
+                >
+                  <Col __component_name="Col" flex="130px">
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      children=""
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    />
+                  </Col>
+                  <Col __component_name="Col" flex="auto">
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => this.getAddFileDatasourceUrl())}
+                    </Typography.Text>
+                  </Col>
+                </Row>
+              )}
+              {!!__$$eval(() => !this.state.addFileLocal) && (
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: {},
+                      allowClear: false,
+                      disabled: false,
+                      placeholder: '请选择页面层级',
+                    },
+                  }}
+                  decoratorProps={{
+                    'x-decorator-props': {
+                      labelCol: 5,
+                      labelEllipsis: true,
+                      tooltip:
+                        '网页中嵌入了其他链接是常见的，如：一级页面提供二级页面的访问链接，二级页面作为详情页提供所需数据。配置获取页面层级，平台将会根据配置进行页面内容获取，最多设置 5 层。',
+                    },
+                  }}
+                  fieldProps={{
+                    'default': '1',
+                    'enum': [
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        label: '1',
+                        type: 'disabled',
+                        value: '1',
+                      },
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        label: '2',
+                        type: 'disabled',
+                        value: '2',
+                      },
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        label: '3',
+                        type: 'disabled',
+                        value: '3',
+                      },
+                      {
+                        children: '未知',
+                        id: 'disabled',
+                        label: '4',
+                        type: 'disabled',
+                        value: '4',
+                      },
+                      {
+                        _unsafe_MixedSetter_value_select: 'NumberSetter',
+                        children: '未知',
+                        id: 'disabled',
+                        label: '5',
+                        type: 'disabled',
+                        value: 5,
+                      },
+                    ],
+                    'name': 'max_depth',
+                    'required': true,
+                    'title': '获取页面层级',
+                    'x-validator': [],
+                  }}
+                />
+              )}
+              {!!__$$eval(() => !this.state.addFileLocal) && (
+                <FormilyNumberPicker
+                  __component_name="FormilyNumberPicker"
+                  componentProps={{
+                    'x-component-props': {
+                      addonAfter: 'ms',
+                      min: 1000,
+                      placeholder: '请输入时间间隔',
+                    },
+                  }}
+                  decoratorProps={{
+                    'x-decorator-props': {
+                      fullness: true,
+                      labelCol: 5,
+                      labelEllipsis: true,
+                      labelWidth: '',
+                      tooltip: '获取每个页面数据的间隔时间，不建议过于频繁地获取页面内容。',
+                      tooltipLayout: 'icon',
+                      wrapperWidth: '',
+                    },
+                  }}
+                  fieldProps={{
+                    '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                    'default': 1000,
+                    'description': '',
+                    'name': 'interval_time',
+                    'required': true,
+                    'title': '间隔时间',
+                    'x-validator': [],
+                  }}
+                />
+              )}
+            </FormilyForm>
+          </Modal>
+        )}
         <Drawer
           __component_name="Drawer"
           destroyOnClose={true}
@@ -486,94 +871,6 @@ class DatasetVersionDetail$$Page extends React.Component {
               showIcon={true}
               type="warning"
             />
-          </Modal>
-        )}
-        {!!__$$eval(() => !this.state.clearFile) && (
-          <Modal
-            __component_name="Modal"
-            centered={false}
-            confirmLoading={__$$eval(() => this.state.addFileLoading)}
-            destroyOnClose={false}
-            forceRender={false}
-            keyboard={true}
-            mask={true}
-            maskClosable={false}
-            onCancel={function () {
-              return this.handleCancle.apply(
-                this,
-                Array.prototype.slice.call(arguments).concat([])
-              );
-            }.bind(this)}
-            onOk={function () {
-              return this.addFileOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
-            }.bind(this)}
-            open={__$$eval(() => this.state.addFileVisible)}
-            title="新增文件"
-            width="650px"
-          >
-            <FormilyForm
-              __component_name="FormilyForm"
-              componentProps={{
-                colon: false,
-                labelAlign: 'left',
-                labelCol: 4,
-                layout: 'horizontal',
-                wrapperCol: 20,
-              }}
-              formHelper={{ autoFocus: true }}
-              ref={this._refsManager.linkRef('add_file')}
-            >
-              <LccComponentQlsmm
-                __component_name="LccComponentQlsmm"
-                accept=".txt,.doc,.docx,.pdf,.md"
-                Authorization={__$$eval(() => this.utils.getAuthorization())}
-                bucket={__$$eval(() => this.utils.getAuthData()?.project)}
-                calcUploadedFile={function () {
-                  return this.onFileUploaded.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                contentWidth="520px"
-                getBucketPath={function () {
-                  return this.getBucketPath.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleFinished={function () {
-                  return this.handleUploadFinished.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleReUpload={function () {
-                  return this.handleReUpload.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                handleSuccess={function () {
-                  return this.handleUploadSuccess.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                multiple={true}
-                onShowTrustModal={function () {
-                  return this.onShowTrustModal.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                setState={function () {
-                  return this.setUploadState.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-              />
-            </FormilyForm>
           </Modal>
         )}
         <LccComponentSbva0
