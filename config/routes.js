@@ -121,6 +121,18 @@ const routes = [
         path: '/chat',
         component: '@/pages/Chat',
       },
+      {
+        path: '/ai-agent-assessment',
+        component: '@/pages/AiAgentAssessmentList',
+      },
+      {
+        path: '/ai-agent-assessment/create',
+        component: '@/pages/CreateAiAgentAssessment',
+      },
+      {
+        path: '/ai-agent-assessment/report',
+        component: '@/pages/AiAgentAssessmentReport',
+      },
     ],
   },
 ];
