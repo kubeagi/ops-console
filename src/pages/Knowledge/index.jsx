@@ -640,6 +640,7 @@ class Knowledge$$Page extends React.Component {
                                           </Space>,
                                           <Tag
                                             __component_name="Tag"
+                                            className="knowledge-card-tag"
                                             closable={false}
                                             color="default"
                                             style={{ marginLeft: '12px' }}

@@ -196,7 +196,8 @@ class KnowledgeCreate$$Page extends React.Component {
         },
       };
       const { Embedder } = await this.utils.bff.listEmbedders(params);
-      const { nodes } = Embedder?.listEmbedders || {};
+      let { nodes } = Embedder?.listEmbedders || {};
+      nodes = nodes.filter(item => item.status === 'True' || item.status === 'Running');
       this.setState({
         embedderList: nodes.map(item => {
           return {
