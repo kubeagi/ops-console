@@ -80,6 +80,7 @@
     "graphql": "^16.6.0",
     "graphql-request": "^5.1.0",
     "graphql-tag": "^2.12.6",
+    "kiwi-intl": "1.2.6-beta.0",
     "kubeagi-knowledge-delete-modal": "workspace:*",
     "kubeagi-knowledge-edit-modal": "workspace:*",
     "lodash": "^4.17.21",

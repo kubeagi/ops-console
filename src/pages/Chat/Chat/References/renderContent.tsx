@@ -20,6 +20,7 @@ import { Button, Divider, Popover, Space, Spin, Tag, Typography } from 'antd';
 import React, { FC, ReactNode } from 'react';
 
 import { Reference } from '@/pages/Chat/Chat/References/index';
+import I18N from '@/utils/kiwiI18N';
 
 import './index.less';
 
@@ -48,14 +49,16 @@ const RefContent: FC<IRefContent> = props => {
     <Spin spinning={loading}>
       <div className="popContent">
         {reference.content ? (
-          <Typography.Title level={4}>引用数据 [{index}]</Typography.Title>
+          <Typography.Title level={4}>
+            {I18N.Chat.yinYongShuJu} [{index}]
+          </Typography.Title>
         ) : (
           '-'
         )}
         <Divider className="divider" />
         {Boolean(debug) && (
           <>
-            <Typography.Title level={5}>知识库</Typography.Title>
+            <Typography.Title level={5}>{I18N.Chat.zhiShiKu}</Typography.Title>
             <Space>
               <FileTextOutlined />
               <Typography.Text code ellipsis strong>
@@ -65,7 +68,8 @@ const RefContent: FC<IRefContent> = props => {
             <Space className="relLine">
               <FieldNumberOutlined />
               <Tag color={getRelColor(reference.score)}>
-                相似度: {(reference.score * 100).toFixed(2)}%
+                {I18N.Chat.xiangSiDu}
+                {(reference.score * 100).toFixed(2)}%
               </Tag>
             </Space>
             <div>
@@ -80,7 +84,7 @@ const RefContent: FC<IRefContent> = props => {
         )}
         {Boolean(reference.title) && (
           <>
-            <Typography.Title level={5}>标题</Typography.Title>
+            <Typography.Title level={5}>{I18N.Chat.biaoTi}</Typography.Title>
             {reference.url ? (
               <Typography.Link href={reference.url} target="_blank">
                 {reference.title}
@@ -90,7 +94,7 @@ const RefContent: FC<IRefContent> = props => {
             )}
           </>
         )}
-        <Typography.Title level={5}>原文</Typography.Title>
+        <Typography.Title level={5}>{I18N.Chat.yuanWen}</Typography.Title>
         <Typography.Paragraph italic>{reference.content}</Typography.Paragraph>
         {reference.file_name && (
           <Space>
@@ -98,7 +102,8 @@ const RefContent: FC<IRefContent> = props => {
             <Typography.Text code ellipsis>
               {reference.file_name}
             </Typography.Text>{' '}
-            - 页码: {reference.page_number}
+            -{I18N.Chat.yeMa}
+            {reference.page_number}
           </Space>
         )}
       </div>

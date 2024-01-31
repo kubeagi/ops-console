@@ -3,6 +3,8 @@ import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Descriptions } from 'antd';
 import React, { useEffect, useState } from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 interface Iprops {
   data: Record<string, any>;
 }
@@ -21,11 +23,12 @@ const Info: React.FC<Iprops> = props => {
         children: data.id,
       },
       {
-        label: '文件类型',
-        children: data.file_type === 'text' ? '普通文本' : 'QA文本',
+        label: I18N.DataHandle.wenJianLeiXing,
+        children:
+          data.file_type === 'text' ? I18N.DataHandle.puTongWenBen : I18N.DataHandle.qAWenBen,
       },
       {
-        label: '处理前数据集',
+        label: I18N.DataHandle.chuLiQianShuJu,
         children: (
           <>
             <a onClick={() => Link('/dataset/detail/' + data.pre_dataset_name)}>
@@ -50,7 +53,7 @@ const Info: React.FC<Iprops> = props => {
         ),
       },
       {
-        label: '处理后数据集',
+        label: I18N.DataHandle.chuLiHouShuJu,
         children: (
           <>
             <a onClick={() => Link('/dataset/detail/' + data.post_dataset_name)}>
@@ -75,11 +78,11 @@ const Info: React.FC<Iprops> = props => {
         ),
       },
       {
-        label: '创建人',
+        label: I18N.DataHandle.chuangJianRen,
         children: data.creator,
       },
       {
-        label: '创建时间',
+        label: I18N.DataHandle.chuangJianShiJian,
         children: (
           <Typography.Time
             __component_name="Typography.Time"

@@ -7,6 +7,7 @@ import { Avatar, Divider, List, Spin, Tabs, Tooltip, notification } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
 import detail from '@/assets/img/data-handle-detail.png';
+import I18N from '@/utils/kiwiI18N';
 
 import Status from '../../components/Status';
 import utils from '../../utils/__utils';
@@ -17,15 +18,15 @@ import Info from './info';
 const DataHandleDetail = props => {
   const statuesMap = {
     processing: {
-      text: '处理中',
+      text: I18N.DataHandle.chuLiZhong,
       status: 'info',
     },
     process_complete: {
-      text: '处理完成',
+      text: I18N.DataHandle.chuLiWanCheng,
       status: 'success',
     },
     process_fail: {
-      text: '处理失败',
+      text: I18N.DataHandle.chuLiShiBai,
       status: 'error',
     },
   };
@@ -66,8 +67,8 @@ const DataHandleDetail = props => {
       .catch(error => {
         setLoading(false);
         notification.warning({
-          message: '失败',
-          description: error[0]?.message || '获取详细信息失败',
+          message: I18N.DataHandle.shiBai,
+          description: error[0]?.message || I18N.DataHandle.huoQuXiangXiXin,
         });
       });
   };
@@ -79,12 +80,12 @@ const DataHandleDetail = props => {
   const items: TabsProps['items'] = [
     {
       key: 'info',
-      label: '详细信息',
+      label: I18N.DataHandle.xiangXiXinXi,
       children: <Info data={detailData} />,
     },
     {
       key: 'data-handle',
-      label: '数据处理',
+      label: I18N.DataHandle.shuJuChuLi,
       children: <DataHandle data={detailData} getData={getData} />,
     },
   ];
@@ -100,7 +101,7 @@ const DataHandleDetail = props => {
     utils.bff
       .getLogInfo(params)
       .then(res => {
-        setLogData(res?.dataProcess?.getLogInfo?.data || '暂无数据');
+        setLogData(res?.dataProcess?.getLogInfo?.data || I18N.DataHandle.zanWuShuJu);
       })
       .catch(error => {
         console.warn(error);
@@ -128,7 +129,7 @@ const DataHandleDetail = props => {
             ellipsis={true}
             level={2}
           >
-            数据处理详情
+            {I18N.DataHandle.shuJuChuLiXiang}
           </Typography.Title>
         </Col>
       </Row>
@@ -142,10 +143,10 @@ const DataHandleDetail = props => {
               <List.Item
                 actions={[
                   <Button key={index} onClick={onShowLog} size="small">
-                    查看日志
+                    {I18N.DataHandle.chaKanRiZhi}
                   </Button>,
                   <Button key={index} onClick={onDel} size="small">
-                    删除
+                    {I18N.DataHandle.shanChu}
                   </Button>,
                 ]}
               >
@@ -174,12 +175,12 @@ const DataHandleDetail = props => {
                         type="vertical"
                       />
                       <span>
-                        更新时间：
+                        {I18N.DataHandle.gengXinShiJian}
                         {item.end_time ? formatTime(item.end_time) : formatTime(item.start_time)}
                       </span>
                     </>
                   }
-                  title={<h4>{item.name || '这是一个名'}</h4>}
+                  title={<h4>{item.name || I18N.DataHandle.zheShiYiGeMing}</h4>}
                 />
               </List.Item>
             )}
@@ -200,20 +201,20 @@ const DataHandleDetail = props => {
               });
               setDelevisible(false);
               notification.success({
-                message: '删除任务成功',
+                message: I18N.DataHandle.shanChuRenWuCheng,
               });
               history.go(-1);
             } catch (error) {
               notification.warnings({
-                message: '删除任务失败',
+                message: I18N.DataHandle.shanChuRenWuShi,
                 errors: error?.response?.errors,
               });
             }
           }}
           open={deleteVisible}
-          title={`删除`}
+          title={I18N.DataHandle.shanChu}
         >
-          <Alert message="确认删除任务？" showIcon={true} type="warning" />
+          <Alert message={I18N.DataHandle.queRenShanChuRen} showIcon={true} type="warning" />
         </Modal>
         {logVisible && (
           <Modal
@@ -223,7 +224,7 @@ const DataHandleDetail = props => {
               setLogvisible(false);
             }}
             open={logVisible}
-            title="日志"
+            title={I18N.DataHandle.riZhi}
           >
             <div>
               <Logs
