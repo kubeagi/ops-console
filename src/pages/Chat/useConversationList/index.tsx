@@ -114,7 +114,7 @@ const useConversationList: IUseConversationList = newConversationId => {
     },
     [conversationId, addConversation]
   );
-  const [currentMenu, setCurrentMenu] = useState<IConversation | undefined>();
+  const [currentMenu, setCurrentMenu] = useState<IConversation | null>();
   const dom = (
     <div className="conversationList">
       <Space className="space" direction="vertical">
@@ -145,8 +145,9 @@ const useConversationList: IUseConversationList = newConversationId => {
                 key: cv.id,
                 label: (
                   <span
+                    className="cvItem"
                     onMouseEnter={setCurrentMenu.bind('', cv)}
-                    onMouseLeave={() => !sureDel && setCurrentMenu()}
+                    onMouseLeave={() => !sureDel && setCurrentMenu(null)}
                   >
                     <span className="cvTitle">
                       <Typography.Text ellipsis>{cv.messages?.[0]?.query}</Typography.Text>
