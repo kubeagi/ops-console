@@ -1,13 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons';
 import FormHelper from '@tenx-ui/form-helper';
 import { Modal, notification } from '@tenx-ui/materials';
-import { Form, Input, Upload } from 'antd';
+import { Form, Input, Select, Upload } from 'antd';
 import React, { useEffect, useReducer, useState } from 'react';
 
 import utils from '../../../../utils/__utils';
 import styles from './index.less';
 
 export interface RowData {
+  category: any;
+  annotations: any;
   icon: string;
   name: string;
   displayName: string;
@@ -38,6 +40,7 @@ const Edit: React.FC<EditProps> = props => {
   };
   useEffect(() => {
     if (open && data && type === 'edit') {
+      data.category = data?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category'];
       form.setFieldsValue(data);
       setImageUrl(data?.icon);
     }
@@ -151,6 +154,33 @@ const Edit: React.FC<EditProps> = props => {
                 </div>
               )}
             </Upload>
+          </Form.Item>
+          <Form.Item
+            label="智能体分类"
+            name="category"
+            rules={[
+              {
+                validator: (_, value, callback) => {
+                  return callback();
+                },
+              },
+            ]}
+          >
+            <Select placeholder="请选择智能体分类">
+              {[
+                '游戏动漫',
+                '通用对话',
+                '工作学习',
+                '内容创作',
+                'AI绘画',
+                '影音生成',
+                '角色扮演',
+                '生活趣味',
+                '其他',
+              ].map(item => (
+                <Select.Option key={item}>{item}</Select.Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item
             label="描述"

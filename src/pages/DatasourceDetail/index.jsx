@@ -78,15 +78,15 @@ class DatasourceDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      uploadFileVisible: false,
-      editVisible: false,
-      deleteVisible: false,
-      dataSourceDetail: {},
-      tableData: [],
-      loading: false,
       currentPage: 1,
-      total: 3,
+      dataSourceDetail: {},
+      deleteVisible: false,
+      editVisible: false,
+      loading: false,
+      tableData: [],
       timer: undefined,
+      total: 3,
+      uploadFileVisible: false,
     };
   }
 
@@ -100,19 +100,28 @@ class DatasourceDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  refresh() {
-    this.props.useGetDatasource?.mutate();
+  cancelDelete() {
+    this.setState({
+      deleteVisible: false,
+    });
   }
 
-  getData() {
-    return {
-      ...(this.props.useGetDatasource?.data?.Datasource?.getDatasource || {}),
-      type: 'objectStorage',
-    };
+  cancelEdit() {
+    this.setState({
+      editVisible: false,
+    });
   }
 
-  getName() {
-    return this.utils.getFullName(this.getData());
+  cancelUploadFile() {
+    this.setState({
+      uploadFileVisible: false,
+    });
+  }
+
+  clickDeleteBtn() {
+    this.setState({
+      deleteVisible: true,
+    });
   }
 
   clickEditBtn() {
@@ -122,29 +131,74 @@ class DatasourceDetail$$Page extends React.Component {
     this.initEditForm();
   }
 
-  initEditForm() {
-    const record = this.getData();
-    const form = this.$('edit_form_ref')?.formRef?.current?.form;
-    this.state.timer && clearTimeout(this.state.timer);
-    if (form) {
-      form.setValues({
-        ...(record || {}),
-        bucket: record?.oss?.bucket,
-        object: record?.oss?.object,
-      });
-      return;
-    }
+  clickUploadFileBtn() {
     this.setState({
-      timer: setTimeout(() => {
-        this.initEditForm();
-      }, 200),
+      uploadFileVisible: true,
     });
   }
 
-  cancelEdit() {
+  async deleteDatasource() {
     this.setState({
-      editVisible: false,
+      loading: true,
     });
+    try {
+      await this.utils.bff.deleteDatasources({
+        input: {
+          name: this.getData()?.name,
+          namespace: this.utils.getAuthData()?.project,
+        },
+      });
+      this.setState({
+        deleteVisible: true,
+      });
+      this.utils.notification.success({
+        message: this.i18n('i18n-vf1xe64m'),
+      });
+      setTimeout(() => {
+        this.history?.go(-1);
+        this.setState({
+          loading: false,
+        });
+      }, 200);
+    } catch (error) {
+      this.setState({
+        loading: false,
+      });
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-yc0jhxgr'),
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
+  deleteFile(event, record) {
+    console.log(record);
+    const newData = this.state.tableData.filter(item => item.id !== record.id);
+    console.log(newData);
+    this.setState(state => {
+      return {
+        tableData: newData,
+        total: state.total - 1,
+      };
+    });
+  }
+
+  downloadFile(event, record) {
+    console.log(record);
+    try {
+      let file = `file content`;
+      const blob = new Blob([file], {
+        type: 'text/html;charset=utf-8',
+      }); // 创建 Blob 对象
+      const url = URL.createObjectURL(blob); // 创建 URL
+      const a = document.createElement('a');
+      a.href = url; // 设置链接地址
+      a.download = record.fileName; // 设置文件名
+      a.click(); // 模拟点击链接进行下载
+      URL.revokeObjectURL(url); // 释放 URL
+    } catch (error) {
+      // console.log(error)
+    }
   }
 
   editDatasource() {
@@ -198,50 +252,40 @@ class DatasourceDetail$$Page extends React.Component {
     });
   }
 
-  clickDeleteBtn() {
-    this.setState({
-      deleteVisible: true,
-    });
+  getData() {
+    const data = this.props.useGetDatasource?.data?.Datasource?.getDatasource || {};
+    return {
+      ...data,
+      type:
+        {
+          web: 'onLine',
+          oss: 'objectStorage',
+          unknown: 'onLine',
+        }[data?.type] || 'web',
+    };
   }
 
-  cancelDelete() {
-    this.setState({
-      deleteVisible: false,
-    });
+  getName() {
+    return this.utils.getFullName(this.getData());
   }
 
-  async deleteDatasource() {
-    this.setState({
-      loading: true,
-    });
-    try {
-      await this.utils.bff.deleteDatasources({
-        input: {
-          name: this.getData()?.name,
-          namespace: this.utils.getAuthData()?.project,
-        },
+  initEditForm() {
+    const record = this.getData();
+    const form = this.$('edit_form_ref')?.formRef?.current?.form;
+    this.state.timer && clearTimeout(this.state.timer);
+    if (form) {
+      form.setValues({
+        ...(record || {}),
+        bucket: record?.oss?.bucket,
+        object: record?.oss?.object,
       });
-      this.setState({
-        deleteVisible: true,
-      });
-      this.utils.notification.success({
-        message: this.i18n('i18n-vf1xe64m'),
-      });
-      setTimeout(() => {
-        this.history?.go(-1);
-        this.setState({
-          loading: false,
-        });
-      }, 200);
-    } catch (error) {
-      this.setState({
-        loading: false,
-      });
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-yc0jhxgr'),
-        errors: error?.response?.errors,
-      });
+      return;
     }
+    this.setState({
+      timer: setTimeout(() => {
+        this.initEditForm();
+      }, 200),
+    });
   }
 
   loadData() {
@@ -296,6 +340,33 @@ class DatasourceDetail$$Page extends React.Component {
     );
   }
 
+  refresh() {
+    this.props.useGetDatasource?.mutate();
+  }
+
+  search(event) {
+    console.log(event.target.value);
+    const newData = this.state.tableData.filter(
+      item => item.fileName.indexOf(event.target.value) > -1
+    );
+    this.setState({
+      tableData: newData,
+    });
+  }
+
+  selectFileChange(event) {
+    console.log(event);
+    const maxFileSize = 2 * 1024 * 1024 * 1024;
+    if (event.file.size > maxFileSize) {
+      event.fileList = event.fileList.filter(item => {
+        return item.uid !== event.file.uid;
+      });
+      this.utils.notification.warnings({
+        message: '文件：' + event.file.name + '内容过大',
+      });
+    }
+  }
+
   sizeTostr(size) {
     var data = '';
     if (size < 0.1 * 1024) {
@@ -321,78 +392,13 @@ class DatasourceDetail$$Page extends React.Component {
     return sizestr;
   }
 
-  search(event) {
-    console.log(event.target.value);
-    const newData = this.state.tableData.filter(
-      item => item.fileName.indexOf(event.target.value) > -1
-    );
-    this.setState({
-      tableData: newData,
-    });
-  }
-
-  clickUploadFileBtn() {
-    this.setState({
-      uploadFileVisible: true,
-    });
-  }
-
-  cancelUploadFile() {
-    this.setState({
-      uploadFileVisible: false,
-    });
-  }
-
-  uploadFile() {}
-
   tablePageChange(value) {
     this.setState({
       currentPage: value,
     });
   }
 
-  downloadFile(event, record) {
-    console.log(record);
-    try {
-      let file = `file content`;
-      const blob = new Blob([file], {
-        type: 'text/html;charset=utf-8',
-      }); // 创建 Blob 对象
-      const url = URL.createObjectURL(blob); // 创建 URL
-      const a = document.createElement('a');
-      a.href = url; // 设置链接地址
-      a.download = record.fileName; // 设置文件名
-      a.click(); // 模拟点击链接进行下载
-      URL.revokeObjectURL(url); // 释放 URL
-    } catch (error) {
-      // console.log(error)
-    }
-  }
-
-  deleteFile(event, record) {
-    console.log(record);
-    const newData = this.state.tableData.filter(item => item.id !== record.id);
-    console.log(newData);
-    this.setState(state => {
-      return {
-        tableData: newData,
-        total: state.total - 1,
-      };
-    });
-  }
-
-  selectFileChange(event) {
-    console.log(event);
-    const maxFileSize = 2 * 1024 * 1024 * 1024;
-    if (event.file.size > maxFileSize) {
-      event.fileList = event.fileList.filter(item => {
-        return item.uid !== event.file.uid;
-      });
-      this.utils.notification.warnings({
-        message: '文件：' + event.file.name + '内容过大',
-      });
-    }
-  }
+  uploadFile() {}
 
   componentDidMount() {}
 
@@ -401,32 +407,36 @@ class DatasourceDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page style={{ backgroundColor: '#f0f0f0' }}>
-        <Row wrap={true} __component_name="Row">
-          <Col span={24} __component_name="Col">
-            <Space align="center" direction="horizontal" __component_name="Space">
+        <Row __component_name="Row" wrap={true}>
+          <Col __component_name="Col" span={24}>
+            <Space __component_name="Space" align="center" direction="horizontal">
               <Button.Back
-                type="primary"
+                __component_name="Button.Back"
                 style={{}}
                 title="数据源详情"
-                __component_name="Button.Back"
+                type="primary"
               />
             </Space>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="default"
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              type="default"
             >
-              <Row wrap={false} __component_name="Row">
-                <Col flex="auto" __component_name="Col">
-                  <Row wrap={false} __component_name="Row">
-                    <Col flex="84px" __component_name="Col">
+              <Row __component_name="Row" wrap={false}>
+                <Col __component_name="Col" flex="auto">
+                  <Row __component_name="Row" wrap={false}>
+                    <Col __component_name="Col" flex="84px">
                       <Image
+                        __component_name="Image"
+                        fallback=""
+                        height={64}
+                        preview={false}
                         src={__$$eval(
                           () =>
                             this.utils
@@ -435,124 +445,120 @@ class DatasourceDetail$$Page extends React.Component {
                         )}
                         style={{ marginRight: '20px' }}
                         width={64}
-                        height={64}
-                        preview={false}
-                        fallback=""
-                        __component_name="Image"
                       />
                     </Col>
-                    <Col flex="auto" __component_name="Col">
-                      <Row wrap={true} gutter={['', 16]} __component_name="Row">
-                        <Col span={24} __component_name="Col">
+                    <Col __component_name="Col" flex="auto">
+                      <Row __component_name="Row" gutter={['', 16]} wrap={true}>
+                        <Col __component_name="Col" span={24}>
                           <Typography.Title
+                            __component_name="Typography.Title"
                             bold={true}
-                            level={1}
                             bordered={false}
                             ellipsis={true}
-                            __component_name="Typography.Title"
+                            level={1}
                           >
                             {__$$eval(() => this.getName())}
                           </Typography.Title>
                         </Col>
-                        <Col span={24} __component_name="Col">
-                          <Space align="center" direction="horizontal" __component_name="Space">
+                        <Col __component_name="Col" span={24}>
+                          <Space __component_name="Space" align="center" direction="horizontal">
                             <Status
+                              __component_name="Status"
                               id={__$$eval(() => this.getData().status)}
                               types={__$$eval(() => this.utils.getDataSourceStatus(this, true))}
-                              __component_name="Status"
                             />
                             <Divider
-                              mode="default"
-                              type="vertical"
+                              __component_name="Divider"
                               dashed={false}
                               defaultOpen={false}
-                              __component_name="Divider"
+                              mode="default"
+                              type="vertical"
                             />
                           </Space>
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             ID:
                           </Typography.Text>
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             {__$$eval(() => this.getData()?.id || '-')}
                           </Typography.Text>
                           <Divider
-                            mode="default"
-                            type="vertical"
+                            __component_name="Divider"
                             dashed={false}
                             defaultOpen={false}
-                            __component_name="Divider"
+                            mode="default"
+                            type="vertical"
                           />
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             更新时间：
                           </Typography.Text>
                           <Typography.Time
-                            time={__$$eval(() => this.getData()?.updateTimestamp)}
+                            __component_name="Typography.Time"
                             format=""
                             relativeTime={false}
-                            __component_name="Typography.Time"
+                            time={__$$eval(() => this.getData()?.updateTimestamp)}
                           />
                           <Divider
-                            mode="default"
-                            type="vertical"
+                            __component_name="Divider"
                             dashed={false}
                             defaultOpen={false}
-                            __component_name="Divider"
+                            mode="default"
+                            type="vertical"
                           />
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             创建时间：
                           </Typography.Text>
                           <Typography.Time
-                            time={__$$eval(() => this.getData()?.creationTimestamp)}
+                            __component_name="Typography.Time"
                             format=""
                             relativeTime={false}
-                            __component_name="Typography.Time"
+                            time={__$$eval(() => this.getData()?.creationTimestamp)}
                           />
                           <Divider
-                            mode="default"
-                            type="vertical"
+                            __component_name="Divider"
                             dashed={false}
                             defaultOpen={false}
-                            __component_name="Divider"
+                            mode="default"
+                            type="vertical"
                           />
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             创建者：
                           </Typography.Text>
                           <Typography.Text
-                            style={{ fontSize: '' }}
-                            strong={false}
+                            __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
-                            __component_name="Typography.Text"
+                            strong={false}
+                            style={{ fontSize: '' }}
                           >
                             {__$$eval(() => this.getData()?.creator || '-')}
                           </Typography.Text>
@@ -561,37 +567,37 @@ class DatasourceDetail$$Page extends React.Component {
                     </Col>
                   </Row>
                 </Col>
-                <Col flex="135px" style={{ display: 'flex' }} __component_name="Col">
-                  <Space align="center" direction="horizontal" __component_name="Space">
+                <Col __component_name="Col" flex="135px" style={{ display: 'flex' }}>
+                  <Space __component_name="Space" align="center" direction="horizontal">
                     <Button
+                      __component_name="Button"
                       block={false}
-                      ghost={false}
-                      shape="default"
                       danger={false}
+                      disabled={false}
+                      ghost={false}
                       onClick={function () {
                         return this.clickEditBtn.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      disabled={false}
-                      __component_name="Button"
+                      shape="default"
                     >
                       编辑
                     </Button>
                     <Button
+                      __component_name="Button"
                       block={false}
-                      ghost={false}
-                      shape="default"
                       danger={false}
+                      disabled={false}
+                      ghost={false}
                       onClick={function () {
                         return this.clickDeleteBtn.apply(
                           this,
                           Array.prototype.slice.call(arguments).concat([])
                         );
                       }.bind(this)}
-                      disabled={false}
-                      __component_name="Button"
+                      shape="default"
                     >
                       删除
                     </Button>
@@ -600,208 +606,299 @@ class DatasourceDetail$$Page extends React.Component {
               </Row>
             </Card>
           </Col>
-          <Col span={24} __component_name="Col">
+          <Col __component_name="Col" span={24}>
             <Card
-              size="default"
-              type="default"
-              style={{}}
+              __component_name="Card"
               actions={[]}
-              loading={false}
               bordered={false}
               hoverable={false}
-              __component_name="Card"
+              loading={false}
+              size="default"
+              style={{}}
+              type="default"
             >
               <Tabs
-                size="large"
-                type="line"
+                __component_name="Tabs"
+                activeKey=""
+                destroyInactiveTabPane="true"
                 items={[
                   {
+                    children: [
+                      !!__$$eval(() => this.getData().type !== 'onLine') && (
+                        <Descriptions
+                          __component_name="Descriptions"
+                          bordered={false}
+                          borderedBottom={false}
+                          borderedBottomDashed={false}
+                          colon={false}
+                          column={2}
+                          id=""
+                          items={[
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      this.utils
+                                        .getDataSourceTypes(this)
+                                        ?.find(item => item.value === this.getData().type)
+                                        ?.children || '-'
+                                  )}
+                                </Typography.Text>
+                              ),
+                              key: 'znsxqm9jvg',
+                              label: '数据来源',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.endpoint?.url || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'ylkewexl94s',
+                              label: '服务地址',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.oss?.bucket || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'znsxqm9jvg',
+                              label: 'Bucket',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.description || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'bmtu55oldgu',
+                              label: '描述',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.oss?.object || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'dytrj9jc2ps',
+                              label: 'Object',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() =>
+                                    this.getData()?.endpoint?.insecure ? 'HTTP' : 'HTTPS'
+                                  )}
+                                </Typography.Text>
+                              ),
+                              key: '5bdfutwg6vd',
+                              label: '协议类型',
+                              span: 1,
+                            },
+                          ]}
+                          labelStyle={{ width: 100 }}
+                          layout="horizontal"
+                          size="default"
+                          title=""
+                          key="node_ocloo1oktwh"
+                        >
+                          <Descriptions.Item key="7u6hhq5r76c" label="ID" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="7yk3a5jlohw" label="数据来源" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="06xockdofixg" label="文件数" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="itgwws5yosa" label="创建时间" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="g5rygvbd6v" label="创建者" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="bmtu55oldgu" label="描述" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                        </Descriptions>
+                      ),
+                      !!__$$eval(() => this.getData().type === 'onLine') && (
+                        <Descriptions
+                          __component_name="Descriptions"
+                          bordered={false}
+                          borderedBottom={false}
+                          borderedBottomDashed={false}
+                          colon={false}
+                          column={2}
+                          id=""
+                          items={[
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      this.utils
+                                        .getDataSourceTypes(this)
+                                        ?.find(item => item.value === this.getData().type)
+                                        ?.children || '-'
+                                  )}
+                                </Typography.Text>
+                              ),
+                              key: 'znsxqm9jvg',
+                              label: '数据来源',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.endpoint?.url || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'ylkewexl94s',
+                              label: 'URL',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.description || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'bmtu55oldgu',
+                              label: '描述',
+                              span: 1,
+                            },
+                          ]}
+                          labelStyle={{ width: 100 }}
+                          layout="horizontal"
+                          size="default"
+                          title=""
+                          key="node_ocls15ywt53"
+                        >
+                          <Descriptions.Item key="7u6hhq5r76c" label="ID" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="7yk3a5jlohw" label="数据来源" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="06xockdofixg" label="文件数" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="itgwws5yosa" label="创建时间" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="g5rygvbd6v" label="创建者" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="bmtu55oldgu" label="描述" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                        </Descriptions>
+                      ),
+                    ],
+                    disabled: false,
                     key: 'base-info',
                     label: '基本信息',
-                    children: (
-                      <Descriptions
-                        id=""
-                        size="default"
-                        colon={false}
-                        items={[
-                          {
-                            key: 'znsxqm9jvg',
-                            span: 1,
-                            label: '数据来源',
-                            children: (
-                              <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                {__$$eval(
-                                  () =>
-                                    this.utils
-                                      .getDataSourceTypes(this)
-                                      ?.find(item => item.value === this.getData().type)
-                                      ?.children || '-'
-                                )}
-                              </Typography.Text>
-                            ),
-                          },
-                          {
-                            key: 'ylkewexl94s',
-                            span: 1,
-                            label: '服务地址',
-                            children: (
-                              <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                {__$$eval(() => this.getData()?.endpoint?.url || '-')}
-                              </Typography.Text>
-                            ),
-                          },
-                          {
-                            key: 'znsxqm9jvg',
-                            span: 1,
-                            label: 'Bucket',
-                            children: (
-                              <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                {__$$eval(() => this.getData()?.oss?.bucket || '-')}
-                              </Typography.Text>
-                            ),
-                          },
-                          {
-                            key: 'bmtu55oldgu',
-                            span: 1,
-                            label: '描述',
-                            children: (
-                              <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                {__$$eval(() => this.getData()?.description || '-')}
-                              </Typography.Text>
-                            ),
-                          },
-                          {
-                            key: 'dytrj9jc2ps',
-                            span: 1,
-                            label: 'Object',
-                            children: (
-                              <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                {__$$eval(() => this.getData()?.oss?.object || '-')}
-                              </Typography.Text>
-                            ),
-                          },
-                          {
-                            key: '5bdfutwg6vd',
-                            span: 1,
-                            label: '协议类型',
-                            children: (
-                              <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
-                                disabled={false}
-                                ellipsis={true}
-                                __component_name="Typography.Text"
-                              >
-                                {__$$eval(() =>
-                                  this.getData()?.endpoint?.insecure ? 'HTTP' : 'HTTPS'
-                                )}
-                              </Typography.Text>
-                            ),
-                          },
-                        ]}
-                        title=""
-                        column={2}
-                        layout="horizontal"
-                        bordered={false}
-                        labelStyle={{ width: 100 }}
-                        borderedBottom={false}
-                        __component_name="Descriptions"
-                        borderedBottomDashed={false}
-                      >
-                        <Descriptions.Item key="7u6hhq5r76c" span={1} label="ID">
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="7yk3a5jlohw" span={1} label="数据来源">
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="06xockdofixg" span={1} label="文件数">
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="itgwws5yosa" span={1} label="创建时间">
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="g5rygvbd6v" span={1} label="创建者">
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="bmtu55oldgu" span={1} label="描述">
-                          {null}
-                        </Descriptions.Item>
-                      </Descriptions>
-                    ),
-                    disabled: false,
                   },
                   {
-                    key: 'import-data',
-                    label: '数据',
-                    hidden: true,
                     children: (
                       <Container __component_name="Container">
-                        <Row wrap={false} justify="space-between" __component_name="Row">
+                        <Row __component_name="Row" justify="space-between" wrap={false}>
                           <Col
+                            __component_name="Col"
                             span={12}
                             style={{ display: 'flex', justifyContent: 'flex-start' }}
-                            __component_name="Col"
                           >
                             <Button
+                              __component_name="Button"
+                              block={false}
+                              danger={false}
+                              disabled={false}
+                              ghost={false}
                               icon={
                                 <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
                               }
-                              type="primary"
-                              block={false}
-                              ghost={false}
-                              shape="default"
-                              danger={false}
                               onClick={function () {
                                 return this.clickUploadFileBtn.apply(
                                   this,
                                   Array.prototype.slice.call(arguments).concat([])
                                 );
                               }.bind(this)}
-                              disabled={false}
-                              __component_name="Button"
+                              shape="default"
+                              type="primary"
                             >
                               上传文件
                             </Button>
                             <Button
+                              __component_name="Button"
+                              block={false}
+                              danger={false}
+                              disabled={false}
+                              ghost={false}
                               icon={
                                 <AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />
                               }
-                              type="default"
-                              block={false}
-                              ghost={false}
-                              shape="default"
-                              style={{ marginLeft: '12px', marginRight: '12px' }}
-                              danger={false}
                               loading={false}
                               onClick={function () {
                                 return this.refresh.apply(
@@ -809,13 +906,14 @@ class DatasourceDetail$$Page extends React.Component {
                                   Array.prototype.slice.call(arguments).concat([])
                                 );
                               }.bind(this)}
-                              disabled={false}
-                              __component_name="Button"
+                              shape="default"
+                              style={{ marginLeft: '12px', marginRight: '12px' }}
+                              type="default"
                             >
                               刷新
                             </Button>
                             <Input.Search
-                              style={{ width: '220px' }}
+                              __component_name="Input.Search"
                               loading={false}
                               onChange={function () {
                                 return this.search.apply(
@@ -824,180 +922,173 @@ class DatasourceDetail$$Page extends React.Component {
                                 );
                               }.bind(this)}
                               placeholder="请输入文件名称搜索"
-                              __component_name="Input.Search"
+                              style={{ width: '220px' }}
                             />
                             <Container
+                              __component_name="Container"
                               style={{
-                                display: 'flex',
                                 alignItems: 'center',
+                                display: 'flex',
+                                justifyContent: 'center',
                                 marginLeft: '12px',
                                 marginRight: '12px',
-                                justifyContent: 'center',
                               }}
-                              __component_name="Container"
                             >
                               <Typography.Text
-                                style={{ fontSize: '', lineHeight: '60px' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '', lineHeight: '60px' }}
                               >
                                 共有文件：113个
                               </Typography.Text>
                             </Container>
                             <Container
-                              style={{ display: 'flex', alignItems: 'center' }}
                               __component_name="Container"
+                              style={{ alignItems: 'center', display: 'flex' }}
                             >
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 大小：2G
                               </Typography.Text>
                             </Container>
                           </Col>
                           <Col
-                            style={{ lineHeight: '32px', marginRight: '120px' }}
                             __component_name="Col"
+                            style={{ lineHeight: '32px', marginRight: '120px' }}
                           >
                             <Typography.Text
-                              style={{ fontSize: '' }}
-                              strong={false}
+                              __component_name="Typography.Text"
                               disabled={false}
                               ellipsis={true}
-                              __component_name="Typography.Text"
+                              strong={false}
+                              style={{ fontSize: '' }}
                             >
                               共计
                             </Typography.Text>
                             <Typography.Text
-                              style={{ padding: '0 5px', fontSize: '' }}
-                              strong={false}
+                              __component_name="Typography.Text"
                               disabled={false}
                               ellipsis={true}
-                              __component_name="Typography.Text"
+                              strong={false}
+                              style={{ fontSize: '', padding: '0 5px' }}
                             >
                               {__$$eval(() => this.state.total)}
                             </Typography.Text>
                             <Typography.Text
-                              style={{ fontSize: '' }}
-                              strong={false}
+                              __component_name="Typography.Text"
                               disabled={false}
                               ellipsis={true}
-                              __component_name="Typography.Text"
+                              strong={false}
+                              style={{ fontSize: '' }}
                             >
                               条
                             </Typography.Text>
                           </Col>
                         </Row>
                         <Table
-                          size="default"
-                          style={{}}
-                          rowKey="id"
-                          scroll={{ scrollToFirstRowOnChange: true }}
+                          __component_name="Table"
+                          bordered={false}
                           columns={[
                             {
+                              dataIndex: 'fileName',
+                              ellipsis: { showTitle: true },
                               key: 'name',
                               title: '文件名称',
-                              ellipsis: { showTitle: true },
-                              dataIndex: 'fileName',
                             },
                             {
+                              dataIndex: 'status',
                               key: 'agestatus',
-                              title: '导入状态',
                               render: (text, record, index) =>
                                 (__$$context => (
                                   <Typography.Text
-                                    style={{ fontSize: '' }}
-                                    strong={false}
+                                    __component_name="Typography.Text"
                                     disabled={false}
                                     ellipsis={true}
-                                    __component_name="Typography.Text"
+                                    strong={false}
+                                    style={{ fontSize: '' }}
                                   >
                                     {__$$eval(() => __$$context.getStatusText(text))}
                                   </Typography.Text>
                                 ))(__$$createChildContext(__$$context, { text, record, index })),
-                              dataIndex: 'status',
+                              title: '导入状态',
                             },
                             {
-                              title: '文件大小',
+                              dataIndex: 'fileSize',
                               render: (text, record, index) =>
                                 (__$$context => (
                                   <Typography.Text
-                                    style={{ fontSize: '' }}
-                                    strong={false}
+                                    __component_name="Typography.Text"
                                     disabled={false}
                                     ellipsis={true}
-                                    __component_name="Typography.Text"
+                                    strong={false}
+                                    style={{ fontSize: '' }}
                                   >
                                     {__$$eval(() => __$$context.sizeTostr(text))}
                                   </Typography.Text>
                                 ))(__$$createChildContext(__$$context, { text, record, index })),
-                              dataIndex: 'fileSize',
+                              title: '文件大小',
                             },
-                            { title: '导入时间', sorter: true, dataIndex: 'importTime' },
+                            { dataIndex: 'importTime', sorter: true, title: '导入时间' },
                             {
-                              title: '操作',
-                              width: 140,
+                              dataIndex: 'opertion',
                               render: (text, record, index) =>
                                 (__$$context => (
                                   <Space
+                                    __component_name="Space"
                                     align="center"
                                     direction="horizontal"
-                                    __component_name="Space"
                                   >
                                     <Button
-                                      type="default"
+                                      __component_name="Button"
                                       block={false}
-                                      ghost={false}
-                                      shape="default"
                                       danger={false}
+                                      disabled={false}
+                                      ghost={false}
                                       onClick={function () {
                                         return this.downloadFile.apply(
                                           this,
                                           Array.prototype.slice.call(arguments).concat([record])
                                         );
                                       }.bind(__$$context)}
-                                      disabled={false}
-                                      __component_name="Button"
+                                      shape="default"
+                                      type="default"
                                     >
                                       下载
                                     </Button>
                                     <Button
-                                      type="default"
+                                      __component_name="Button"
                                       block={false}
-                                      ghost={false}
-                                      shape="default"
                                       danger={false}
+                                      disabled={false}
+                                      ghost={false}
                                       onClick={function () {
                                         return this.deleteFile.apply(
                                           this,
                                           Array.prototype.slice.call(arguments).concat([record])
                                         );
                                       }.bind(__$$context)}
-                                      disabled={false}
-                                      __component_name="Button"
+                                      shape="default"
+                                      type="default"
                                     >
                                       删除
                                     </Button>
                                   </Space>
                                 ))(__$$createChildContext(__$$context, { text, record, index })),
-                              dataIndex: 'opertion',
+                              title: '操作',
+                              width: 140,
                             },
                           ]}
-                          loading={__$$eval(() => this.state.loading)}
-                          bordered={false}
-                          showCard={false}
                           dataSource={__$$eval(() => this.state.tableData)}
                           expandable={{ expandedRowRender: '' }}
+                          loading={__$$eval(() => this.state.loading)}
                           pagination={{
-                            size: 'small',
-                            total: __$$eval(() => this.state.total),
-                            simple: false,
                             current: __$$eval(() => this.state.currentPage),
                             onChange: function () {
                               return this.tablePageChange.apply(
@@ -1006,149 +1097,150 @@ class DatasourceDetail$$Page extends React.Component {
                               );
                             }.bind(this),
                             pageSize: 2,
-                            position: ['topRight'],
                             pagination: { pageSize: 10 },
+                            position: ['topRight'],
                             showQuickJumper: false,
                             showSizeChanger: false,
+                            simple: false,
+                            size: 'small',
+                            total: __$$eval(() => this.state.total),
                           }}
-                          showHeader={true}
+                          rowKey="id"
                           rowSelection={false}
-                          __component_name="Table"
+                          scroll={{ scrollToFirstRowOnChange: true }}
+                          showCard={false}
+                          showHeader={true}
+                          size="default"
+                          style={{}}
                         />
                       </Container>
                     ),
                     disabled: false,
+                    hidden: true,
+                    key: 'import-data',
+                    label: '数据',
                   },
                   {
-                    key: 'api-data',
-                    label: '数据',
-                    hidden: true,
                     children: [
                       <Input.Search
-                        style={{ width: '240px', marginBottom: '10px' }}
-                        placeholder="请输入关键字搜索"
                         __component_name="Input.Search"
+                        placeholder="请输入关键字搜索"
+                        style={{ marginBottom: '10px', width: '240px' }}
                         key="node_ocloo4llf1t"
                       />,
                       <Tabs
-                        size="large"
-                        type="line"
+                        __component_name="Tabs"
+                        activeKey=""
+                        destroyInactiveTabPane="true"
                         items={[
                           {
-                            key: 'tab-item-1',
-                            label: '标签项1',
                             children: (
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                               >
                                 数据1
                               </Typography.Text>
                             ),
+                            key: 'tab-item-1',
+                            label: '标签项1',
                           },
                           {
-                            key: 'tab-item-2',
-                            label: '标签项2',
                             children: [
                               <Typography.Text
-                                style={{ fontSize: '' }}
-                                strong={false}
+                                __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
-                                __component_name="Typography.Text"
+                                strong={false}
+                                style={{ fontSize: '' }}
                                 key="node_ocloo4llf110"
                               >
                                 数据2
                               </Typography.Text>,
                               <Empty
-                                description="该类文件暂不支持预览"
                                 __component_name="Empty"
+                                description="该类文件暂不支持预览"
                                 key="node_ocloo4llf113"
                               />,
                             ],
+                            key: 'tab-item-2',
+                            label: '标签项2',
                           },
                         ]}
-                        activeKey=""
-                        tabPosition="left"
+                        size="large"
                         tabBarGutter={0}
-                        __component_name="Tabs"
-                        destroyInactiveTabPane="true"
+                        tabPosition="left"
+                        type="line"
                         key="node_ocloo4llf19"
                       />,
                     ],
+                    hidden: true,
+                    key: 'api-data',
+                    label: '数据',
                   },
                 ]}
+                size="large"
                 style={{ marginTop: '-20px' }}
-                activeKey=""
-                tabPosition="top"
                 tabBarGutter={30}
-                __component_name="Tabs"
-                destroyInactiveTabPane="true"
+                tabPosition="top"
+                type="line"
               >
                 <Card
-                  size="default"
-                  type="default"
+                  __component_name="Card"
                   actions={[]}
-                  loading={false}
                   bordered={false}
                   hoverable={false}
-                  __component_name="Card"
+                  loading={false}
+                  size="default"
+                  type="default"
                 />
               </Tabs>
             </Card>
           </Col>
         </Row>
         <Modal
-          mask={true}
-          onOk={function () {
-            return this.uploadFile.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          open={__$$eval(() => this.state.uploadFileVisible)}
-          title="上传数据"
-          okType="primary"
+          __component_name="Modal"
           centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
           keyboard={true}
+          mask={true}
+          maskClosable={false}
+          okType="primary"
           onCancel={function () {
             return this.cancelUploadFile.apply(
               this,
               Array.prototype.slice.call(arguments).concat([])
             );
           }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={false}
-          destroyOnClose={true}
-          __component_name="Modal"
+          onOk={function () {
+            return this.uploadFile.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          open={__$$eval(() => this.state.uploadFileVisible)}
+          title="上传数据"
         >
           <FormilyForm
-            ref={this._refsManager.linkRef('formily_xvs0e43ve49')}
-            formHelper={{ autoFocus: true }}
+            __component_name="FormilyForm"
             componentProps={{
               colon: false,
-              layout: 'horizontal',
-              labelCol: 4,
               labelAlign: 'left',
+              labelCol: 4,
+              layout: 'horizontal',
               wrapperCol: 20,
             }}
-            __component_name="FormilyForm"
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('formily_xvs0e43ve49')}
           >
             <FormilyUpload
-              fieldProps={{
-                enum: [],
-                name: 'Upload',
-                title: '',
-                required: true,
-                'x-display': 'visible',
-                'x-pattern': 'editable',
-                'x-component': 'FormilyUpload',
-                'x-validator': [],
-              }}
+              __component_name="FormilyUpload"
               componentProps={{
                 'x-component-props': {
                   accept: '.txt,.doc,.docx,.pdf,.md',
+                  directory: false,
                   disabled: false,
                   listType: 'text',
                   maxCount: 20,
@@ -1159,181 +1251,189 @@ class DatasourceDetail$$Page extends React.Component {
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this),
-                  directory: false,
-                  showUploadList: true,
                   openFileDialogOnClick: true,
+                  showUploadList: true,
                 },
               }}
               decoratorProps={{
                 'x-decorator-props': {
-                  colon: true,
                   asterisk: true,
                   bordered: false,
+                  colon: true,
                   labelEllipsis: true,
                 },
               }}
-              __component_name="FormilyUpload"
+              fieldProps={{
+                'enum': [],
+                'name': 'Upload',
+                'required': true,
+                'title': '',
+                'x-component': 'FormilyUpload',
+                'x-display': 'visible',
+                'x-pattern': 'editable',
+                'x-validator': [],
+              }}
             >
               <FormilyFormItem
-                style={{ paddingTop: '20px', borderRadius: '4px', paddingBottom: '20px' }}
+                __component_name="FormilyFormItem"
+                decoratorProps={{
+                  'x-decorator-props': {
+                    bordered: false,
+                    feedbackLayout: 'loose',
+                    fullness: false,
+                    inset: false,
+                    labelEllipsis: true,
+                    layout: 'vertical',
+                    wrapperWidth: '',
+                  },
+                }}
                 fieldProps={{
-                  name: 'FormilyFormItem',
-                  title: '',
+                  'name': 'FormilyFormItem',
+                  'title': '',
                   'x-component': 'FormilyFormItem',
                   'x-validator': [],
                 }}
-                decoratorProps={{
-                  'x-decorator-props': {
-                    inset: false,
-                    layout: 'vertical',
-                    bordered: false,
-                    fullness: false,
-                    wrapperWidth: '',
-                    labelEllipsis: true,
-                    feedbackLayout: 'loose',
-                  },
-                }}
-                __component_name="FormilyFormItem"
+                style={{ borderRadius: '4px', paddingBottom: '20px', paddingTop: '20px' }}
               >
                 <Row
-                  wrap={true}
+                  __component_name="Row"
                   align="middle"
                   gutter={['', 24]}
                   justify="center"
-                  __component_name="Row"
+                  wrap={true}
                 >
                   <Col
+                    __component_name="Col"
                     flex=""
                     span={24}
                     style={{ display: 'flex', fontSize: '44px', justifyContent: 'center' }}
-                    __component_name="Col"
                   >
                     <TenxIconUpload __component_name="TenxIconUpload" />
                   </Col>
                   <Col
+                    __component_name="Col"
                     span={24}
                     style={{ display: 'flex', justifyContent: 'center' }}
-                    __component_name="Col"
                   >
                     <Typography.Text
-                      style={{ fontSize: '16px' }}
-                      strong={false}
+                      __component_name="Typography.Text"
                       disabled={false}
                       ellipsis={true}
-                      __component_name="Typography.Text"
+                      strong={false}
+                      style={{ fontSize: '16px' }}
                     >
                       点击上传 / 拖拽文件到此区域
                     </Typography.Text>
                   </Col>
                 </Row>
                 <Row
-                  wrap={true}
+                  __component_name="Row"
                   align="middle"
-                  style={{ fontSize: '12px', marginTop: '20px' }}
                   gutter={['', 10]}
                   justify="center"
-                  __component_name="Row"
+                  style={{ fontSize: '12px', marginTop: '20px' }}
+                  wrap={true}
                 >
                   <Col
+                    __component_name="Col"
                     flex=""
                     span={24}
                     style={{ display: 'flex', justifyContent: 'center' }}
-                    __component_name="Col"
                   >
                     <Typography.Paragraph
                       code={false}
-                      mark={false}
-                      style={{ width: '204px', fontSize: '' }}
                       delete={false}
-                      strong={false}
                       disabled={false}
                       editable={false}
                       ellipsis={false}
+                      mark={false}
+                      strong={false}
+                      style={{ fontSize: '', width: '204px' }}
                       underline={false}
                     >
                       文件限制:
                     </Typography.Paragraph>
                   </Col>
                   <Col
+                    __component_name="Col"
                     flex=""
                     span={24}
                     style={{ display: 'flex', justifyContent: 'center' }}
-                    __component_name="Col"
                   >
                     <Typography.Paragraph
                       code={false}
-                      mark={false}
-                      style={{ width: '204px', fontSize: '' }}
                       delete={false}
-                      strong={false}
                       disabled={false}
                       editable={false}
                       ellipsis={false}
+                      mark={false}
+                      strong={false}
+                      style={{ fontSize: '', width: '204px' }}
                       underline={false}
                     >
                       - 仅支持 .txt,.doc,.docx,.pdf,.md 文件
                     </Typography.Paragraph>
                   </Col>
                   <Col
+                    __component_name="Col"
                     flex=""
                     span={24}
                     style={{ display: 'flex', justifyContent: 'center' }}
-                    __component_name="Col"
                   >
                     <Typography.Paragraph
                       code={false}
-                      mark={false}
-                      style={{ width: '70px', fontSize: '' }}
                       delete={false}
-                      strong={false}
                       disabled={false}
                       editable={false}
                       ellipsis={false}
+                      mark={false}
+                      strong={false}
+                      style={{ fontSize: '', width: '70px' }}
                       underline={false}
                     >
                       - 单文件大小
                     </Typography.Paragraph>
                     <Typography.Paragraph
                       code={false}
-                      mark={false}
-                      style={{ color: '#f5a623', width: '134px', fontSize: '12px' }}
                       delete={false}
-                      strong={false}
                       disabled={false}
                       editable={false}
                       ellipsis={false}
+                      mark={false}
+                      strong={false}
+                      style={{ color: '#f5a623', fontSize: '12px', width: '134px' }}
                       underline={false}
                     >
                       不超过2G
                     </Typography.Paragraph>
                   </Col>
                   <Col
+                    __component_name="Col"
                     span={24}
                     style={{ display: 'flex', justifyContent: 'center' }}
-                    __component_name="Col"
                   >
                     <Typography.Paragraph
                       code={false}
-                      mark={false}
-                      style={{ width: '106px', fontSize: '' }}
                       delete={false}
-                      strong={false}
                       disabled={false}
                       editable={false}
                       ellipsis={false}
+                      mark={false}
+                      strong={false}
+                      style={{ fontSize: '', width: '106px' }}
                       underline={false}
                     >
                       - 单次上传文件数量
                     </Typography.Paragraph>
                     <Typography.Paragraph
                       code={false}
-                      mark={false}
-                      style={{ color: '#f5a623', width: '98px', fontSize: '' }}
                       delete={false}
-                      strong={false}
                       disabled={false}
                       editable={false}
                       ellipsis={false}
+                      mark={false}
+                      strong={false}
+                      style={{ color: '#f5a623', fontSize: '', width: '98px' }}
                       underline={false}
                     >
                       不超过 20个
@@ -1345,7 +1445,17 @@ class DatasourceDetail$$Page extends React.Component {
           </FormilyForm>
         </Modal>
         <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.loading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
           mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.cancelEdit.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
           onOk={function () {
             return this.editDatasource.apply(
               this,
@@ -1354,108 +1464,108 @@ class DatasourceDetail$$Page extends React.Component {
           }.bind(this)}
           open={__$$eval(() => this.state.editVisible)}
           title="编辑"
-          centered={false}
-          keyboard={true}
-          onCancel={function () {
-            return this.cancelEdit.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={__$$eval(() => this.state.loading)}
-          destroyOnClose={true}
-          __component_name="Modal"
         >
           <FormilyForm
-            ref={this._refsManager.linkRef('edit_form_ref')}
-            formHelper={{ autoFocus: true }}
+            __component_name="FormilyForm"
             componentProps={{
               colon: false,
-              layout: 'horizontal',
-              labelCol: 4,
               labelAlign: 'left',
+              labelCol: 4,
+              layout: 'horizontal',
               wrapperCol: 20,
             }}
             createFormProps={{ values: __$$eval(() => this.state.dataSourceDetail) }}
-            __component_name="FormilyForm"
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('edit_form_ref')}
           >
             <FormilyInput
-              fieldProps={{
-                name: 'name',
-                title: '数据源名称',
-                required: true,
-                'x-pattern': 'disabled',
-                'x-validator': [
-                  {
-                    id: 'disabled',
-                    type: 'disabled',
-                    message: '请输入数据源名称',
-                    children: '未知',
-                    required: true,
-                    whitespace: false,
-                    triggerType: 'onBlur',
-                  },
-                ],
-              }}
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
-                  bordered: true,
                   allowClear: true,
+                  bordered: true,
                   placeholder: '请输入数据源名称',
                 },
               }}
-              decoratorProps={{ 'x-decorator-props': { labelWidth: '', labelEllipsis: false } }}
-              __component_name="FormilyInput"
-            />
-            <FormilyInput
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: false, labelWidth: '' } }}
               fieldProps={{
-                name: 'displayName',
-                title: '数据源别名',
-                required: true,
-                'x-pattern': 'editable',
+                'name': 'name',
+                'required': true,
+                'title': '数据源名称',
+                'x-pattern': 'disabled',
                 'x-validator': [
                   {
-                    id: 'disabled',
-                    type: 'disabled',
-                    message: '请输入数据源名称',
                     children: '未知',
+                    id: 'disabled',
+                    message: '请输入数据源名称',
                     required: true,
-                    whitespace: false,
                     triggerType: 'onBlur',
+                    type: 'disabled',
+                    whitespace: false,
                   },
                 ],
               }}
+            />
+            <FormilyInput
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
-                  bordered: true,
                   allowClear: true,
+                  bordered: true,
                   placeholder: '请输入数据源别名',
                 },
               }}
-              decoratorProps={{ 'x-decorator-props': { labelWidth: '', labelEllipsis: false } }}
-              __component_name="FormilyInput"
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: false, labelWidth: '' } }}
+              fieldProps={{
+                'name': 'displayName',
+                'required': true,
+                'title': '数据源别名',
+                'x-pattern': 'editable',
+                'x-validator': [
+                  {
+                    children: '未知',
+                    id: 'disabled',
+                    message: '请输入数据源名称',
+                    required: true,
+                    triggerType: 'onBlur',
+                    type: 'disabled',
+                    whitespace: false,
+                  },
+                ],
+              }}
             />
             <FormilyTextArea
-              fieldProps={{
-                name: 'description',
-                title: '描述',
-                'x-component': 'Input.TextArea',
-                'x-validator': [],
-              }}
+              __component_name="FormilyTextArea"
               componentProps={{
                 'x-component-props': {
-                  rows: 3,
                   autoSize: false,
-                  showCount: false,
                   placeholder: '请输入描述',
+                  rows: 3,
+                  showCount: false,
                 },
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-              __component_name="FormilyTextArea"
+              fieldProps={{
+                'name': 'description',
+                'title': '描述',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
             />
           </FormilyForm>
         </Modal>
         <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.loading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
           mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.cancelDelete.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
           onOk={function () {
             return this.deleteDatasource.apply(
               this,
@@ -1464,81 +1574,71 @@ class DatasourceDetail$$Page extends React.Component {
           }.bind(this)}
           open={__$$eval(() => this.state.deleteVisible)}
           title="删除"
-          centered={false}
-          keyboard={true}
-          onCancel={function () {
-            return this.cancelDelete.apply(this, Array.prototype.slice.call(arguments).concat([]));
-          }.bind(this)}
-          forceRender={false}
-          maskClosable={false}
-          confirmLoading={__$$eval(() => this.state.loading)}
-          destroyOnClose={true}
-          __component_name="Modal"
         >
           {!!false && (
             <Container
+              __component_name="Container"
+              defaultStyle={{
+                borderColor: '#f5a623',
+                borderRadius: '4px',
+                borderStyle: 'solid',
+                borderWidth: '1px',
+              }}
               style={{
-                display: 'flex',
-                padding: '10px',
                 alignItems: 'center',
+                backgroundColor: '#fffbf5',
                 borderColor: '#fedc9f',
                 borderStyle: 'solid',
                 borderWidth: '1px',
-                backgroundColor: '#fffbf5',
+                display: 'flex',
+                padding: '10px',
               }}
-              defaultStyle={{
-                borderColor: '#f5a623',
-                borderStyle: 'solid',
-                borderWidth: '1px',
-                borderRadius: '4px',
-              }}
-              __component_name="Container"
             >
               <AntdIconWarningFilled
-                style={{ color: '#ff7f23', fontSize: '16px', marginRight: '10px' }}
                 __component_name="AntdIconWarningFilled"
+                style={{ color: '#ff7f23', fontSize: '16px', marginRight: '10px' }}
               />
             </Container>
           )}
           <Alert
-            type="warning"
+            __component_name="Alert"
             message={
-              <Space align="center" direction="horizontal" __component_name="Space">
+              <Space __component_name="Space" align="center" direction="horizontal">
                 <Typography.Paragraph
                   code={false}
-                  mark={false}
-                  style={{ fontSize: '' }}
                   delete={false}
-                  strong={false}
                   disabled={false}
                   editable={false}
                   ellipsis={true}
+                  mark={false}
+                  strong={false}
+                  style={{ fontSize: '' }}
                   underline={false}
                 >
                   确定删除{' '}
                 </Typography.Paragraph>
                 <Typography.Paragraph
                   code={false}
-                  mark={false}
-                  style={{ padding: '0 4px', fontSize: '' }}
                   delete={false}
-                  strong={false}
                   disabled={false}
                   editable={false}
                   ellipsis={true}
+                  mark={false}
+                  strong={false}
+                  style={{ fontSize: '', padding: '0 4px' }}
                   underline={false}
                 >
                   {__$$eval(() => this.getName())}
                 </Typography.Paragraph>
                 <Typography.Paragraph
                   code={false}
-                  mark={false}
-                  style={{ fontSize: '' }}
                   delete={false}
-                  strong={false}
                   disabled={false}
                   editable={false}
                   ellipsis={true}
+                  mark={false}
+                  strong={false}
+                  style={{ fontSize: '' }}
                   underline={false}
                 >
                   {' '}
@@ -1547,7 +1647,7 @@ class DatasourceDetail$$Page extends React.Component {
               </Space>
             }
             showIcon={true}
-            __component_name="Alert"
+            type="warning"
           />
         </Modal>
       </Page>
@@ -1614,6 +1714,14 @@ function __$$createChildContext(oldContext, ext) {
   const childContext = {
     ...oldContext,
     ...ext,
+    // 重写 state getter，保证 state 的指向不变，这样才能从 context 中拿到最新的 state
+    get state() {
+      return oldContext.state;
+    },
+    // 重写 props getter，保证 props 的指向不变，这样才能从 context 中拿到最新的 props
+    get props() {
+      return oldContext.props;
+    },
   };
   childContext.__proto__ = oldContext;
   return childContext;

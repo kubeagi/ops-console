@@ -242,7 +242,7 @@ class DataSource$$Page extends React.Component {
             },
           },
           webinput: {
-            recommendIntervalTime: v?.recommendIntervalTime,
+            recommendIntervalTime: v?.recommendIntervalTime || 1000,
           },
         },
       };
@@ -257,7 +257,7 @@ class DataSource$$Page extends React.Component {
               url: v?.serverAddress,
             },
             webinput: {
-              recommendIntervalTime: +v?.recommendIntervalTime,
+              recommendIntervalTime: +v?.recommendIntervalTime || 1000,
             },
           },
         };
@@ -323,7 +323,7 @@ class DataSource$$Page extends React.Component {
       password: record?.endpoint?.auth?.password,
       username: record?.endpoint?.auth?.username,
       insecure: record?.endpoint?.insecure ? 'http' : 'https',
-      recommendIntervalTime: record?.web?.recommendIntervalTime,
+      recommendIntervalTime: record?.web?.recommendIntervalTime || 1000,
     });
   }
 
