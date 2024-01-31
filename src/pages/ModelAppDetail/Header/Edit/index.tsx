@@ -185,7 +185,6 @@ const Edit: React.FC<EditProps> = props => {
           <Form.Item
             label="描述"
             name="description"
-            required
             rules={[
               {
                 validator: (_, value, callback) => {

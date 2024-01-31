@@ -83,6 +83,7 @@ const PlatPanel: React.FC<PlatPanelProps> = props => {
 
 export interface RowData {
   metadata: {
+    annotations: any;
     isPublic: boolean;
     name: string;
     namespace: string;
@@ -123,6 +124,7 @@ const Publish: React.FC<PublishProps> = props => {
                 description: data?.metadata?.description,
                 icon: data?.metadata?.icon,
                 isPublic: !data?.metadata?.isPublic,
+                category: data?.metadata?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category'],
               },
             });
             setOpen(false);
