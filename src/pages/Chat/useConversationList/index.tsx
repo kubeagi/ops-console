@@ -174,7 +174,7 @@ const useConversationList: IUseConversationList = newConversationId => {
                         <>
                           {dayjs(cv.updated_at).isSame(dayjs(), 'day')
                             ? '今天'
-                            : dayjs(cv.updated_at).format('HH:mm')}
+                            : dayjs(cv.updated_at).format('MM-DD')}
                         </>
                       )}
                     </span>
