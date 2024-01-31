@@ -1,0 +1,21 @@
+{
+  "baiduApiKey": {
+    "appId": "20220803001292685",
+    "appKey": "19Kxdh1bibvfsPduL9Qm"
+  },
+  "baiduLangMap": {
+    "en-US": "en"
+  },
+  "defaultTranslateKeyApi": "Pinyin",
+  "distLangs": ["en-US"],
+  "googleApiKey": "",
+  "ignoreDir": "",
+  "ignoreFile": "",
+  "importI18N": "import I18N from '@/utils/kiwiI18N';",
+  "kiwiDir": "./.kiwi",
+  "srcLang": "zh-CN",
+  "translateOptions": {
+    "concurrentLimit": 10,
+    "requestOptions": {}
+  }
+}

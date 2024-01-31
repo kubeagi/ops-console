@@ -13,6 +13,7 @@ import { Divider, Space } from 'antd';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import RefContent from '@/pages/Chat/Chat/References/renderContent';
+import I18N from '@/utils/kiwiI18N';
 
 import './index.less';
 
@@ -86,7 +87,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
             setClear(clear => clear - 1);
           }}
         >
-          引用：
+          {I18N.Chat.yinYong}
           {chat.extra.references.map((item, index) => {
             return (
               <>

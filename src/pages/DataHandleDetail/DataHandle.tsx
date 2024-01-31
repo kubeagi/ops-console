@@ -19,9 +19,11 @@ import {
 import { Button, Card, Col, Form, Modal, Progress, Row, Steps, Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import styles from './datahandle.less';
 
-const SPLIT_TYPE_NAME = '拆分处理';
+const SPLIT_TYPE_NAME = I18N.DataHandle.chaiFenChuLi;
 const layout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 },
@@ -43,7 +45,7 @@ const DataHandle: React.FC<Iprops> = props => {
   const getColumns = useMemo(() => {
     return [
       {
-        title: '文件名',
+        title: I18N.DataHandle.wenJianMing,
         dataIndex: 'file_name',
         key: 'file_name',
         render(text) {
@@ -51,7 +53,7 @@ const DataHandle: React.FC<Iprops> = props => {
         },
       },
       {
-        title: '处理前',
+        title: I18N.DataHandle.chuLiQian,
         dataIndex: 'pre',
         key: 'pre',
         render(text) {
@@ -59,7 +61,7 @@ const DataHandle: React.FC<Iprops> = props => {
         },
       },
       {
-        title: '处理后',
+        title: I18N.DataHandle.chuLiHou,
         dataIndex: 'post',
         key: 'post',
         render(text) {
@@ -72,7 +74,7 @@ const DataHandle: React.FC<Iprops> = props => {
   const getSplitColumns = useMemo(() => {
     return [
       {
-        title: '文件名',
+        title: I18N.DataHandle.wenJianMing,
         dataIndex: 'file_name',
         key: 'file_name',
         render(text) {
@@ -80,7 +82,7 @@ const DataHandle: React.FC<Iprops> = props => {
         },
       },
       {
-        title: '处理后',
+        title: I18N.DataHandle.chuLiHou,
         dataIndex: 'post',
         key: 'post',
         render(text, record) {
@@ -123,7 +125,7 @@ const DataHandle: React.FC<Iprops> = props => {
             {type === SPLIT_TYPE_NAME && (
               <div style={{ display: 'flex' }}>
                 <div style={{ textAlign: 'left', flex: 1 }}>
-                  模型:{' '}
+                  {I18N.DataHandle.moXing}{' '}
                   <span>
                     {item.llm_config?.provider === 'worker'
                       ? item.llm_config?.name || '-'
@@ -131,7 +133,7 @@ const DataHandle: React.FC<Iprops> = props => {
                   </span>
                 </div>
                 <div style={{ textAlign: 'right', flex: 1 }}>
-                  <a onClick={openHighConfig}>高级配置</a>
+                  <a onClick={openHighConfig}>{I18N.DataHandle.gaoJiPeiZhi}</a>
                 </div>
               </div>
             )}
@@ -170,7 +172,7 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0', color: '#000' }}>
             {' '}
-            对 {sourceItem.file_num} 个文件进行了{type}。
+            {I18N.template(I18N.DataHandle.duiSOUR3, { val1: sourceItem.file_num, val2: type })}
           </div>
         </div>
       );
@@ -190,8 +192,8 @@ const DataHandle: React.FC<Iprops> = props => {
               <Row gutter={16}>{_data}</Row>
               <div style={{ padding: '8px 0', color: '#000' }}>
                 {' '}
-                对 {sourceItem.file_num} 个文件进行了{type}，处理进度：{progressPrecent.length}/
-                {fileProgress.length}
+                {I18N.template(I18N.DataHandle.duiSOUR2, { val1: sourceItem.file_num, val2: type })}
+                {progressPrecent.length}/{fileProgress.length}
               </div>
               {fileProgress.map((item, index) => {
                 return (
@@ -215,8 +217,7 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0', color: '#000' }}>
             {' '}
-            对 {sourceItem.file_num} 个文件进行了{type}
-            ，以下内容为处理效果抽样预览，并非全部内容
+            {I18N.template(I18N.DataHandle.duiSOUR, { val1: sourceItem.file_num, val2: type })}
           </div>
           <Table columns={getSplitColumns} dataSource={dataSource} pagination={false} />
         </div>
@@ -228,7 +229,7 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0', color: '#000' }}>
             {' '}
-            对 {sourceItem.file_num} 个文件进行了{type}，以下内容为处理效果抽样预览，并非全部内容
+            {I18N.template(I18N.DataHandle.duiSOUR, { val1: sourceItem.file_num, val2: type })}
           </div>
           <Table
             columns={type === SPLIT_TYPE_NAME ? getSplitColumns : getColumns}
@@ -268,19 +269,19 @@ const DataHandle: React.FC<Iprops> = props => {
   const statuesMapText = {
     not_start: {
       color: 'rgba(0,0,0,.25)',
-      text: '未处理',
+      text: I18N.DataHandle.weiChuLi,
     },
     doing: {
       color: '#1677ff',
-      text: '处理中',
+      text: I18N.DataHandle.chuLiZhong,
     },
     success: {
       color: '#5cb85c',
-      text: '处理成功',
+      text: I18N.DataHandle.chuLiChengGong,
     },
     fail: {
       color: '#f85a5a',
-      text: '处理失败',
+      text: I18N.DataHandle.chuLiShiBai,
     },
   };
   useEffect(() => {
@@ -301,7 +302,8 @@ const DataHandle: React.FC<Iprops> = props => {
               setVisibleMap({ ...visibleMap, [item.description]: !visibleMap[item.description] });
             }}
           >
-            展开 <UpOutlined />
+            {I18N.DataHandle.zhanKai}
+            <UpOutlined />
           </a>
         ) : (
           <>
@@ -311,7 +313,8 @@ const DataHandle: React.FC<Iprops> = props => {
                 setVisibleMap({ ...visibleMap, [item.description]: !visibleMap[item.description] });
               }}
             >
-              收起 <DownOutlined />
+              {I18N.DataHandle.shouQi}
+              <DownOutlined />
             </a>
           </>
         ),
@@ -326,17 +329,24 @@ const DataHandle: React.FC<Iprops> = props => {
     <div className={styles.datahandle}>
       {config?.find(item => item.status === 'doing') ? (
         <Button className={styles.reloadBtn} onClick={props.getData}>
-          刷新
+          {I18N.DataHandle.shuaXin}
         </Button>
       ) : (
         ''
       )}
       <Steps direction="vertical" items={items} progressDot size="small" />
-      <Modal footer={null} onCancel={closeHighConfig} open={highConfigVisible} title="模型配置">
+      <Modal
+        footer={null}
+        onCancel={closeHighConfig}
+        open={highConfigVisible}
+        title={I18N.DataHandle.moXingPeiZhi}
+      >
         <Form labelAlign="right" {...layout}>
-          <Form.Item label="温度">{highConfig?.temperature || '-'}</Form.Item>
-          <Form.Item label="最大响应长度">{highConfig?.max_tokens || '-'}</Form.Item>
-          <Form.Item label="QA 拆分 Prompt">
+          <Form.Item label={I18N.DataHandle.wenDu}>{highConfig?.temperature || '-'}</Form.Item>
+          <Form.Item label={I18N.DataHandle.zuiDaXiangYingChang}>
+            {highConfig?.max_tokens || '-'}
+          </Form.Item>
+          <Form.Item label={I18N.DataHandle.qAChaiFenP}>
             <div style={{ width: '370px', marginTop: 10, padding: 12, border: '1px solid #ccc' }}>
               <pre style={{ whiteSpace: 'pre-wrap' }}>{highConfig?.prompt_template || '-'}</pre>
             </div>

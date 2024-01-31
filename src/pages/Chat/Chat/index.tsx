@@ -34,6 +34,7 @@ import PromptStarter from '@/pages/Chat/Chat/PromptStarter';
 import RenderReferences, { Reference } from '@/pages/Chat/Chat/References';
 import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
 import Retry from '@/pages/Chat/Chat/retry';
+import I18N from '@/utils/kiwiI18N';
 import request from '@/utils/request';
 
 import './index.less';
@@ -150,12 +151,12 @@ const Chat: React.FC<IChat> = props => {
   useEffect(() => {
     if (conversation.data?.length) return;
     const app = application?.data?.Application?.getApplication;
+    const defaultPrologue = I18N.template(I18N.Chat.ninHaoWoShiA, {
+      val1: `${app?.metadata.displayName || app?.metadata.name}${app?.metadata.description ? `\n\n${app?.metadata.description}` : ''}`,
+    });
     let cvList = [
       getCvsMeta(
-        app?.prologue ||
-          `##### 您好，我是${app?.metadata.displayName || app?.metadata.name}${
-            app?.metadata.description ? `\n\n${app?.metadata.description}` : ''
-          }`,
+        app?.prologue || defaultPrologue,
         props.conversationId || Date.now().toString(),
         null,
         false
@@ -203,7 +204,7 @@ const Chat: React.FC<IChat> = props => {
   );
   const setLastCvsErr = useCallback(
     (err: Error) => {
-      message.warning('系统异常，请稍后重试');
+      message.warning(I18N.Chat.xiTongYiChangQing);
       setConversation(_conversation => {
         const [first, ...rest] = _conversation.data.reverse();
         return addIndexToCvs({
@@ -214,7 +215,7 @@ const Chat: React.FC<IChat> = props => {
             {
               ...first,
               error: {
-                message: '请求出错',
+                message: I18N.Chat.qingQiuChuCuo,
                 type: 'error',
                 detail: err,
               },
@@ -387,7 +388,9 @@ const Chat: React.FC<IChat> = props => {
                           {Boolean(chat.extra?.latency) && (
                             <Tag color="green">{(chat.extra?.latency / 1000).toFixed(2)}s</Tag>
                           )}
-                          <Tag color="purple">{chat.extra?.index}条上下文</Tag>
+                          <Tag color="purple">
+                            {I18N.template(I18N.Chat.tiaoShangXiaWen, { val1: chat.extra?.index })}
+                          </Tag>
                         </div>
                       )}
                     {Boolean(appData?.showRetrievalInfo) && (
@@ -414,21 +417,21 @@ const Chat: React.FC<IChat> = props => {
               <Flex align="center" className="sendAction" gap="large" justify="end">
                 <span className="keyBindings">
                   <CornerDownLeft size={12} />
-                  <span>发送 / </span>
+                  <span>{I18N.Chat.faSong2}</span>
                   <ArrowBigUp size={12} />
                   <CornerDownLeft size={12} />
-                  <span>换行</span>
+                  <span>{I18N.Chat.huanXing}</span>
                 </span>
-                <Tooltip title={appData?.llm ? '' : '暂未关联模型服务，请先关联模型服务再进行对话'}>
+                <Tooltip title={appData?.llm ? '' : I18N.Chat.zanWeiGuanLianMo}>
                   <Button disabled={!appData?.llm} onClick={onSend.bind('', input)} type="primary">
-                    发送
+                    {I18N.Chat.faSong}
                   </Button>
                 </Tooltip>
               </Flex>
             }
             onInput={setInput}
-            onSend={onSend}
-            placeholder="请输入问题，可通过 shift+回车换行"
+            onSend={onSend.bind('', input)}
+            placeholder={I18N.Chat.qingShuRuWenTi}
             value={input}
           />
         </div>

@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 
 import useGetCommonData from '@/components/hooks/useGetCommonData';
+import I18N from '@/utils/kiwiI18N';
 import request from '@/utils/request';
 
 import './index.less';
@@ -105,7 +106,7 @@ const useConversationList: IUseConversationList = newConversationId => {
           //
         });
       if (res?.message === 'ok') {
-        message.success('删除成功');
+        message.success(I18N.Chat.shanChuChengGong);
         setForceUpdate();
         if (id === conversationId) {
           addConversation();
@@ -136,7 +137,7 @@ const useConversationList: IUseConversationList = newConversationId => {
           </Typography.Title>
         </div>
         <Button className="new" onClick={addConversation} type="primary">
-          新建对话
+          {I18N.Chat.xinJianDuiHua}
         </Button>
         {conversations.length > 0 ? (
           <span className="cvsList">
@@ -155,13 +156,13 @@ const useConversationList: IUseConversationList = newConversationId => {
                     <span className="time">
                       {currentMenu?.id === cv.id ? (
                         <Popconfirm
-                          cancelText="取消"
-                          description="确定删除对话吗?"
-                          okText="确定"
+                          cancelText={I18N.Chat.quXiao}
+                          description={I18N.Chat.queDingShanChuDui}
+                          okText={I18N.Chat.queDing}
                           onConfirm={del.bind('', cv.id)}
                           onOpenChange={open => (sureDel = open)}
                           onPopupClick={e => e.stopPropagation()}
-                          title="删除对话"
+                          title={I18N.Chat.shanChuDuiHua}
                         >
                           <DeleteOutlined
                             className="del"
@@ -174,7 +175,7 @@ const useConversationList: IUseConversationList = newConversationId => {
                       ) : (
                         <>
                           {dayjs(cv.updated_at).isSame(dayjs(), 'day')
-                            ? '今天'
+                            ? I18N.Chat.jinTian
                             : dayjs(cv.updated_at).format('MM-DD')}
                         </>
                       )}
