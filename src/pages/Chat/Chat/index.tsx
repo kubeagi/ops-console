@@ -78,6 +78,7 @@ const retry = new Retry(ctrl, 3);
 const Chat: React.FC<IChat> = props => {
   const { qiankun }: { qiankun: Record<string, any> } = useModel('qiankun');
   const isDark = qiankun?.theme?.isDark;
+  const [showNextGuide, setShowNextGuide] = useState(true);
   const [conversation, setConversation] = useState<{
     id?: string;
     loadingMsgId?: string;
@@ -340,8 +341,16 @@ const Chat: React.FC<IChat> = props => {
       scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
       fetchConversation(_input);
       setInput('');
+      setShowNextGuide(false);
     },
-    [setInput, setConversation, fetchConversation]
+    [setInput, setConversation, fetchConversation, setShowNextGuide]
+  );
+  const onPromptClick = useCallback(
+    value => {
+      onSend(value);
+      setShowNextGuide(false);
+    },
+    [onSend, setShowNextGuide]
   );
   return (
     <div className="chatComponent">
@@ -404,13 +413,15 @@ const Chat: React.FC<IChat> = props => {
           />
           <div className="safeArea" id={safeAreaId}></div>
         </div>
-        {!props.conversationId && (
-          <PromptStarter
-            appName={props.appName}
-            appNamespace={props.appNamespace}
-            onPromptClick={onSend}
-          />
-        )}
+        {!props.conversationId && // 历史对话不展示引导
+          appData?.showNextGuide && // 根据智能体个性化配置展示引导
+          showNextGuide && ( // 智能体 debug 时, 问过后就不再展示引导
+            <PromptStarter
+              appName={props.appName}
+              appNamespace={props.appNamespace}
+              onPromptClick={onPromptClick}
+            />
+          )}
         <div className="inputArea">
           <ChatInputArea
             bottomAddons={
