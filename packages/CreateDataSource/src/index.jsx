@@ -164,7 +164,7 @@ class CreateDataSource$$Component extends React.Component {
             },
           },
           webinput: {
-            recommendIntervalTime: v?.recommendIntervalTime,
+            recommendIntervalTime: v?.recommendIntervalTime || 1000,
           },
         },
       };
@@ -566,25 +566,27 @@ class CreateDataSource$$Component extends React.Component {
               }}
             />
           )}
-          <FormilyNumberPicker
-            __component_name="FormilyNumberPicker"
-            componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-            decoratorProps={{
-              'x-decorator-props': {
-                addonAfter: '毫秒',
-                labelEllipsis: true,
-                wrapperWidth: '100px',
-              },
-            }}
-            fieldProps={{
-              'default': '1000',
-              'name': 'recommendIntervalTime ',
-              'required': true,
-              'title': '抓取时间间隔',
-              'x-validator': [],
-            }}
-            style={{ width: '100px' }}
-          />
+          {!!false && (
+            <FormilyNumberPicker
+              __component_name="FormilyNumberPicker"
+              componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+              decoratorProps={{
+                'x-decorator-props': {
+                  addonAfter: '毫秒',
+                  labelEllipsis: true,
+                  wrapperWidth: '100px',
+                },
+              }}
+              fieldProps={{
+                'default': '1000',
+                'name': 'recommendIntervalTime ',
+                'required': true,
+                'title': '抓取时间间隔',
+                'x-validator': [],
+              }}
+              style={{ width: '100px' }}
+            />
+          )}
           {!!__$$eval(
             () => this.getTypeForms()?.includes('serverAddress') && !this.getType() === 'onLine'
           ) && (

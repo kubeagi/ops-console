@@ -97,7 +97,7 @@ class DataSourceCreate$$Page extends React.Component {
               url: v?.serverAddress,
             },
             webinput: {
-              recommendIntervalTime: +v?.recommendIntervalTime,
+              recommendIntervalTime: +v?.recommendIntervalTime || 1000,
             },
           },
         };

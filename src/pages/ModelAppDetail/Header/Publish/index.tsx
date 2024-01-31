@@ -9,9 +9,10 @@ import styles from './index.less';
 
 const PLATS_MAPS = [
   {
-    id: '平台应用',
-    name: '平台应用',
-    description: '平台用户将会在 AI 应用列表中看到此应用，点击即可进行对话交互，无需其他配置',
+    id: 'AgileGPT',
+    name: 'AgileGPT',
+    description:
+      '用户将会在 AgileGPT 平台智能体列表中看到此应用，点击即可进行对话交互，无需其他配置',
     Icon: AlipayMiniProgram,
   },
   // {
