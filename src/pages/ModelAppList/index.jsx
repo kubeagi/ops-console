@@ -419,6 +419,7 @@ class ModelAppList$$Page extends React.Component {
         setTimeout(() => {
           pageThis.form('create_form').setValues({
             imageUrl: imageUrl,
+            category: '游戏动漫',
             icon: {
               fileList: [
                 {

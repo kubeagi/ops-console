@@ -15,10 +15,9 @@ import {
   FormilyTextArea,
   Space,
   Button,
-  Container,
+  Card,
   FormilySelect,
   FormilyFormItem,
-  Card,
   FormilySwitch,
   Input,
   Pagination,
@@ -304,7 +303,12 @@ class CreateAiAgentAssessment$$Page extends React.Component {
       .validate()
       .then(res => {
         const values = this.form('create_form')?.values;
-        if (this.state.fileSelectCheckErrorFlag) return;
+        if (!this.state.selectedFileList.length) {
+          this.setState({
+            fileSelectCheckErrorFlag: true,
+          });
+          return;
+        }
         const otherParams = this.formatParameters(values);
         const params = {
           namespace: this.utils.getAuthData().project || 'system-tce',
@@ -349,16 +353,6 @@ class CreateAiAgentAssessment$$Page extends React.Component {
               },
               ...otherParams,
             ],
-          },
-          storage: {
-            volumeName: 'ab',
-            accessModes: ['ReadWriteOnce'],
-            storageClassName: 'openebs-hostpath',
-            resources: {
-              requests: {
-                storage: '1Gi',
-              },
-            },
           },
         };
         this.setState({
@@ -761,1829 +755,1741 @@ class CreateAiAgentAssessment$$Page extends React.Component {
             </Typography.Title>
           </Col>
         </Row>
-        <Container
-          __component_name="Container"
-          style={{
-            backgroundColor: '#fff',
-            paddingBottom: '24px',
-            paddingLeft: '24px',
-            paddingRight: '24px',
-            paddingTop: '24px',
-          }}
+        <Card
+          __component_name="Card"
+          actions={[]}
+          bordered={false}
+          hoverable={false}
+          loading={false}
+          size="default"
+          type="default"
         >
-          <Row
-            __component_name="Row"
-            align="top"
-            gutter={['', '']}
-            style={{ backgroundColor: '#ffffff' }}
-            wrap={true}
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 4,
+              labelWidth: '',
+              layout: 'horizontal',
+              wrapperCol: 20,
+            }}
+            formHelper={{ autoFocus: false }}
+            ref={this._refsManager.linkRef('create_form')}
           >
-            <Col __component_name="Col" span={24} style={{ backgroundColor: '#ffffff' }} />
-          </Row>
-          <Row __component_name="Row" style={{ backgroundColor: '#ffffff' }} wrap={true}>
-            <Col __component_name="Col" span={24} style={{ color: '#ffffff !important' }}>
-              <FormilyForm
-                __component_name="FormilyForm"
-                componentProps={{
-                  colon: false,
-                  labelAlign: 'left',
-                  labelCol: 4,
-                  labelWidth: '',
-                  layout: 'horizontal',
-                  wrapperCol: 20,
-                }}
-                formHelper={{ autoFocus: false }}
-                ref={this._refsManager.linkRef('create_form')}
-              >
-                <Row __component_name="Row" wrap={true}>
-                  <Col __component_name="Col" flex="960px">
-                    <FormilySelect
-                      __component_name="FormilySelect"
-                      componentProps={{
-                        'x-component-props': {
-                          _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
-                          _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
-                          allowClear: false,
-                          disabled: false,
-                          placeholder: '请选择裁判大模型',
-                          showSearch: true,
-                        },
-                      }}
-                      decoratorProps={{
-                        'x-decorator-props': {
-                          labelEllipsis: true,
-                          labelWidth: '120px',
-                          wrapperWidth: '',
-                        },
-                      }}
-                      fieldProps={{
-                        '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
-                        'enum': null,
-                        'name': 'judgeLLM',
-                        'required': true,
-                        'title': '裁判大模型',
-                        'x-validator': [],
-                      }}
-                      style={{}}
-                    />
-                  </Col>
-                </Row>
-                <Row
-                  __component_name="Row"
-                  gutter={[null, 0]}
-                  style={{ marginBottom: '0px', paddingBottom: '0px' }}
-                  wrap={true}
-                >
-                  <Col __component_name="Col" flex="120px">
-                    <FormilyFormItem
-                      __component_name="FormilyFormItem"
-                      decoratorProps={{
-                        'x-decorator-props': {
-                          asterisk: true,
-                          labelCol: 6,
-                          labelEllipsis: true,
-                          wrapperWidth: '0',
-                        },
-                      }}
-                      fieldProps={{
-                        'name': 'FormilyFormItem',
-                        'title': '评测指标',
-                        'type': 'object',
-                        'x-component': 'FormilyFormItem',
-                        'x-validator': [],
-                      }}
-                      style={{}}
-                    />
-                  </Col>
-                  <Col __component_name="Col" span={19} style={{}}>
-                    <Row __component_name="Row" justify="start" wrap={false}>
-                      <Col __component_name="Col" flex="420px">
-                        <Card
-                          __component_name="Card"
-                          actions={[]}
-                          bordered={true}
-                          className="index-card"
-                          hoverable={true}
-                          loading={false}
-                          size="default"
-                          style={{ marginBottom: '16px' }}
-                          type="default"
-                        >
-                          <Row __component_name="Row" gutter={['', 0]} wrap={true}>
-                            <Col __component_name="Col" span={22}>
-                              <Row __component_name="Row" gutter={['', 8]} wrap={true}>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={true}
-                                            style={{ fontSize: '16' }}
-                                          >
-                                            忠实度
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                    <Col __component_name="Col">
-                                      <FormilySwitch
-                                        __component_name="FormilySwitch"
-                                        componentProps={{
-                                          'x-component-props': {
-                                            disabled: false,
-                                            loading: false,
-                                            onChange: function () {
-                                              return this.onSwitchCheckChange.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    type: 'faithfulness',
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(this),
-                                            size: 'small',
-                                          },
-                                        }}
-                                        decoratorProps={{
-                                          'x-decorator-props': {
-                                            labelEllipsis: true,
-                                            style: { height: '20px', marginBottom: '0px' },
-                                          },
-                                        }}
-                                        fieldProps={{
-                                          'name': 'faithfulness.checked',
-                                          'title': '',
-                                          'x-validator': [],
-                                        }}
-                                      />
-                                    </Col>
-                                  </Row>
-                                </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Typography.Paragraph
-                                    code={false}
-                                    delete={false}
-                                    disabled={false}
-                                    editable={false}
-                                    ellipsis={{ rows: 2 }}
-                                    mark={false}
-                                    strong={false}
-                                    style={{ fontSize: '' }}
-                                    type="secondary"
-                                    underline={false}
-                                  >
-                                    衡量待测模型应用生成的答案与知识库内容的一致性，阈值范围为（0,1），得分越高越好。
-                                  </Typography.Paragraph>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 1,
-                                                min: 0,
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: false,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginLeft: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'faithfulness.value',
-                                              'required': true,
-                                              'title': '容忍阈值设置',
-                                              'x-validator': [],
-                                            }}
-                                            style={{ display: 'inline-block' }}
-                                          />
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                      <Col __component_name="Col" flex="420px">
-                        <Card
-                          __component_name="Card"
-                          actions={[]}
-                          bordered={true}
-                          className="index-card"
-                          hoverable={true}
-                          loading={false}
-                          size="default"
-                          style={{ marginBottom: '16px' }}
-                          type="default"
-                        >
-                          <Row __component_name="Row" gutter={['', 0]} wrap={true}>
-                            <Col __component_name="Col" span={22}>
-                              <Row __component_name="Row" gutter={['', 8]} wrap={true}>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={true}
-                                            style={{ fontSize: '16' }}
-                                          >
-                                            权重分配
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        gutter={[null, 0]}
-                                        justify="center"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 100,
-                                                min: 0,
-                                                onChange: function () {
-                                                  return this.onValueChange.apply(
-                                                    this,
-                                                    Array.prototype.slice.call(arguments).concat([
-                                                      {
-                                                        type: 'semantic',
-                                                      },
-                                                    ])
-                                                  );
-                                                }.bind(this),
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: true,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginLeft: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'semantic',
-                                              'required': true,
-                                              'title': '语义相关性',
-                                              'x-validator': [],
-                                            }}
-                                            style={{ display: 'inline-block' }}
-                                          />
-                                        </Col>
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            lineHeight: '32px',
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '0px',
-                                            paddingRight: '0px',
-                                          }}
-                                        />
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            lineHeight: '37px',
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '0px',
-                                          }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={false}
-                                            style={{ fontSize: '', paddingLeft: '5px' }}
-                                          >
-                                            %
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                      <Row __component_name="Row" justify="center" wrap={false}>
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '00px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 100,
-                                                min: 0,
-                                                onChange: function () {
-                                                  return this.onValueChange.apply(
-                                                    this,
-                                                    Array.prototype.slice.call(arguments).concat([
-                                                      {
-                                                        type: 'factuality',
-                                                      },
-                                                    ])
-                                                  );
-                                                }.bind(this),
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: true,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'factuality',
-                                              'required': true,
-                                              'title': '事实相似性',
-                                              'x-validator': [],
-                                            }}
-                                            style={{}}
-                                          />
-                                        </Col>
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            height: '37px',
-                                            lineHeight: '37px',
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '0px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={false}
-                                            style={{ fontSize: '', paddingLeft: '5px' }}
-                                          >
-                                            %
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                          }}
-                                        />
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        />
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                    </Row>
-                    <Row __component_name="Row" justify="start" wrap={false}>
-                      <Col __component_name="Col" flex="420px">
-                        <Card
-                          __component_name="Card"
-                          actions={[]}
-                          bordered={true}
-                          className="index-card"
-                          hoverable={true}
-                          loading={false}
-                          size="default"
-                          style={{ marginBottom: '16px' }}
-                          type="default"
-                        >
-                          <Row __component_name="Row" gutter={['', 0]} wrap={true}>
-                            <Col __component_name="Col" span={22}>
-                              <Row __component_name="Row" gutter={['', 8]} wrap={true}>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={true}
-                                            style={{ fontSize: '16' }}
-                                          >
-                                            答案相关度
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                    <Col __component_name="Col">
-                                      <FormilySwitch
-                                        __component_name="FormilySwitch"
-                                        componentProps={{
-                                          'x-component-props': {
-                                            disabled: false,
-                                            loading: false,
-                                            onChange: function () {
-                                              return this.onSwitchCheckChange.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    type: 'answer_relevancy',
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(this),
-                                            size: 'small',
-                                          },
-                                        }}
-                                        decoratorProps={{
-                                          'x-decorator-props': {
-                                            labelEllipsis: true,
-                                            style: { height: '20px', marginBottom: '0px' },
-                                          },
-                                        }}
-                                        fieldProps={{
-                                          'name': 'answer_relevancy.checked',
-                                          'title': '',
-                                          'x-validator': [],
-                                        }}
-                                      />
-                                    </Col>
-                                  </Row>
-                                </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Typography.Paragraph
-                                    code={false}
-                                    delete={false}
-                                    disabled={false}
-                                    editable={false}
-                                    ellipsis={{ rows: 4 }}
-                                    mark={false}
-                                    strong={false}
-                                    style={{ fontSize: '' }}
-                                    type="secondary"
-                                    underline={false}
-                                  >
-                                    衡量待测智能体的答案与问题的相关程度。当一个答案直接恰当地解决了最初的问题时，它就被认为是相关的；答案不完整或冗余则分数降低。该指标不考虑答案真实性，阈值范围为（0,1），得分越高越好。
-                                  </Typography.Paragraph>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 1,
-                                                min: 0,
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: false,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginLeft: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'answer_relevancy.value',
-                                              'required': true,
-                                              'title': '容忍阈值设置',
-                                              'x-validator': [],
-                                            }}
-                                            style={{ display: 'inline-block' }}
-                                          />
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                      <Col __component_name="Col" flex="420px">
-                        <Card
-                          __component_name="Card"
-                          actions={[]}
-                          bordered={true}
-                          className="index-card"
-                          hoverable={true}
-                          loading={false}
-                          size="default"
-                          style={{ marginBottom: '16px' }}
-                          type="default"
-                        >
-                          <Row __component_name="Row" gutter={['', 0]} wrap={true}>
-                            <Col __component_name="Col" span={22}>
-                              <Row __component_name="Row" gutter={['', 8]} wrap={true}>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={true}
-                                            style={{ fontSize: '16' }}
-                                          >
-                                            知识库相关度
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                    <Col __component_name="Col">
-                                      <FormilySwitch
-                                        __component_name="FormilySwitch"
-                                        componentProps={{
-                                          'x-component-props': {
-                                            disabled: false,
-                                            loading: false,
-                                            onChange: function () {
-                                              return this.onSwitchCheckChange.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    type: 'context_relevancy',
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(this),
-                                            size: 'small',
-                                          },
-                                        }}
-                                        decoratorProps={{
-                                          'x-decorator-props': {
-                                            labelEllipsis: true,
-                                            style: { height: '20px', marginBottom: '0px' },
-                                          },
-                                        }}
-                                        fieldProps={{
-                                          'name': 'context_relevancy.checked',
-                                          'title': '',
-                                          'x-validator': [],
-                                        }}
-                                      />
-                                    </Col>
-                                  </Row>
-                                </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Typography.Paragraph
-                                    code={false}
-                                    delete={false}
-                                    disabled={false}
-                                    editable={false}
-                                    ellipsis={{ rows: 2 }}
-                                    mark={false}
-                                    strong={false}
-                                    style={{ fontSize: '' }}
-                                    type="secondary"
-                                    underline={false}
-                                  >
-                                    衡量待测智能体的知识库与问题的相关度，阈值范围为（0,1），得分越高越好。
-                                  </Typography.Paragraph>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 1,
-                                                min: 0,
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: false,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginLeft: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'context_relevancy.value',
-                                              'required': true,
-                                              'title': '容忍阈值设置',
-                                              'x-validator': [],
-                                            }}
-                                            style={{ display: 'inline-block' }}
-                                          />
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        />
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                    </Row>
-                    <Row __component_name="Row" justify="start" wrap={false}>
-                      <Col __component_name="Col" flex="420px">
-                        <Card
-                          __component_name="Card"
-                          actions={[]}
-                          bordered={true}
-                          className="index-card"
-                          hoverable={true}
-                          loading={false}
-                          size="default"
-                          style={{ marginBottom: '16px' }}
-                          type="default"
-                        >
-                          <Row __component_name="Row" gutter={['', 0]} wrap={true}>
-                            <Col __component_name="Col" span={22}>
-                              <Row __component_name="Row" gutter={['', 8]} wrap={true}>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={true}
-                                            style={{ fontSize: '16' }}
-                                          >
-                                            答案语义相似度
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                    <Col __component_name="Col">
-                                      <FormilySwitch
-                                        __component_name="FormilySwitch"
-                                        componentProps={{
-                                          'x-component-props': {
-                                            disabled: false,
-                                            loading: false,
-                                            onChange: function () {
-                                              return this.onSwitchCheckChange.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    type: 'answer_similarity',
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(this),
-                                            size: 'small',
-                                          },
-                                        }}
-                                        decoratorProps={{
-                                          'x-decorator-props': {
-                                            labelEllipsis: true,
-                                            style: { height: '20px', marginBottom: '0px' },
-                                          },
-                                        }}
-                                        fieldProps={{
-                                          'name': 'answer_similarity.checked',
-                                          'title': '',
-                                          'x-validator': [],
-                                        }}
-                                      />
-                                    </Col>
-                                  </Row>
-                                </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Typography.Paragraph
-                                    code={false}
-                                    delete={false}
-                                    disabled={false}
-                                    editable={false}
-                                    ellipsis={{ rows: 2 }}
-                                    mark={false}
-                                    strong={false}
-                                    style={{ fontSize: '' }}
-                                    type="secondary"
-                                    underline={false}
-                                  >
-                                    衡量待测智能体的答案与评测数据集中给定答案的语义相似度，阈值范围为（0,1），得分越高越好。
-                                  </Typography.Paragraph>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 1,
-                                                min: 0,
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: false,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginLeft: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'answer_similarity.value',
-                                              'required': true,
-                                              'title': '容忍阈值设置',
-                                              'x-validator': [],
-                                            }}
-                                            style={{ display: 'inline-block' }}
-                                          />
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        />
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                      <Col __component_name="Col" flex="420px">
-                        <Card
-                          __component_name="Card"
-                          actions={[]}
-                          bordered={true}
-                          className="index-card"
-                          hoverable={true}
-                          loading={false}
-                          size="default"
-                          style={{ marginBottom: '16px' }}
-                          type="default"
-                        >
-                          <Row __component_name="Row" gutter={['', 0]} wrap={true}>
-                            <Col __component_name="Col" span={22}>
-                              <Row __component_name="Row" gutter={['', 8]} wrap={true}>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={true}
-                                            style={{ fontSize: '16' }}
-                                          >
-                                            知识库精度
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                    <Col __component_name="Col">
-                                      <FormilySwitch
-                                        __component_name="FormilySwitch"
-                                        componentProps={{
-                                          'x-component-props': {
-                                            disabled: false,
-                                            loading: false,
-                                            onChange: function () {
-                                              return this.onSwitchCheckChange.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    type: 'context_precision',
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(this),
-                                            size: 'small',
-                                          },
-                                        }}
-                                        decoratorProps={{
-                                          'x-decorator-props': {
-                                            labelEllipsis: true,
-                                            style: { height: '20px', marginBottom: '0px' },
-                                          },
-                                        }}
-                                        fieldProps={{
-                                          'name': 'context_precision.checked',
-                                          'title': '',
-                                          'x-validator': [],
-                                        }}
-                                      />
-                                    </Col>
-                                  </Row>
-                                </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Typography.Paragraph
-                                    code={false}
-                                    delete={false}
-                                    disabled={false}
-                                    editable={false}
-                                    ellipsis={{ rows: 4 }}
-                                    mark={false}
-                                    strong={false}
-                                    style={{ fontSize: '' }}
-                                    type="secondary"
-                                    underline={false}
-                                  >
-                                    衡量待测智能体知识库所有与评测数据集中给定答案相关的数据是否排名更改，阈值范围为（0,1），得分越高越好。
-                                  </Typography.Paragraph>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 1,
-                                                min: 0,
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: false,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginLeft: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'context_precision.value',
-                                              'required': true,
-                                              'title': '容忍阈值设置',
-                                              'x-validator': [],
-                                            }}
-                                            style={{ display: 'inline-block' }}
-                                          />
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        />
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                    </Row>
-                    <Row __component_name="Row" justify="start" wrap={false}>
-                      <Col __component_name="Col" flex="420px">
-                        <Card
-                          __component_name="Card"
-                          actions={[]}
-                          bordered={true}
-                          className="index-card"
-                          hoverable={true}
-                          loading={false}
-                          size="default"
-                          style={{ marginBottom: '16px' }}
-                          type="default"
-                        >
-                          <Row __component_name="Row" gutter={['', 0]} wrap={true}>
-                            <Col __component_name="Col" span={22}>
-                              <Row __component_name="Row" gutter={['', 8]} wrap={true}>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={true}
-                                            style={{ fontSize: '16' }}
-                                          >
-                                            答案正确性
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                    <Col __component_name="Col">
-                                      <FormilySwitch
-                                        __component_name="FormilySwitch"
-                                        componentProps={{
-                                          'x-component-props': {
-                                            disabled: false,
-                                            loading: false,
-                                            onChange: function () {
-                                              return this.onSwitchCheckChange.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    type: 'answer_correctness',
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(this),
-                                            size: 'small',
-                                          },
-                                        }}
-                                        decoratorProps={{
-                                          'x-decorator-props': {
-                                            labelEllipsis: true,
-                                            style: { height: '20px', marginBottom: '0px' },
-                                          },
-                                        }}
-                                        fieldProps={{
-                                          'name': 'answer_correctness.checked',
-                                          'title': '',
-                                          'x-validator': [],
-                                        }}
-                                      />
-                                    </Col>
-                                  </Row>
-                                </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Typography.Paragraph
-                                    code={false}
-                                    delete={false}
-                                    disabled={false}
-                                    editable={false}
-                                    ellipsis={{ rows: 4 }}
-                                    mark={false}
-                                    strong={false}
-                                    style={{ fontSize: '' }}
-                                    type="secondary"
-                                    underline={false}
-                                  >
-                                    衡量待测智能体的答案与评测数据集中给定答案的准确性，阈值范围为（0,1），得分越高越好。此项指标包含两个计分项：语义相似性、事实相似性，可手动配置两项计分项的权重。
-                                  </Typography.Paragraph>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 1,
-                                                min: 0,
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: false,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginLeft: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'answer_correctness.value',
-                                              'required': true,
-                                              'title': '容忍阈值设置',
-                                              'x-validator': [],
-                                            }}
-                                            style={{ display: 'inline-block' }}
-                                          />
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        />
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                      <Col __component_name="Col" flex="420px">
-                        <Card
-                          __component_name="Card"
-                          actions={[]}
-                          bordered={true}
-                          className="index-card"
-                          hoverable={true}
-                          loading={false}
-                          size="default"
-                          style={{ marginBottom: '16px' }}
-                          type="default"
-                        >
-                          <Row __component_name="Row" gutter={['', 0]} wrap={true}>
-                            <Col __component_name="Col" span={22}>
-                              <Row __component_name="Row" gutter={['', 8]} wrap={true}>
-                                <Col __component_name="Col" span={24}>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        >
-                                          <Typography.Text
-                                            __component_name="Typography.Text"
-                                            disabled={false}
-                                            ellipsis={true}
-                                            strong={true}
-                                            style={{ fontSize: '16' }}
-                                          >
-                                            知识库相似度
-                                          </Typography.Text>
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                    <Col __component_name="Col">
-                                      <FormilySwitch
-                                        __component_name="FormilySwitch"
-                                        componentProps={{
-                                          'x-component-props': {
-                                            disabled: false,
-                                            loading: false,
-                                            onChange: function () {
-                                              return this.onSwitchCheckChange.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    type: 'context_recall',
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(this),
-                                            size: 'small',
-                                          },
-                                        }}
-                                        decoratorProps={{
-                                          'x-decorator-props': {
-                                            labelEllipsis: true,
-                                            style: { height: '20px', marginBottom: '0px' },
-                                          },
-                                        }}
-                                        fieldProps={{
-                                          'name': 'context_recall.checked',
-                                          'title': '',
-                                          'x-validator': [],
-                                        }}
-                                      />
-                                    </Col>
-                                  </Row>
-                                </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Typography.Paragraph
-                                    code={false}
-                                    delete={false}
-                                    disabled={false}
-                                    editable={false}
-                                    ellipsis={{ rows: 2 }}
-                                    mark={false}
-                                    strong={false}
-                                    style={{ fontSize: '' }}
-                                    type="secondary"
-                                    underline={false}
-                                  >
-                                    衡量待测智能体知识库与评测数据集中给定答案是否一致，阈值范围为（0,1），得分越高越好。
-                                  </Typography.Paragraph>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{
-                                            marginBottom: '0px',
-                                            marginLeft: '0px',
-                                            marginRight: '0px',
-                                            paddingBottom: '0px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '0px',
-                                          }}
-                                        >
-                                          <FormilyNumberPicker
-                                            __component_name="FormilyNumberPicker"
-                                            componentProps={{
-                                              'x-component-props': {
-                                                max: 1,
-                                                min: 0,
-                                                placeholder: '请输入',
-                                              },
-                                            }}
-                                            decoratorProps={{
-                                              'x-decorator-props': {
-                                                asterisk: false,
-                                                colon: false,
-                                                labelAlign: 'left',
-                                                labelEllipsis: false,
-                                                labelWidth: '120px',
-                                                size: 'default',
-                                                style: {
-                                                  marginBottom: '0px',
-                                                  marginLeft: '0px',
-                                                  marginRight: '0px',
-                                                  marginTop: '5px',
-                                                  paddingBottom: '0px',
-                                                  paddingRight: '0px',
-                                                  paddingTop: '0px',
-                                                  textAlign: 'left',
-                                                },
-                                                wrapperAlign: 'left',
-                                                wrapperWidth: '80px',
-                                              },
-                                            }}
-                                            fieldProps={{
-                                              'name': 'context_recall.value',
-                                              'required': true,
-                                              'title': '容忍阈值设置',
-                                              'x-validator': [],
-                                            }}
-                                            style={{ display: 'inline-block' }}
-                                          />
-                                        </Col>
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                                    <Col __component_name="Col">
-                                      <Row
-                                        __component_name="Row"
-                                        justify="space-between"
-                                        wrap={false}
-                                      >
-                                        <Col
-                                          __component_name="Col"
-                                          style={{ marginLeft: '0px', paddingLeft: '8px' }}
-                                        />
-                                      </Row>
-                                    </Col>
-                                  </Row>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-                <Row __component_name="Row" wrap={true}>
-                  <Col __component_name="Col" flex="520px">
-                    <FormilySelect
-                      __component_name="FormilySelect"
-                      componentProps={{
-                        'x-component-props': {
-                          _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
-                          _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
-                          allowClear: false,
-                          disabled: false,
-                          onChange: function () {
-                            return this.onDataSetChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this),
-                          placeholder: '请选择数据集',
-                          showSearch: true,
-                        },
-                      }}
-                      decoratorProps={{
-                        'x-decorator-props': {
-                          labelEllipsis: true,
-                          labelWidth: '120px',
-                          wrapperWidth: '400px',
-                        },
-                      }}
-                      fieldProps={{
-                        '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
-                        'enum': null,
-                        'name': 'data_set_name',
-                        'required': true,
-                        'title': '评测数据集',
-                        'x-validator': [],
-                      }}
-                      style={{}}
-                    />
-                  </Col>
-                  <Col __component_name="Col" flex="300px">
-                    <FormilySelect
-                      __component_name="FormilySelect"
-                      componentProps={{
-                        'x-component-props': {
-                          _sdkSwrGetFunc: {},
-                          _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
-                          allowClear: false,
-                          disabled: false,
-                          onChange: function () {
-                            return this.onDataSetVersionChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this),
-                          placeholder: '请选择数据集版本',
-                          showSearch: true,
-                        },
-                      }}
-                      decoratorProps={{
-                        'x-decorator-props': { labelEllipsis: true, wrapperWidth: '400px' },
-                      }}
-                      fieldProps={{
-                        '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
-                        'enum': null,
-                        'name': 'data_set_version',
-                        'required': true,
-                        'title': '',
-                        'x-validator': [],
-                      }}
-                    />
-                  </Col>
-                </Row>
-                <Row
-                  __component_name="Row"
-                  style={{ marginBottom: '0px', paddingBottom: '0px' }}
-                  wrap={true}
-                >
-                  <Col __component_name="Col" flex="120px" />
-                  <Col __component_name="Col" span={19} style={{}}>
-                    <Row __component_name="Row" wrap={true}>
-                      <Col __component_name="Col" span={24}>
-                        <Row
-                          __component_name="Row"
-                          justify="space-between"
-                          style={{ width: '840px' }}
-                          wrap={false}
-                        >
-                          <Col __component_name="Col">
-                            <Input.Search
-                              __component_name="Input.Search"
-                              onSearch={function () {
-                                return this.onSearch.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
-                              }.bind(this)}
-                              placeholder="请输入"
-                              style={{ width: '400px' }}
-                            />
-                          </Col>
-                          <Col __component_name="Col">
-                            <Space __component_name="Space" align="center" direction="horizontal">
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" flex="960px">
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
+                      _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
+                      allowClear: false,
+                      disabled: false,
+                      placeholder: '请选择裁判大模型',
+                      showSearch: true,
+                    },
+                  }}
+                  decoratorProps={{
+                    'x-decorator-props': {
+                      labelEllipsis: true,
+                      labelWidth: '120px',
+                      wrapperWidth: '',
+                    },
+                  }}
+                  fieldProps={{
+                    '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                    'enum': null,
+                    'name': 'judgeLLM',
+                    'required': true,
+                    'title': '裁判大模型',
+                    'x-validator': [],
+                  }}
+                  style={{}}
+                />
+              </Col>
+            </Row>
+            <Row
+              __component_name="Row"
+              gutter={[null, 0]}
+              style={{ marginBottom: '0px', paddingBottom: '0px' }}
+              wrap={true}
+            >
+              <Col __component_name="Col" flex="120px">
+                <FormilyFormItem
+                  __component_name="FormilyFormItem"
+                  decoratorProps={{
+                    'x-decorator-props': {
+                      asterisk: true,
+                      labelCol: 6,
+                      labelEllipsis: true,
+                      wrapperWidth: '0',
+                    },
+                  }}
+                  fieldProps={{
+                    'name': 'FormilyFormItem',
+                    'title': '评测指标',
+                    'type': 'object',
+                    'x-component': 'FormilyFormItem',
+                    'x-validator': [],
+                  }}
+                  style={{}}
+                />
+              </Col>
+              <Col __component_name="Col" span={19} style={{}}>
+                <Row __component_name="Row" justify="start" wrap={false}>
+                  <Col __component_name="Col" flex="420px">
+                    <Card
+                      __component_name="Card"
+                      actions={[]}
+                      bordered={true}
+                      className="index-card"
+                      hoverable={true}
+                      loading={false}
+                      size="default"
+                      style={{ marginBottom: '16px' }}
+                      type="default"
+                    >
+                      <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                        <Col __component_name="Col" span={22}>
+                          <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                            <Col __component_name="Col" span={24}>
                               <Row __component_name="Row" justify="space-between" wrap={false}>
                                 <Col __component_name="Col">
-                                  <Pagination
-                                    __component_name="Pagination"
-                                    current={__$$eval(
-                                      () => this.state.dataSetFileSearchParams.currentPage
-                                    )}
-                                    onChange={function () {
-                                      return this.onPageChange.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([])
-                                      );
-                                    }.bind(this)}
-                                    onShowSizeChange={function () {
-                                      return this.onPageChange.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([])
-                                      );
-                                    }.bind(this)}
-                                    pageSize={__$$eval(
-                                      () => this.state.dataSetFileSearchParams.pageSize
-                                    )}
-                                    showTotal={function () {
-                                      return this.showTotal.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([])
-                                      );
-                                    }.bind(this)}
-                                    simple={false}
-                                    style={{ textAlign: 'right' }}
-                                    total={__$$eval(() => this.state.dataSetFileTotal)}
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    >
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={true}
+                                        style={{ fontSize: '16' }}
+                                      >
+                                        忠实度
+                                      </Typography.Text>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                                <Col __component_name="Col">
+                                  <FormilySwitch
+                                    __component_name="FormilySwitch"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        disabled: false,
+                                        loading: false,
+                                        onChange: function () {
+                                          return this.onSwitchCheckChange.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                type: 'faithfulness',
+                                              },
+                                            ])
+                                          );
+                                        }.bind(this),
+                                        size: 'small',
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': {
+                                        labelEllipsis: true,
+                                        style: { height: '20px', marginBottom: '0px' },
+                                      },
+                                    }}
+                                    fieldProps={{
+                                      'name': 'faithfulness.checked',
+                                      'title': '',
+                                      'x-validator': [],
+                                    }}
                                   />
                                 </Col>
                               </Row>
-                            </Space>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Table
-                      __component_name="Table"
-                      bordered={false}
-                      columns={[
-                        { dataIndex: 'path', key: 'name', title: '文件名称' },
-                        {
-                          dataIndex: 'fileType',
-                          render: (text, record, index) =>
-                            (__$$context => (
-                              <Typography.Text
-                                __component_name="Typography.Text"
+                            </Col>
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Paragraph
+                                code={false}
+                                delete={false}
                                 disabled={false}
-                                ellipsis={true}
+                                editable={false}
+                                ellipsis={{ rows: 2 }}
+                                mark={false}
                                 strong={false}
                                 style={{ fontSize: '' }}
+                                type="secondary"
+                                underline={false}
                               >
-                                {__$$eval(() => text || '-')}
-                              </Typography.Text>
-                            ))(__$$createChildContext(__$$context, { text, record, index })),
-                          title: '标签',
-                          width: 120,
-                        },
-                        { dataIndex: 'size', key: 'size', title: '文件大小', width: 100 },
-                        { dataIndex: 'count', title: '数据量' },
-                      ]}
-                      dataSource={__$$eval(() => this.state.dataSetFileList)}
-                      expandable={{ expandedRowRender: '' }}
-                      loading={__$$eval(() => this.state.fileTableLoading)}
-                      pagination={false}
-                      rowKey="path"
-                      rowSelection={{
-                        onChange: function () {
-                          return this.onSelectFileChange.apply(
-                            this,
-                            Array.prototype.slice.call(arguments).concat([])
-                          );
-                        }.bind(this),
-                        selectedRowKeys: __$$eval(() => this.state.selectedFileList),
-                        type: 'checkbox',
-                      }}
-                      scroll={{ scrollToFirstRowOnChange: true }}
-                      showHeader={true}
+                                衡量待测智能体生成的答案与知识库内容的一致性，阈值范围为（0,1），得分越高越好。
+                              </Typography.Paragraph>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        marginRight: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '8px',
+                                        paddingRight: '0px',
+                                      }}
+                                    >
+                                      <FormilyNumberPicker
+                                        __component_name="FormilyNumberPicker"
+                                        componentProps={{
+                                          'x-component-props': {
+                                            max: 1,
+                                            min: 0,
+                                            placeholder: '请输入',
+                                            step: __$$eval(() => 1 / 10),
+                                          },
+                                        }}
+                                        decoratorProps={{
+                                          'x-decorator-props': {
+                                            asterisk: false,
+                                            colon: false,
+                                            labelAlign: 'left',
+                                            labelEllipsis: false,
+                                            labelWidth: '120px',
+                                            size: 'default',
+                                            style: {
+                                              marginBottom: '0px',
+                                              marginLeft: '0px',
+                                              marginRight: '0px',
+                                              marginTop: '5px',
+                                              paddingBottom: '0px',
+                                              paddingRight: '0px',
+                                              paddingTop: '0px',
+                                              textAlign: 'left',
+                                            },
+                                            wrapperAlign: 'left',
+                                            wrapperWidth: '80px',
+                                          },
+                                        }}
+                                        fieldProps={{
+                                          'name': 'faithfulness.value',
+                                          'required': true,
+                                          'title': '容忍阈值设置',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ display: 'inline-block' }}
+                                      />
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                  <Col __component_name="Col" flex="420px">
+                    <Card
+                      __component_name="Card"
+                      actions={[]}
+                      bordered={true}
+                      className="index-card"
+                      hoverable={true}
+                      loading={false}
                       size="default"
-                      style={{ width: '820px' }}
-                    />
+                      style={{ marginBottom: '16px' }}
+                      type="default"
+                    >
+                      <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                        <Col __component_name="Col" span={22}>
+                          <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                            <Col __component_name="Col" span={24}>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    >
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={true}
+                                        style={{ fontSize: '16' }}
+                                      >
+                                        知识库相关度
+                                      </Typography.Text>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                                <Col __component_name="Col">
+                                  <FormilySwitch
+                                    __component_name="FormilySwitch"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        disabled: false,
+                                        loading: false,
+                                        onChange: function () {
+                                          return this.onSwitchCheckChange.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                type: 'context_relevancy',
+                                              },
+                                            ])
+                                          );
+                                        }.bind(this),
+                                        size: 'small',
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': {
+                                        labelEllipsis: true,
+                                        style: { height: '20px', marginBottom: '0px' },
+                                      },
+                                    }}
+                                    fieldProps={{
+                                      'name': 'context_relevancy.checked',
+                                      'title': '',
+                                      'x-pattern': '',
+                                      'x-validator': [],
+                                    }}
+                                  />
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Paragraph
+                                code={false}
+                                delete={false}
+                                disabled={false}
+                                editable={false}
+                                ellipsis={{ rows: 2 }}
+                                mark={false}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                                type="secondary"
+                                underline={false}
+                              >
+                                衡量待测智能体的知识库与问题的相关度，阈值范围为（0,1），得分越高越好。
+                              </Typography.Paragraph>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        marginRight: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '8px',
+                                        paddingRight: '0px',
+                                      }}
+                                    >
+                                      <FormilyNumberPicker
+                                        __component_name="FormilyNumberPicker"
+                                        componentProps={{
+                                          'x-component-props': {
+                                            max: 1,
+                                            min: 0,
+                                            placeholder: '请输入',
+                                            step: __$$eval(() => 1 / 10),
+                                          },
+                                        }}
+                                        decoratorProps={{
+                                          'x-decorator-props': {
+                                            asterisk: false,
+                                            colon: false,
+                                            labelAlign: 'left',
+                                            labelEllipsis: false,
+                                            labelWidth: '120px',
+                                            size: 'default',
+                                            style: {
+                                              marginBottom: '0px',
+                                              marginLeft: '0px',
+                                              marginRight: '0px',
+                                              marginTop: '5px',
+                                              paddingBottom: '0px',
+                                              paddingRight: '0px',
+                                              paddingTop: '0px',
+                                              textAlign: 'left',
+                                            },
+                                            wrapperAlign: 'left',
+                                            wrapperWidth: '80px',
+                                          },
+                                        }}
+                                        fieldProps={{
+                                          'name': 'context_relevancy.value',
+                                          'required': true,
+                                          'title': '容忍阈值设置',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ display: 'inline-block' }}
+                                      />
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    />
+                                  </Row>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Card>
                   </Col>
                 </Row>
-                {!!__$$eval(() => this.state.fileSelectCheckErrorFlag) && (
-                  <Row
-                    __component_name="Row"
-                    style={{ marginBottom: '0px', paddingBottom: '0px' }}
-                    wrap={true}
-                  >
-                    <Col __component_name="Col" flex="120px" />
-                    <Col __component_name="Col" span={19} style={{}}>
-                      <Row __component_name="Row" wrap={true}>
-                        <Col __component_name="Col" span={24}>
+                <Row __component_name="Row" justify="start" wrap={false}>
+                  <Col __component_name="Col" flex="420px">
+                    <Card
+                      __component_name="Card"
+                      actions={[]}
+                      bordered={true}
+                      className="index-card"
+                      hoverable={true}
+                      loading={false}
+                      size="default"
+                      style={{ marginBottom: '16px' }}
+                      type="default"
+                    >
+                      <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                        <Col __component_name="Col" span={22}>
+                          <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                            <Col __component_name="Col" span={24}>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    >
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={true}
+                                        style={{ fontSize: '16' }}
+                                      >
+                                        答案相关度
+                                      </Typography.Text>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                                <Col __component_name="Col">
+                                  <FormilySwitch
+                                    __component_name="FormilySwitch"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        disabled: true,
+                                        loading: false,
+                                        onChange: function () {
+                                          return this.onSwitchCheckChange.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                type: 'answer_relevancy',
+                                              },
+                                            ])
+                                          );
+                                        }.bind(this),
+                                        size: 'small',
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': {
+                                        labelEllipsis: true,
+                                        style: { height: '20px', marginBottom: '0px' },
+                                      },
+                                    }}
+                                    fieldProps={{
+                                      'name': 'answer_relevancy.checked',
+                                      'title': '',
+                                      'x-validator': [],
+                                    }}
+                                  />
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Paragraph
+                                code={false}
+                                delete={false}
+                                disabled={false}
+                                editable={false}
+                                ellipsis={{ rows: 4 }}
+                                mark={false}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                                type="secondary"
+                                underline={false}
+                              >
+                                衡量待测智能体的答案与问题的相关程度。当一个答案直接恰当地解决了最初的问题时，它就被认为是相关的；答案不完整或冗余则分数降低。该指标不考虑答案真实性，阈值范围为（0,1），得分越高越好。
+                              </Typography.Paragraph>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        marginRight: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '8px',
+                                        paddingRight: '0px',
+                                      }}
+                                    >
+                                      <FormilyNumberPicker
+                                        __component_name="FormilyNumberPicker"
+                                        componentProps={{
+                                          'x-component-props': {
+                                            max: 1,
+                                            min: 0,
+                                            placeholder: '请输入',
+                                            step: __$$eval(() => 1 / 10),
+                                          },
+                                        }}
+                                        decoratorProps={{
+                                          'x-decorator-props': {
+                                            asterisk: false,
+                                            colon: false,
+                                            labelAlign: 'left',
+                                            labelEllipsis: false,
+                                            labelWidth: '120px',
+                                            size: 'default',
+                                            style: {
+                                              marginBottom: '0px',
+                                              marginLeft: '0px',
+                                              marginRight: '0px',
+                                              marginTop: '5px',
+                                              paddingBottom: '0px',
+                                              paddingRight: '0px',
+                                              paddingTop: '0px',
+                                              textAlign: 'left',
+                                            },
+                                            wrapperAlign: 'left',
+                                            wrapperWidth: '80px',
+                                          },
+                                        }}
+                                        fieldProps={{
+                                          'name': 'answer_relevancy.value',
+                                          'required': true,
+                                          'title': '容忍阈值设置',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ display: 'inline-block' }}
+                                      />
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                  <Col __component_name="Col" flex="420px">
+                    <Card
+                      __component_name="Card"
+                      actions={[]}
+                      bordered={true}
+                      className="index-card"
+                      hoverable={true}
+                      loading={false}
+                      size="default"
+                      style={{ marginBottom: '16px' }}
+                      type="default"
+                    >
+                      <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                        <Col __component_name="Col" span={22}>
+                          <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                            <Col __component_name="Col" span={24}>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    >
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={true}
+                                        style={{ fontSize: '16' }}
+                                      >
+                                        知识库精度
+                                      </Typography.Text>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                                <Col __component_name="Col">
+                                  <FormilySwitch
+                                    __component_name="FormilySwitch"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        disabled: false,
+                                        loading: false,
+                                        onChange: function () {
+                                          return this.onSwitchCheckChange.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                type: 'context_precision',
+                                              },
+                                            ])
+                                          );
+                                        }.bind(this),
+                                        size: 'small',
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': {
+                                        labelEllipsis: true,
+                                        style: { height: '20px', marginBottom: '0px' },
+                                      },
+                                    }}
+                                    fieldProps={{
+                                      'name': 'context_precision.checked',
+                                      'title': '',
+                                      'x-validator': [],
+                                    }}
+                                  />
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Paragraph
+                                code={false}
+                                delete={false}
+                                disabled={false}
+                                editable={false}
+                                ellipsis={{ rows: 4 }}
+                                mark={false}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                                type="secondary"
+                                underline={false}
+                              >
+                                衡量待测智能体知识库所有与评测数据集中给定答案相关的数据是否排名更改，阈值范围为（0,1），得分越高越好。
+                              </Typography.Paragraph>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        marginRight: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '8px',
+                                        paddingRight: '0px',
+                                      }}
+                                    >
+                                      <FormilyNumberPicker
+                                        __component_name="FormilyNumberPicker"
+                                        componentProps={{
+                                          'x-component-props': {
+                                            max: 1,
+                                            min: 0,
+                                            placeholder: '请输入',
+                                            step: __$$eval(() => 1 / 10),
+                                          },
+                                        }}
+                                        decoratorProps={{
+                                          'x-decorator-props': {
+                                            asterisk: false,
+                                            colon: false,
+                                            labelAlign: 'left',
+                                            labelEllipsis: false,
+                                            labelWidth: '120px',
+                                            size: 'default',
+                                            style: {
+                                              marginBottom: '0px',
+                                              marginLeft: '0px',
+                                              marginRight: '0px',
+                                              marginTop: '5px',
+                                              paddingBottom: '0px',
+                                              paddingRight: '0px',
+                                              paddingTop: '0px',
+                                              textAlign: 'left',
+                                            },
+                                            wrapperAlign: 'left',
+                                            wrapperWidth: '80px',
+                                          },
+                                        }}
+                                        fieldProps={{
+                                          'name': 'context_precision.value',
+                                          'required': true,
+                                          'title': '容忍阈值设置',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ display: 'inline-block' }}
+                                      />
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    />
+                                  </Row>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                </Row>
+                <Row __component_name="Row" justify="start" wrap={false}>
+                  <Col __component_name="Col" flex="420px">
+                    <Card
+                      __component_name="Card"
+                      actions={[]}
+                      bordered={true}
+                      className="index-card"
+                      hoverable={true}
+                      loading={false}
+                      size="default"
+                      style={{ marginBottom: '16px' }}
+                      type="default"
+                    >
+                      <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                        <Col __component_name="Col" span={22}>
+                          <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                            <Col __component_name="Col" span={24}>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    >
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={true}
+                                        style={{ fontSize: '16' }}
+                                      >
+                                        答案语义相似度
+                                      </Typography.Text>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                                <Col __component_name="Col">
+                                  <FormilySwitch
+                                    __component_name="FormilySwitch"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        disabled: true,
+                                        loading: false,
+                                        onChange: function () {
+                                          return this.onSwitchCheckChange.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                type: 'answer_similarity',
+                                              },
+                                            ])
+                                          );
+                                        }.bind(this),
+                                        size: 'small',
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': {
+                                        labelEllipsis: true,
+                                        style: { height: '20px', marginBottom: '0px' },
+                                      },
+                                    }}
+                                    fieldProps={{
+                                      'name': 'answer_similarity.checked',
+                                      'title': '',
+                                      'x-validator': [],
+                                    }}
+                                  />
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Paragraph
+                                code={false}
+                                delete={false}
+                                disabled={false}
+                                editable={false}
+                                ellipsis={{ rows: 2 }}
+                                mark={false}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                                type="secondary"
+                                underline={false}
+                              >
+                                衡量待测智能体的答案与评测数据集中给定答案的语义相似度，阈值范围为（0,1），得分越高越好。
+                              </Typography.Paragraph>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        marginRight: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '8px',
+                                        paddingRight: '0px',
+                                      }}
+                                    >
+                                      <FormilyNumberPicker
+                                        __component_name="FormilyNumberPicker"
+                                        componentProps={{
+                                          'x-component-props': {
+                                            max: 1,
+                                            min: 0,
+                                            placeholder: '请输入',
+                                            step: __$$eval(() => 1 / 10),
+                                          },
+                                        }}
+                                        decoratorProps={{
+                                          'x-decorator-props': {
+                                            asterisk: false,
+                                            colon: false,
+                                            labelAlign: 'left',
+                                            labelEllipsis: false,
+                                            labelWidth: '120px',
+                                            size: 'default',
+                                            style: {
+                                              marginBottom: '0px',
+                                              marginLeft: '0px',
+                                              marginRight: '0px',
+                                              marginTop: '5px',
+                                              paddingBottom: '0px',
+                                              paddingRight: '0px',
+                                              paddingTop: '0px',
+                                              textAlign: 'left',
+                                            },
+                                            wrapperAlign: 'left',
+                                            wrapperWidth: '80px',
+                                          },
+                                        }}
+                                        fieldProps={{
+                                          'name': 'answer_similarity.value',
+                                          'required': true,
+                                          'title': '容忍阈值设置',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ display: 'inline-block' }}
+                                      />
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    />
+                                  </Row>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                  <Col __component_name="Col" flex="420px">
+                    <Card
+                      __component_name="Card"
+                      actions={[]}
+                      bordered={true}
+                      className="index-card"
+                      hoverable={true}
+                      loading={false}
+                      size="default"
+                      style={{ marginBottom: '16px' }}
+                      type="default"
+                    >
+                      <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                        <Col __component_name="Col" span={22}>
+                          <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                            <Col __component_name="Col" span={24}>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    >
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={true}
+                                        style={{ fontSize: '16' }}
+                                      >
+                                        知识库相似度
+                                      </Typography.Text>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                                <Col __component_name="Col">
+                                  <FormilySwitch
+                                    __component_name="FormilySwitch"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        disabled: false,
+                                        loading: false,
+                                        onChange: function () {
+                                          return this.onSwitchCheckChange.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                type: 'context_recall',
+                                              },
+                                            ])
+                                          );
+                                        }.bind(this),
+                                        size: 'small',
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': {
+                                        labelEllipsis: true,
+                                        style: { height: '20px', marginBottom: '0px' },
+                                      },
+                                    }}
+                                    fieldProps={{
+                                      'name': 'context_recall.checked',
+                                      'title': '',
+                                      'x-validator': [],
+                                    }}
+                                  />
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Paragraph
+                                code={false}
+                                delete={false}
+                                disabled={false}
+                                editable={false}
+                                ellipsis={{ rows: 2 }}
+                                mark={false}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                                type="secondary"
+                                underline={false}
+                              >
+                                衡量待测智能体知识库与评测数据集中给定答案是否一致，阈值范围为（0,1），得分越高越好。
+                              </Typography.Paragraph>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        marginRight: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '8px',
+                                        paddingRight: '0px',
+                                      }}
+                                    >
+                                      <FormilyNumberPicker
+                                        __component_name="FormilyNumberPicker"
+                                        componentProps={{
+                                          'x-component-props': {
+                                            max: 1,
+                                            min: 0,
+                                            placeholder: '请输入',
+                                            step: __$$eval(() => 1 / 10),
+                                          },
+                                        }}
+                                        decoratorProps={{
+                                          'x-decorator-props': {
+                                            asterisk: false,
+                                            colon: false,
+                                            labelAlign: 'left',
+                                            labelEllipsis: false,
+                                            labelWidth: '120px',
+                                            size: 'default',
+                                            style: {
+                                              marginBottom: '0px',
+                                              marginLeft: '0px',
+                                              marginRight: '0px',
+                                              marginTop: '5px',
+                                              paddingBottom: '0px',
+                                              paddingRight: '0px',
+                                              paddingTop: '0px',
+                                              textAlign: 'left',
+                                            },
+                                            wrapperAlign: 'left',
+                                            wrapperWidth: '80px',
+                                          },
+                                        }}
+                                        fieldProps={{
+                                          'name': 'context_recall.value',
+                                          'required': true,
+                                          'title': '容忍阈值设置',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ display: 'inline-block' }}
+                                      />
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    />
+                                  </Row>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                </Row>
+                <Row __component_name="Row" justify="start" wrap={false}>
+                  <Col __component_name="Col" flex="840px">
+                    <Card
+                      __component_name="Card"
+                      actions={[]}
+                      bordered={true}
+                      className="index-card"
+                      hoverable={true}
+                      loading={false}
+                      size="default"
+                      style={{ marginBottom: '16px' }}
+                      type="default"
+                    >
+                      <Row __component_name="Row" gutter={['', 0]} wrap={true}>
+                        <Col __component_name="Col" span={22}>
+                          <Row __component_name="Row" gutter={['', 8]} wrap={true}>
+                            <Col __component_name="Col" span={24}>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{ marginLeft: '0px', paddingLeft: '8px' }}
+                                    >
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={true}
+                                        style={{ fontSize: '16' }}
+                                      >
+                                        答案正确性
+                                      </Typography.Text>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                                <Col __component_name="Col">
+                                  <FormilySwitch
+                                    __component_name="FormilySwitch"
+                                    componentProps={{
+                                      'x-component-props': {
+                                        disabled: true,
+                                        loading: false,
+                                        onChange: function () {
+                                          return this.onSwitchCheckChange.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
+                                              {
+                                                type: 'answer_correctness',
+                                              },
+                                            ])
+                                          );
+                                        }.bind(this),
+                                        size: 'small',
+                                      },
+                                    }}
+                                    decoratorProps={{
+                                      'x-decorator-props': {
+                                        labelEllipsis: true,
+                                        style: { height: '20px', marginBottom: '0px' },
+                                      },
+                                    }}
+                                    fieldProps={{
+                                      'name': 'answer_correctness.checked',
+                                      'title': '',
+                                      'x-validator': [],
+                                    }}
+                                  />
+                                </Col>
+                              </Row>
+                            </Col>
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Paragraph
+                                code={false}
+                                delete={false}
+                                disabled={false}
+                                editable={false}
+                                ellipsis={{ rows: 4 }}
+                                mark={false}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                                type="secondary"
+                                underline={false}
+                              >
+                                衡量待测智能体的答案与评测数据集中给定答案的准确性，阈值范围为（0,1），得分越高越好。此项指标包含两个计分项：语义相似性、事实相似性，可手动配置两项计分项的权重。
+                              </Typography.Paragraph>
+                              <Row __component_name="Row" justify="space-between" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        marginRight: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '8px',
+                                        paddingRight: '0px',
+                                      }}
+                                    >
+                                      <FormilyNumberPicker
+                                        __component_name="FormilyNumberPicker"
+                                        componentProps={{
+                                          'x-component-props': {
+                                            max: 1,
+                                            min: 0,
+                                            placeholder: '请输入',
+                                            step: __$$eval(() => 1 / 10),
+                                          },
+                                        }}
+                                        decoratorProps={{
+                                          'x-decorator-props': {
+                                            asterisk: false,
+                                            colon: false,
+                                            labelAlign: 'left',
+                                            labelEllipsis: false,
+                                            labelWidth: '120px',
+                                            size: 'default',
+                                            style: {
+                                              marginBottom: '0px',
+                                              marginLeft: '0px',
+                                              marginRight: '0px',
+                                              marginTop: '5px',
+                                              paddingBottom: '0px',
+                                              paddingRight: '0px',
+                                              paddingTop: '0px',
+                                              textAlign: 'left',
+                                            },
+                                            wrapperAlign: 'left',
+                                            wrapperWidth: '80px',
+                                          },
+                                        }}
+                                        fieldProps={{
+                                          'name': 'answer_correctness.value',
+                                          'required': true,
+                                          'title': '容忍阈值设置',
+                                          'x-validator': [],
+                                        }}
+                                        style={{ display: 'inline-block' }}
+                                      />
+                                    </Col>
+                                  </Row>
+                                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        marginRight: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '8px',
+                                        paddingRight: '0px',
+                                      }}
+                                    />
+                                  </Row>
+                                </Col>
+                              </Row>
+                              <Row __component_name="Row" wrap={true}>
+                                <Col __component_name="Col" span={24}>
+                                  <Row __component_name="Row" wrap={false}>
+                                    <Col
+                                      __component_name="Col"
+                                      flex="120px"
+                                      style={{ lineHeight: '32px' }}
+                                    >
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={false}
+                                        style={{ fontSize: '' }}
+                                      >
+                                        权重分配
+                                      </Typography.Text>
+                                    </Col>
+                                    <Col __component_name="Col" flex="auto">
+                                      <Row __component_name="Row" wrap={true}>
+                                        <Col __component_name="Col" span={24}>
+                                          <Row
+                                            __component_name="Row"
+                                            justify="space-between"
+                                            wrap={false}
+                                          >
+                                            <Col __component_name="Col">
+                                              <Row
+                                                __component_name="Row"
+                                                gutter={[null, 0]}
+                                                justify="start"
+                                                wrap={false}
+                                              >
+                                                <Col
+                                                  __component_name="Col"
+                                                  style={{
+                                                    marginBottom: '0px',
+                                                    marginRight: '0px',
+                                                    paddingBottom: '0px',
+                                                    paddingLeft: '8px',
+                                                    paddingRight: '0px',
+                                                  }}
+                                                >
+                                                  <FormilyNumberPicker
+                                                    __component_name="FormilyNumberPicker"
+                                                    componentProps={{
+                                                      'x-component-props': {
+                                                        max: 100,
+                                                        min: 0,
+                                                        onChange: function () {
+                                                          return this.onValueChange.apply(
+                                                            this,
+                                                            Array.prototype.slice
+                                                              .call(arguments)
+                                                              .concat([
+                                                                {
+                                                                  type: 'semantic',
+                                                                },
+                                                              ])
+                                                          );
+                                                        }.bind(this),
+                                                        placeholder: '请输入',
+                                                      },
+                                                    }}
+                                                    decoratorProps={{
+                                                      'x-decorator-props': {
+                                                        asterisk: true,
+                                                        colon: false,
+                                                        labelAlign: 'left',
+                                                        labelEllipsis: false,
+                                                        labelWidth: '80px',
+                                                        size: 'default',
+                                                        style: {
+                                                          marginBottom: '0px',
+                                                          marginLeft: '0px',
+                                                          marginRight: '0px',
+                                                          marginTop: '5px',
+                                                          paddingBottom: '0px',
+                                                          paddingRight: '0px',
+                                                          paddingTop: '0px',
+                                                          textAlign: 'left',
+                                                        },
+                                                        wrapperAlign: 'left',
+                                                        wrapperWidth: '80px',
+                                                      },
+                                                    }}
+                                                    fieldProps={{
+                                                      'name': 'semantic',
+                                                      'required': true,
+                                                      'title': '语义相关性',
+                                                      'x-validator': [],
+                                                    }}
+                                                    style={{ display: 'inline-block' }}
+                                                  />
+                                                </Col>
+                                                <Col
+                                                  __component_name="Col"
+                                                  style={{
+                                                    lineHeight: '32px',
+                                                    marginBottom: '0px',
+                                                    marginLeft: '0px',
+                                                    marginRight: '0px',
+                                                    paddingBottom: '0px',
+                                                    paddingLeft: '0px',
+                                                    paddingRight: '0px',
+                                                  }}
+                                                />
+                                                <Col
+                                                  __component_name="Col"
+                                                  style={{
+                                                    lineHeight: '37px',
+                                                    marginBottom: '0px',
+                                                    marginLeft: '0px',
+                                                    paddingBottom: '0px',
+                                                    paddingLeft: '0px',
+                                                  }}
+                                                >
+                                                  <Typography.Text
+                                                    __component_name="Typography.Text"
+                                                    disabled={false}
+                                                    ellipsis={true}
+                                                    strong={false}
+                                                    style={{ fontSize: '', paddingLeft: '5px' }}
+                                                  >
+                                                    %
+                                                  </Typography.Text>
+                                                </Col>
+                                              </Row>
+                                            </Col>
+                                            <Col __component_name="Col">
+                                              <Row
+                                                __component_name="Row"
+                                                gutter={[null, 0]}
+                                                justify="space-around"
+                                                wrap={false}
+                                              >
+                                                <Col
+                                                  __component_name="Col"
+                                                  style={{
+                                                    marginBottom: '0px',
+                                                    marginRight: '0px',
+                                                    paddingBottom: '0px',
+                                                    paddingLeft: '8px',
+                                                    paddingRight: '0px',
+                                                  }}
+                                                >
+                                                  <FormilyNumberPicker
+                                                    __component_name="FormilyNumberPicker"
+                                                    componentProps={{
+                                                      'x-component-props': {
+                                                        max: 100,
+                                                        min: 0,
+                                                        onChange: function () {
+                                                          return this.onValueChange.apply(
+                                                            this,
+                                                            Array.prototype.slice
+                                                              .call(arguments)
+                                                              .concat([
+                                                                {
+                                                                  type: 'factuality',
+                                                                },
+                                                              ])
+                                                          );
+                                                        }.bind(this),
+                                                        placeholder: '请输入',
+                                                      },
+                                                    }}
+                                                    decoratorProps={{
+                                                      'x-decorator-props': {
+                                                        asterisk: true,
+                                                        colon: false,
+                                                        labelAlign: 'left',
+                                                        labelEllipsis: false,
+                                                        labelWidth: '80px',
+                                                        size: 'default',
+                                                        style: {
+                                                          marginBottom: '0px',
+                                                          marginRight: '0px',
+                                                          marginTop: '5px',
+                                                          paddingBottom: '0px',
+                                                          paddingRight: '0px',
+                                                          paddingTop: '0px',
+                                                          textAlign: 'left',
+                                                        },
+                                                        wrapperAlign: 'left',
+                                                        wrapperWidth: '80px',
+                                                      },
+                                                    }}
+                                                    fieldProps={{
+                                                      'name': 'factuality',
+                                                      'required': true,
+                                                      'title': '事实相似性',
+                                                      'x-validator': [],
+                                                    }}
+                                                    style={{}}
+                                                  />
+                                                </Col>
+                                                <Col
+                                                  __component_name="Col"
+                                                  style={{
+                                                    lineHeight: '32px',
+                                                    marginBottom: '0px',
+                                                    marginLeft: '0px',
+                                                    marginRight: '0px',
+                                                    paddingBottom: '0px',
+                                                    paddingLeft: '0px',
+                                                    paddingRight: '0px',
+                                                  }}
+                                                />
+                                                <Col
+                                                  __component_name="Col"
+                                                  style={{
+                                                    lineHeight: '37px',
+                                                    marginBottom: '0px',
+                                                    marginLeft: '0px',
+                                                    paddingBottom: '0px',
+                                                    paddingLeft: '0px',
+                                                  }}
+                                                >
+                                                  <Typography.Text
+                                                    __component_name="Typography.Text"
+                                                    disabled={false}
+                                                    ellipsis={true}
+                                                    strong={false}
+                                                    style={{ fontSize: '', paddingLeft: '5px' }}
+                                                  >
+                                                    %
+                                                  </Typography.Text>
+                                                </Col>
+                                              </Row>
+                                            </Col>
+                                          </Row>
+                                        </Col>
+                                      </Row>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                              <Row __component_name="Row" justify="start" wrap={false}>
+                                <Col __component_name="Col">
+                                  <Row
+                                    __component_name="Row"
+                                    gutter={[null, 0]}
+                                    justify="start"
+                                    wrap={false}
+                                  >
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        lineHeight: '37px',
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '0px',
+                                      }}
+                                    />
+                                    <Col
+                                      __component_name="Col"
+                                      style={{
+                                        lineHeight: '37px',
+                                        marginBottom: '0px',
+                                        marginLeft: '0px',
+                                        paddingBottom: '0px',
+                                        paddingLeft: '0px',
+                                      }}
+                                    />
+                                  </Row>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" flex="520px">
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: __$$eval(() => this.state.dataSetDataList),
+                      _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ExpressionSetter',
+                      allowClear: false,
+                      disabled: false,
+                      onChange: function () {
+                        return this.onDataSetChange.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
+                      placeholder: '请选择数据集',
+                      showSearch: true,
+                    },
+                  }}
+                  decoratorProps={{
+                    'x-decorator-props': {
+                      labelEllipsis: true,
+                      labelWidth: '120px',
+                      wrapperWidth: '400px',
+                    },
+                  }}
+                  fieldProps={{
+                    '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                    'enum': null,
+                    'name': 'data_set_name',
+                    'required': true,
+                    'title': '评测数据集',
+                    'x-validator': [],
+                  }}
+                  style={{}}
+                />
+              </Col>
+              <Col __component_name="Col" flex="300px">
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      _sdkSwrGetFunc: {},
+                      _unsafe_MixedSetter__sdkSwrGetFunc_select: 'ObjectSetter',
+                      allowClear: false,
+                      disabled: false,
+                      onChange: function () {
+                        return this.onDataSetVersionChange.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
+                      placeholder: '请选择数据集版本',
+                      showSearch: true,
+                    },
+                  }}
+                  decoratorProps={{
+                    'x-decorator-props': { labelEllipsis: true, wrapperWidth: '400px' },
+                  }}
+                  fieldProps={{
+                    '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
+                    'enum': null,
+                    'name': 'data_set_version',
+                    'required': true,
+                    'title': '',
+                    'x-validator': [],
+                  }}
+                />
+              </Col>
+            </Row>
+            <Row
+              __component_name="Row"
+              style={{ marginBottom: '0px', paddingBottom: '0px' }}
+              wrap={true}
+            >
+              <Col __component_name="Col" flex="120px" />
+              <Col __component_name="Col" span={19} style={{}}>
+                <Row __component_name="Row" wrap={true}>
+                  <Col __component_name="Col" span={24}>
+                    <Row
+                      __component_name="Row"
+                      justify="space-between"
+                      style={{ width: '840px' }}
+                      wrap={false}
+                    >
+                      <Col __component_name="Col">
+                        <Input.Search
+                          __component_name="Input.Search"
+                          onSearch={function () {
+                            return this.onSearch.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          placeholder="请输入"
+                          style={{ width: '400px' }}
+                        />
+                      </Col>
+                      <Col __component_name="Col">
+                        <Space __component_name="Space" align="center" direction="horizontal">
+                          <Row __component_name="Row" justify="space-between" wrap={false}>
+                            <Col __component_name="Col">
+                              <Pagination
+                                __component_name="Pagination"
+                                current={__$$eval(
+                                  () => this.state.dataSetFileSearchParams.currentPage
+                                )}
+                                onChange={function () {
+                                  return this.onPageChange.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                onShowSizeChange={function () {
+                                  return this.onPageChange.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                pageSize={__$$eval(
+                                  () => this.state.dataSetFileSearchParams.pageSize
+                                )}
+                                showTotal={function () {
+                                  return this.showTotal.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                simple={false}
+                                style={{ textAlign: 'right' }}
+                                total={__$$eval(() => this.state.dataSetFileTotal)}
+                              />
+                            </Col>
+                          </Row>
+                        </Space>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+                <Table
+                  __component_name="Table"
+                  bordered={false}
+                  columns={[
+                    { dataIndex: 'path', key: 'name', title: '文件名称' },
+                    {
+                      dataIndex: 'fileType',
+                      render: (text, record, index) =>
+                        (__$$context => (
                           <Typography.Text
                             __component_name="Typography.Text"
                             disabled={false}
                             ellipsis={true}
                             strong={false}
-                            style={{ color: '#d0021b', fontSize: '' }}
+                            style={{ fontSize: '' }}
                           >
-                            请选择文件
+                            {__$$eval(() => text || '-')}
                           </Typography.Text>
-                        </Col>
-                      </Row>
+                        ))(__$$createChildContext(__$$context, { text, record, index })),
+                      title: '标签',
+                      width: 120,
+                    },
+                    { dataIndex: 'size', key: 'size', title: '文件大小', width: 100 },
+                    { dataIndex: 'count', title: '数据量' },
+                  ]}
+                  dataSource={__$$eval(() => this.state.dataSetFileList)}
+                  expandable={{ expandedRowRender: '' }}
+                  loading={__$$eval(() => this.state.fileTableLoading)}
+                  pagination={false}
+                  rowKey="path"
+                  rowSelection={{
+                    onChange: function () {
+                      return this.onSelectFileChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                    selectedRowKeys: __$$eval(() => this.state.selectedFileList),
+                    type: 'checkbox',
+                  }}
+                  scroll={{ scrollToFirstRowOnChange: true }}
+                  showHeader={true}
+                  size="default"
+                  style={{ width: '820px' }}
+                />
+              </Col>
+            </Row>
+            {!!__$$eval(() => this.state.fileSelectCheckErrorFlag) && (
+              <Row
+                __component_name="Row"
+                style={{ marginBottom: '0px', paddingBottom: '0px' }}
+                wrap={true}
+              >
+                <Col __component_name="Col" flex="120px" />
+                <Col __component_name="Col" span={19} style={{}}>
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={24}>
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ color: '#d0021b', fontSize: '' }}
+                      >
+                        请选择文件
+                      </Typography.Text>
                     </Col>
                   </Row>
-                )}
-              </FormilyForm>
+                </Col>
+              </Row>
+            )}
+          </FormilyForm>
+          <Divider
+            __component_name="Divider"
+            dashed={false}
+            defaultOpen={false}
+            mode="line"
+            style={{ height: '1px', marginBottom: '0px', marginTop: '0px' }}
+          />
+          <Row __component_name="Row" style={{ marginLeft: '0px', marginRight: '0px' }} wrap={true}>
+            <Col
+              __component_name="Col"
+              flex="140px"
+              style={{
+                display: 'inline',
+                marginLeft: '0px',
+                marginRight: '0px',
+                paddingBottom: '16px',
+                paddingTop: '16px',
+                textAlign: 'center',
+              }}
+            />
+            <Col
+              __component_name="Col"
+              span={6}
+              style={{
+                display: 'inline',
+                marginLeft: '0px',
+                marginRight: '0px',
+                paddingBottom: '16px',
+                paddingTop: '16px',
+                textAlign: 'left',
+              }}
+            >
+              <Button
+                __component_name="Button"
+                block={false}
+                danger={false}
+                disabled={false}
+                ghost={false}
+                loading={__$$eval(() => this.state.loading)}
+                onClick={function () {
+                  return this.onFinish.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                shape="default"
+                type="primary"
+              >
+                创建
+              </Button>
+              <Button
+                __component_name="Button"
+                block={false}
+                danger={false}
+                disabled={false}
+                ghost={false}
+                shape="default"
+                style={{ marginLeft: '12px' }}
+              >
+                取消
+              </Button>
             </Col>
           </Row>
-        </Container>
-        <Divider
-          __component_name="Divider"
-          dashed={false}
-          defaultOpen={false}
-          mode="line"
-          style={{
-            backgroundColor: '#ffffff',
-            height: '1px',
-            marginBottom: '0px',
-            marginTop: '0px',
-          }}
-        />
-        <Row
-          __component_name="Row"
-          style={{ backgroundColor: '#ffffff', marginLeft: '0px', marginRight: '0px' }}
-          wrap={true}
-        >
-          <Col
-            __component_name="Col"
-            flex="140px"
-            style={{
-              backgroundColor: '#ffffff',
-              display: 'inline',
-              marginLeft: '0px',
-              marginRight: '0px',
-              paddingBottom: '16px',
-              paddingTop: '16px',
-              textAlign: 'center',
-            }}
-          />
-          <Col
-            __component_name="Col"
-            span={6}
-            style={{
-              backgroundColor: '#ffffff',
-              display: 'inline',
-              marginLeft: '0px',
-              marginRight: '0px',
-              paddingBottom: '16px',
-              paddingTop: '16px',
-              textAlign: 'left',
-            }}
-          >
-            <Button
-              __component_name="Button"
-              block={false}
-              danger={false}
-              disabled={false}
-              ghost={false}
-              loading={__$$eval(() => this.state.loading)}
-              onClick={function () {
-                return this.onFinish.apply(this, Array.prototype.slice.call(arguments).concat([]));
-              }.bind(this)}
-              shape="default"
-              type="primary"
-            >
-              创建
-            </Button>
-            <Button
-              __component_name="Button"
-              block={false}
-              danger={false}
-              disabled={false}
-              ghost={false}
-              shape="default"
-              style={{ marginLeft: '12px' }}
-            >
-              取消
-            </Button>
-          </Col>
-        </Row>
+        </Card>
       </Page>
     );
   }
