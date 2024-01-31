@@ -30,6 +30,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
 import useGetCommonData from '@/components/hooks/useGetCommonData';
+import PromptStarter from '@/pages/Chat/Chat/PromptStarter';
 import RenderReferences, { Reference } from '@/pages/Chat/Chat/References';
 import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
 import Retry from '@/pages/Chat/Chat/retry';
@@ -318,26 +319,29 @@ const Chat: React.FC<IChat> = props => {
       }
     };
   }, []);
-  const onSend = useCallback(() => {
-    const _input = input?.trim();
-    if (!_input) return;
-    setConversation(conversation => {
-      const userMsgId = Date.now().toString();
-      const assistantMsgId = (Date.now() + 10).toString();
-      return addIndexToCvs({
-        ...conversation,
-        loadingMsgId: assistantMsgId,
-        data: [
-          ...conversation.data,
-          getCvsMeta(_input, userMsgId, null, true),
-          getCvsMeta('', assistantMsgId, null, false),
-        ],
+  const onSend = useCallback(
+    (__input: string) => {
+      const _input = __input?.trim();
+      if (!_input) return;
+      setConversation(conversation => {
+        const userMsgId = Date.now().toString();
+        const assistantMsgId = (Date.now() + 10).toString();
+        return addIndexToCvs({
+          ...conversation,
+          loadingMsgId: assistantMsgId,
+          data: [
+            ...conversation.data,
+            getCvsMeta(_input, userMsgId, null, true),
+            getCvsMeta('', assistantMsgId, null, false),
+          ],
+        });
       });
-    });
-    scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
-    fetchConversation(_input);
-    setInput('');
-  }, [input, setInput, setConversation, fetchConversation]);
+      scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
+      fetchConversation(_input);
+      setInput('');
+    },
+    [setInput, setConversation, fetchConversation]
+  );
   return (
     <div className="chatComponent">
       <div
@@ -397,6 +401,13 @@ const Chat: React.FC<IChat> = props => {
           />
           <div className="safeArea" id={safeAreaId}></div>
         </div>
+        {!props.conversationId && (
+          <PromptStarter
+            appName={props.appName}
+            appNamespace={props.appNamespace}
+            onPromptClick={onSend}
+          />
+        )}
         <div className="inputArea">
           <ChatInputArea
             bottomAddons={
@@ -409,7 +420,7 @@ const Chat: React.FC<IChat> = props => {
                   <span>换行</span>
                 </span>
                 <Tooltip title={appData?.llm ? '' : '暂未关联模型服务，请先关联模型服务再进行对话'}>
-                  <Button disabled={!appData?.llm} onClick={onSend} type="primary">
+                  <Button disabled={!appData?.llm} onClick={onSend.bind('', input)} type="primary">
                     发送
                   </Button>
                 </Tooltip>
