@@ -9,6 +9,7 @@
  * @date 2023-12-18
  */
 import { useModel } from '@@/exports';
+import { FileOutlined, LoadingOutlined } from '@ant-design/icons';
 import {
   ChatInputArea,
   ChatList as ChatItemsList,
@@ -22,14 +23,14 @@ import {
 import { getAuthData } from '@tenx-ui/auth-utils';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
-import { Button, Flex, Spin, Tag, Tooltip, message } from 'antd';
+import { Spin, Tag, UploadFile, message } from 'antd';
 import classNames from 'classnames';
 import { throttle } from 'lodash';
-import { ArrowBigUp, CornerDownLeft } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { fetchEventSource } from '@/components/fetchEventSource';
 import useGetCommonData from '@/components/hooks/useGetCommonData';
+import ChatInputBottomAddons from '@/pages/Chat/Chat/ChatInputBottomAddons';
 import PromptStarter from '@/pages/Chat/Chat/PromptStarter';
 import RenderReferences, { Reference } from '@/pages/Chat/Chat/References';
 import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
@@ -51,6 +52,18 @@ interface IChat {
   // 当第一次建立新会话时, 触发该事件
   onNewChat?: (conversationId: string) => any;
 }
+type TMessage = {
+  id: string;
+  query: string;
+  answer: string;
+  references: Reference[];
+  latency?: number;
+  documents: {
+    id: string;
+    name: string;
+    summary: string;
+  }[];
+};
 const safeAreaId = 'safe-area-id-not-use-in-your-code';
 class RetriableError extends Error {}
 class FatalError extends Error {}
@@ -77,6 +90,7 @@ const ctrl = new AbortController();
 const retry = new Retry(ctrl, 3);
 const Chat: React.FC<IChat> = props => {
   const { qiankun }: { qiankun: Record<string, any> } = useModel('qiankun');
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const isDark = qiankun?.theme?.isDark;
   const [showNextGuide, setShowNextGuide] = useState(true);
   const [conversation, setConversation] = useState<{
@@ -93,9 +107,7 @@ const Chat: React.FC<IChat> = props => {
     namespace: props.appNamespace,
   });
   const appData = application?.data?.Application?.getApplication;
-  const [messages, messagesLoading] = useGetCommonData<
-    { id: string; query: string; answer: string; references: Reference[]; latency?: number }[]
-  >({
+  const [messages, messagesLoading] = useGetCommonData<TMessage[]>({
     url: '/chat/messages',
     method: 'post',
     options: {
@@ -124,7 +136,7 @@ const Chat: React.FC<IChat> = props => {
             },
           },
         })
-        .catch(error => {
+        .catch(() => {
           //
         });
       if (!res?.length) return;
@@ -169,7 +181,16 @@ const Chat: React.FC<IChat> = props => {
       cvList = messages?.reduce(
         (pre, cur) => [
           ...pre,
-          getCvsMeta(cur.query, cur.id + '_query', null, true),
+          getCvsMeta(
+            cur.query,
+            cur.id + '_query',
+            cur.documents?.length
+              ? {
+                  fileList: cur.documents,
+                }
+              : null,
+            true
+          ),
           getCvsMeta(
             cur.answer,
             cur.id + '_answer',
@@ -321,6 +342,54 @@ const Chat: React.FC<IChat> = props => {
       }
     };
   }, []);
+  const sendChatWithFile = useCallback(async () => {
+    const formData = new FormData();
+    for (const [key, value] of Object.entries({
+      app_name: props.appName,
+      app_namespace: props.appNamespace || '',
+      conversation_id: props.conversationId || '',
+      query: 'DOC:ABSTRACT',
+      response_mode: 'blocking', // 目前不支持 streaming
+    })) {
+      formData.append(key, value);
+    }
+    for (const file of fileList) {
+      formData.append('docs', file.originFileObj, file.originFileObj.name);
+    }
+
+    const res = await request
+      .post({
+        url: `/chat/conversations/docs`,
+        options: {
+          body: formData,
+        },
+      })
+      .catch(() => {
+        setFileList([]);
+      });
+    setFileList([]);
+    if (!res.message_id) {
+      return;
+    }
+    setConversation(_conversation => {
+      const [first, ...rest] = _conversation.data.reverse();
+      return addIndexToCvs({
+        ..._conversation,
+        loadingMsgId: undefined,
+        data: [
+          ...rest.reverse(),
+          {
+            ...first,
+            content: res.message,
+            extra: {
+              ...first?.extra,
+              fileParsing: false,
+            },
+          },
+        ],
+      });
+    });
+  }, [input, fileList, setFileList]);
   const onSend = useCallback(
     (__input: string) => {
       const _input = __input?.trim();
@@ -333,17 +402,37 @@ const Chat: React.FC<IChat> = props => {
           loadingMsgId: assistantMsgId,
           data: [
             ...conversation.data,
-            getCvsMeta(_input, userMsgId, null, true),
-            getCvsMeta('', assistantMsgId, null, false),
+            getCvsMeta(
+              _input,
+              userMsgId,
+              fileList?.length
+                ? {
+                    fileList: fileList.map(file => ({
+                      name: file.name,
+                      size: file.size,
+                      type: file.type,
+                    })),
+                  }
+                : null,
+              true
+            ),
+            getCvsMeta(
+              '',
+              assistantMsgId,
+              {
+                fileParsing: Boolean(fileList?.length),
+              },
+              false
+            ),
           ],
         });
       });
       scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
-      fetchConversation(_input);
+      fileList?.length ? sendChatWithFile() : fetchConversation(_input);
       setInput('');
       setShowNextGuide(false);
     },
-    [setInput, setConversation, fetchConversation, setShowNextGuide]
+    [setInput, setConversation, fetchConversation, setShowNextGuide, fileList, sendChatWithFile]
   );
   const onPromptClick = useCallback(
     value => {
@@ -351,6 +440,12 @@ const Chat: React.FC<IChat> = props => {
       setShowNextGuide(false);
     },
     [onSend, setShowNextGuide]
+  );
+  const onFileListChange = useCallback(
+    (fileList: UploadFile[]) => {
+      setFileList(fileList);
+    },
+    [onSend]
   );
   return (
     <div className="chatComponent">
@@ -386,9 +481,25 @@ const Chat: React.FC<IChat> = props => {
               default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
             }}
             renderMessagesExtra={{
-              default: (chat, s) => {
+              default: chat => {
                 return (
                   <>
+                    {chat.extra?.fileParsing && (
+                      <span>
+                        <Spin indicator={<LoadingOutlined spin />} />
+                        <span>&nbsp;</span>
+                        文档解析中
+                      </span>
+                    )}
+                    {Boolean(chat.extra.fileList?.length) && (
+                      <div>
+                        {chat.extra.fileList.map((file, index) => (
+                          <Tag key={index}>
+                            <FileOutlined /> {file.name}
+                          </Tag>
+                        ))}
+                      </div>
+                    )}
                     {conversation.loadingMsgId !== chat.id &&
                       Boolean(chat.extra?.index) &&
                       chat.role === 'assistant' &&
@@ -425,20 +536,13 @@ const Chat: React.FC<IChat> = props => {
         <div className="inputArea">
           <ChatInputArea
             bottomAddons={
-              <Flex align="center" className="sendAction" gap="large" justify="end">
-                <span className="keyBindings">
-                  <CornerDownLeft size={12} />
-                  <span>{I18N.Chat.faSong2}</span>
-                  <ArrowBigUp size={12} />
-                  <CornerDownLeft size={12} />
-                  <span>{I18N.Chat.huanXing}</span>
-                </span>
-                <Tooltip title={appData?.llm ? '' : I18N.Chat.zanWeiGuanLianMo}>
-                  <Button disabled={!appData?.llm} onClick={onSend.bind('', input)} type="primary">
-                    {I18N.Chat.faSong}
-                  </Button>
-                </Tooltip>
-              </Flex>
+              <ChatInputBottomAddons
+                appData={appData}
+                fileList={fileList}
+                input={input}
+                onFileListChange={onFileListChange}
+                onSend={onSend}
+              />
             }
             onInput={setInput}
             onSend={onSend.bind('', input)}
