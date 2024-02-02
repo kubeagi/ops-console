@@ -356,21 +356,20 @@ const Chat: React.FC<IChat> = props => {
     for (const file of fileList) {
       formData.append('docs', file.originFileObj, file.originFileObj.name);
     }
-
+    let error;
     const res = await request
       .post({
         url: `/chat/conversations/docs`,
         options: {
           body: formData,
+          timeout: 1000 * 60 * 10,
         },
       })
-      .catch(() => {
+      .catch(_error => {
         setFileList([]);
+        error = _error;
       });
     setFileList([]);
-    if (!res.message_id) {
-      return;
-    }
     setConversation(_conversation => {
       const [first, ...rest] = _conversation.data.reverse();
       return addIndexToCvs({
@@ -380,11 +379,18 @@ const Chat: React.FC<IChat> = props => {
           ...rest.reverse(),
           {
             ...first,
-            content: res.message,
+            content: res?.message,
             extra: {
               ...first?.extra,
               fileParsing: false,
             },
+            error: res?.message
+              ? undefined
+              : {
+                  message: I18N.Chat.qingQiuChuCuo,
+                  type: 'error',
+                  detail: error,
+                },
           },
         ],
       });
