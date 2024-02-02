@@ -362,6 +362,7 @@ const Chat: React.FC<IChat> = props => {
         url: `/chat/conversations/docs`,
         options: {
           body: formData,
+          timeout: 1000 * 60 * 10,
         },
       })
       .catch(() => {
