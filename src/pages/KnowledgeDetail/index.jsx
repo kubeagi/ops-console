@@ -206,7 +206,7 @@ class KnowledgeDetail$$Page extends React.Component {
     this.setState({
       deleteModalOpen: false,
     });
-    this.history.relpace('/knowledge');
+    this.history.replace('/knowledge');
   }
 
   onEditModalCancel() {

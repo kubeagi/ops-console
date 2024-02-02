@@ -41,7 +41,7 @@ export const getAuthorization = utils.getAuthorization;
 /** 获取 axios 默认配置，也可在配置中指定拦截器，用于数据源初始化 axios handler */
 utils.getAxiosHanlderConfig = function __getAxiosHanlderConfig() {
   return () => ({
-    // 详细配置见：http://dev-npm.tenxcloud.net/-/web/detail/@yunti/lowcode-datasource-axios-handler
+    // 详细配置见：http://dev-npm.k8s.com.cn/-/web/detail/@yunti/lowcode-datasource-axios-handler
     interceptors: {
       request: [
         {

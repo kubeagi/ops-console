@@ -273,9 +273,6 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.40(classnames@2.5.1)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.30.1)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.21.3)(react@18.2.0)
       '@yunti/lowcode-datasource-axios-handler':
         specifier: ^1.0.0
         version: 1.0.1
@@ -319,9 +316,6 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.40(classnames@2.5.1)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.30.1)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.21.3)(react@18.2.0)
       babel-runtime:
         specifier: ^6.26.0
         version: 6.26.0
@@ -356,9 +350,6 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.40(classnames@2.5.1)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.30.1)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.21.3)(react@18.2.0)
       babel-runtime:
         specifier: ^6.26.0
         version: 6.26.0
@@ -504,9 +495,6 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.40(classnames@2.5.1)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.30.1)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.21.3)(react@18.2.0)
       babel-runtime:
         specifier: ^6.26.0
         version: 6.26.0
@@ -541,9 +529,6 @@ importers:
       '@tenx-ui/icon':
         specifier: ^2.4.17
         version: 2.4.40(classnames@2.5.1)(prop-types@15.8.1)(react-dom@17.0.2)(react@18.2.0)
-      '@tenx-ui/utils':
-        specifier: ^2.3.1
-        version: 2.3.1(lodash@4.17.21)(moment@2.30.1)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.21.3)(react@18.2.0)
       babel-runtime:
         specifier: ^6.26.0
         version: 6.26.0
@@ -2206,7 +2191,7 @@ packages:
       '@dnd-kit/core': ^6.0.7
       react: '>=16.8.0'
     dependencies:
-      '@dnd-kit/core': 6.1.0(react-dom@18.2.0)(react@18.2.0)
+      '@dnd-kit/core': 6.1.0(react-dom@17.0.2)(react@18.2.0)
       '@dnd-kit/utilities': 3.2.2(react@18.2.0)
       react: 18.2.0
       tslib: 2.6.2
@@ -3663,7 +3648,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.319.0(react@18.2.0)
+      lucide-react: 0.321.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.1(react@18.2.0)
       query-string: 8.1.0
@@ -5307,33 +5292,6 @@ packages:
       qs: 6.11.2
     transitivePeerDependencies:
       - encoding
-    dev: false
-
-  /@tenx-ui/utils@2.3.1(lodash@4.17.21)(moment@2.30.1)(prop-types@15.8.1)(react-dom@17.0.2)(react-router-dom@6.21.3)(react@18.2.0):
-    resolution: {integrity: sha512-82qY79WUHnAV3aS/mm54MvdbmF82S1Hu7j0gLpgDyB7jg0PJ8Ji4bj88x/rmfn9kVIje+A7omh2fCAIjmCoBwg==}
-    peerDependencies:
-      lodash: '>=4.15.0'
-      moment: ^2.19.2
-      prop-types: '>=15.6.1'
-      react: '>=15.0.0'
-      react-dom: '>=15.0.0'
-      react-router-dom: '>=4.0.0'
-    dependencies:
-      cidr-tools: 2.2.10
-      decode-uri-component: 0.2.2
-      ip-cidr: 2.1.5
-      ip-range-check: 0.0.2
-      is-cidr: 3.1.1
-      is-domain-name: 1.0.1
-      is-ip: 2.0.0
-      lodash: 4.17.21
-      moment: 2.30.1
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 17.0.2(react@18.2.0)
-      react-router-dom: 6.21.3(react-dom@17.0.2)(react@18.2.0)
-      strict-uri-encode: 2.0.0
-      url-parse-lax: 3.0.0
     dev: false
 
   /@tenx-ui/utils@2.3.1(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-router-dom@6.21.3)(react@18.2.0):
@@ -13465,8 +13423,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /lucide-react@0.319.0(react@18.2.0):
-    resolution: {integrity: sha512-IIbu4TfVI3yPI3ba/Li53mKeOd+WwcWI6+WcyoVdFLtrBfH88m2uQ/uTmtzBWt523HyxCFjWy3RFs0OxDFYm8w==}
+  /lucide-react@0.321.0(react@18.2.0):
+    resolution: {integrity: sha512-Fi9VahIna6642U+2nAGSjnXwUBV3WyfFFPQq4yi3w30jtqxDLfSyiYCtCYCYQZ2KWNZc1MDI+rcsa0t+ChdYpw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -18117,19 +18075,6 @@ packages:
       react: 18.2.0
       react-router: 4.3.1(react@18.2.0)
       warning: 4.0.3
-    dev: false
-
-  /react-router-dom@6.21.3(react-dom@17.0.2)(react@18.2.0):
-    resolution: {integrity: sha512-kNzubk7n4YHSrErzjLK72j0B5i969GsuCGazRl3G6j1zqZBLjuSlYBdVdkDOgzGdPIffUOc9nmgiadTEVoq91g==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      react: '>=16.8'
-      react-dom: '>=16.8'
-    dependencies:
-      '@remix-run/router': 1.14.2
-      react: 18.2.0
-      react-dom: 17.0.2(react@18.2.0)
-      react-router: 6.21.3(react@18.2.0)
     dev: false
 
   /react-router-dom@6.21.3(react-dom@18.2.0)(react@18.2.0):

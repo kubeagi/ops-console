@@ -15,7 +15,7 @@
     "build:deps": "father prebundle",
     "dev": "father dev",
     "prepublishOnly": "father doctor && npm run build",
-    "pub": "npm run prepublishOnly && npm publish --registry http://dev-npm.tenxcloud.net"
+    "pub": "npm run prepublishOnly && npm publish --registry http://dev-npm.k8s.com.cn"
   },
   "dependencies": {
     "@alilc/lowcode-datasource-engine": "^1.0.0",

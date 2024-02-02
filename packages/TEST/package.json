@@ -1,8 +1,8 @@
 {
-  "private": true,
   "name": "TEST",
-  "description": "TEST",
   "version": "0.0.7",
+  "private": true,
+  "description": "TEST",
   "keywords": [],
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -15,19 +15,19 @@
     "build:deps": "father prebundle",
     "dev": "father dev",
     "prepublishOnly": "father doctor && npm run build",
-    "pub": "npm run prepublishOnly && npm publish --registry http://dev-npm.tenxcloud.net"
+    "pub": "npm run prepublishOnly && npm publish --registry http://dev-npm.k8s.com.cn"
   },
   "dependencies": {
+    "@alilc/lowcode-datasource-engine": "^1.0.0",
     "@formily/antd": "^2.1.4",
     "@formily/core": "^2.1.4",
     "@formily/react": "^2.1.4",
-    "@tenx-ui/icon": "^2.4.17",
     "@tenx-ui/form-helper": "^0.0.2",
+    "@tenx-ui/icon": "^2.4.17",
     "@tenx-ui/utils": "^2.3.1",
     "babel-runtime": "^6.26.0",
     "react-sortable-hoc": "^2.0.0",
-    "shared-components": "workspace:*",
-    "@alilc/lowcode-datasource-engine": "^1.0.0"
+    "shared-components": "workspace:*"
   },
   "devDependencies": {
     "react": "^18.0.0"

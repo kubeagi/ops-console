@@ -1,5 +1,4 @@
 {
-  "version": "1.0.0",
   "componentsMap": [
     {
       "package": "@tenx-ui/materials",
@@ -419,6 +418,61 @@
       ]
     }
   ],
+  "config": {
+    "antd": {
+      "configProvider": {
+        "space": {
+          "size": 12
+        },
+        "theme": {
+          "token": {
+            "fontSize": 12,
+            "colorLink": "#00b96b",
+            "colorError": "#f85a5a",
+            "borderRadius": 2,
+            "colorPrimary": "#00b96b",
+            "colorSuccess": "#5cb85c",
+            "colorWarning": "#ffbf00",
+            "colorLinkHover": "#6f8bf7"
+          },
+          "components": {
+            "Row": {
+              "rowVerticalGutter": 20,
+              "rowHorizontalGutter": 20
+            },
+            "Page": {
+              "pagePadding": 20,
+              "pagePaddingTop": 20,
+              "pagePaddingBottom": 32
+            }
+          }
+        },
+        "componentSize": "middle"
+      }
+    }
+  },
+  "constants": {
+    "IS_PROD": {
+      "mock": "false",
+      "type": "JSExpression",
+      "value": "process.env.NODE_ENV === 'production'",
+      "builtin": true,
+      "description": "是否为生产环境"
+    },
+    "basename": {
+      "type": "JSExpression",
+      "value": "'/kubeagi-portal'",
+      "builtin": true,
+      "description": "应用路由前缀"
+    },
+    "IS_QIAN_KUN": {
+      "mock": "true",
+      "type": "JSExpression",
+      "value": "window.__POWERED_BY_QIANKUN__",
+      "builtin": true,
+      "description": "是否为乾坤微前端环境"
+    }
+  },
   "i18n": {},
   "meta": {
     "name": "KubeAGI 前端 portal",
@@ -1064,64 +1118,10 @@
       "builtin": true,
       "content": {
         "type": "JSFunction",
-        "value": "() => ({\r\n  // 详细配置见：http://dev-npm.tenxcloud.net/-/web/detail/@yunti/lowcode-datasource-axios-handler\r\n  interceptors: {\r\n    request: [\r\n      {\r\n        onFulfilled: (config) => {\r\n          if (!config.headers.get('Authorization')) {\r\n            config.headers.set('Authorization', this.getAuthorization());\r\n          }\r\n          return config;\r\n        }\r\n      }\r\n    ],\r\n  }\r\n})"
+        "value": "() => ({\r\n  // 详细配置见：http://dev-npm.k8s.com.cn/-/web/detail/@yunti/lowcode-datasource-axios-handler\r\n  interceptors: {\r\n    request: [\r\n      {\r\n        onFulfilled: (config) => {\r\n          if (!config.headers.get('Authorization')) {\r\n            config.headers.set('Authorization', this.getAuthorization());\r\n          }\r\n          return config;\r\n        }\r\n      }\r\n    ],\r\n  }\r\n})"
       },
       "description": "获取 axios 默认配置，也可在配置中指定拦截器，用于数据源初始化 axios handler"
     }
   ],
-  "config": {
-    "antd": {
-      "configProvider": {
-        "space": {
-          "size": 12
-        },
-        "theme": {
-          "token": {
-            "fontSize": 12,
-            "colorLink": "#00b96b",
-            "colorError": "#f85a5a",
-            "borderRadius": 2,
-            "colorPrimary": "#00b96b",
-            "colorSuccess": "#5cb85c",
-            "colorWarning": "#ffbf00",
-            "colorLinkHover": "#6f8bf7"
-          },
-          "components": {
-            "Row": {
-              "rowVerticalGutter": 20,
-              "rowHorizontalGutter": 20
-            },
-            "Page": {
-              "pagePadding": 20,
-              "pagePaddingTop": 20,
-              "pagePaddingBottom": 32
-            }
-          }
-        },
-        "componentSize": "middle"
-      }
-    }
-  },
-  "constants": {
-    "IS_PROD": {
-      "mock": "false",
-      "type": "JSExpression",
-      "value": "process.env.NODE_ENV === 'production'",
-      "builtin": true,
-      "description": "是否为生产环境"
-    },
-    "basename": {
-      "type": "JSExpression",
-      "value": "'/kubeagi-portal'",
-      "builtin": true,
-      "description": "应用路由前缀"
-    },
-    "IS_QIAN_KUN": {
-      "mock": "true",
-      "type": "JSExpression",
-      "value": "window.__POWERED_BY_QIANKUN__",
-      "builtin": true,
-      "description": "是否为乾坤微前端环境"
-    }
-  }
+  "version": "1.0.0"
 }
