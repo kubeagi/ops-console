@@ -236,6 +236,10 @@ const Chat: React.FC<IChat> = props => {
             ...rest.reverse(),
             {
               ...first,
+              extra: {
+                ...first?.extra,
+                fileParsing: false,
+              },
               error: {
                 message: I18N.Chat.qingQiuChuCuo,
                 type: 'error',
@@ -250,87 +254,119 @@ const Chat: React.FC<IChat> = props => {
   );
   const fetchConversation = useCallback(
     async query => {
-      await fetchEventSource(`${window.location.origin}/kubeagi-apis/chat`, {
-        method: 'POST',
-        signal: ctrl.signal,
-        openWhenHidden: true,
-        headers: {
-          Authorization: `bearer ${getAuthData()?.token.id_token}`,
-        },
-        body: JSON.stringify({
+      const isDocs = Boolean(fileList?.length);
+      const body = (() => {
+        const _body = {
           query,
           response_mode: 'streaming',
           conversation_id: conversation?.id || '',
           app_name: props.appName,
           app_namespace: props.appNamespace,
           debug: Boolean(props.debug),
-        }),
-        async onopen(response) {
-          shouldUpdateConversationId = false;
-          if (response.ok) {
-            return; // everything's good
-          } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-            // client-side errors are usually non-retriable:
-            throw new FatalError();
-          } else {
-            throw new RetriableError();
-          }
-        },
-        onmessage(event) {
-          const parsedData = JSON.parse(event.data);
-          setConversation(_conversation => {
-            if (parsedData.conversation_id !== _conversation.id) {
-              shouldUpdateConversationId = true;
+        };
+        if (!isDocs) return JSON.stringify(_body);
+        const formData = new FormData();
+        for (const [key, value] of Object.entries({
+          ..._body,
+          query: 'DOC:ABSTRACT',
+        })) {
+          formData.append(key, value);
+        }
+        for (const file of fileList) {
+          formData.append('docs', file.originFileObj, file.originFileObj.name);
+        }
+        return formData;
+      })();
+      await fetchEventSource(
+        `${window.location.origin}/kubeagi-apis/chat${isDocs ? '/conversations/docs' : ''}`,
+        {
+          method: 'POST',
+          signal: ctrl.signal,
+          openWhenHidden: true,
+          headers: {
+            Authorization: `bearer ${getAuthData()?.token.id_token}`,
+          },
+          body,
+          async onopen(response) {
+            shouldUpdateConversationId = false;
+            if (response.ok) {
+              return; // everything's good
+            } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+              // client-side errors are usually non-retriable:
+              throw new FatalError();
+            } else {
+              throw new RetriableError();
             }
-            return addIndexToCvs({
-              ..._conversation,
-              id: parsedData.conversation_id,
-              data: _conversation.data.map((item, index) => {
-                if (index < _conversation.data.length - 1) return item;
-                const last = _conversation.data.at(-1);
-                return {
-                  ...last,
-                  id: parsedData.message_id || last.id,
-                  content: last.content + (parsedData?.message || ''),
-                  extra: {
-                    ...last?.extra,
-                    latency: parsedData.latency,
+          },
+          onmessage(event) {
+            const parsedData = JSON.parse(event.data);
+            setConversation(_conversation => {
+              if (parsedData.conversation_id !== _conversation.id) {
+                shouldUpdateConversationId = true;
+              }
+              return addIndexToCvs({
+                ..._conversation,
+                id: parsedData.conversation_id,
+                data: _conversation.data.map((item, index) => {
+                  if (index < _conversation.data.length - 1) return item;
+                  const last = _conversation.data.at(-1);
+                  return {
+                    ...last,
+                    id: parsedData.message_id || last.id,
+                    content: last.content + (parsedData?.message || ''),
+                    extra: {
+                      ...last?.extra,
+                      latency: parsedData.latency,
+                    },
+                  };
+                }),
+              });
+            });
+            scrollToBottom();
+          },
+          onerror(err) {
+            setFileList([]);
+            const retryRes = retry.retry();
+            if (retryRes === retry.abortFlag) {
+              setLastCvsErr(err);
+              throw err; // rethrow to stop the operation
+            } else {
+              setLastCvsErr(err);
+            }
+          },
+          onclose() {
+            setFileList([]);
+            setConversation(_conversation => {
+              if (shouldUpdateConversationId) {
+                shouldUpdateConversationId = false;
+                props.onNewChat?.(_conversation.id);
+              }
+              fetchLastReference(
+                _conversation.id,
+                // "791d25a6-7102-4f7c-afcd-29eee3624250" ||
+                _conversation.data.at(-1)?.id
+              );
+              const [first, ...rest] = _conversation.data.reverse();
+              return addIndexToCvs({
+                ..._conversation,
+                loadingMsgId: undefined,
+                data: [
+                  ...rest.reverse(),
+                  {
+                    ...first,
+                    extra: {
+                      ...first?.extra,
+                      fileParsing: false,
+                    },
                   },
-                };
-              }),
+                ],
+              });
             });
-          });
-          scrollToBottom();
-        },
-        onerror(err) {
-          const retryRes = retry.retry();
-          if (retryRes === retry.abortFlag) {
-            setLastCvsErr(err);
-            throw err; // rethrow to stop the operation
-          } else {
-            setLastCvsErr(err);
-          }
-        },
-        onclose() {
-          setConversation(_conversation => {
-            if (shouldUpdateConversationId) {
-              shouldUpdateConversationId = false;
-              props.onNewChat?.(_conversation.id);
-            }
-            fetchLastReference(
-              _conversation.id,
-              // "791d25a6-7102-4f7c-afcd-29eee3624250" ||
-              _conversation.data.at(-1)?.id
-            );
-            return addIndexToCvs({
-              ..._conversation,
-              loadingMsgId: undefined,
-            });
-          });
-        },
-      });
+          },
+        }
+      );
     },
-    [conversation, setConversation]
+    [conversation, setConversation, fileList, setFileList]
   );
 
   useEffect(() => {
@@ -342,60 +378,6 @@ const Chat: React.FC<IChat> = props => {
       }
     };
   }, []);
-  const sendChatWithFile = useCallback(async () => {
-    const formData = new FormData();
-    for (const [key, value] of Object.entries({
-      app_name: props.appName,
-      app_namespace: props.appNamespace || '',
-      conversation_id: props.conversationId || '',
-      query: 'DOC:ABSTRACT',
-      response_mode: 'blocking', // 目前不支持 streaming
-    })) {
-      formData.append(key, value);
-    }
-    for (const file of fileList) {
-      formData.append('docs', file.originFileObj, file.originFileObj.name);
-    }
-    let error;
-    const res = await request
-      .post({
-        url: `/chat/conversations/docs`,
-        options: {
-          body: formData,
-          timeout: 1000 * 60 * 10,
-        },
-      })
-      .catch(_error => {
-        setFileList([]);
-        error = _error;
-      });
-    setFileList([]);
-    setConversation(_conversation => {
-      const [first, ...rest] = _conversation.data.reverse();
-      return addIndexToCvs({
-        ..._conversation,
-        loadingMsgId: undefined,
-        data: [
-          ...rest.reverse(),
-          {
-            ...first,
-            content: res?.message,
-            extra: {
-              ...first?.extra,
-              fileParsing: false,
-            },
-            error: res?.message
-              ? undefined
-              : {
-                  message: I18N.Chat.qingQiuChuCuo,
-                  type: 'error',
-                  detail: error,
-                },
-          },
-        ],
-      });
-    });
-  }, [input, fileList, setFileList]);
   const onSend = useCallback(
     (__input: string) => {
       const _input = __input?.trim();
@@ -434,11 +416,11 @@ const Chat: React.FC<IChat> = props => {
         });
       });
       scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
-      fileList?.length ? sendChatWithFile() : fetchConversation(_input);
+      fetchConversation(_input);
       setInput('');
       setShowNextGuide(false);
     },
-    [setInput, setConversation, fetchConversation, setShowNextGuide, fileList, sendChatWithFile]
+    [setInput, setConversation, fetchConversation, setShowNextGuide, fileList]
   );
   const onPromptClick = useCallback(
     value => {
