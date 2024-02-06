@@ -38,7 +38,7 @@ export default {
   qAWenBen: 'QA文本',
   puTongWenBen: '普通文本',
   wenJianLeiXing: '文件类型',
-  duiSOUR: '对 {val1} 个文件进行了{val2}，以下内容为处理效果抽样预览，并非全部内容',
-  duiSOUR2: '对 {val1} 个文件进行了{val2}，处理进度：',
-  duiSOUR3: '对 {val1} 个文件进行了{val2}。',
+  duiSOUR: '对 {val1} 个文件进行了 {val2}，以下内容为处理效果抽样预览，并非全部内容',
+  duiSOUR2: '对 {val1} 个文件进行了 {val2}，处理进度：',
+  duiSOUR3: '对 {val1} 个文件进行了 {val2}。',
 };

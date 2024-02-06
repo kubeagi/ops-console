@@ -6,7 +6,7 @@ export default {
   xiangSiDu: '相似度:',
   zhiShiKu: '知识库',
   yinYongShuJu: '引用数据',
-  qingShuRuWenTi: '请输入问题，可通过 shift+回车换行',
+  qingShuRuWenTi: '请输入问题，可通过 shift+回车 换行',
   faSong: '发送',
   zanWeiGuanLianMo: '暂未关联模型服务，请先关联模型服务再进行对话',
   huanXing: '换行',
