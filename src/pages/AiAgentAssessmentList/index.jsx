@@ -224,7 +224,7 @@ class AiAgentAssessmentList$$Page extends React.Component {
 
   onLinkReport(e, { record }) {
     this.history.push(
-      `/ai-agent-assessment/report?name=${record.name}&namespace=${record.namespace}`
+      `/ai-agent-assessment/report?name=${record.name}&namespace=${record.namespace}&appName=${this.history.query.appName}`
     );
   }
 

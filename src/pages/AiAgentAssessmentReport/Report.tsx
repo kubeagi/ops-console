@@ -1,40 +1,52 @@
 import { CloseOutlined, EditOutlined, FilePdfOutlined } from '@ant-design/icons';
-import { Chart, Coordinate, Line, PointChart } from '@tenx-ui/charts';
-import { Table } from '@tenx-ui/materials';
-import { Col, Drawer, Form, Input, Modal, Progress, Row, Space, Tag } from 'antd';
-import React, { useState } from 'react';
+import { Chart, Coordinate, Legend, Line, Point } from '@tenx-ui/charts';
+import { Col, Pagination, Row, Table } from '@tenx-ui/materials';
+import { Drawer, Form, Input, Modal, Progress, Space, Tag } from 'antd';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import request from '@/utils/request';
 
 import styles from './report.less';
 
 const { TextArea } = Input;
-const data = [
-  { item: '忠实度', value: 70 },
-  { item: '知识库精度', value: 60 },
-  { item: '答案正确性', value: 50 },
-  { item: '答案相关度', value: 40 },
-  { item: '答案语义相似度', value: 60 },
-];
+const cateMap = {
+  faithfulness: '忠实度',
+  context_relevancy: '知识库相关度',
+  answer_relevancy: '答案相关度',
+  context_precision: '知识库精度',
+  answer_similarity: '答案语义相似度',
+  context_recall: '知识库相似度',
+  answer_correctness: '答案正确性',
+};
 
 interface Iprops {
   data: Record<string, any>;
+  history: Record<string, any>;
 }
 const Report: React.FC<Iprops> = props => {
   const [refDrawerVisible, setRefDrawerVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [record, setCurrentRecord] = useState({});
-  const [editRecord, setEditRecord] = useState({});
-  const detaildata = props.data;
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(10);
+  const [dataSource, setDataSource] = useState([]);
+  const [total, setTotal] = useState(0);
+  // const [editRecord, setEditRecord] = useState({});
+  const [tableLoading, setTableLoading] = useState(false);
+  const [columns, setColumns] = useState([]);
+  const [tableSortParam, setTableSortParam] = useState('');
+  const [tableSortOrder, setTableSortOrder] = useState('desc');
 
-  const openDrawer = record => {
-    setRefDrawerVisible(true);
-    setCurrentRecord(record);
-  };
+  // const openDrawer = record => {
+  //   setRefDrawerVisible(true);
+  //   setCurrentRecord(record);
+  // };
 
-  const onOpenEdit = record => {
+  const onOpenEdit = () => {
     setEditModalVisible(true);
-    setEditRecord(record);
+    // setEditRecord(record);
   };
-  const Bold = children => <span style={{ fontWeight: 600 }}>{children}</span>;
+
   const renderRefData = () => {
     return (
       <div style={{ border: '1px solid #E2E2E2', marginBottom: 16 }}>
@@ -90,26 +102,155 @@ const Report: React.FC<Iprops> = props => {
       </div>
     );
   };
+
+  const getColumns = useCallback((dataSource = []) => {
+    const base = [
+      {
+        title: '问题',
+        dataIndex: 'question',
+        key: 'question',
+        // ellipsis: { showTitle: true },
+      },
+      {
+        title: '期望回答',
+        dataIndex: 'groundTruths',
+        key: 'groundTruths',
+        // ellipsis: { showTitle: true },
+        render(text) {
+          return (
+            <>
+              {text.map((item, index) => (
+                <div key={index}>{item}</div>
+              ))}
+            </>
+          );
+        },
+      },
+      {
+        title: '模型回答',
+        dataIndex: 'answer',
+        key: 'answer',
+        // todo
+        // render(text, record) {
+        //   return (
+        //     <a
+        //       onClick={() => {
+        //         openDrawer(record);
+        //       }}
+        //     >
+        //       {text}
+        //     </a>
+        //   );
+        // },
+      },
+      {
+        title: '问答耗时(s)',
+        dataIndex: 'costTime',
+        key: 'costTime',
+        // todo
+        // sorter: true,
+      },
+      {
+        title: '总得分',
+        dataIndex: 'totalScore',
+        key: 'totalScore',
+        // todo
+        // sorter: true,
+        render(text) {
+          return text.toFixed(2);
+        },
+      },
+    ];
+    const other = [];
+    if (dataSource.length > 0) {
+      const items = dataSource[0].data;
+      for (let key in items) {
+        other.push({
+          title: cateMap[key],
+          dataIndex: key,
+          key: key,
+          sorter: true,
+          ellipsis: { showTitle: true },
+          render(text, record) {
+            return record.data[key].toString().slice(0, 4);
+          },
+        });
+      }
+    }
+
+    return [...base, ...other];
+  }, []);
+
+  const getTableList = () => {
+    setTableLoading(true);
+    request
+      .get({
+        url: `/rags/detail?ragName=${props.history.query.name}&appName=${props.history.query.appName}&page=${page}&size=${size}&sortBy=${tableSortParam}&order=${tableSortOrder}`,
+        options: {
+          headers: {
+            namespace: props.history.query.namespace,
+          },
+        },
+      })
+      .then(res => {
+        if (columns.length === 0) {
+          const cols = getColumns(res.data);
+          setColumns(cols);
+        }
+        setDataSource(res.data);
+        setTotal(res.total);
+        setTableLoading(false);
+      })
+      .catch(error => {
+        console.warn(error);
+        setDataSource([]);
+        setTotal(0);
+        setTableLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    getTableList();
+  }, [page, size, tableSortOrder, tableSortParam]);
+
+  const handlePaginationChange = (c, s = 10) => {
+    setSize(s);
+    setPage(c);
+  };
+  const showTotal = useCallback((total, range) => {
+    // 用于格式化显示表格数据总量
+    return `共 ${total} 条`;
+  }, []);
+
+  const handleTableChange = (pagination, filters, sorter) => {
+    const { columnKey, order } = sorter;
+    if (order === 'descend') {
+      setTableSortOrder('desc');
+    } else if (order === 'ascend') {
+      setTableSortOrder('asc');
+    } else {
+      setTableSortOrder();
+    }
+    setTableSortParam(columnKey);
+    setPage(1);
+  };
+
   return (
     <div className={styles.report}>
       <div style={{ fontWeight: 700, fontSize: '14px', lineHeight: '32px' }}>评估结论</div>
-      <div style={{ lineHeight: '24px' }}>
-        通过此次评估，您的 RAG 方案得分{' '}
-        <span style={{ color: '#F49F23', fontSize: 14, fontWeight: 600 }}>0.62</span> 主要体现在{' '}
-        {Bold('答案相关度')}、{Bold('答案正确性')}、{Bold('知识库精度')} 这三项指标得分偏低。
-      </div>
-      <div style={{ fontWeight: 600, lineHeight: '24px' }}>
-        建议您对特定场景应用的模型进行模型精调；调整知识库 embedding 模型。
-      </div>
+      <div
+        dangerouslySetInnerHTML={{ __html: props.data.summary }}
+        style={{ lineHeight: '24px' }}
+      ></div>
       <Row>
         <Col span={12} style={{ borderRight: '1px solid #E2E2E2' }}>
           <div style={{ fontWeight: 700, lineHeight: '32px' }}>总得分</div>
           <div style={{ textAlign: 'center', paddingBottom: 16, height: 200, paddingTop: 25 }}>
             <Progress
               gapDegree={0}
-              percent={75}
+              percent={props.data?.totalScore?.score.toFixed(4) * 100}
               size={150}
-              strokeColor={'#F49F23'}
+              strokeColor={props.data?.totalScore?.color}
               type="dashboard"
             />
           </div>
@@ -118,17 +259,23 @@ const Report: React.FC<Iprops> = props => {
           <div style={{ fontWeight: 700, marginLeft: 24 }}>各项指标得分（avg）</div>
           <Chart
             autoFit
-            data={data}
-            height={200}
+            data={props?.data?.radarChart?.map(item => ({ ...item, type: cateMap[item.type] }))}
+            height={210}
             scale={{
               value: {
                 min: 0,
-                max: 100,
+                max: 1,
+                alias: '得分',
+              },
+              type: {
+                formatter: val => {
+                  return val;
+                },
               },
             }}
           >
             <Coordinate radius={0.8} type="polar" />
-            <Line position="item*value" size={2} />
+            <Line position="type*value" size={2} />
           </Chart>
         </Col>
       </Row>
@@ -136,29 +283,28 @@ const Report: React.FC<Iprops> = props => {
         <Col span={22}>
           <div style={{ fontWeight: 700 }}>得分&耗时分布</div>
           <div style={{ textAlign: 'center', paddingBottom: 16, height: 200, paddingTop: 25 }}>
-            <PointChart
-              data={[
-                { month: '2015-01-01 12:00', acc: 84, type: '类型1' },
-                { month: '2015-02-01', acc: 14.9, type: '类型1' },
-                { month: '2015-03-01', acc: 17, type: '类型1' },
-                { month: '2015-04-01', acc: 20.2, type: '类型1' },
-                { month: '2015-05-01', acc: 55.6, type: '类型1' },
-                { month: '2015-06-01', acc: 56.7, type: '类型1' },
-                { month: '2015-07-01', acc: 30.6, type: '类型1' },
-                { month: '2015-08-01', acc: 63.2, type: '类型1' },
-                { month: '2015-09-01', acc: 24.6, type: '类型1' },
-                { month: '2015-10-01', acc: 14, type: '类型1' },
-                { month: '2015-11-01', acc: 9.4, type: '类型1' },
-                { month: '2015-12-01', acc: 7.3, type: '类型1' },
-              ]}
-              legend={{ position: 'bottom' }}
-              seriesField="type"
-              tootipFormat={text => `${text} 单位`}
-              xField="month"
-              xFieldTimeFormat="HH-MM HH:mm"
-              yField="acc"
-              yFieldFormat={text => `${text} unit`}
-            />
+            <Chart
+              autoFit
+              data={props?.data?.scatterChart?.map(item => ({ ...item, type: cateMap[item.type] }))}
+              scale={{
+                score: {
+                  alias: '得分',
+                },
+              }}
+            >
+              <Legend visible={false} />
+              <Point
+                color={[
+                  'color',
+                  val => {
+                    return val;
+                  },
+                ]}
+                position="type*score"
+                shape="circle"
+                tooltip="score"
+              />
+            </Chart>
           </div>
         </Col>
       </Row>
@@ -166,84 +312,26 @@ const Report: React.FC<Iprops> = props => {
         <Col span={24}>
           <div style={{ fontWeight: 700 }}>评估详情</div>
           <Table
-            columns={[
-              {
-                title: '问题',
-                dataIndex: 'question',
-                key: 'question',
-                ellipsis: { showTitle: true },
-              },
-              {
-                title: '期望回答',
-                dataIndex: '2',
-                key: '2',
-                ellipsis: { showTitle: true },
-              },
-              {
-                title: '模型回答',
-                dataIndex: '3',
-                key: '3',
-                ellipsis: { showTitle: true },
-                render(text, record) {
-                  return (
-                    <a
-                      onClick={() => {
-                        openDrawer(record);
-                      }}
-                    >
-                      {text}
-                    </a>
-                  );
-                },
-              },
-              {
-                title: '问答耗时(s)',
-                dataIndex: '4',
-                key: '4',
-                ellipsis: { showTitle: true },
-              },
-              {
-                title: '总得分',
-                dataIndex: '5',
-                key: '5',
-                ellipsis: { showTitle: true },
-              },
-              {
-                title: '忠实度',
-                dataIndex: '6',
-                key: '6',
-                ellipsis: { showTitle: true },
-              },
-              {
-                title: '答案语义相似度',
-                dataIndex: '7',
-                key: '7',
-                ellipsis: { showTitle: true },
-              },
-              {
-                title: '答案相关度',
-                dataIndex: '8',
-                key: '8',
-                ellipsis: { showTitle: true },
-              },
-              {
-                title: '答案正确性',
-                dataIndex: '9',
-                key: '9',
-                ellipsis: { showTitle: true },
-              },
-              {
-                title: '知识库相似度',
-                dataIndex: '1',
-                key: '1',
-                ellipsis: { showTitle: true },
-              },
-            ]}
-            dataSource={[
-              {
-                '3': '我是成龙',
-              },
-            ]}
+            columns={columns}
+            dataSource={dataSource}
+            loading={tableLoading}
+            onChange={handleTableChange}
+            pagination={false}
+          />
+        </Col>
+      </Row>
+      <Row wrap={false}>
+        <Col span={24}>
+          <Pagination
+            __component_name="Pagination"
+            current={page}
+            onChange={handlePaginationChange}
+            onShowSizeChange={handlePaginationChange}
+            pageSize={size}
+            showTotal={showTotal}
+            simple={false}
+            style={{ marginTop: '12px', textAlign: 'right' }}
+            total={total}
           />
         </Col>
       </Row>
