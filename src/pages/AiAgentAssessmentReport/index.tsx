@@ -16,16 +16,18 @@ import { matchPath, useLocation } from '@umijs/max';
 import type { TabsProps } from 'antd';
 import { Avatar, Divider, List, Spin, Tabs, Tooltip, notification } from 'antd';
 import qs from 'query-string';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import detail from '@/assets/img/report.png';
+import useGetCommonData from '@/components/hooks/useGetCommonData';
+import request from '@/utils/request';
 
 import utils from '../../utils/__utils';
 import Config from './Config';
 import Report from './Report';
 import styles from './index.less';
 
-const ModelEstimateReport = props => {
+const ModelEstimateReport = () => {
   const [detailData, setDetailData] = useState({});
   const [logData, setLogData] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,64 +40,17 @@ const ModelEstimateReport = props => {
   history.match = match;
   history.query = qs.parse(location.search);
 
-  useEffect(() => {
-    getData();
-  }, []);
+  const [reportData] = useGetCommonData<any[]>({
+    url: `/rags/report?ragName=${history.query.name}&appName=${history.query.appName}`,
+    options: {
+      headers: {
+        namespace: history.query.namespace,
+      },
+    },
+    initValue: [],
+  });
 
   const getData = () => {
-    setDetailData({
-      id: '01HM5YHX8D0B3NT5YMM20HW5CP',
-      status: 'process_fail',
-      name: 'test-01151',
-      file_type: 'text',
-      pre_dataset_name: 'test-0115',
-      pre_dataset_version: 'v1',
-      post_dataset_name: 'test-0115',
-      post_dataset_version: 'v1',
-      file_num: 1,
-      start_time: '2024-01-15 14:57:12.973658',
-      end_time: '2024-01-15 14:57:13.262508',
-      creator: 'admin',
-      error_msg: 'csv file type is not currently supported.',
-      config: [
-        {
-          name: 'chunk_processing',
-          description: '拆分处理',
-          file_num: 0,
-          status: 'not_start',
-          children: [
-            {
-              name: 'qa_split',
-              enable: 'true',
-              zh_name: 'QA拆分',
-              description: '根据文件中的文档内容，自动将文件做 QA 拆分处理。',
-              llm_config: {
-                name: 'zhipu-test',
-                namespace: 'agitest',
-                model: 'chatglm_lite',
-                temperature: '0.4',
-                top_p: null,
-                max_tokens: '2048',
-                prompt_template:
-                  '{text}\n\n请将上述内容按照问答的方式，提出不超过 25 个问题，并给出每个问题的答案，每个问题必须有 Q 和对应的 A，并严格按照以下方式展示：\n Q1: 问题。\n A1: 答案。\n Q2: 问题 \n A2: 答案\n  注意，尽可能多的提出问题，但是 Q 不要重复，也不要出现只有 Q 没有 A 的情况。',
-                provider: null,
-              },
-              preview: [],
-              file_progress: [
-                {
-                  id: '01HM5YHXB0PRK7NX1M1TBFZDJM',
-                  file_name: 'test.csv',
-                  status: 'not_start',
-                  start_time: null,
-                  end_time: null,
-                  progress: '0',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
     setLoading(true);
     const name = history.query.name;
     const namespace = history.query.namespace;
@@ -118,16 +73,15 @@ const ModelEstimateReport = props => {
         });
       });
   };
-
-  const formatTime = (time = '') => {
-    return time.split('.')[0];
-  };
+  useEffect(() => {
+    getData();
+  }, []);
 
   const items: TabsProps['items'] = [
     {
       key: 'report',
       label: '评估报告',
-      children: <Report data={detailData} />,
+      children: <Report data={reportData} history={history} />,
     },
     {
       key: 'config',
@@ -136,6 +90,7 @@ const ModelEstimateReport = props => {
     },
   ];
 
+  /**
   const getLogInfo = () => {
     const match = matchPath({ path: '/data-handle/detail/:id' }, location.pathname);
     const id = match.params.id;
@@ -153,14 +108,46 @@ const ModelEstimateReport = props => {
         console.warn(error);
       });
   };
+
+   */
+
+  /** 
   const onShowLog = () => {
     setLogvisible(true);
     // getLogInfo();
   };
-  // 下载日志
-  const download = () => {};
 
-  const calcSpendTime = record => {
+  */
+
+  // 下载文件
+  const downloadFile = useCallback(url => {
+    try {
+      const a = document.createElement('a');
+      a.href = url; // 设置链接地址
+      a.download = 'result.csv'; // 设置文件名
+      a.click(); // 模拟点击链接进行下载
+      URL.revokeObjectURL(url); // 释放 URL
+    } catch {
+      // console.log(error)
+    }
+  }, []);
+
+  const download = () => {
+    request
+      .get({
+        url: `/bff/rags/files/downloadlink?bucketPath=evals/${history.query.appName}/${history.query.name}&fileName=result.csv`,
+        options: {
+          headers: {
+            namespace: history.query.namespace,
+          },
+        },
+      })
+      .then(res => {
+        downloadFile(res.url);
+      });
+  };
+
+  const calcSpendTime = useCallback(record => {
     const times: number = (
       ((record.completeTimestamp ? new Date(record.completeTimestamp) : new Date()).getTime() -
         new Date(record.creationTimestamp).getTime()) /
@@ -170,7 +157,8 @@ const ModelEstimateReport = props => {
       return `${(times / 60).toFixed(2)} 小时`;
     }
     return `${times} 分钟`;
-  };
+  }, []);
+
   return (
     <Page style={{ marginBottom: '0px', paddingBottom: '0px' }}>
       <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
@@ -201,9 +189,10 @@ const ModelEstimateReport = props => {
                   <Button key={index} onClick={download} size="small">
                     下载报告
                   </Button>,
-                  <Button key={index} onClick={onShowLog} size="small">
-                    查看日志
-                  </Button>,
+                  // v0.3 todo
+                  // <Button key={index} onClick={onShowLog} size="small">
+                  //   查看日志
+                  // </Button>,
                 ]}
               >
                 <List.Item.Meta
