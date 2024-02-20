@@ -5,6 +5,7 @@ import React from 'react';
 import {
   Page,
   Modal,
+  Divider,
   Row,
   Col,
   Typography,
@@ -13,14 +14,14 @@ import {
   FormilyForm,
   FormilyNumberPicker,
   FormilyTextArea,
+  FormilyCheckbox,
+  FormilySelect,
   Space,
   Button,
   Container,
   Steps,
-  Divider,
   Card,
   Switch,
-  FormilySelect,
   FormilyFormItem,
   Input,
   Pagination,
@@ -197,6 +198,7 @@ class $$Page extends React.Component {
         pageSize: 10,
       },
       dataSetFileTotal: '0',
+      embedderList: [],
       fileSelectCheckErrorFlag: false,
       fileTableLoading: false,
       isdebug: false,
@@ -207,6 +209,9 @@ class $$Page extends React.Component {
       },
       numberInputStep: 0.1,
       qaSplitHighConfig: {
+        removeDuplicateConfigChecked: 'checked',
+        removeDuplicateConfigSimilarity: 0.9,
+        removeDuplicateConfigEmbedding: '',
         temperature: 40,
         max_tokens: 2048,
         prompt_template: `{text}
@@ -316,8 +321,35 @@ class $$Page extends React.Component {
                           item => item.value === this.state.step3Data.QAsplitForm.type
                         )._models[0]
                       : this.state.step3Data.QAsplitForm.model,
-                  ...this.state.qaSplitHighConfig,
+                  prompt_template: this.state.qaSplitHighConfig.prompt_template,
+                  max_tokens: this.state.qaSplitHighConfig.max_tokens,
                   temperature: this.state.qaSplitHighConfig.temperature / 100,
+                },
+                ...{
+                  ...(this.state.qaSplitHighConfig.removeDuplicateConfigChecked === 'checked'
+                    ? {
+                        remove_duplicate_config: {
+                          embedding_name:
+                            this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding,
+                          embedding_namespace: this.state.embedderList.find(
+                            item =>
+                              item.value ===
+                              this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
+                          ).namespace,
+                          embedding_model: this.state.embedderList.find(
+                            item =>
+                              item.value ===
+                              this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
+                          ).models[0],
+                          embedding_provider: this.state.embedderList.find(
+                            item =>
+                              item.value ===
+                              this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
+                          ).provider,
+                          similarity: this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity,
+                        },
+                      }
+                    : {}),
                 },
               }
             : {};
@@ -388,6 +420,36 @@ class $$Page extends React.Component {
         this.getTableList(name);
       }
     );
+  }
+
+  async getEmbedder() {
+    try {
+      const project = JSON.parse(localStorage.getItem('authData')).project;
+      const params = {
+        input: {
+          namespace: project,
+          page: 1,
+          pageSize: 99999,
+        },
+      };
+      const { Embedder } = await this.utils.bff.listEmbedders(params);
+      let { nodes } = Embedder?.listEmbedders || {};
+      nodes = nodes.filter(item => item.status === 'True' || item.status === 'Running');
+      this.setState({
+        embedderList: nodes.map(item => {
+          return {
+            ...item,
+            label: item.displayName || item.name,
+            value: item.name,
+          };
+        }),
+        qaSplitHighConfig: {
+          ...this.state.qaSplitHighConfig,
+          removeDuplicateConfigEmbedding:
+            this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding || nodes[0].name,
+        },
+      });
+    } catch (error) {}
   }
 
   getListWorkers() {
@@ -717,6 +779,7 @@ class $$Page extends React.Component {
           // })
           this.backToStep3Form();
           this.getListWorkers();
+          this.getEmbedder();
         }
         if (this.state.currentStep === 3) {
           const list = this.getStep4TableData();
@@ -735,6 +798,15 @@ class $$Page extends React.Component {
         ...this.state.qaSplitHighConfig,
       },
     });
+    setTimeout(() => {
+      this.form('remove_duplicate_form')?.setFieldState('embedding', {
+        dataSource: this.state.embedderList,
+      });
+      this.form('remove_duplicate_form')?.setValues({
+        remove_duplicate: this.state.qaSplitHighConfig.removeDuplicateConfigChecked,
+        embedding: this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding,
+      });
+    }, 500);
     this.form('temperature_form')?.setValues({
       temperature: this.state.qaSplitHighConfig.temperature / 100,
     });
@@ -743,6 +815,9 @@ class $$Page extends React.Component {
     });
     this.form('prompt_template_form')?.setValues({
       prompt_template: this.state.qaSplitHighConfig.prompt_template,
+    });
+    this.form('similarity_form')?.setValues({
+      similarity: this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity,
     });
   }
 
@@ -863,6 +938,18 @@ class $$Page extends React.Component {
       this.form('max_tokens_form').setValues({
         max_tokens: value,
       });
+    } else if (fieldName === 'removeDuplicateConfigSimilarity') {
+      this.form('similarity_form')?.setValues({
+        similarity: value,
+      });
+    } else if (fieldName === 'removeDuplicateConfigEmbedding') {
+      this.form('remove_duplicate_form')?.setValues({
+        embedding: value,
+      });
+    } else if (fieldName === 'removeDuplicateConfigChecked') {
+      this.form('remove_duplicate_form')?.setValues({
+        remove_duplicate: value,
+      });
     }
   }
 
@@ -952,6 +1039,17 @@ class $$Page extends React.Component {
           title="模型高级配置"
           width="700px"
         >
+          <Divider
+            __component_name="Divider"
+            dashed={false}
+            defaultOpen={false}
+            mode="default"
+            orientation="left"
+            orientationMargin={0}
+            style={{ fontSize: '12px', fontWeight: 700 }}
+          >
+            模型配置
+          </Divider>
           <Row __component_name="Row" wrap={false}>
             <Col
               __component_name="Col"
@@ -1059,11 +1157,11 @@ class $$Page extends React.Component {
                 strong={false}
                 style={{ fontSize: '' }}
               >
-                最大响应长度
+                最大 Token
               </Typography.Text>
               <Tooltip
                 __component_name="Tooltip"
-                title="控制 AI 回复的最大 Tokens，范围为[10，4096],较小的值可以一定程度上减少 AI 的废话，但也可能导致 AI 回复不完整。"
+                title="控制 AI 对话最大 Token，范围为[10，+∞)。Token 涵盖了输入和输出的总 Token 数，这意味着如果用户的输入很长，模型可用于生成回应的 Token 数量会相应减少。"
               >
                 <AntdIconQuestionCircleOutlined
                   __component_name="AntdIconQuestionCircleOutlined"
@@ -1073,25 +1171,6 @@ class $$Page extends React.Component {
             </Col>
             <Col __component_name="Col" flex="auto">
               <Row __component_name="Row" wrap={true}>
-                <Col __component_name="Col" span={18}>
-                  <Slider
-                    __component_name="Slider"
-                    marks={__$$eval(() => this.state.max_token_marks)}
-                    max={4096}
-                    min={10}
-                    onChange={function () {
-                      return this.setQaSplitHighConfigValue.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([
-                          {
-                            fieldName: 'max_tokens',
-                          },
-                        ])
-                      );
-                    }.bind(this)}
-                    value={__$$eval(() => this.state.qaSplitHighConfig.max_tokens)}
-                  />
-                </Col>
                 <Col __component_name="Col" span={6}>
                   <FormilyForm
                     __component_name="FormilyForm"
@@ -1109,7 +1188,6 @@ class $$Page extends React.Component {
                       __component_name="FormilyNumberPicker"
                       componentProps={{
                         'x-component-props': {
-                          max: 4096,
                           min: 10,
                           onChange: function () {
                             return this.setQaSplitHighConfigValue.apply(
@@ -1192,6 +1270,230 @@ class $$Page extends React.Component {
               }}
             />
           </FormilyForm>
+          <Divider
+            __component_name="Divider"
+            dashed={false}
+            defaultOpen={false}
+            mode="default"
+            orientation="left"
+            orientationMargin={0}
+            style={{ fontSize: '12px', fontWeight: 700 }}
+          >
+            QA 去重配置
+          </Divider>
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 5,
+              layout: 'horizontal',
+              wrapperCol: 19,
+            }}
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('remove_duplicate_form')}
+          >
+            <FormilyCheckbox
+              __component_name="FormilyCheckbox"
+              componentProps={{
+                'x-component-props': {
+                  _sdkSwrGetFunc: {},
+                  onChange: function () {
+                    return this.setQaSplitHighConfigValue.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([
+                        {
+                          fieldName: 'removeDuplicateConfigChecked',
+                        },
+                      ])
+                    );
+                  }.bind(this),
+                },
+              }}
+              decoratorProps={{
+                'x-decorator-props': {
+                  labelEllipsis: true,
+                  style: {
+                    marginBottom: '0px',
+                    marginTop: '0px',
+                    paddingBottom: '0px',
+                    paddingTop: '0px',
+                  },
+                },
+              }}
+              fieldProps={{
+                '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                'default': __$$eval(
+                  () => this.state.qaSplitHighConfig.removeDuplicateConfigChecked
+                ),
+                'enum': [{ label: '对拆分结果进行去重处理', value: 'checked' }],
+                'name': 'remove_duplicate',
+                'x-validator': [],
+              }}
+              style={{ marginLeft: '12px' }}
+            />
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" span={24} style={{ marginLeft: '12px' }}>
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                  type="colorTextDescription"
+                >
+                  选中此项，平台将会对 QA 拆分结果进行比对，对于相似度高的 QA
+                  问答对，仅会保留一条数据。
+                </Typography.Text>
+              </Col>
+            </Row>
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" span={24} style={{ marginLeft: '12px' }}>
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={false}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                  type="colorTextDescription"
+                >
+                  相似判断标准：平台会根据拆分后的完整 QA 内容计算每一条 QA
+                  的相似距离，基于相似距离进行相似度打分，得分越高代表越相似。
+                </Typography.Text>
+              </Col>
+            </Row>
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  _sdkSwrGetFunc: {},
+                  allowClear: false,
+                  disabled: false,
+                  onChange: function () {
+                    return this.setQaSplitHighConfigValue.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([
+                        {
+                          fieldName: 'removeDuplicateConfigEmbedding',
+                        },
+                      ])
+                    );
+                  }.bind(this),
+                  placeholder: '请选择',
+                },
+              }}
+              decoratorProps={{
+                'x-decorator-props': { labelEllipsis: true, style: { marginTop: '12px' } },
+              }}
+              fieldProps={{
+                '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                'default': __$$eval(
+                  () => this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
+                ),
+                'name': 'embedding',
+                'title': '向量化模型',
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+          <Row __component_name="Row" wrap={false}>
+            <Col
+              __component_name="Col"
+              flex="140px"
+              style={{ paddingLeft: '20px', paddingTop: '8px' }}
+            >
+              <Typography.Text
+                __component_name="Typography.Text"
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                相似度阈值
+              </Typography.Text>
+              <Tooltip
+                __component_name="Tooltip"
+                title=" 配置相似度阈值，低于阈值，则认为不相似；高于阈值，则认为相似，将会进行去重处理，范围为[0, 1]。"
+              >
+                <AntdIconQuestionCircleOutlined
+                  __component_name="AntdIconQuestionCircleOutlined"
+                  style={{ marginLeft: '5px' }}
+                />
+              </Tooltip>
+            </Col>
+            <Col __component_name="Col" flex="auto">
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={18}>
+                  <Slider
+                    __component_name="Slider"
+                    marks={null}
+                    max={1}
+                    min={0}
+                    onChange={function () {
+                      return this.setQaSplitHighConfigValue.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([
+                          {
+                            fieldName: 'removeDuplicateConfigSimilarity',
+                          },
+                        ])
+                      );
+                    }.bind(this)}
+                    step={__$$eval(() => 1 / 10)}
+                    value={__$$eval(
+                      () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
+                    )}
+                  />
+                </Col>
+                <Col __component_name="Col" span={6}>
+                  <FormilyForm
+                    __component_name="FormilyForm"
+                    componentProps={{
+                      colon: false,
+                      labelAlign: 'left',
+                      labelCol: 4,
+                      layout: 'horizontal',
+                      wrapperCol: 20,
+                    }}
+                    formHelper={{ autoFocus: true }}
+                    ref={this._refsManager.linkRef('similarity_form')}
+                  >
+                    <FormilyNumberPicker
+                      __component_name="FormilyNumberPicker"
+                      componentProps={{
+                        'x-component-props': {
+                          max: 1,
+                          min: 0,
+                          onChange: function () {
+                            return this.setQaSplitHighConfigValue.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([
+                                {
+                                  fieldName: 'removeDuplicateConfigSimilarity',
+                                },
+                              ])
+                            );
+                          }.bind(this),
+                          placeholder: '请输入',
+                          step: __$$eval(() => 1 / 10),
+                        },
+                      }}
+                      decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                      fieldProps={{
+                        '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                        'default': __$$eval(
+                          () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
+                        ),
+                        'name': 'similarity',
+                        'title': '',
+                        'x-validator': [],
+                      }}
+                    />
+                  </FormilyForm>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
         </Modal>
         <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
           <Col __component_name="Col" span={24}>
