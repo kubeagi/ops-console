@@ -140,10 +140,27 @@ class CreateAiAgentAssessment$$Page extends React.Component {
       const item = keys[i];
       const { checked, value } = values[item];
       if (checked) {
-        result.push({
-          key: item,
-          value,
-        });
+        if (item === 'answer_correctness') {
+          result.push({
+            metricKind: item,
+            toleranceThreshbold: value * 100,
+            parameters: [
+              {
+                key: 'factuality',
+                value: values.factuality / 100,
+              },
+              {
+                key: 'semantic',
+                value: values.semantic / 100,
+              },
+            ],
+          });
+        } else {
+          result.push({
+            metricKind: item,
+            toleranceThreshbold: value * 100,
+          });
+        }
       }
     }
     return result;
@@ -341,19 +358,7 @@ class CreateAiAgentAssessment$$Page extends React.Component {
               ?.namespace,
           },
           serviceAccountName: 'ragas-eval-sa',
-          metrics: {
-            parameters: [
-              {
-                key: 'factuality',
-                value: values.factuality,
-              },
-              {
-                key: 'semantic',
-                value: values.semantic,
-              },
-              ...otherParams,
-            ],
-          },
+          metrics: [...otherParams],
         };
         this.setState({
           loading: true,
