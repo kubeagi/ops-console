@@ -1,8 +1,13 @@
 export default {
   qAChaiFenP: 'Prompt for QA Split',
-  zuiDaXiangYingChang: 'Max Response Length',
+  zuiDaXiangYingChang: 'Max Token',
   wenDu: 'Temperature',
+  moXingGaoJiPeiZhi: 'Advanced Model Configuration',
   moXingPeiZhi: 'Model Configuration',
+  QAQuChongPeiZhi: 'QA reconfiguration',
+  xiangLiangHuaMoXing: 'Vectorized model',
+  xiangSiDuYuZhi: 'Similarity threshold',
+  duiChaiFenJieGuoJinXingQuChongChuLi: 'Perform deduplication on the split results',
   shuaXin: 'Refresh',
   shouQi: 'Fold',
   zhanKai: 'Unfold',
@@ -38,7 +43,8 @@ export default {
   qAWenBen: 'QA Text',
   puTongWenBen: 'Normal ext',
   wenJianLeiXing: 'File Type',
-  duiSOUR: 'Processed {val1} files to {val2}, the following is the sample preview of the processing effect, but not all samples.',
+  duiSOUR:
+    'Processed {val1} files to {val2}, the following is the sample preview of the processing effect, but not all samples.',
   duiSOUR2: 'Processed {val1} files to {val2}, current progress: ',
   duiSOUR3: 'Processed {val1} files to {val2}',
 };

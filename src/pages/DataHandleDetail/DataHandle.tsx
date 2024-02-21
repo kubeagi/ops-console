@@ -16,14 +16,15 @@ import {
   Teshuzifu,
   Wenbenfenduan,
 } from '@tenx-ui/icon';
-import { Button, Card, Col, Form, Modal, Progress, Row, Steps, Table } from 'antd';
+import { Divider } from '@tenx-ui/materials';
+import { Button, Card, Checkbox, Col, Form, Modal, Progress, Row, Steps, Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import I18N from '@/utils/kiwiI18N';
 
 import styles from './datahandle.less';
 
-const SPLIT_TYPE_NAME = I18N.DataHandle.chaiFenChuLi;
+const SPLIT_TYPE_NAME = '拆分处理';
 const layout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 },
@@ -39,6 +40,7 @@ const DataHandle: React.FC<Iprops> = props => {
   const [items, setItems] = useState([]);
   const [highConfigVisible, setHighConfigVisible] = useState(false);
   const [highConfig, setHighConfig] = useState({});
+  const [QADuplicateConfig, setQADuplicateConfig] = useState(null);
   const [visibleMap, setVisibleMap] = useState({});
   const [showReloadBtn, setShowReloadBtn] = useState(false);
 
@@ -142,11 +144,6 @@ const DataHandle: React.FC<Iprops> = props => {
       );
     });
 
-    // 如果是拆分处理把高级配置存起来
-    if (type === SPLIT_TYPE_NAME) {
-      const qa_split_data = data.find(item => item.name === 'qa_split');
-      setHighConfig(qa_split_data.llm_config);
-    }
     const dataSource = [];
     // 拆分处理的表格只展示文件名和拆分后
     if (type === SPLIT_TYPE_NAME) {
@@ -325,6 +322,16 @@ const DataHandle: React.FC<Iprops> = props => {
     setItems(item);
   }, [config, visibleMap]);
 
+  useEffect(() => {
+    // 如果是拆分处理把高级配置存起来
+    for (const item of props.data.data_process_config_info) {
+      if (item.type === 'qa_split') {
+        setQADuplicateConfig(item.remove_duplicate_config);
+        setHighConfig(item.llm_config);
+      }
+    }
+  }, [props.data]);
+
   return (
     <div className={styles.datahandle}>
       {config?.find(item => item.status === 'doing') ? (
@@ -339,8 +346,20 @@ const DataHandle: React.FC<Iprops> = props => {
         footer={null}
         onCancel={closeHighConfig}
         open={highConfigVisible}
-        title={I18N.DataHandle.moXingPeiZhi}
+        title={I18N.DataHandle.moXingGaoJiPeiZhi}
+        width={600}
       >
+        <Divider
+          __component_name="Divider"
+          dashed={false}
+          defaultOpen={false}
+          mode="default"
+          orientation="left"
+          orientationMargin={0}
+          style={{ fontSize: '12px', fontWeight: 700 }}
+        >
+          {I18N.DataHandle.moXingPeiZhi}
+        </Divider>
         <Form labelAlign="right" {...layout}>
           <Form.Item label={I18N.DataHandle.wenDu}>{highConfig?.temperature || '-'}</Form.Item>
           <Form.Item label={I18N.DataHandle.zuiDaXiangYingChang}>
@@ -351,6 +370,32 @@ const DataHandle: React.FC<Iprops> = props => {
               <pre style={{ whiteSpace: 'pre-wrap' }}>{highConfig?.prompt_template || '-'}</pre>
             </div>
           </Form.Item>
+          {QADuplicateConfig ? (
+            <>
+              <Divider
+                __component_name="Divider"
+                dashed={false}
+                defaultOpen={false}
+                mode="default"
+                orientation="left"
+                orientationMargin={0}
+                style={{ fontSize: '12px', fontWeight: 700 }}
+              >
+                {I18N.DataHandle.QAQuChongPeiZhi}
+              </Divider>
+              <Form.Item label={''}>
+                <Checkbox checked disabled /> {I18N.DataHandle.duiChaiFenJieGuoJinXingQuChongChuLi}
+              </Form.Item>
+              <Form.Item label={I18N.DataHandle.xiangLiangHuaMoXing}>
+                {QADuplicateConfig?.embedding_name || '-'}
+              </Form.Item>
+              <Form.Item label={I18N.DataHandle.xiangSiDuYuZhi}>
+                {QADuplicateConfig?.similarity || '-'}
+              </Form.Item>
+            </>
+          ) : (
+            ''
+          )}
         </Form>
       </Modal>
     </div>
