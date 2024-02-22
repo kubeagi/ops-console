@@ -219,6 +219,7 @@ class $$Page extends React.Component {
       },
       selectedFileList: [],
       showLlmModel: false,
+      showQASplitDuplicateConfig: true,
       step1FormData: {
         name: undefined,
         file_type: 'text',
@@ -325,7 +326,7 @@ class $$Page extends React.Component {
                   temperature: this.state.qaSplitHighConfig.temperature / 100,
                 },
                 ...{
-                  ...(this.state.qaSplitHighConfig.removeDuplicateConfigChecked === 'checked'
+                  ...(this.state.qaSplitHighConfig.removeDuplicateConfigChecked.length
                     ? {
                         remove_duplicate_config: {
                           embedding_name:
@@ -613,6 +614,8 @@ class $$Page extends React.Component {
       qaSplitHighConfig: {
         ...this.state.cacheqaSplitHighConfig,
       },
+      showQASplitDuplicateConfig:
+        !!this.state.cacheqaSplitHighConfig.removeDuplicateConfigChecked.length,
     });
   }
 
@@ -949,6 +952,15 @@ class $$Page extends React.Component {
       this.form('remove_duplicate_form')?.setValues({
         remove_duplicate: value,
       });
+      if (!value || !value.length) {
+        this.setState({
+          showQASplitDuplicateConfig: false,
+        });
+      } else {
+        this.setState({
+          showQASplitDuplicateConfig: true,
+        });
+      }
     }
   }
 
@@ -1035,7 +1047,7 @@ class $$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(() => this.state.configVisible)}
-          title="模型高级配置"
+          title="QA 拆分高级配置"
           width="700px"
         >
           <Divider
@@ -1361,138 +1373,142 @@ class $$Page extends React.Component {
                 </Typography.Text>
               </Col>
             </Row>
-            <FormilySelect
-              __component_name="FormilySelect"
-              componentProps={{
-                'x-component-props': {
-                  _sdkSwrGetFunc: {},
-                  allowClear: false,
-                  disabled: false,
-                  onChange: function () {
-                    return this.setQaSplitHighConfigValue.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([
-                        {
-                          fieldName: 'removeDuplicateConfigEmbedding',
-                        },
-                      ])
-                    );
-                  }.bind(this),
-                  placeholder: '请选择',
-                },
-              }}
-              decoratorProps={{
-                'x-decorator-props': { labelEllipsis: true, style: { marginTop: '12px' } },
-              }}
-              fieldProps={{
-                '_unsafe_MixedSetter_default_select': 'VariableSetter',
-                'default': __$$eval(
-                  () => this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
-                ),
-                'name': 'embedding',
-                'title': '向量化模型',
-                'x-validator': [],
-              }}
-            />
-          </FormilyForm>
-          <Row __component_name="Row" wrap={false}>
-            <Col
-              __component_name="Col"
-              flex="140px"
-              style={{ paddingLeft: '20px', paddingTop: '8px' }}
-            >
-              <Typography.Text
-                __component_name="Typography.Text"
-                disabled={false}
-                ellipsis={true}
-                strong={false}
-                style={{ fontSize: '' }}
-              >
-                相似度阈值
-              </Typography.Text>
-              <Tooltip
-                __component_name="Tooltip"
-                title=" 配置相似度阈值，低于阈值，则认为不相似；高于阈值，则认为相似，将会进行去重处理，范围为[0, 1]。"
-              >
-                <AntdIconQuestionCircleOutlined
-                  __component_name="AntdIconQuestionCircleOutlined"
-                  style={{ marginLeft: '5px' }}
-                />
-              </Tooltip>
-            </Col>
-            <Col __component_name="Col" flex="auto">
-              <Row __component_name="Row" wrap={true}>
-                <Col __component_name="Col" span={18}>
-                  <Slider
-                    __component_name="Slider"
-                    marks={null}
-                    max={1}
-                    min={0}
-                    onChange={function () {
+            {!!__$$eval(() => this.state.showQASplitDuplicateConfig) && (
+              <FormilySelect
+                __component_name="FormilySelect"
+                componentProps={{
+                  'x-component-props': {
+                    _sdkSwrGetFunc: {},
+                    allowClear: false,
+                    disabled: false,
+                    onChange: function () {
                       return this.setQaSplitHighConfigValue.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([
                           {
-                            fieldName: 'removeDuplicateConfigSimilarity',
+                            fieldName: 'removeDuplicateConfigEmbedding',
                           },
                         ])
                       );
-                    }.bind(this)}
-                    step={__$$eval(() => 1 / 10)}
-                    value={__$$eval(
-                      () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
-                    )}
+                    }.bind(this),
+                    placeholder: '请选择',
+                  },
+                }}
+                decoratorProps={{
+                  'x-decorator-props': { labelEllipsis: true, style: { marginTop: '12px' } },
+                }}
+                fieldProps={{
+                  '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                  'default': __$$eval(
+                    () => this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
+                  ),
+                  'name': 'embedding',
+                  'title': '向量化模型',
+                  'x-validator': [],
+                }}
+              />
+            )}
+          </FormilyForm>
+          {!!__$$eval(() => this.state.showQASplitDuplicateConfig) && (
+            <Row __component_name="Row" wrap={false}>
+              <Col
+                __component_name="Col"
+                flex="140px"
+                style={{ paddingLeft: '20px', paddingTop: '8px' }}
+              >
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  相似度阈值
+                </Typography.Text>
+                <Tooltip
+                  __component_name="Tooltip"
+                  title=" 配置相似度阈值，低于阈值，则认为不相似；高于阈值，则认为相似，将会进行去重处理，范围为[0, 1]。"
+                >
+                  <AntdIconQuestionCircleOutlined
+                    __component_name="AntdIconQuestionCircleOutlined"
+                    style={{ marginLeft: '5px' }}
                   />
-                </Col>
-                <Col __component_name="Col" span={6}>
-                  <FormilyForm
-                    __component_name="FormilyForm"
-                    componentProps={{
-                      colon: false,
-                      labelAlign: 'left',
-                      labelCol: 4,
-                      layout: 'horizontal',
-                      wrapperCol: 20,
-                    }}
-                    formHelper={{ autoFocus: true }}
-                    ref={this._refsManager.linkRef('similarity_form')}
-                  >
-                    <FormilyNumberPicker
-                      __component_name="FormilyNumberPicker"
-                      componentProps={{
-                        'x-component-props': {
-                          max: 1,
-                          min: 0,
-                          onChange: function () {
-                            return this.setQaSplitHighConfigValue.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([
-                                {
-                                  fieldName: 'removeDuplicateConfigSimilarity',
-                                },
-                              ])
-                            );
-                          }.bind(this),
-                          placeholder: '请输入',
-                          step: __$$eval(() => 1 / 10),
-                        },
-                      }}
-                      decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                      fieldProps={{
-                        '_unsafe_MixedSetter_default_select': 'VariableSetter',
-                        'default': __$$eval(
-                          () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
-                        ),
-                        'name': 'similarity',
-                        'title': '',
-                        'x-validator': [],
-                      }}
+                </Tooltip>
+              </Col>
+              <Col __component_name="Col" flex="auto">
+                <Row __component_name="Row" wrap={true}>
+                  <Col __component_name="Col" span={18}>
+                    <Slider
+                      __component_name="Slider"
+                      marks={null}
+                      max={1}
+                      min={0}
+                      onChange={function () {
+                        return this.setQaSplitHighConfigValue.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([
+                            {
+                              fieldName: 'removeDuplicateConfigSimilarity',
+                            },
+                          ])
+                        );
+                      }.bind(this)}
+                      step={__$$eval(() => 1 / 10)}
+                      value={__$$eval(
+                        () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
+                      )}
                     />
-                  </FormilyForm>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
+                  </Col>
+                  <Col __component_name="Col" span={6}>
+                    <FormilyForm
+                      __component_name="FormilyForm"
+                      componentProps={{
+                        colon: false,
+                        labelAlign: 'left',
+                        labelCol: 4,
+                        layout: 'horizontal',
+                        wrapperCol: 20,
+                      }}
+                      formHelper={{ autoFocus: true }}
+                      ref={this._refsManager.linkRef('similarity_form')}
+                    >
+                      <FormilyNumberPicker
+                        __component_name="FormilyNumberPicker"
+                        componentProps={{
+                          'x-component-props': {
+                            max: 1,
+                            min: 0,
+                            onChange: function () {
+                              return this.setQaSplitHighConfigValue.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([
+                                  {
+                                    fieldName: 'removeDuplicateConfigSimilarity',
+                                  },
+                                ])
+                              );
+                            }.bind(this),
+                            placeholder: '请输入',
+                            step: __$$eval(() => 1 / 10),
+                          },
+                        }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        fieldProps={{
+                          '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                          'default': __$$eval(
+                            () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
+                          ),
+                          'name': 'similarity',
+                          'title': '',
+                          'x-validator': [],
+                        }}
+                      />
+                    </FormilyForm>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          )}
         </Modal>
         <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
           <Col __component_name="Col" span={24}>

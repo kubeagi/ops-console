@@ -2,7 +2,7 @@ export default {
   qAChaiFenP: 'QA 拆分 Prompt',
   zuiDaXiangYingChang: '最大 Token',
   wenDu: '温度',
-  moXingGaoJiPeiZhi: '模型高级配置',
+  QAChaiFenGaoJiPeiZhi: 'QA拆分高级配置',
   moXingPeiZhi: '模型配置',
   QAQuChongPeiZhi: 'QA 去重配置',
   xiangLiangHuaMoXing: '向量化模型',
