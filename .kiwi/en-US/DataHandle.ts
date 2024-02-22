@@ -2,7 +2,7 @@ export default {
   qAChaiFenP: 'Prompt for QA Split',
   zuiDaXiangYingChang: 'Max Token',
   wenDu: 'Temperature',
-  moXingGaoJiPeiZhi: 'Advanced Model Configuration',
+  QAChaiFenGaoJiPeiZhi: 'QA Split Advanced Configuration',
   moXingPeiZhi: 'Model Configuration',
   QAQuChongPeiZhi: 'QA reconfiguration',
   xiangLiangHuaMoXing: 'Vectorized model',

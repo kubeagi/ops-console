@@ -110,7 +110,7 @@ class ModelAppList$$Page extends React.Component {
       pageRange: [],
       pages: {
         currentPage: 1,
-        pageSize: 10,
+        pageSize: 12,
         total: 0,
       },
     };

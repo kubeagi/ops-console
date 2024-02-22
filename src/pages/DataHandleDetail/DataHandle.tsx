@@ -17,7 +17,7 @@ import {
   Wenbenfenduan,
 } from '@tenx-ui/icon';
 import { Divider } from '@tenx-ui/materials';
-import { Button, Card, Checkbox, Col, Form, Modal, Progress, Row, Steps, Table } from 'antd';
+import { Button, Card, Col, Form, Modal, Progress, Row, Steps, Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import I18N from '@/utils/kiwiI18N';
@@ -346,7 +346,7 @@ const DataHandle: React.FC<Iprops> = props => {
         footer={null}
         onCancel={closeHighConfig}
         open={highConfigVisible}
-        title={I18N.DataHandle.moXingGaoJiPeiZhi}
+        title={I18N.DataHandle.QAChaiFenGaoJiPeiZhi}
         width={600}
       >
         <Divider
@@ -383,9 +383,6 @@ const DataHandle: React.FC<Iprops> = props => {
               >
                 {I18N.DataHandle.QAQuChongPeiZhi}
               </Divider>
-              <Form.Item label={''}>
-                <Checkbox checked disabled /> {I18N.DataHandle.duiChaiFenJieGuoJinXingQuChongChuLi}
-              </Form.Item>
               <Form.Item label={I18N.DataHandle.xiangLiangHuaMoXing}>
                 {QADuplicateConfig?.embedding_name || '-'}
               </Form.Item>

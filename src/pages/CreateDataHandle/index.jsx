@@ -18,9 +18,8 @@ import {
   FormilySelect,
   Space,
   Button,
-  Container,
-  Steps,
   Card,
+  Steps,
   Switch,
   FormilyFormItem,
   Input,
@@ -220,6 +219,7 @@ class $$Page extends React.Component {
       },
       selectedFileList: [],
       showLlmModel: false,
+      showQASplitDuplicateConfig: true,
       step1FormData: {
         name: undefined,
         file_type: 'text',
@@ -326,7 +326,7 @@ class $$Page extends React.Component {
                   temperature: this.state.qaSplitHighConfig.temperature / 100,
                 },
                 ...{
-                  ...(this.state.qaSplitHighConfig.removeDuplicateConfigChecked === 'checked'
+                  ...(this.state.qaSplitHighConfig.removeDuplicateConfigChecked.length
                     ? {
                         remove_duplicate_config: {
                           embedding_name:
@@ -614,6 +614,8 @@ class $$Page extends React.Component {
       qaSplitHighConfig: {
         ...this.state.cacheqaSplitHighConfig,
       },
+      showQASplitDuplicateConfig:
+        !!this.state.cacheqaSplitHighConfig.removeDuplicateConfigChecked.length,
     });
   }
 
@@ -950,6 +952,15 @@ class $$Page extends React.Component {
       this.form('remove_duplicate_form')?.setValues({
         remove_duplicate: value,
       });
+      if (!value || !value.length) {
+        this.setState({
+          showQASplitDuplicateConfig: false,
+        });
+      } else {
+        this.setState({
+          showQASplitDuplicateConfig: true,
+        });
+      }
     }
   }
 
@@ -1036,7 +1047,7 @@ class $$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(() => this.state.configVisible)}
-          title="模型高级配置"
+          title="QA 拆分高级配置"
           width="700px"
         >
           <Divider
@@ -1362,138 +1373,142 @@ class $$Page extends React.Component {
                 </Typography.Text>
               </Col>
             </Row>
-            <FormilySelect
-              __component_name="FormilySelect"
-              componentProps={{
-                'x-component-props': {
-                  _sdkSwrGetFunc: {},
-                  allowClear: false,
-                  disabled: false,
-                  onChange: function () {
-                    return this.setQaSplitHighConfigValue.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([
-                        {
-                          fieldName: 'removeDuplicateConfigEmbedding',
-                        },
-                      ])
-                    );
-                  }.bind(this),
-                  placeholder: '请选择',
-                },
-              }}
-              decoratorProps={{
-                'x-decorator-props': { labelEllipsis: true, style: { marginTop: '12px' } },
-              }}
-              fieldProps={{
-                '_unsafe_MixedSetter_default_select': 'VariableSetter',
-                'default': __$$eval(
-                  () => this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
-                ),
-                'name': 'embedding',
-                'title': '向量化模型',
-                'x-validator': [],
-              }}
-            />
-          </FormilyForm>
-          <Row __component_name="Row" wrap={false}>
-            <Col
-              __component_name="Col"
-              flex="140px"
-              style={{ paddingLeft: '20px', paddingTop: '8px' }}
-            >
-              <Typography.Text
-                __component_name="Typography.Text"
-                disabled={false}
-                ellipsis={true}
-                strong={false}
-                style={{ fontSize: '' }}
-              >
-                相似度阈值
-              </Typography.Text>
-              <Tooltip
-                __component_name="Tooltip"
-                title=" 配置相似度阈值，低于阈值，则认为不相似；高于阈值，则认为相似，将会进行去重处理，范围为[0, 1]。"
-              >
-                <AntdIconQuestionCircleOutlined
-                  __component_name="AntdIconQuestionCircleOutlined"
-                  style={{ marginLeft: '5px' }}
-                />
-              </Tooltip>
-            </Col>
-            <Col __component_name="Col" flex="auto">
-              <Row __component_name="Row" wrap={true}>
-                <Col __component_name="Col" span={18}>
-                  <Slider
-                    __component_name="Slider"
-                    marks={null}
-                    max={1}
-                    min={0}
-                    onChange={function () {
+            {!!__$$eval(() => this.state.showQASplitDuplicateConfig) && (
+              <FormilySelect
+                __component_name="FormilySelect"
+                componentProps={{
+                  'x-component-props': {
+                    _sdkSwrGetFunc: {},
+                    allowClear: false,
+                    disabled: false,
+                    onChange: function () {
                       return this.setQaSplitHighConfigValue.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([
                           {
-                            fieldName: 'removeDuplicateConfigSimilarity',
+                            fieldName: 'removeDuplicateConfigEmbedding',
                           },
                         ])
                       );
-                    }.bind(this)}
-                    step={__$$eval(() => 1 / 10)}
-                    value={__$$eval(
-                      () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
-                    )}
+                    }.bind(this),
+                    placeholder: '请选择',
+                  },
+                }}
+                decoratorProps={{
+                  'x-decorator-props': { labelEllipsis: true, style: { marginTop: '12px' } },
+                }}
+                fieldProps={{
+                  '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                  'default': __$$eval(
+                    () => this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
+                  ),
+                  'name': 'embedding',
+                  'title': '向量化模型',
+                  'x-validator': [],
+                }}
+              />
+            )}
+          </FormilyForm>
+          {!!__$$eval(() => this.state.showQASplitDuplicateConfig) && (
+            <Row __component_name="Row" wrap={false}>
+              <Col
+                __component_name="Col"
+                flex="140px"
+                style={{ paddingLeft: '20px', paddingTop: '8px' }}
+              >
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  相似度阈值
+                </Typography.Text>
+                <Tooltip
+                  __component_name="Tooltip"
+                  title=" 配置相似度阈值，低于阈值，则认为不相似；高于阈值，则认为相似，将会进行去重处理，范围为[0, 1]。"
+                >
+                  <AntdIconQuestionCircleOutlined
+                    __component_name="AntdIconQuestionCircleOutlined"
+                    style={{ marginLeft: '5px' }}
                   />
-                </Col>
-                <Col __component_name="Col" span={6}>
-                  <FormilyForm
-                    __component_name="FormilyForm"
-                    componentProps={{
-                      colon: false,
-                      labelAlign: 'left',
-                      labelCol: 4,
-                      layout: 'horizontal',
-                      wrapperCol: 20,
-                    }}
-                    formHelper={{ autoFocus: true }}
-                    ref={this._refsManager.linkRef('similarity_form')}
-                  >
-                    <FormilyNumberPicker
-                      __component_name="FormilyNumberPicker"
-                      componentProps={{
-                        'x-component-props': {
-                          max: 1,
-                          min: 0,
-                          onChange: function () {
-                            return this.setQaSplitHighConfigValue.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([
-                                {
-                                  fieldName: 'removeDuplicateConfigSimilarity',
-                                },
-                              ])
-                            );
-                          }.bind(this),
-                          placeholder: '请输入',
-                          step: __$$eval(() => 1 / 10),
-                        },
-                      }}
-                      decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                      fieldProps={{
-                        '_unsafe_MixedSetter_default_select': 'VariableSetter',
-                        'default': __$$eval(
-                          () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
-                        ),
-                        'name': 'similarity',
-                        'title': '',
-                        'x-validator': [],
-                      }}
+                </Tooltip>
+              </Col>
+              <Col __component_name="Col" flex="auto">
+                <Row __component_name="Row" wrap={true}>
+                  <Col __component_name="Col" span={18}>
+                    <Slider
+                      __component_name="Slider"
+                      marks={null}
+                      max={1}
+                      min={0}
+                      onChange={function () {
+                        return this.setQaSplitHighConfigValue.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([
+                            {
+                              fieldName: 'removeDuplicateConfigSimilarity',
+                            },
+                          ])
+                        );
+                      }.bind(this)}
+                      step={__$$eval(() => 1 / 10)}
+                      value={__$$eval(
+                        () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
+                      )}
                     />
-                  </FormilyForm>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
+                  </Col>
+                  <Col __component_name="Col" span={6}>
+                    <FormilyForm
+                      __component_name="FormilyForm"
+                      componentProps={{
+                        colon: false,
+                        labelAlign: 'left',
+                        labelCol: 4,
+                        layout: 'horizontal',
+                        wrapperCol: 20,
+                      }}
+                      formHelper={{ autoFocus: true }}
+                      ref={this._refsManager.linkRef('similarity_form')}
+                    >
+                      <FormilyNumberPicker
+                        __component_name="FormilyNumberPicker"
+                        componentProps={{
+                          'x-component-props': {
+                            max: 1,
+                            min: 0,
+                            onChange: function () {
+                              return this.setQaSplitHighConfigValue.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([
+                                  {
+                                    fieldName: 'removeDuplicateConfigSimilarity',
+                                  },
+                                ])
+                              );
+                            }.bind(this),
+                            placeholder: '请输入',
+                            step: __$$eval(() => 1 / 10),
+                          },
+                        }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        fieldProps={{
+                          '_unsafe_MixedSetter_default_select': 'VariableSetter',
+                          'default': __$$eval(
+                            () => this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity
+                          ),
+                          'name': 'similarity',
+                          'title': '',
+                          'x-validator': [],
+                        }}
+                      />
+                    </FormilyForm>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          )}
         </Modal>
         <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
           <Col __component_name="Col" span={24}>
@@ -1511,24 +1526,17 @@ class $$Page extends React.Component {
             </Typography.Title>
           </Col>
         </Row>
-        <Container
-          __component_name="Container"
-          style={{
-            backgroundColor: '#fff',
-            paddingBottom: '24px',
-            paddingLeft: '24px',
-            paddingRight: '24px',
-            paddingTop: '24px',
-          }}
+        <Card
+          __component_name="Card"
+          actions={[]}
+          bordered={false}
+          hoverable={false}
+          loading={false}
+          size="default"
+          type="default"
         >
-          <Row
-            __component_name="Row"
-            align="top"
-            gutter={['', '']}
-            style={{ backgroundColor: '#ffffff' }}
-            wrap={true}
-          >
-            <Col __component_name="Col" span={24} style={{ backgroundColor: '#ffffff' }}>
+          <Row __component_name="Row" align="top" gutter={['', '']} style={{}} wrap={true}>
+            <Col __component_name="Col" span={24} style={{}}>
               <Steps
                 __component_name="Steps"
                 current={__$$eval(() => this.state.currentStep)}
@@ -3893,7 +3901,7 @@ class $$Page extends React.Component {
           {!!__$$eval(() => this.state.currentStep === 1) && (
             <Row
               __component_name="Row"
-              style={{ backgroundColor: '#ffffff', marginLeft: '0px', marginRight: '0px' }}
+              style={{ marginLeft: '0px', marginRight: '0px' }}
               wrap={true}
             >
               <Col
@@ -3904,8 +3912,8 @@ class $$Page extends React.Component {
             </Row>
           )}
           {!!__$$eval(() => this.state.currentStep === 1) && (
-            <Row __component_name="Row" style={{ backgroundColor: '#ffffff' }} wrap={true}>
-              <Col __component_name="Col" span={24} style={{ color: '#ffffff !important' }}>
+            <Row __component_name="Row" style={{}} wrap={true}>
+              <Col __component_name="Col" span={24} style={{}}>
                 <FormilyForm
                   __component_name="FormilyForm"
                   componentProps={{
@@ -4208,7 +4216,7 @@ class $$Page extends React.Component {
               style={{ marginLeft: '0px', marginRight: '0px' }}
               wrap={true}
             >
-              <Col __component_name="Col" span={24} style={{ backgroundColor: '#ffffff' }}>
+              <Col __component_name="Col" span={24} style={{}}>
                 <FormilyForm
                   __component_name="FormilyForm"
                   componentProps={{
@@ -4223,7 +4231,7 @@ class $$Page extends React.Component {
                 >
                   <Row
                     __component_name="Row"
-                    style={{ backgroundColor: '#ffffff', marginLeft: '0px', marginRight: '0px' }}
+                    style={{ marginLeft: '0px', marginRight: '0px' }}
                     wrap={true}
                   >
                     <Col __component_name="Col" span={24} style={{ height: '40px' }}>
@@ -4310,12 +4318,7 @@ class $$Page extends React.Component {
             <Row
               __component_name="Row"
               gutter={[0]}
-              style={{
-                backgroundColor: '#ffffff',
-                paddingBottom: '24px',
-                paddingLeft: '24px',
-                paddingRight: '24px',
-              }}
+              style={{ paddingBottom: '24px', paddingLeft: '24px', paddingRight: '24px' }}
               wrap={true}
             >
               <Col __component_name="Col" span={24}>
@@ -4368,55 +4371,32 @@ class $$Page extends React.Component {
               </Col>
             </Row>
           )}
-        </Container>
-        <Divider
-          __component_name="Divider"
-          dashed={false}
-          defaultOpen={false}
-          mode="line"
-          style={{
-            backgroundColor: '#ffffff',
-            height: '1px',
-            marginBottom: '0px',
-            marginTop: '0px',
-          }}
-        />
-        <Row __component_name="Row" style={{ marginLeft: '0px', marginRight: '0px' }} wrap={true}>
-          <Col
-            __component_name="Col"
-            span={24}
-            style={{
-              backgroundColor: '#ffffff',
-              display: 'inline',
-              marginLeft: '0px',
-              marginRight: '0px',
-              paddingBottom: '16px',
-              paddingTop: '16px',
-              textAlign: 'center',
-            }}
-          >
-            <Space
-              __component_name="Space"
-              align="center"
-              direction="horizontal"
-              style={{ marginRight: '8px' }}
+          <Divider
+            __component_name="Divider"
+            dashed={false}
+            defaultOpen={false}
+            mode="line"
+            style={{ height: '1px', marginBottom: '0px', marginTop: '0px' }}
+          />
+          <Row __component_name="Row" style={{ marginLeft: '0px', marginRight: '0px' }} wrap={true}>
+            <Col
+              __component_name="Col"
+              span={24}
+              style={{
+                display: 'inline',
+                marginLeft: '0px',
+                marginRight: '0px',
+                paddingBottom: '16px',
+                paddingTop: '16px',
+                textAlign: 'center',
+              }}
             >
-              <Button
-                __component_name="Button"
-                block={false}
-                danger={false}
-                disabled={false}
-                ghost={false}
-                icon=""
-                onClick={function () {
-                  return this.onBack.apply(this, Array.prototype.slice.call(arguments).concat([]));
-                }.bind(this)}
-                shape="default"
-                style={{ marginRight: '12px' }}
+              <Space
+                __component_name="Space"
+                align="center"
+                direction="horizontal"
+                style={{ marginRight: '8px' }}
               >
-                取消
-              </Button>
-              {!!__$$eval(() => this.state.currentStep !== 0) && (
                 <Button
                   __component_name="Button"
                   block={false}
@@ -4425,7 +4405,7 @@ class $$Page extends React.Component {
                   ghost={false}
                   icon=""
                   onClick={function () {
-                    return this.onPrevious.apply(
+                    return this.onBack.apply(
                       this,
                       Array.prototype.slice.call(arguments).concat([])
                     );
@@ -4433,51 +4413,74 @@ class $$Page extends React.Component {
                   shape="default"
                   style={{ marginRight: '12px' }}
                 >
-                  上一步
+                  取消
+                </Button>
+                {!!__$$eval(() => this.state.currentStep !== 0) && (
+                  <Button
+                    __component_name="Button"
+                    block={false}
+                    danger={false}
+                    disabled={false}
+                    ghost={false}
+                    icon=""
+                    onClick={function () {
+                      return this.onPrevious.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    shape="default"
+                    style={{ marginRight: '12px' }}
+                  >
+                    上一步
+                  </Button>
+                )}
+              </Space>
+              {!!__$$eval(() => this.state.currentStep !== 3) && (
+                <Button
+                  __component_name="Button"
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  icon=""
+                  onClick={function () {
+                    return this.onNext.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                  style={{ marginRight: '20px' }}
+                  type="primary"
+                >
+                  下一步
                 </Button>
               )}
-            </Space>
-            {!!__$$eval(() => this.state.currentStep !== 3) && (
-              <Button
-                __component_name="Button"
-                block={false}
-                danger={false}
-                disabled={false}
-                ghost={false}
-                icon=""
-                onClick={function () {
-                  return this.onNext.apply(this, Array.prototype.slice.call(arguments).concat([]));
-                }.bind(this)}
-                shape="default"
-                style={{ marginRight: '20px' }}
-                type="primary"
-              >
-                下一步
-              </Button>
-            )}
-            {!!__$$eval(() => this.state.currentStep === 3) && (
-              <Button
-                __component_name="Button"
-                block={false}
-                danger={false}
-                disabled={false}
-                ghost={false}
-                icon=""
-                onClick={function () {
-                  return this.onFinish.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                shape="default"
-                style={{ marginRight: '12px' }}
-                type="primary"
-              >
-                完成
-              </Button>
-            )}
-          </Col>
-        </Row>
+              {!!__$$eval(() => this.state.currentStep === 3) && (
+                <Button
+                  __component_name="Button"
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  icon=""
+                  onClick={function () {
+                    return this.onFinish.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                  style={{ marginRight: '12px' }}
+                  type="primary"
+                >
+                  完成
+                </Button>
+              )}
+            </Col>
+          </Row>
+        </Card>
       </Page>
     );
   }

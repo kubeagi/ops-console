@@ -110,6 +110,7 @@ class CreateAiAgentAssessment$$Page extends React.Component {
           value: 0.5,
         },
       },
+      hasKnowledgebase: true,
       llmList: [],
       loading: false,
       numberInputStep: 0.1,
@@ -164,6 +165,41 @@ class CreateAiAgentAssessment$$Page extends React.Component {
       }
     }
     return result;
+  }
+
+  async getApplication() {
+    const res = await this.utils.bff.getApplication({
+      name: this.history?.query?.appName,
+      namespace: this.history?.query?.appNamespace,
+    });
+    const Application = res?.Application?.getApplication;
+    if (!Application.knowledgebase) {
+      this.setState({
+        hasKnowledgebase: false,
+      });
+      this.form('create_form').fields['faithfulness.checked'].componentProps.disabled = true;
+      this.form('create_form').fields['faithfulness.value'].required = false;
+      this.form('create_form').fields['context_relevancy.checked'].componentProps.disabled = true;
+      this.form('create_form').fields['context_relevancy.value'].required = false;
+      this.form('create_form').fields['context_precision.checked'].componentProps.disabled = true;
+      this.form('create_form').fields['context_precision.value'].required = false;
+      this.form('create_form').fields['context_recall.checked'].componentProps.disabled = true;
+      this.form('create_form').fields['context_recall.value'].required = false;
+      this.form('create_form').setValues({
+        faithfulness: {
+          checked: false,
+        },
+        context_relevancy: {
+          checked: false,
+        },
+        context_precision: {
+          checked: false,
+        },
+        context_recall: {
+          checked: false,
+        },
+      });
+    }
   }
 
   async getDataSet() {
@@ -468,6 +504,7 @@ class CreateAiAgentAssessment$$Page extends React.Component {
   componentDidMount() {
     this.getDataSet();
     this.getListWorkers();
+    this.getApplication();
     setTimeout(() => {
       this.form('create_form').setValues(this.state.formInitValue);
     });
