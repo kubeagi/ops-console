@@ -577,12 +577,6 @@ class ModelAppList$$Page extends React.Component {
     return `共 ${total} 条`;
   }
 
-  validate(value, item) {
-    if (!value?.fileList?.length) {
-      return '请选择文件上传';
-    }
-  }
-
   async validatorName(v) {
     if (v) {
       try {
@@ -727,27 +721,14 @@ class ModelAppList$$Page extends React.Component {
                 },
               }}
               decoratorProps={{
-                'x-decorator-props': { asterisk: true, labelEllipsis: true, size: 'default' },
+                'x-decorator-props': { asterisk: false, labelEllipsis: true, size: 'default' },
               }}
               fieldProps={{
                 'name': 'icon',
                 'required': false,
                 'title': '上传',
                 'x-component': 'FormilyUpload',
-                'x-validator': [
-                  {
-                    children: '未知',
-                    id: 'disabled',
-                    required: false,
-                    type: 'disabled',
-                    validator: function () {
-                      return this.validate.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this),
-                  },
-                ],
+                'x-validator': [],
               }}
             >
               <FormilyFormItem
@@ -1312,25 +1293,13 @@ class ModelAppList$$Page extends React.Component {
                 },
               }}
               decoratorProps={{
-                'x-decorator-props': { asterisk: true, labelEllipsis: true, size: 'default' },
+                'x-decorator-props': { asterisk: false, labelEllipsis: true, size: 'default' },
               }}
               fieldProps={{
                 'name': 'icon',
                 'title': '上传',
                 'x-component': 'FormilyUpload',
-                'x-validator': [
-                  {
-                    children: '未知',
-                    id: 'disabled',
-                    type: 'disabled',
-                    validator: function () {
-                      return this.validate.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this),
-                  },
-                ],
+                'x-validator': [],
               }}
             >
               <FormilyFormItem
