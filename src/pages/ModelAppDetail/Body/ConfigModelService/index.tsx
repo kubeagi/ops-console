@@ -152,14 +152,16 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
               <Select
                 onChange={v => {
                   forceUpdate();
+                  const llm = llmList?.find(item => item.name === v);
+                  const model = llm?.provider === 'worker' ? llm?.models?.[0] : undefined;
                   form.setFieldsValue({
-                    model: undefined,
+                    model,
                   });
                   setConfigs({
                     ...configs,
                     ConfigModelService: {
                       ...configs?.ConfigModelService,
-                      model: undefined,
+                      model,
                       llm: v,
                     },
                   });
@@ -173,41 +175,39 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
                 ))}
               </Select>
             </Form.Item>
-            {!noModelSelect && (
-              <Form.Item
-                name="model"
-                rules={[
-                  {
-                    validator: (_, value, callback) => {
-                      if (!value) {
-                        return callback('请选择模型');
-                      }
-                      return callback();
-                    },
+            <Form.Item
+              name="model"
+              rules={[
+                {
+                  validator: (_, value, callback) => {
+                    if (!value) {
+                      return callback('请选择模型');
+                    }
+                    return callback();
                   },
-                ]}
-                style={{ marginBottom: 0 }}
+                },
+              ]}
+              style={noModelSelect ? { display: 'none', marginBottom: 0 } : { marginBottom: 0 }}
+            >
+              <Select
+                onChange={v => {
+                  setConfigs({
+                    ...configs,
+                    ConfigModelService: {
+                      ...configs?.ConfigModelService,
+                      model: v,
+                    },
+                  });
+                }}
+                placeholder="请选择模型"
               >
-                <Select
-                  onChange={v => {
-                    setConfigs({
-                      ...configs,
-                      ConfigModelService: {
-                        ...configs?.ConfigModelService,
-                        model: v,
-                      },
-                    });
-                  }}
-                  placeholder="请选择模型"
-                >
-                  {llm?.models?.map(item => (
-                    <Select.Option key={item} value={item}>
-                      {item}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            )}
+                {llm?.models?.map(item => (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
           </>
         );
       }}
