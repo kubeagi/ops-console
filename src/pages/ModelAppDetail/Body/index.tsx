@@ -51,10 +51,6 @@ const Body: React.FC<BodyProps> = props => {
                           name: data?.metadata?.name,
                           namespace: data?.metadata?.namespace,
                           ...values,
-                          knowledgebase:
-                            values?.knowledgebase === 'undefined'
-                              ? undefined
-                              : values?.knowledgebase || data?.knowledgebase,
                           tools: [],
                         };
                         delete input.RealTimeSearchUsed;

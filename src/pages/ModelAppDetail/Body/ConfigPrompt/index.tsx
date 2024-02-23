@@ -155,7 +155,7 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
         actions={[
           {
             key: 'string',
-            icon: <a>Prompt 模板</a>,
+            icon: <a className={styles.link}>Prompt 模板</a>,
             data: {},
             modal: {
               title: '选择 Prompt 模板',

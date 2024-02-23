@@ -12,6 +12,7 @@ import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 import { SliderItem } from '../Modal';
+import stylesCommon from '../index.less';
 import { linkageReference } from '../linkage';
 import styles from './index.less';
 
@@ -117,7 +118,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
         {
           key: 'string',
           icon: (
-            <a>
+            <a className={stylesCommon.link}>
               <PlusCircleOutlined style={{ marginRight: 5 }} />
               添加
             </a>
@@ -135,7 +136,6 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
               }
               return (
                 <>
-                  <Form.Item name="knowledgebase" style={{ display: 'none' }}></Form.Item>
                   <Knowledge
                     canDelete={false}
                     canSelect={true}
@@ -143,7 +143,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                     items={knowledges}
                     setCheckedIds={v => {
                       form.setFieldsValue({
-                        knowledgebase: v?.[0] || 'undefined',
+                        knowledgebase: v?.[0],
                       });
                       setConfigs({
                         ...configs,
@@ -242,6 +242,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
       }}
       title={'知识库'}
     >
+      <Form.Item name="knowledgebase" style={{ display: 'none' }}></Form.Item>
       <Knowledge
         canDelete={true}
         canSelect={false}
@@ -253,7 +254,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
         setCheckedIds={v => {
           form.setFieldsValue({
             ...configs?.ConfigKnowledge,
-            knowledgebase: v?.[0] || 'undefined',
+            knowledgebase: v?.[0],
           });
           const newConfigs = {
             ...configs,
