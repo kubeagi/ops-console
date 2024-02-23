@@ -1,5 +1,5 @@
 import { CloseOutlined, EditOutlined, FilePdfOutlined } from '@ant-design/icons';
-import { Chart, Coordinate, Legend, Line, Point } from '@tenx-ui/charts';
+import { Area, Axis, Chart, Coordinate, Legend, Line, Point } from '@tenx-ui/charts';
 import { Col, Pagination, Row, Table } from '@tenx-ui/materials';
 import { Drawer, Form, Input, Modal, Progress, Space, Tag } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -109,27 +109,28 @@ const Report: React.FC<Iprops> = props => {
         title: '问题',
         dataIndex: 'question',
         key: 'question',
-        // ellipsis: { showTitle: true },
+        ellipsis: { showTitle: true },
       },
       {
         title: '期望回答',
         dataIndex: 'groundTruths',
         key: 'groundTruths',
-        // ellipsis: { showTitle: true },
-        render(text) {
-          return (
-            <>
-              {text.map((item, index) => (
-                <div key={index}>{item}</div>
-              ))}
-            </>
-          );
-        },
+        ellipsis: { showTitle: true },
+        // render(text) {
+        //   return (
+        //     <>
+        //       {text.map((item, index) => (
+        //         <div key={index}>{item}</div>
+        //       ))}
+        //     </>
+        //   );
+        // },
       },
       {
         title: '模型回答',
         dataIndex: 'answer',
         key: 'answer',
+        ellipsis: { showTitle: true },
         // todo
         // render(text, record) {
         //   return (
@@ -197,7 +198,11 @@ const Report: React.FC<Iprops> = props => {
           const cols = getColumns(res.data);
           setColumns(cols);
         }
-        setDataSource(res.data);
+        const _dataSource = res.data.map(item => ({
+          ...item,
+          groundTruths: item.groundTruths.join('\n'),
+        }));
+        setDataSource(_dataSource);
         setTotal(res.total);
         setTableLoading(false);
       })
@@ -234,7 +239,6 @@ const Report: React.FC<Iprops> = props => {
     setTableSortParam(columnKey);
     setPage(1);
   };
-
   return (
     <div className={styles.report}>
       <div style={{ fontWeight: 700, fontSize: '14px', lineHeight: '32px' }}>评估结论</div>
@@ -247,6 +251,7 @@ const Report: React.FC<Iprops> = props => {
           <div style={{ fontWeight: 700, lineHeight: '32px' }}>总得分</div>
           <div style={{ textAlign: 'center', paddingBottom: 16, height: 200, paddingTop: 25 }}>
             <Progress
+              format={percent => `${percent}`}
               gapDegree={0}
               percent={props.data?.totalScore?.score.toFixed(4) * 100}
               size={150}
@@ -259,23 +264,42 @@ const Report: React.FC<Iprops> = props => {
           <div style={{ fontWeight: 700, marginLeft: 24 }}>各项指标得分（avg）</div>
           <Chart
             autoFit
-            data={props?.data?.radarChart?.map(item => ({ ...item, type: cateMap[item.type] }))}
-            height={210}
+            data={props?.data?.radarChart?.map(item => {
+              const value = `${item.value}`.slice(0, 4);
+              return { ...item, type: `${cateMap[item.type]} ${value}`, value: Number(value) };
+            })}
+            height={250}
+            padding={[20]}
             scale={{
               value: {
                 min: 0,
                 max: 1,
                 alias: '得分',
               },
-              type: {
-                formatter: val => {
-                  return val;
-                },
-              },
             }}
           >
             <Coordinate radius={0.8} type="polar" />
             <Line position="type*value" size={2} />
+            <Area position="type*value" />
+            <Axis grid={{ line: { type: 'line' } }} name="value" />
+            <Axis
+              label={{
+                autoRotate: true,
+                style: (type, ...val) => {
+                  const item = props?.data?.radarChart?.find(item => {
+                    const _type = type.split('\n')[0];
+                    return cateMap[item.type] === _type;
+                  });
+                  return { fill: item.color };
+                },
+                formatter(text, item, index) {
+                  let arr = text.split(' ');
+                  return `${arr[0]}\n${arr[1]}`;
+                },
+              }}
+              line={false}
+              name="type"
+            />
           </Chart>
         </Col>
       </Row>
