@@ -16,9 +16,10 @@ import {
   Dropdown,
   Space,
   Descriptions,
+  Flex,
 } from '@tenx-ui/materials';
 
-import { TenxIconModelIcon } from '@tenx-ui/icon-materials';
+import { TenxIconModelIcon, AntdIconCodepenCircleOutlined } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -253,6 +254,21 @@ class ModelServiceDetail$$Page extends React.Component {
       return result;
     }
     return '-';
+  }
+
+  handleModelInfos() {
+    const detail = this.state.detail;
+    const { type } = this.getBaseInfo();
+    if (type === 'local') {
+      const model = detail?.model || [];
+      return Array.isArray(model) ? model : [model];
+    } else {
+      const llmModels = detail?.llmModels || [];
+      const embeddingModels = detail?.embeddingModels || [];
+      return [...llmModels, ...embeddingModels]?.map(name => ({
+        name,
+      }));
+    }
   }
 
   handleModelTypes(key) {
@@ -917,6 +933,98 @@ class ModelServiceDetail$$Page extends React.Component {
                     label: this.i18n('i18n-txt5kh4m') /* 描述 */,
                     span: 1,
                   },
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: [
+                      !!__$$eval(() => this.handleModelInfos()?.length === 0) && (
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={false}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                          key="node_oclt2bpkaw1"
+                        >
+                          -
+                        </Typography.Text>
+                      ),
+                      !!__$$eval(() => this.handleModelInfos()?.length > 0) && (
+                        <Flex
+                          __component_name="Flex"
+                          justify="flex-start"
+                          style={{ width: '100%' }}
+                          wrap="wrap"
+                          key="node_oclt2bnfrq1"
+                        >
+                          {__$$evalArray(() => this.handleModelInfos()).map((item, index) =>
+                            (__$$context => (
+                              <Card
+                                __component_name="Card"
+                                actions={[]}
+                                bordered={true}
+                                hoverable={false}
+                                loading={false}
+                                size="default"
+                                style={{
+                                  marginBottom: '20px',
+                                  marginRight: '20px',
+                                  width: 'calc(25% - 20px)',
+                                }}
+                                type="default"
+                              >
+                                <Row
+                                  __component_name="Row"
+                                  align="middle"
+                                  gutter={[0, 0]}
+                                  justify="start"
+                                  wrap={false}
+                                >
+                                  <Col __component_name="Col">
+                                    <AntdIconCodepenCircleOutlined
+                                      __component_name="AntdIconCodepenCircleOutlined"
+                                      style={{
+                                        color: '#4a90e2',
+                                        fontSize: '56px',
+                                        marginRight: '20px',
+                                      }}
+                                    />
+                                  </Col>
+                                  <Col __component_name="Col">
+                                    <Typography.Paragraph
+                                      code={false}
+                                      delete={false}
+                                      disabled={false}
+                                      editable={false}
+                                      ellipsis={{
+                                        rows: 2,
+                                        tooltip: {
+                                          _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                          title: __$$eval(() => item?.name),
+                                        },
+                                      }}
+                                      mark={false}
+                                      strong={false}
+                                      style={{
+                                        fontSize: '16px',
+                                        fontWeight: 'bold',
+                                        wordBreak: 'break-all',
+                                      }}
+                                      underline={false}
+                                    >
+                                      {__$$eval(() => item?.name)}
+                                    </Typography.Paragraph>
+                                  </Col>
+                                </Row>
+                              </Card>
+                            ))(__$$createChildContext(__$$context, { item, index }))
+                          )}
+                        </Flex>
+                      ),
+                    ],
+                    key: 'gl4qwni097',
+                    label: '模型信息',
+                    span: 1,
+                  },
                 ]}
                 labelStyle={{ width: 100 }}
                 layout="horizontal"
@@ -1065,7 +1173,7 @@ class ModelServiceDetail$$Page extends React.Component {
                       <Typography.Text
                         __component_name="Typography.Text"
                         disabled={false}
-                        ellipsis={true}
+                        ellipsis={false}
                         strong={false}
                         style={{ fontSize: '' }}
                       >
@@ -1207,6 +1315,98 @@ class ModelServiceDetail$$Page extends React.Component {
                     ),
                     key: '45yg37my717',
                     label: this.i18n('i18n-bwjy26tq') /* 服务规格 */,
+                    span: 1,
+                  },
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: [
+                      !!__$$eval(() => this.handleModelInfos()?.length === 0) && (
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={false}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                          key="node_oclt2bj9n71k"
+                        >
+                          -
+                        </Typography.Text>
+                      ),
+                      !!__$$eval(() => this.handleModelInfos()?.length > 0) && (
+                        <Flex
+                          __component_name="Flex"
+                          justify="flex-start"
+                          style={{ width: '100%' }}
+                          wrap="wrap"
+                          key="node_oclt2bh8um3"
+                        >
+                          {__$$evalArray(() => this.handleModelInfos()).map((item, index) =>
+                            (__$$context => (
+                              <Card
+                                __component_name="Card"
+                                actions={[]}
+                                bordered={true}
+                                hoverable={false}
+                                loading={false}
+                                size="default"
+                                style={{
+                                  marginBottom: '20px',
+                                  marginRight: '20px',
+                                  width: 'calc(25% - 20px)',
+                                }}
+                                type="default"
+                              >
+                                <Row
+                                  __component_name="Row"
+                                  align="middle"
+                                  gutter={[0, 0]}
+                                  justify="start"
+                                  wrap={false}
+                                >
+                                  <Col __component_name="Col">
+                                    <AntdIconCodepenCircleOutlined
+                                      __component_name="AntdIconCodepenCircleOutlined"
+                                      style={{
+                                        color: '#4a90e2',
+                                        fontSize: '56px',
+                                        marginRight: '20px',
+                                      }}
+                                    />
+                                  </Col>
+                                  <Col __component_name="Col">
+                                    <Typography.Paragraph
+                                      code={false}
+                                      delete={false}
+                                      disabled={false}
+                                      editable={false}
+                                      ellipsis={{
+                                        rows: 2,
+                                        tooltip: {
+                                          _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                          title: __$$eval(() => item?.name),
+                                        },
+                                      }}
+                                      mark={false}
+                                      strong={false}
+                                      style={{
+                                        fontSize: '16px',
+                                        fontWeight: 'bold',
+                                        wordBreak: 'break-all',
+                                      }}
+                                      underline={false}
+                                    >
+                                      {__$$eval(() => item?.name)}
+                                    </Typography.Paragraph>
+                                  </Col>
+                                </Row>
+                              </Card>
+                            ))(__$$createChildContext(__$$context, { item, index }))
+                          )}
+                        </Flex>
+                      ),
+                    ],
+                    key: 'ayhgg13s7ep',
+                    label: '模型信息',
                     span: 1,
                   },
                 ]}
