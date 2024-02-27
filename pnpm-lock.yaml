@@ -59,8 +59,8 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5(antd@5.13.2)(classnames@2.5.1)(prop-types@15.8.1)(rc-dialog@9.3.4)(react-dom@18.2.0)(react@18.2.0)
       '@tenx-ui/materials':
-        specifier: 1.5.31
-        version: 1.5.31(@ant-design/icons@5.2.6)(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd@5.13.2)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.21.3)(react@18.2.0)(typescript@5.3.3)
+        specifier: 1.5.32
+        version: 1.5.32(@ant-design/icons@5.2.6)(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd@5.13.2)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.21.3)(react@18.2.0)(typescript@5.3.3)
       '@tenx-ui/request':
         specifier: ^1.0.0-beta.6
         version: 1.0.0-beta.6
@@ -3663,7 +3663,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.335.0(react@18.2.0)
+      lucide-react: 0.341.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.1(react@18.2.0)
       query-string: 8.1.0
@@ -5259,8 +5259,8 @@ packages:
       react-virtualized: 9.22.5(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
-  /@tenx-ui/materials@1.5.31(@ant-design/icons@5.2.6)(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd@5.13.2)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.21.3)(react@18.2.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-+2XX0wlL2VS9Cu3EtH56xmwNPgbXjoCquvovRbrzkqbjyI7XzhPSphbFoGqWmUNgepTa721JViIYvgpVOhQpoA==}
+  /@tenx-ui/materials@1.5.32(@ant-design/icons@5.2.6)(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd@5.13.2)(dayjs@1.11.10)(lodash@4.17.21)(prop-types@15.8.1)(react-dom@18.2.0)(react-is@18.2.0)(react-router-dom@6.21.3)(react@18.2.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-DLDZa+aFZ3r9yKpEX+sQQmNIZuVnGJBVwtmCo5Q2kmx1NdinUtmTEXodRGr1MRomiHWZiWhSq2Mvl3s2Rc7MFQ==}
     peerDependencies:
       '@ant-design/icons': ^4.7.0
       antd: ^5.8.6
@@ -13465,8 +13465,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /lucide-react@0.335.0(react@18.2.0):
-    resolution: {integrity: sha512-FNmIG4JLdvpK86ZFJjrT0SnFEa95KhsiNokVicA5mWEf1oe+ujP2C/bTr0PVQzr/wzvZpzgxaOySq0O79q2oMA==}
+  /lucide-react@0.341.0(react@18.2.0):
+    resolution: {integrity: sha512-fqI0TLU/VbzC3p90MHP3kdCRRUMTRT5qBfxwaXlllkZieYfRrMVd/RORXytqJUC2GBrvZdWYs6yvJIrqdsOmDQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -18298,7 +18298,6 @@ packages:
       object-assign: 4.1.1
       prop-types: 15.8.1
     dev: false
-    bundledDependencies: false
 
   /react@18.1.0:
     resolution: {integrity: sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ==}
