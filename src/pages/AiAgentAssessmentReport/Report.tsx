@@ -1,7 +1,7 @@
 import { CloseOutlined, EditOutlined, FilePdfOutlined } from '@ant-design/icons';
-import { Area, Axis, Chart, Coordinate, Legend, Line, Point } from '@tenx-ui/charts';
+import { Area, Axis, Chart, Coordinate, Legend, Line, Point, Tooltip } from '@tenx-ui/charts';
 import { Col, Pagination, Row, Table } from '@tenx-ui/materials';
-import { Drawer, Form, Input, Modal, Progress, Space, Tag } from 'antd';
+import { Badge, Drawer, Form, Input, Modal, Progress, Space, Tag } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import request from '@/utils/request';
@@ -36,6 +36,7 @@ const Report: React.FC<Iprops> = props => {
   const [columns, setColumns] = useState([]);
   const [tableSortParam, setTableSortParam] = useState('');
   const [tableSortOrder, setTableSortOrder] = useState('desc');
+  const [scatterData, setScatterData] = useState([]);
 
   // const openDrawer = record => {
   //   setRefDrawerVisible(true);
@@ -214,6 +215,30 @@ const Report: React.FC<Iprops> = props => {
       });
   };
 
+  const getScatterData = () => {
+    request
+      .get({
+        url: `/rags/scatter?ragName=${props.history.query.name}&appName=${props.history.query.appName}`,
+        options: {
+          headers: {
+            namespace: props.history.query.namespace,
+          },
+        },
+      })
+      .then(res => {
+        setScatterData(
+          res.data.map(item => ({ ...item, score: Number(item.score.toString().slice(0, 4)) }))
+        );
+      })
+      .catch(error => {
+        console.warn(error);
+        setScatterData([]);
+      });
+  };
+
+  useEffect(() => {
+    getScatterData();
+  }, []);
   useEffect(() => {
     getTableList();
   }, [page, size, tableSortOrder, tableSortParam]);
@@ -239,6 +264,7 @@ const Report: React.FC<Iprops> = props => {
     setTableSortParam(columnKey);
     setPage(1);
   };
+
   return (
     <div className={styles.report}>
       <div style={{ fontWeight: 700, fontSize: '14px', lineHeight: '32px' }}>评估结论</div>
@@ -278,6 +304,21 @@ const Report: React.FC<Iprops> = props => {
               },
             }}
           >
+            <Tooltip>
+              {(title, items) => {
+                const type = title.split(' ')[0];
+                const value = items[0].value;
+                return (
+                  <div style={{ height: 50, padding: '12px 8px 12px 8px' }}>
+                    <h4 style={{ fontWeight: 700 }}>{type}</h4>
+                    <p>
+                      <Badge color="blue" />
+                      &nbsp;&nbsp;得分：{value}
+                    </p>
+                  </div>
+                );
+              }}
+            </Tooltip>
             <Coordinate radius={0.8} type="polar" />
             <Line position="type*value" size={2} />
             <Area position="type*value" />
@@ -309,22 +350,53 @@ const Report: React.FC<Iprops> = props => {
           <div style={{ textAlign: 'center', paddingBottom: 16, height: 200, paddingTop: 25 }}>
             <Chart
               autoFit
-              data={props?.data?.scatterChart?.map(item => ({ ...item, type: cateMap[item.type] }))}
+              data={scatterData}
+              padding={[10, 30, 20, 40]}
               scale={{
                 score: {
-                  alias: '得分',
+                  min: 0,
+                  max: 1,
+                  alias: '总评分',
+                },
+                costTime: {
+                  alias: '问答耗时',
+                  min: 0,
                 },
               }}
             >
+              <Tooltip>
+                {(title, items) => {
+                  const costTime = items[0].title;
+                  const value = items[0].value;
+                  return (
+                    <div style={{ height: 70, padding: '12px 8px 12px 8px' }}>
+                      <div style={{ display: 'flex', lineHeight: '24px' }}>
+                        <div>
+                          <Badge color="blue" />
+                          &nbsp;&nbsp;总评分：
+                        </div>
+                        <div>{value}</div>
+                      </div>
+                      <div style={{ display: 'flex', lineHeight: '24px' }}>
+                        <div>
+                          <Badge color="blue" />
+                          &nbsp;&nbsp;问答耗时：
+                        </div>
+                        <div>{costTime} 秒</div>
+                      </div>
+                    </div>
+                  );
+                }}
+              </Tooltip>
               <Legend visible={false} />
               <Point
-                color={[
-                  'color',
-                  val => {
-                    return val;
-                  },
-                ]}
-                position="type*score"
+                // color={[
+                //   'color',
+                //   val => {
+                //     return val;
+                //   },
+                // ]}
+                position="costTime*score"
                 shape="circle"
                 tooltip="score"
               />
