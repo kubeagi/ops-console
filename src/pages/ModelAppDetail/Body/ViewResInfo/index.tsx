@@ -2,6 +2,8 @@ import { KubeagiRes } from '@tenx-ui/icon';
 import { Form, Switch } from 'antd';
 import React from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 
@@ -36,7 +38,7 @@ const ViewResInfo: React.FC<ViewResInfoProps> = props => {
       configKey="ViewResInfo"
       icon={<KubeagiRes />}
       style={{ paddingTop: 0, marginBottom: 0 }}
-      title={'查看响应信息'}
+      title={I18N.ModelApp.chaKanXiangYingXin}
     ></Container>
   );
 };

@@ -2,6 +2,8 @@ import { KubeagiNextLead } from '@tenx-ui/icon';
 import { Form, Switch } from 'antd';
 import React from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 
@@ -36,7 +38,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
       configKey="ConfigNext"
       icon={<KubeagiNextLead />}
       style={{ paddingTop: 0, marginBottom: -8, marginTop: -10 }}
-      title={'问题引导'}
+      title={I18N.ModelApp.wenTiYinDao}
     ></Container>
   );
 };

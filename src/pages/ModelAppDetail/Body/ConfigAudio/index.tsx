@@ -4,6 +4,7 @@ import { Flex, Form, Select, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import Icon from '@/assets/img/model-app-bx.png';
+import I18N from '@/utils/kiwiI18N';
 
 import Container from '../Container';
 import { SliderItem } from '../Modal';
@@ -63,11 +64,11 @@ interface ConfigAudioProps {}
 const ConfigAudio: React.FC<ConfigAudioProps> = props => {
   const [checkedAudioStyleTemp, setCheckedAudioStyleTemp] = useState('1');
   const audioStyles = [
-    { icon: Icon, id: '1', name: '考勤知识库' },
-    { icon: Icon, id: '2', name: '报销知识库' },
-    { icon: Icon, id: '3', name: '考勤知识2库' },
-    { icon: Icon, id: '4', name: '报销知识库w' },
-    { icon: Icon, id: '5', name: '报销知识库q' },
+    { icon: Icon, id: '1', name: I18N.ModelApp.kaoQinZhiShiKu2 },
+    { icon: Icon, id: '2', name: I18N.ModelApp.baoXiaoZhiShiKu3 },
+    { icon: Icon, id: '3', name: I18N.ModelApp.kaoQinZhiShiKu },
+    { icon: Icon, id: '4', name: I18N.ModelApp.baoXiaoZhiShiKu2 },
+    { icon: Icon, id: '5', name: I18N.ModelApp.baoXiaoZhiShiKu },
   ];
   return (
     <Container
@@ -78,18 +79,18 @@ const ConfigAudio: React.FC<ConfigAudioProps> = props => {
           // children?: React.ReactElement
           data: {},
           modal: {
-            title: '语音播报配置',
+            title: I18N.ModelApp.yuYinBoBaoPei,
             refresh: () => {},
             type: 'edit',
             children: (
               <>
                 <Form.Item
                   initialValue={'alloy'}
-                  label="语音模型"
+                  label={I18N.ModelApp.yuYinMoXing}
                   name="voice"
                   style={{ marginBottom: 10 }}
                 >
-                  <Select placeholder="请选择语音模型">
+                  <Select placeholder={I18N.ModelApp.qingXuanZeYuYin}>
                     {['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'].map(value => (
                       <Select.Option key={value} value={value}>
                         {value}
@@ -104,10 +105,10 @@ const ConfigAudio: React.FC<ConfigAudioProps> = props => {
                     max: 10,
                     precision: 0,
                   }}
-                  label="语速"
-                  name="语速"
+                  label={I18N.ModelApp.yuSu}
+                  name={I18N.ModelApp.yuSu}
                 />
-                <Form.Item label="语音风格" style={{ marginBottom: 0 }}>
+                <Form.Item label={I18N.ModelApp.yuYinFengGe} style={{ marginBottom: 0 }}>
                   <AudioStyle
                     checkedId={checkedAudioStyleTemp}
                     items={audioStyles}
@@ -122,7 +123,7 @@ const ConfigAudio: React.FC<ConfigAudioProps> = props => {
       ]}
       configKey="ConfigAudio"
       icon={<KubeagiRadio />}
-      title={'语音播报'}
+      title={I18N.ModelApp.yuYinBoBao}
     ></Container>
   );
 };

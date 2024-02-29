@@ -3,6 +3,8 @@ import { Modal } from '@tenx-ui/materials';
 import { Modal as AntdModal, Form, InputNumber, Slider, Space, notification } from 'antd';
 import React, { useReducer } from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import { useModalAppDetailContext } from '../../index';
 import styles from './index.less';
 
@@ -56,7 +58,7 @@ export const SliderItem: React.FC<SliderProps> = props => {
           initialValue={Config.initialValue}
           name={name}
           required
-          rules={[{ required: true, message: `请输入` }]}
+          rules={[{ required: true, message: I18N.ModelApp.qingShuRu }]}
           style={{ marginBottom }}
         >
           <InputNumber
@@ -65,7 +67,7 @@ export const SliderItem: React.FC<SliderProps> = props => {
             onChange={() => {
               forceUpdate && forceUpdate();
             }}
-            placeholder={`请输入`}
+            placeholder={I18N.ModelApp.qingShuRu}
             precision={Config.precision}
           />
         </Form.Item>
@@ -133,7 +135,7 @@ const Setting: React.FC<SettingProps> = props => {
             // });
           } catch {
             notification.warning({
-              message: `${title}失败`,
+              message: I18N.template(I18N.ModelApp.tITLE, { val1: title }),
             });
           }
         });

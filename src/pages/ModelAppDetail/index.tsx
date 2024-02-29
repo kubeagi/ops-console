@@ -3,6 +3,8 @@ import { matchPath, useLocation } from '@umijs/max';
 import { Form } from 'antd';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import utils from '../../utils/__utils';
 import Body from './Body';
 import { SEARCH_TOOLS_VALUES } from './Body/RealTimeSearch';
@@ -93,7 +95,7 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
         <Row wrap={true}>
           <Col span={24}>
             <Space align="center" direction="horizontal">
-              <Button.Back title="智能体详情" type="primary" />
+              <Button.Back title={I18N.ModelApp.zhiNengTiXiangQing} type="primary" />
             </Space>
           </Col>
           <Col span={24}>

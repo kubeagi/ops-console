@@ -38,6 +38,22 @@ cp config/api.sample.ts config/api.ts
 nr dev
 ```
 
+自动提取中文文案：
+
+> 使用工具[kiwi-clis](https://github.com/alibaba/kiwi/tree/master/kiwi-cli)
+
+1.  全局安装kiwi-clis（注意：1.0.24版本和1.1.0版本，提取操作有问题：不能指定文件夹，需要具体到文件；但1.1.0版本支持提取js、jsx文件）
+
+```bash
+yarn global add kiwi-clis@1.0.23
+```
+
+2.  执行 `kiwi --extract`，如：
+
+```bash
+kiwi --extract src/pages/ModelAppDetail --prefix I18N.ModelApp
+```
+
 ### 构建
 
 #### 仅构建静态文件

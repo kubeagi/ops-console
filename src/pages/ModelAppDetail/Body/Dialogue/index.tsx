@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import Icon from '@/assets/img/model-app-bx.png';
 import ChatComponent from '@/pages/Chat/Chat';
+import I18N from '@/utils/kiwiI18N';
 
 import { useModalAppDetailContext } from '../../index';
 import Modal from '../Modal';
@@ -36,7 +37,7 @@ const Dialogue: React.FC<DialogueProps> = props => {
         data={modalData}
         open={modalOpen && modalType === 'reference'}
         setOpen={setModalOpen}
-        title={`引用数据（3）`}
+        title={I18N.ModelApp.yinYongShuJu}
       >
         <Card
           title={
@@ -44,7 +45,8 @@ const Dialogue: React.FC<DialogueProps> = props => {
               <img src={Icon} width={24} />
               <Typography.Title>aaaawer</Typography.Title>
               <Tag bordered={false} color="green">
-                相似度 {0.1}
+                {I18N.ModelApp.xiangSiDu}
+                {0.1}
               </Tag>
             </Space>
           }
