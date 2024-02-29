@@ -4,6 +4,8 @@ import { Modal, notification } from '@tenx-ui/materials';
 import { Form, Input, Select, Upload } from 'antd';
 import React, { useEffect, useReducer, useState } from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import utils from '../../../../utils/__utils';
 import styles from './index.less';
 
@@ -34,7 +36,7 @@ const Edit: React.FC<EditProps> = props => {
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
   const [imageUrl, setImageUrl] = useState<string>();
 
-  const title = type === 'add' ? '新建' : '编辑';
+  const title = type === 'add' ? I18N.ModelApp.xinJian : I18N.ModelApp.bianJi;
   const handelBlur = () => {
     forceUpdate();
   };
@@ -74,65 +76,69 @@ const Edit: React.FC<EditProps> = props => {
             setImageUrl();
             refresh && refresh();
             notification.success({
-              message: '编辑智能体成功',
+              message: I18N.ModelApp.bianJiZhiNengTi2,
             });
           } catch (error) {
             notification.warnings({
-              message: '编辑智能体失败',
+              message: I18N.ModelApp.bianJiZhiNengTi,
               errors: error?.response?.errors,
             });
           }
         });
       }}
       open={open}
-      title={`${title}智能体`}
+      title={I18N.template(I18N.ModelApp.tITLE3, { val1: title })}
     >
       <FormHelper>
         <Form className={styles.form} form={form} labelAlign="left" labelCol={{ span: 5 }}>
           <Form.Item
-            label="智能体名称"
+            label={I18N.ModelApp.zhiNengTiMingCheng}
             name="name"
             required
             rules={[
               {
                 validator: (_, value, callback) => {
                   if (!value) {
-                    return callback('请输入智能体名称');
+                    return callback(I18N.ModelApp.qingShuRuZhiNeng2);
                   }
                   return callback();
                 },
               },
             ]}
           >
-            <Input disabled={type === 'edit'} onBlur={handelBlur} placeholder="请输入智能体名称" />
+            <Input
+              disabled={type === 'edit'}
+              onBlur={handelBlur}
+              placeholder={I18N.ModelApp.qingShuRuZhiNeng2}
+            />
           </Form.Item>
           <Form.Item
-            label="智能体别名"
+            label={I18N.ModelApp.zhiNengTiBieMing}
             name="displayName"
             required
             rules={[
               {
                 validator: (_, value, callback) => {
                   if (!value) {
-                    return callback('请输入智能体别名');
+                    return callback(I18N.ModelApp.qingShuRuZhiNeng);
                   }
                   return callback();
                 },
               },
             ]}
           >
-            <Input onBlur={handelBlur} placeholder="请输入智能体别名" />
+            <Input onBlur={handelBlur} placeholder={I18N.ModelApp.qingShuRuZhiNeng} />
           </Form.Item>
           <Form.Item
             className={styles.uploadItem}
-            label="智能体头像"
+            label={I18N.ModelApp.zhiNengTiTouXiang}
             name="icon"
             required
             rules={[
               {
                 validator: (_, value, callback) => {
                   if (!value) {
-                    return callback('请上传头像');
+                    return callback(I18N.ModelApp.qingShangChuanTouXiang);
                   }
                   return callback();
                 },
@@ -156,7 +162,7 @@ const Edit: React.FC<EditProps> = props => {
             </Upload>
           </Form.Item>
           <Form.Item
-            label="智能体分类"
+            label={I18N.ModelApp.zhiNengTiFenLei}
             name="category"
             rules={[
               {
@@ -166,24 +172,24 @@ const Edit: React.FC<EditProps> = props => {
               },
             ]}
           >
-            <Select placeholder="请选择智能体分类">
+            <Select placeholder={I18N.ModelApp.qingXuanZeZhiNeng}>
               {[
-                '游戏动漫',
-                '通用对话',
-                '工作学习',
-                '内容创作',
-                'AI绘画',
-                '影音生成',
-                '角色扮演',
-                '生活趣味',
-                '其他',
+                I18N.ModelApp.youXiDongMan,
+                I18N.ModelApp.tongYongDuiHua,
+                I18N.ModelApp.gongZuoXueXi,
+                I18N.ModelApp.neiRongChuangZuo,
+                I18N.ModelApp.aIHuiHua,
+                I18N.ModelApp.yingYinShengCheng,
+                I18N.ModelApp.jueSeBanYan,
+                I18N.ModelApp.shengHuoQuWei,
+                I18N.ModelApp.qiTa,
               ].map(item => (
                 <Select.Option key={item}>{item}</Select.Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item
-            label="描述"
+            label={I18N.ModelApp.miaoShu}
             name="description"
             rules={[
               {
@@ -193,7 +199,7 @@ const Edit: React.FC<EditProps> = props => {
               },
             ]}
           >
-            <Input placeholder="请输入描述" />
+            <Input placeholder={I18N.ModelApp.qingShuRuMiaoShu} />
           </Form.Item>
         </Form>
       </FormHelper>

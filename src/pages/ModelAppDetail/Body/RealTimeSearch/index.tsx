@@ -2,6 +2,8 @@ import { KubeagiSearch } from '@tenx-ui/icon';
 import { Form, Select, Switch } from 'antd';
 import React from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 import { linkageReference } from '../linkage';
@@ -52,7 +54,7 @@ const RealTimeSearch: React.FC<RealTimeSearchProps> = props => {
                 {
                   validator: (_, value, callback) => {
                     if (!value) {
-                      return callback('请选择搜索地址');
+                      return callback(I18N.ModelApp.qingXuanZeSouSuo);
                     }
                     return callback();
                   },
@@ -71,7 +73,7 @@ const RealTimeSearch: React.FC<RealTimeSearchProps> = props => {
                     },
                   });
                 }}
-                placeholder="请选择搜索地址"
+                placeholder={I18N.ModelApp.qingXuanZeSouSuo}
               >
                 {SEARCH_TOOLS_MAP?.map(item => (
                   <Select.Option key={item.value} value={item.value}>
@@ -84,7 +86,7 @@ const RealTimeSearch: React.FC<RealTimeSearchProps> = props => {
         );
       }}
       style={RealTimeSearchUsed ? {} : { marginBottom: -10 }}
-      title={'实时搜索'}
+      title={I18N.ModelApp.shiShiSouSuo}
     ></Container>
   );
 };

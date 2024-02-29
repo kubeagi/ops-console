@@ -2,6 +2,8 @@ import { KubeagiDialogue } from '@tenx-ui/icon';
 import { Form, Input } from 'antd';
 import React from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 
@@ -15,10 +17,10 @@ const ConversationStarter: React.FC<ConversationStarterProps> = props => {
       changeConfig
       configKey="ConfigConversationStarter"
       icon={<KubeagiDialogue />}
-      title={'对话开场白'}
+      title={I18N.ModelApp.duiHuaKaiChangBai}
     >
       <Form.Item
-        initialValue={'您好，我是考勤知识小助手，请问有什么可以帮您？'}
+        initialValue={I18N.ModelApp.ninHaoWoShiKao}
         name="prologue"
         style={{ marginBottom: 0 }}
       >
@@ -32,7 +34,7 @@ const ConversationStarter: React.FC<ConversationStarterProps> = props => {
               },
             });
           }}
-          placeholder="请输入对话开场白"
+          placeholder={I18N.ModelApp.qingShuRuDuiHua}
           rows={3}
         />
       </Form.Item>

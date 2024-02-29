@@ -2,6 +2,8 @@ import { KubeagiQuote } from '@tenx-ui/icon';
 import { Form, Switch } from 'antd';
 import React from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
 
@@ -36,7 +38,7 @@ const ViewReference: React.FC<ViewReferenceProps> = props => {
       configKey="ViewReference"
       icon={<KubeagiQuote />}
       style={{ paddingTop: 0, marginBottom: -8 }}
-      title={'查看引用'}
+      title={I18N.ModelApp.chaKanYinYong}
     ></Container>
   );
 };

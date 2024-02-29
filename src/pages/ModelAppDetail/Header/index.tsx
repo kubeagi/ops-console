@@ -3,6 +3,8 @@ import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Card } from 'antd';
 import React, { useState } from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import { useModalAppDetailContext } from '../index';
 import Delete from './Delete';
 import Edit from './Edit';
@@ -73,7 +75,7 @@ const Header: React.FC<HeaderProps> = props => {
                   </Typography.Title>
                 </Col>
                 <Col span={24}>
-                  <Typography.Text ellipsis={true}>名称：</Typography.Text>
+                  <Typography.Text ellipsis={true}>{I18N.ModelApp.mingCheng}</Typography.Text>
                   <Typography.Text ellipsis={{ tooltip: 1 }} style={{ maxWidth: 200 }}>
                     {data?.metadata?.name}
                   </Typography.Text>
@@ -86,7 +88,7 @@ const Header: React.FC<HeaderProps> = props => {
                   </Typography.Text>
                   <Divider dashed={false} mode="default" type="vertical" />
                   <Typography.Text disabled={false} ellipsis={true} strong={false}>
-                    更新时间：
+                    {I18N.DataHandle.gengXinShiJian}
                   </Typography.Text>
                   <Typography.Time
                     format=""
@@ -95,7 +97,7 @@ const Header: React.FC<HeaderProps> = props => {
                   />
                   <Divider mode="default" type="vertical" />
                   <Typography.Text ellipsis={true} strong={false}>
-                    创建时间：
+                    {I18N.ModelApp.chuangJianShiJian}
                   </Typography.Text>
                   <Typography.Time
                     format=""
@@ -104,14 +106,14 @@ const Header: React.FC<HeaderProps> = props => {
                   />
                   <Divider mode="default" type="vertical" />
                   <Typography.Text ellipsis={true} strong={false}>
-                    创建者：
+                    {I18N.ModelApp.chuangJianZhe}
                   </Typography.Text>
                   <Typography.Text ellipsis={true} strong={false}>
                     {data?.metadata?.creator || '-'}
                   </Typography.Text>
                   <Divider mode="default" type="vertical" />
                   <Typography.Text ellipsis={true} strong={false}>
-                    描述：
+                    {I18N.ModelApp.miaoShu2}
                   </Typography.Text>
                   <Typography.Text
                     ellipsis={{ tooltip: data?.metadata?.description || '-' }}
@@ -133,19 +135,21 @@ const Header: React.FC<HeaderProps> = props => {
                 items: [
                   {
                     key: 'assessment',
-                    label: '智能体评估',
+                    label: I18N.ModelApp.zhiNengTiPingGu,
                   },
                   {
                     key: 'publish',
-                    label: data?.metadata?.isPublic ? '撤销发布' : '发布智能体',
+                    label: data?.metadata?.isPublic
+                      ? I18N.ModelApp.cheXiaoFaBu
+                      : I18N.ModelApp.faBuZhiNengTi,
                   },
                   {
                     key: 'edit',
-                    label: '编辑',
+                    label: I18N.ModelApp.bianJi,
                   },
                   {
                     key: 'delete',
-                    label: '删除',
+                    label: I18N.DataHandle.shanChu,
                   },
                 ],
                 onClick: ({ key }) => {
@@ -182,7 +186,7 @@ const Header: React.FC<HeaderProps> = props => {
                 );
               }}
             >
-              对话
+              {I18N.ModelApp.duiHua}
             </Dropdown.Button>
           </Space>
         </Col>

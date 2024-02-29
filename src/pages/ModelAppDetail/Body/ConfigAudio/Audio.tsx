@@ -2,12 +2,15 @@ import { PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { OpenaiVoice } from '@lobehub/tts';
 import { useOpenAITTS } from '@lobehub/tts/react';
 import { Space } from 'antd';
+import React from 'react';
+
+import I18N from '@/utils/kiwiI18N';
 
 import styles from './index.less';
 
 // import { OPENAI_BASE_URL } from '@lobehub/tts/core/const/api';
 const OPENAI_BASE_URL = 'https://api.openai.com/v1';
-const defaultText = '这是一段使用 OpenAI Speech to Text 的语音演示';
+const defaultText = I18N.ModelApp.zheShiYiDuanShi;
 
 interface AudioProps {
   voice: OpenaiVoice;

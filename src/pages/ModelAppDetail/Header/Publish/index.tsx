@@ -4,6 +4,8 @@ import { Modal, Typography, notification } from '@tenx-ui/materials';
 import { Checkbox, Flex, Form } from 'antd';
 import React, { useReducer } from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import utils from '../../../../utils/__utils';
 import styles from './index.less';
 
@@ -11,8 +13,7 @@ const PLATS_MAPS = [
   {
     id: 'AgileGPT',
     name: 'AgileGPT',
-    description:
-      '用户将会在 AgileGPT 平台智能体列表中看到此应用，点击即可进行对话交互，无需其他配置',
+    description: I18N.ModelApp.yongHuJiangHuiZai,
     Icon: AlipayMiniProgram,
   },
   // {
@@ -104,7 +105,7 @@ const Publish: React.FC<PublishProps> = props => {
   const [form] = Form.useForm();
   const { open, setOpen, refresh, type, data } = props;
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
-  const title = data?.metadata?.isPublic ? '撤销发布' : '发布';
+  const title = data?.metadata?.isPublic ? I18N.ModelApp.cheXiaoFaBu : I18N.ModelApp.faBu;
   const handelBlur = () => {
     forceUpdate();
   };
@@ -130,35 +131,43 @@ const Publish: React.FC<PublishProps> = props => {
             setOpen(false);
             refresh && refresh();
             notification.success({
-              message: `${title}智能体成功`,
+              message: I18N.template(I18N.ModelApp.tITLE5, { val1: title }),
             });
           } catch (error) {
             notification.warnings({
-              message: `${title}智能体成功`,
+              message: I18N.template(I18N.ModelApp.tITLE5, { val1: title }),
               errors: error?.response?.errors,
             });
           }
         });
       }}
       open={open}
-      title={`${title}智能体`}
+      title={I18N.template(I18N.ModelApp.tITLE4, { val1: title })}
       width={720}
     >
       <FormHelper>
         <Form className={styles.form} form={form} labelAlign="left" labelCol={{ span: 4 }}>
-          <Form.Item label="智能体名称" name="name">
+          <Form.Item label={I18N.ModelApp.zhiNengTiMingCheng} name="name">
             {utils.getFullName(data?.metadata)}
           </Form.Item>
           <Form.Item
             initialValue={[PLATS_MAPS?.[0]?.id]}
-            label={`选择${data?.metadata?.isPublic ? '撤销' : '发布'}平台`}
+            label={
+              data?.metadata?.isPublic
+                ? I18N.ModelApp.xuanZeCheXiaoPing
+                : I18N.ModelApp.xuanZeFaBuPing
+            }
             name="plats"
             required
             rules={[
               {
                 validator: (_, value, callback) => {
                   if (!(value?.length > 0)) {
-                    return callback(`请选择${data?.metadata?.isPublic ? '撤销' : '发布'}平台`);
+                    return callback(
+                      data?.metadata?.isPublic
+                        ? I18N.ModelApp.qingXuanZeCheXiao
+                        : I18N.ModelApp.qingXuanZeFaBu
+                    );
                   }
                   return callback();
                 },

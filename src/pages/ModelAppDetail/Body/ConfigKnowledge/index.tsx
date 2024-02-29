@@ -8,6 +8,8 @@ import { KubeagiKnowledge } from '@tenx-ui/icon';
 import { Empty, Flex, Form, Input, Space, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
@@ -120,13 +122,13 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
           icon: (
             <a className={stylesCommon.link}>
               <PlusCircleOutlined style={{ marginRight: 5 }} />
-              添加
+              {I18N.ModelApp.tianJia}
             </a>
           ),
           // children?: React.ReactElement
           data: {},
           modal: {
-            title: '选择知识库',
+            title: I18N.ModelApp.xuanZeZhiShiKu,
             width: 593,
             refresh: () => {},
             type: 'edit',
@@ -168,7 +170,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
           // children?: React.ReactElement
           data: {},
           modal: {
-            title: '知识库高级配置',
+            title: I18N.ModelApp.zhiShiKuGaoJi,
             refresh: () => {},
             type: 'edit',
             data: {},
@@ -183,8 +185,8 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                   }}
                   label={
                     <Space size={3}>
-                      最低相似度
-                      <Tooltip title="匹配用户问题的最低相似度阈值，范围为[0，1]，阈值越低，匹配的内容越发散，阈值越高，匹配的内容越精确。不同知识库最低相似度有差异，建议根据具体的知识库配置合适的相似度。">
+                      {I18N.ModelApp.zuiDiXiangSiDu}
+                      <Tooltip title={I18N.ModelApp.piPeiYongHuWen}>
                         <QuestionCircleOutlined className={styles.tooltip} />
                       </Tooltip>
                     </Space>
@@ -200,8 +202,8 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                   }}
                   label={
                     <Space size={3}>
-                      引用上限
-                      <Tooltip title="单词搜索匹配答案的最大数量，范围为[1，10]。">
+                      {I18N.ModelApp.yinYongShangXian}
+                      <Tooltip title={I18N.ModelApp.danCiSouSuoPi}>
                         <QuestionCircleOutlined className={styles.tooltip} />
                       </Tooltip>
                     </Space>
@@ -209,14 +211,14 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                   name="numDocuments"
                 />
                 <Form.Item
-                  initialValue={'未找到您询问的内容，请详细描述您的问题'}
-                  label="空搜索回复"
+                  initialValue={I18N.ModelApp.weiZhaoDaoNinXun}
+                  label={I18N.ModelApp.kongSouSuoHuiFu}
                   name="docNullReturn"
                   rules={[
                     {
                       validator: (_, value, callback) => {
                         if (value && value.length > 200) {
-                          return callback('最多可输入 200 字符');
+                          return callback(I18N.ModelApp.zuiDuoKeShuRu);
                         }
                         return callback();
                       },
@@ -224,10 +226,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                   ]}
                   style={{ marginBottom: 0, marginTop: 10 }}
                 >
-                  <Input.TextArea
-                    placeholder="没有搜索到合适的内容时，将会直接回复此内容"
-                    rows={3}
-                  />
+                  <Input.TextArea placeholder={I18N.ModelApp.meiYouSouSuoDao} rows={3} />
                 </Form.Item>
               </>
             ),
@@ -240,7 +239,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
       style={{
         marginBottom: configs?.ConfigKnowledge?.knowledgebase ? '0' : '-12px',
       }}
-      title={'知识库'}
+      title={I18N.Chat.zhiShiKu}
     >
       <Form.Item name="knowledgebase" style={{ display: 'none' }}></Form.Item>
       <Knowledge

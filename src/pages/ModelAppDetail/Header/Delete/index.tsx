@@ -2,6 +2,8 @@ import { Alert, Modal, Space, Typography, notification } from '@tenx-ui/material
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import React from 'react';
 
+import I18N from '@/utils/kiwiI18N';
+
 import utils from '../../../../utils/__utils';
 
 export interface RowData {
@@ -17,7 +19,7 @@ interface PublishProps {
 }
 const Publish: React.FC<PublishProps> = props => {
   const { open, setOpen, data } = props;
-  const title = '删除';
+  const title = I18N.DataHandle.shanChu;
   const history = getUnifiedHistory();
 
   return (
@@ -34,27 +36,29 @@ const Publish: React.FC<PublishProps> = props => {
           });
           setOpen(false);
           notification.success({
-            message: '删除智能体成功',
+            message: I18N.ModelApp.shanChuZhiNengTi2,
           });
           history.go(-1);
         } catch (error) {
           notification.warnings({
-            message: '删除智能体失败',
+            message: I18N.ModelApp.shanChuZhiNengTi,
             errors: error?.response?.errors,
           });
         }
       }}
       open={open}
-      title={`${title}智能体`}
+      title={I18N.template(I18N.ModelApp.tITLE2, { val1: title })}
     >
       <Alert
         message={
           <Space align="center" direction="horizontal">
-            <Typography.Paragraph ellipsis={true}>确定删除 </Typography.Paragraph>
+            <Typography.Paragraph ellipsis={true}>
+              {I18N.ModelApp.queDingShanChu}
+            </Typography.Paragraph>
             <Typography.Paragraph ellipsis={true} style={{ padding: '0 4px' }}>
               {data?.displayName}({data?.name})
             </Typography.Paragraph>
-            <Typography.Paragraph ellipsis={true}> 吗？</Typography.Paragraph>
+            <Typography.Paragraph ellipsis={true}> {I18N.ModelApp.ma}</Typography.Paragraph>
           </Space>
         }
         showIcon={true}
