@@ -16,6 +16,7 @@ import {
   ChatMessage,
   CopyButton,
   Highlighter,
+  ThemeProvider,
   useControls,
   useCreateStore,
 } from '@lobehub/ui';
@@ -564,6 +565,11 @@ const ChatComponent: React.FC<IChat> = props => {
         <Spin spinning />
       </div>
     );
-  return <Chat {...props} />;
+  // return  <Chat {...props} />
+  return (
+    <ThemeProvider appearance={props.isDark ? 'dark' : 'light'}>
+      <Chat {...props} />
+    </ThemeProvider>
+  );
 };
 export default ChatComponent;
