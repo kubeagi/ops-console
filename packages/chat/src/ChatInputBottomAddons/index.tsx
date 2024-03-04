@@ -15,9 +15,9 @@ import { ArrowBigUp, CornerDownLeft } from 'lucide-react';
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import I18N from '@/utils/kiwiI18N';
+import I18N from '../utils/kiwiI18N';
 
-import './index.less';
+// import './index.less';
 
 interface IChatInputBottomAddons {
   appData: any;

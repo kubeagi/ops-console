@@ -46,6 +46,7 @@ export const alias = {
   ),
   'dataset-version-list': join(__dirname, '../packages/dataset-version-list/src'),
   confirm: join(__dirname, '../packages/confirm/src'),
+  '@yuntijs/chat': join(__dirname, '../packages/chat/src'),
 };
 
 export default defineConfig({

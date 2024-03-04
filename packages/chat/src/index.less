@@ -1,4 +1,8 @@
-@import '@/assets/style/index.less';
+@import './assets/less/index.less';
+@import './ChatInputBottomAddons/index.less';
+@import './PromptStarter/index.less';
+@import './References/index.less';
+
 @inputAreaHeight: 150px;
 
 .chatComponent {
@@ -29,12 +33,13 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      align-items: center;
 
       width: @width;
-      max-width: @max-width;
       height: calc(100% - @inputAreaHeight - 24px);
       & > div {
         width: 100%;
+        max-width: @max-width;
       }
       article > *:last-child {
         margin-bottom: unset;
@@ -74,6 +79,10 @@
   .chatDebug {
     height: calc(100vh - 278px);
   }
+  .gpts {
+    height: calc(100vh);
+  }
+
   .chatDark {
     background: #191919;
     border-color: #353535;

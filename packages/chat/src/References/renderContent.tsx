@@ -19,10 +19,10 @@ import '@lobehub/ui';
 import { Button, Divider, Popover, Space, Spin, Tag, Typography } from 'antd';
 import React, { FC, ReactNode } from 'react';
 
-import { Reference } from '@/pages/Chat/Chat/References/index';
-import I18N from '@/utils/kiwiI18N';
+import I18N from '../utils/kiwiI18N';
+import { Reference } from './index';
 
-import './index.less';
+// import './index.less';
 
 const getRelColor = (score: number) => {
   if (score < 0.5) {

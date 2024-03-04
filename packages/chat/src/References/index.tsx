@@ -12,10 +12,9 @@ import { ChatMessage } from '@lobehub/ui';
 import { Divider, Space } from 'antd';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
-import RefContent from '@/pages/Chat/Chat/References/renderContent';
-import I18N from '@/utils/kiwiI18N';
-
-import './index.less';
+import I18N from '../utils/kiwiI18N';
+// import './index.less';
+import RefContent from './renderContent';
 
 export type Reference = {
   answer: string;

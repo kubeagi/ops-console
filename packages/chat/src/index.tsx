@@ -8,7 +8,6 @@
  * @author zggmd
  * @date 2023-12-18
  */
-import { useModel } from '@@/exports';
 import { FileOutlined, LoadingOutlined } from '@ant-design/icons';
 import {
   ChatInputArea,
@@ -28,21 +27,23 @@ import classNames from 'classnames';
 import { throttle } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { fetchEventSource } from '@/components/fetchEventSource';
-import useGetCommonData from '@/components/hooks/useGetCommonData';
-import ChatInputBottomAddons from '@/pages/Chat/Chat/ChatInputBottomAddons';
-import PromptStarter from '@/pages/Chat/Chat/PromptStarter';
-import RenderReferences, { Reference } from '@/pages/Chat/Chat/References';
-import { formatJson, getCvsMeta } from '@/pages/Chat/Chat/helper';
-import Retry from '@/pages/Chat/Chat/retry';
-import I18N from '@/utils/kiwiI18N';
-import request from '@/utils/request';
-
-import './index.less';
+import ChatInputBottomAddons from './ChatInputBottomAddons';
+import PromptStarter from './PromptStarter';
+import RenderReferences, { Reference } from './References';
+import { formatJson, getCvsMeta } from './helper';
+// import './index.less';
+import Retry from './retry';
+import { fetchEventSource } from './utils/fetchEventSource';
+import useGetCommonData from './utils/hooks/useGetCommonData';
+import I18N from './utils/kiwiI18N';
+import request from './utils/request';
 
 interface IChat {
   appName: string;
   appNamespace: string;
+  isDark: boolean;
+  // 是否是在gpts中调用
+  gpts?: boolean;
   // 会话id, 如果有值, 则拉取并继续该会话; 否则新建会话
   conversationId?: string;
   // refresh 变化, 触发重新拉取
@@ -84,14 +85,12 @@ const addIndexToCvs = data => {
 const scrollToBottom = throttle(() => {
   document.querySelector(`#${safeAreaId}`)?.scrollIntoView();
 }, 200);
-let scrollToBottomTimeout;
+let scrollToBottomTimeout: undefined | ReturnType<typeof setTimeout>;
 let shouldUpdateConversationId: boolean = false;
 const ctrl = new AbortController();
 const retry = new Retry(ctrl, 3);
 const Chat: React.FC<IChat> = props => {
-  const { qiankun }: { qiankun: Record<string, any> } = useModel('qiankun');
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const isDark = qiankun?.theme?.isDark;
   const [showNextGuide, setShowNextGuide] = useState(true);
   const [conversation, setConversation] = useState<{
     id?: string;
@@ -440,7 +439,8 @@ const Chat: React.FC<IChat> = props => {
       <div
         className={classNames('chatColumn', {
           chatDebug: props.debug,
-          chatDark: isDark,
+          chatDark: props.isDark,
+          gpts: props.gpts,
         })}
       >
         <div className="chatList">

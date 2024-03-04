@@ -8,12 +8,14 @@
  * @author zggmd
  * @date 2023-12-18
  */
+import { useModel } from '@@/exports';
 import { history } from '@umijs/max';
+import ChatComponent from '@yuntijs/chat';
 import React, { useCallback, useState } from 'react';
 
-import ChatComponent from '@/pages/Chat/Chat';
 import useConversationList, { setQueryConversationId } from '@/pages/Chat/useConversationList';
 
+import '../../../packages/chat/src/index.less';
 import './index.less';
 
 interface IChat {}
@@ -32,6 +34,7 @@ const Chat: React.FC<IChat> = props => {
     },
     [setNewConversationId]
   );
+  const { qiankun }: { qiankun: Record<string, any> } = useModel('qiankun');
   return (
     <div className="chatContainer">
       {conversationListDom}
@@ -40,6 +43,7 @@ const Chat: React.FC<IChat> = props => {
           appName={appName as string}
           appNamespace={appNamespace as string}
           conversationId={selectedConversationId}
+          isDark={qiankun?.theme?.isDark}
           onNewChat={onNewChat}
           refresh={selectedConversationId || selectedConversationIdEmpty}
         />

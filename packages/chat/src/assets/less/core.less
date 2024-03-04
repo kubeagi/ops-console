@@ -1,0 +1,49 @@
+:root {
+  // 定义 css 变量
+  --primary-color: @primary-color;
+  --a-hover-color: @a-hover-color;
+  --background-color: #fff;
+  --background-color-body: #ecf0f4;
+  --background-color-navigation: #2b343d;
+  --menu-item-color: #f8f8f8;
+  --menu-item-active-color: #f6f6f6;
+  --border-color-base: #d9d9d9;
+  --border-color-split: #e9e9e9;
+  --font-color-1: rgba(0, 0, 0, 0.85);
+  --font-color-1-1: rgba(0, 0, 0, 0.75);
+  --font-color-2: rgba(0, 0, 0, 0.65);
+  --font-color-3: rgba(0, 0, 0, 0.45);
+  --font-color-4: rgba(0, 0, 0, 0.45);
+}
+// 主色（antd 的主题色）请勿使用 @primary-color（无法动态定制主题色）
+@primary-color-custom: var(--primary-color);
+
+// 链接 hover 颜色
+@a-hover-color-custom: var(--a-hover-color);
+
+// 分界线色
+// 边框色
+@border-color-base: var(--border-color-base);
+// 分界线色
+@border-color-split-custom: var(--border-color-split);
+
+// 背景色
+@background-color: var(--background-color);
+@background-color-body: var(--background-color-body);
+// 导航背景色
+@background-color-navigation: var(--background-color-navigation);
+
+@menu-item-color-custom: var(--menu-item-color);
+@menu-item-active-color: var(--menu-item-active-color);
+
+// 字体颜色
+// 一级文字颜色（如：标题）
+@font-color-1: var(--font-color-1);
+// 一级文字副标题颜色（如：副标题）
+@font-color-1-1: var(--font-color-1-1);
+// 二级文字颜色
+@font-color-2: var(--font-color-2);
+// 输入框文字颜色
+@font-color-3: var(--font-color-3);
+// 说明文字颜色
+@font-color-4: var(--font-color-4);
