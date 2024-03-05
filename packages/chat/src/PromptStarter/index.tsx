@@ -11,9 +11,9 @@
 import { Col, Row, Tag } from 'antd';
 import * as React from 'react';
 
-import useGetCommonData from '@/components/hooks/useGetCommonData';
+import useGetCommonData from '../utils/hooks/useGetCommonData';
 
-import './index.less';
+// import './index.less';
 
 interface IPromptStarter {
   appName: string;

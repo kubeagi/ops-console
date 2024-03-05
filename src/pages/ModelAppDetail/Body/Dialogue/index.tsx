@@ -1,11 +1,13 @@
+import { useModel } from '@@/exports';
 import { Typography } from '@tenx-ui/materials';
+
 import { Card, Space, Spin, Tag } from 'antd';
 import React, { useState } from 'react';
 
 import Icon from '@/assets/img/model-app-bx.png';
-import ChatComponent from '@/pages/Chat/Chat';
 import I18N from '@/utils/kiwiI18N';
-
+import ChatComponent from '@yuntijs/chat';
+import '../../../../../packages/chat/src/index.less';
 import { useModalAppDetailContext } from '../../index';
 import Modal from '../Modal';
 
@@ -14,6 +16,7 @@ interface DialogueProps {
 }
 
 const Dialogue: React.FC<DialogueProps> = props => {
+  const { qiankun }: { qiankun: Record<string, any> } = useModel('qiankun');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<any>('reference');
   const [modalData, setModalData] = useState<any>();
@@ -31,6 +34,7 @@ const Dialogue: React.FC<DialogueProps> = props => {
         appName={data?.metadata?.name}
         appNamespace={data?.metadata?.namespace}
         debug={true}
+        isDark={qiankun?.theme?.isDark}
         refresh={props.saveIng}
       />
       <Modal

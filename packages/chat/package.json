@@ -1,0 +1,52 @@
+{
+  "name": "@yuntijs/chat",
+  "version": "0.1.0-beta.2",
+  "description": "对话组件",
+  "keywords": [],
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "scripts": {
+    "build": "father build",
+    "build:deps": "father prebundle",
+    "dev": "father dev",
+    "prepublishOnly": "father doctor && npm run build",
+    "pub": "npm run prepublishOnly && npm publish"
+  },
+  "dependencies": {
+    "@tenx-ui/auth-utils": "0.0.1",
+    "@tenx-ui/icon": "^2.4.41",
+    "@tenx-ui/request": "^1.0.0-beta.6",
+    "kiwi-intl": "1.2.6-beta.0"
+  },
+  "devDependencies": {
+    "father": "4.3.1",
+    "react": "^18.0.0"
+  },
+  "peerDependencies": {
+    "@ant-design/icons": "^5.0.0",
+    "@lobehub/ui": "^1.128.4",
+    "@yuntijs/arcadia-bff-sdk": "^1.1.6",
+    "antd": "^5.0.0",
+    "classnames": "^2.2.7",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.300.0",
+    "react": ">=16.9.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "yunti": {
+    "umd": {
+      "library": "yunti-chat",
+      "entry": [
+        "/dist/umd/chat.js",
+        "/dist/umd/chat.css"
+      ]
+    }
+  }
+}

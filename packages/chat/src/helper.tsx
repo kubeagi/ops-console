@@ -6,7 +6,7 @@ import { ChatMessage } from '@lobehub/ui';
 import { ChatAssistant, ChatUser } from '@tenx-ui/icon';
 import React from 'react';
 
-import { Reference } from '@/pages/Chat/Chat/References';
+import { Reference } from './References';
 
 /**
  * helper
