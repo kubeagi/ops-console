@@ -89,6 +89,11 @@ class ModelWarehouse$$Page extends React.Component {
       },
       systemModel: true,
       types: '',
+      typesMap: {
+        llm: 'LLM',
+        embedding: 'Embedding',
+        reranking: 'Reranking',
+      },
     };
   }
 
@@ -475,6 +480,7 @@ class ModelWarehouse$$Page extends React.Component {
                                 { disabled: false, label: '全部类型', value: 'all' },
                                 { label: 'LLM', value: 'llm' },
                                 { label: 'Embedding', value: 'embedding' },
+                                { disabled: false, label: 'Reranking', value: 'reranking' },
                               ]}
                               placeholder="全部类型"
                               showSearch={true}
@@ -663,7 +669,7 @@ class ModelWarehouse$$Page extends React.Component {
                                               style={{ width: '100%' }}
                                               wrap={false}
                                             >
-                                              <Col __component_name="Col" span={9}>
+                                              <Col __component_name="Col" flex="80px">
                                                 <Status
                                                   __component_name="Status"
                                                   id={__$$eval(() => item.status)}
@@ -695,7 +701,7 @@ class ModelWarehouse$$Page extends React.Component {
                                               </Col>
                                               <Col
                                                 __component_name="Col"
-                                                span={15}
+                                                flex="1"
                                                 style={{ textAlign: 'right' }}
                                               >
                                                 {__$$evalArray(() => item.types.split(',')).map(
@@ -706,14 +712,11 @@ class ModelWarehouse$$Page extends React.Component {
                                                         closable={false}
                                                         color="success"
                                                         key="item"
-                                                        style={{ marginRight: '0px' }}
+                                                        style={{ marginLeft: '1px' }}
                                                       >
-                                                        {__$$eval(() =>
-                                                          item === 'llm'
-                                                            ? 'LLM'
-                                                            : item === 'embedding'
-                                                            ? 'Embedding'
-                                                            : item
+                                                        {__$$eval(
+                                                          () =>
+                                                            __$$context.state.typesMap[item] || item
                                                         )}
                                                       </Tag>
                                                     ))(

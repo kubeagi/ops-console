@@ -159,7 +159,6 @@ class ModelWarehouseEdit$$Page extends React.Component {
   }
 
   setFormData(data) {
-    console.log(this.form('model_edit'), data);
     this.form('model_edit').setValues({
       types: data?.types?.split(','),
       name: data.name,
@@ -289,6 +288,7 @@ class ModelWarehouseEdit$$Page extends React.Component {
                       fieldProps={{
                         'enum': [
                           { label: 'LLM', value: 'llm' },
+                          { label: 'Reranking', value: 'reranking' },
                           { label: 'Embedding', value: 'embedding' },
                         ],
                         'name': 'types',

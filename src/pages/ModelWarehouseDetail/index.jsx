@@ -113,6 +113,11 @@ class ModelWarehouseDetail$$Page extends React.Component {
       readmeLoading: false,
       selectedFileList: [],
       submitLoading: false,
+      typesMap: {
+        llm: 'LLM',
+        embedding: 'Embedding',
+        reranking: 'Reranking',
+      },
       uploadedFileCount: 0,
       uploadModalVisible: false,
     };
@@ -726,9 +731,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                         (item, index) =>
                           (__$$context => (
                             <Tag __component_name="Tag" closable={false} color="success">
-                              {__$$eval(() =>
-                                item === 'llm' ? 'LLM' : item === 'embedding' ? 'Embedding' : item
-                              )}
+                              {__$$eval(() => __$$context.state.typesMap[item] || item)}
                             </Tag>
                           ))(__$$createChildContext(__$$context, { item, index }))
                       ),
