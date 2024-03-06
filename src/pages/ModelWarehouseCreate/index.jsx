@@ -243,6 +243,7 @@ class CreateModelWarehouse$$Page extends React.Component {
                 fieldProps={{
                   'enum': [
                     { label: 'LLM', value: 'llm' },
+                    { label: 'Reranking', value: 'reranking' },
                     { label: 'Embedding', value: 'embedding' },
                   ],
                   'name': 'types',
