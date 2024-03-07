@@ -37,7 +37,7 @@ const Body: React.FC<BodyProps> = props => {
   return (
     <Card bordered={false} className={styles.card} loading={cardLoading} type="inner">
       <Row className={styles.content}>
-        <Col span={16}>
+        <Col span={12}>
           <Card
             className={styles.setting}
             extra={
@@ -86,10 +86,10 @@ const Body: React.FC<BodyProps> = props => {
           >
             <Form form={form}>
               <Flex gap={24}>
-                <div style={{ width: '50%' }}>
+                <div style={{ width: '40%' }}>
                   <ConfigPrompt />
                 </div>
-                <div style={{ width: '50%' }}>
+                <div style={{ width: '60%' }}>
                   <ConfigModelService />
                   <Container title="技能" titleLevel={1}>
                     <Plugins />
@@ -124,7 +124,7 @@ const Body: React.FC<BodyProps> = props => {
             </Form>
           </Card>
         </Col>
-        <Col className={styles.dialogue} span={8}>
+        <Col className={styles.dialogue} span={12}>
           <Dialogue saveIng={saveIng} />
         </Col>
       </Row>
