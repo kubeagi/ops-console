@@ -89,6 +89,7 @@ export interface SettingProps {
   form?: any;
   configKey: string;
   renderChildren?: (form, forceUpdate, setOpen) => React.ReactElement;
+  validateNames?: string[];
 }
 const Setting: React.FC<SettingProps> = props => {
   const { configs, setConfigs } = useModalAppDetailContext();
@@ -105,6 +106,7 @@ const Setting: React.FC<SettingProps> = props => {
     children,
     handleSave,
     configKey,
+    validateNames,
     ...otherProps
   } = props;
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
@@ -117,7 +119,7 @@ const Setting: React.FC<SettingProps> = props => {
         curForm.setFieldsValue(configs[configKey]);
       }}
       onOk={() => {
-        curForm.validateFields().then(async values => {
+        curForm.validateFields(validateNames || undefined).then(async values => {
           try {
             setOpen(false);
             const newConfigs = {

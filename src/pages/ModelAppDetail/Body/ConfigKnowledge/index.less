@@ -11,10 +11,17 @@
     width: 24px;
     height: 24px;
     margin-right: 8px;
+
+    font-size: 24px;
+    line-height: normal;
+    color: @primary-color;
   }
   .delete {
     cursor: pointer;
     color: @font-color-3;
+  }
+  .delete:hover {
+    color: @a-hover-color;
   }
 }
 .KnowledgeItemSelected {
@@ -28,4 +35,32 @@
 }
 .tooltip {
   color: @font-color-3;
+}
+.RowItem {
+  .icon {
+    position: relative;
+    top: -1px;
+
+    width: 14px;
+    height: 14px;
+    margin-right: 3px;
+
+    font-size: 14px;
+  }
+  .img {
+    position: relative;
+    top: -4px;
+  }
+  .KnowledgeItem {
+    width: auto;
+    height: 42px;
+    padding: 0;
+
+    border: none;
+    border-top: 1px solid #e7e6f2;
+    border-radius: 0;
+  }
+  .KnowledgeItem:nth-child(1) {
+    border-top: none;
+  }
 }

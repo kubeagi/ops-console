@@ -7,7 +7,6 @@ import I18N from '@/utils/kiwiI18N';
 
 import utils from '../../utils/__utils';
 import Body from './Body';
-import { SEARCH_TOOLS_VALUES } from './Body/RealTimeSearch';
 import Header from './Header';
 
 export const ModalAppDetailContext = createContext(null);
@@ -63,13 +62,8 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
       ViewReference: {
         showRetrievalInfo: Application?.showRetrievalInfo,
       },
-      RealTimeSearch: {
-        RealTimeSearchUsed: Application?.tools?.some(item =>
-          SEARCH_TOOLS_VALUES.includes(item.name)
-        ),
-        RealTimeSearchName: Application?.tools?.find(item =>
-          SEARCH_TOOLS_VALUES.includes(item.name)
-        )?.name,
+      Skill: {
+        tools: Application?.tools?.map(item => item.name),
       },
     };
     setConfigs(Config);

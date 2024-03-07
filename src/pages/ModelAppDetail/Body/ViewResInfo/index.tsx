@@ -37,7 +37,7 @@ const ViewResInfo: React.FC<ViewResInfoProps> = props => {
       changeConfig
       configKey="ViewResInfo"
       icon={<KubeagiRes />}
-      style={{ paddingTop: 0, marginBottom: 0 }}
+      isRowItem
       title={I18N.ModelApp.chaKanXiangYingXin}
     ></Container>
   );

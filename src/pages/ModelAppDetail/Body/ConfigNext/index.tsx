@@ -6,6 +6,7 @@ import I18N from '@/utils/kiwiI18N';
 
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
+import styles from '../index.less';
 
 interface ConfigNextProps {}
 
@@ -36,8 +37,9 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
       ]}
       changeConfig
       configKey="ConfigNext"
-      icon={<KubeagiNextLead />}
-      style={{ paddingTop: 0, marginBottom: -8, marginTop: -10 }}
+      icon={<KubeagiNextLead className={styles.orangeIcon} />}
+      isRowItem
+      style={{ marginBottom: 8 }}
       title={I18N.ModelApp.wenTiYinDao}
     ></Container>
   );

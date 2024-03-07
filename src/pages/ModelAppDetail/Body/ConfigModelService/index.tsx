@@ -1,5 +1,4 @@
 import { QuestionCircleOutlined, SettingOutlined } from '@ant-design/icons';
-import { KubeagiModelService } from '@tenx-ui/icon';
 import { Form, Select, Space, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
 
@@ -127,11 +126,12 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
               );
             },
             handleSave: (values: any) => {},
+            validateNames: ['temperature', 'maxTokens', 'conversionWindowSize', 'maxLength'],
           },
         },
       ]}
       configKey="ConfigModelService"
-      icon={<KubeagiModelService />}
+      // icon={<KubeagiModelService />}
       renderChildren={(form, forceUpdate) => {
         const llm = llmList?.find(item => item.name === form.getFieldValue('llm'));
         const noModelSelect = llm?.provider === 'worker' || !llm;
@@ -214,6 +214,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
         );
       }}
       title={I18N.ModelApp.moXingFuWu}
+      titleLevel={1}
     ></Container>
   );
 };
