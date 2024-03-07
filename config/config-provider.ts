@@ -3,13 +3,13 @@ const config = {
   theme: {
     token: {
       fontSize: 12,
-      colorLink: '#4461eb',
+      colorLink: '#8f1aff',
       colorError: '#f85a5a',
       borderRadius: 4,
-      colorPrimary: '#4461eb',
+      colorPrimary: '#8f1aff',
       colorSuccess: '#5cb85c',
       colorWarning: '#ffbf00',
-      colorLinkHover: '#6f8bf7',
+      colorLinkHover: '#aa42ff',
     },
     components: {
       Row: { rowVerticalGutter: 16, rowHorizontalGutter: 16 },

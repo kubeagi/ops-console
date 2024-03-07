@@ -2,11 +2,12 @@
 .container {
   padding: 16px 0 0;
   .header {
-    margin-bottom: 8px;
+    padding-bottom: 8px;
+    // margin-bottom: 8px;
   }
   .titleIcon {
     font-size: 12px;
-    color: @font-color-3;
+    color: @primary-color;
   }
   .icon {
     cursor: pointer;
@@ -14,5 +15,24 @@
   }
   .icon:hover {
     color: @primary-color;
+  }
+}
+.bold {
+  font-weight: bold;
+}
+.click {
+  cursor: pointer;
+}
+.isCollapseContainer {
+  padding-top: 8px;
+  .header {
+    border-bottom: 1px solid #e7e6f2;
+  }
+}
+.RowItemContainer {
+  padding: 0;
+  .header {
+    padding-bottom: 0;
+    border-bottom: 1px solid #e7e6f2;
   }
 }

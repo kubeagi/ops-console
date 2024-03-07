@@ -144,7 +144,12 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
         actions={[
           {
             key: 'string',
-            icon: <a className={styles.link}>{I18N.ModelApp.pROMP3}</a>,
+            icon: (
+              <a className={styles.link}>
+                <KubeagiPrompt style={{ marginRight: 5 }} />
+                {I18N.ModelApp.pROMP3}
+              </a>
+            ),
             data: {},
             modal: {
               title: I18N.ModelApp.xuanZePRO,
@@ -204,19 +209,52 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
           },
         ]}
         changeConfig
-        configKey={'ConfigPrompt'}
-        icon={<KubeagiPrompt />}
         title={
           <Space size={4}>
-            Prompt
-            <Tooltip title={I18N.ModelApp.tiShiCiKeYi}>
+            角色设定&回复逻辑
+            <Tooltip
+              overlayClassName={styles.PromptTooltip}
+              title={
+                <div>
+                  <p>可使用自然语言设定智能体的角色与工作流程，如：</p>
+
+                  <p className={styles.PromptTooltipNoMargin}>角色</p>
+                  <p>
+                    你是一个能够高效生成文档摘要的智能体。你擅长通过用户提供的文本或文章生成精炼、准确的提要。
+                  </p>
+
+                  <p className={styles.PromptTooltipNoMargin}>技能：生成文档摘要</p>
+                  <p className={styles.PromptTooltipNoMargin}>
+                    - 将用户上传的文档进行分析，识别其主要的观点和主题。
+                  </p>
+                  <p>- 编写一份精练却内容丰富的提要，概括文档的核心观点。</p>
+
+                  <p className={styles.PromptTooltipNoMargin}>举例格式：</p>
+                  <p className={styles.PromptTooltipNoMargin}>- 💭 主标题：《文档标题》</p>
+                  <p className={styles.PromptTooltipNoMargin}>
+                    - 📍 主要观点：文档的核心观点，尽可能用有力度的语言，突出观点的重要性和启发性。
+                  </p>
+                  <p>- 📝 摘要：对文档的简短概括，约 100-200 字。</p>
+
+                  <p className={styles.PromptTooltipNoMargin}>限制</p>
+                  <p className={styles.PromptTooltipNoMargin}>- 仅讨论与文档内容相关的主题。</p>
+                  <p className={styles.PromptTooltipNoMargin}>- 坚持使用提供的输出格式。</p>
+                  <p className={styles.PromptTooltipNoMargin}>- 尽量不超过 200 字的限制。</p>
+                  <p>- 使用 Markdown 格式引用来源。</p>
+                </div>
+              }
+            >
               <QuestionCircleOutlined className={styles.tooltip} />
             </Tooltip>
           </Space>
         }
+        configKey={'ConfigPrompt'}
+        // icon={<KubeagiPrompt />}
+        titleLevel={1}
       >
         <Form.Item name="userPrompt" style={{ marginBottom: 0 }}>
           <Input.TextArea
+            className={styles.PromptTextArea}
             onChange={e => {
               setConfigs({
                 ...configs,

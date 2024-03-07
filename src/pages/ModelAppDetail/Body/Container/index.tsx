@@ -1,3 +1,4 @@
+import { CaretDownOutlined, CaretRightOutlined } from '@ant-design/icons';
 import { Typography } from '@tenx-ui/materials';
 import { Divider, Flex, Space } from 'antd';
 import React, { useEffect, useReducer, useState } from 'react';
@@ -17,29 +18,49 @@ interface Action {
 
 interface ContainerProps {
   children?: React.ReactElement;
-  icon: React.ReactElement;
+  icon?: React.ReactElement;
   title: string;
   actions?: Action[];
-  configKey: string;
+  configKey?: string;
   changeConfig?: boolean;
   renderChildren?: (form, forceUpdate, setModalOpen) => React.ReactElement;
   style?: any;
+  titleLevel?: number;
+  isCollapse?: boolean;
+  headerStyle?: any;
+  isRowItem?: boolean;
 }
 
 const Container: React.FC<ContainerProps> = props => {
-  const { children, icon, title, actions, configKey, changeConfig, renderChildren } = props;
+  const {
+    children,
+    icon,
+    title,
+    actions,
+    configKey,
+    changeConfig,
+    renderChildren,
+    titleLevel,
+    isCollapse,
+    headerStyle,
+    isRowItem = false,
+  } = props;
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<any>();
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
   const [actionData, setActionData] = useState<Action>();
   const { initConfigs, configs, setConfigs, form } = useModalAppDetailContext();
+  const [collapse, setCollapse] = useState<boolean>(true);
   useEffect(() => {
     form.setFieldsValue(initConfigs?.[configKey] || {});
     forceUpdate();
   }, [initConfigs?.[configKey], form]);
 
   return (
-    <div className={styles.container} style={props.style}>
+    <div
+      className={`${styles.container} ${isCollapse && styles.isCollapseContainer} ${isRowItem && styles.RowItemContainer}`}
+      style={props.style}
+    >
       <Modal
         form={form}
         open={modalOpen && modalType === actionData.key}
@@ -47,10 +68,26 @@ const Container: React.FC<ContainerProps> = props => {
         {...(actionData?.modal || {})}
         configKey={configKey}
       />
-      <Flex className={styles.header} justify="space-between">
+      <Flex className={styles.header} justify="space-between" style={headerStyle}>
         <Space size={5}>
-          <span className={styles.titleIcon}>{icon}</span>
-          <Typography.Title level={3}>{title}</Typography.Title>
+          {isCollapse && (
+            <span className={styles.click} onClick={() => setCollapse(!collapse)}>
+              {collapse ? (
+                <a>
+                  <CaretDownOutlined />
+                </a>
+              ) : (
+                <CaretRightOutlined />
+              )}
+            </span>
+          )}
+          {icon && <span className={styles.titleIcon}>{icon}</span>}
+          <Typography.Title
+            className={[1, 3].includes(titleLevel) && styles.bold}
+            level={titleLevel || 3}
+          >
+            {title}
+          </Typography.Title>
         </Space>
         <Space size={5}>
           {actions?.map((action: Action, i) => {
@@ -79,8 +116,10 @@ const Container: React.FC<ContainerProps> = props => {
           })}
         </Space>
       </Flex>
-      {children}
-      {renderChildren && renderChildren(form, forceUpdate, setModalOpen)}
+      <div style={isCollapse && !collapse ? { display: 'none' } : {}}>
+        {children}
+        {renderChildren && renderChildren(form, forceUpdate, setModalOpen)}
+      </div>
     </div>
   );
 };

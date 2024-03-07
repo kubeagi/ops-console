@@ -17,12 +17,13 @@ const ConversationStarter: React.FC<ConversationStarterProps> = props => {
       changeConfig
       configKey="ConfigConversationStarter"
       icon={<KubeagiDialogue />}
+      style={{ padding: 0 }}
       title={I18N.ModelApp.duiHuaKaiChangBai}
     >
       <Form.Item
         initialValue={I18N.ModelApp.ninHaoWoShiKao}
         name="prologue"
-        style={{ marginBottom: 0 }}
+        style={{ marginBottom: 8 }}
       >
         <Input.TextArea
           onChange={e => {

@@ -6,6 +6,7 @@ import I18N from '@/utils/kiwiI18N';
 
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
+import styles from '../index.less';
 
 interface ViewReferenceProps {}
 
@@ -36,8 +37,8 @@ const ViewReference: React.FC<ViewReferenceProps> = props => {
       ]}
       changeConfig
       configKey="ViewReference"
-      icon={<KubeagiQuote />}
-      style={{ paddingTop: 0, marginBottom: -8 }}
+      icon={<KubeagiQuote className={styles.greenIcon} />}
+      isRowItem={true}
       title={I18N.ModelApp.chaKanYinYong}
     ></Container>
   );

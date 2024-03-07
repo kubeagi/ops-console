@@ -1,7 +1,7 @@
 export const linkageReference = (form, configs) => {
   form.setFieldsValue({
     showRetrievalInfo: !!(
-      configs?.RealTimeSearch?.RealTimeSearchUsed || configs?.ConfigKnowledge?.knowledgebase
+      configs?.Skill?.tools?.includes('bing') || configs?.ConfigKnowledge?.knowledgebase
     ),
   });
 };

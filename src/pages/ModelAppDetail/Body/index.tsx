@@ -13,8 +13,9 @@ import ConfigKnowledge from './ConfigKnowledge';
 import ConfigModelService from './ConfigModelService';
 import ConfigNext from './ConfigNext';
 import ConfigPrompt from './ConfigPrompt';
+import Container from './Container';
 import Dialogue from './Dialogue';
-import RealTimeSearch from './RealTimeSearch';
+import Plugins from './Plugins';
 import ViewReference from './ViewReference';
 import ViewResInfo from './ViewResInfo';
 import styles from './index.less';
@@ -36,10 +37,10 @@ const Body: React.FC<BodyProps> = props => {
   return (
     <Card bordered={false} className={styles.card} loading={cardLoading} type="inner">
       <Row className={styles.content}>
-        <Col span={10}>
-          <Card className={styles.setting}>
-            <Flex className={styles.action} justify="space-between">
-              <Typography.Title level={1}>{I18N.ModelApp.zhiNengTiPeiZhi}</Typography.Title>
+        <Col span={16}>
+          <Card
+            className={styles.setting}
+            extra={
               <Tooltip title={isEqual(initConfigs, configs) && I18N.ModelApp.qingXianXiuGaiZhi}>
                 <Button
                   disabled={isEqual(initConfigs, configs)}
@@ -53,17 +54,8 @@ const Body: React.FC<BodyProps> = props => {
                           name: data?.metadata?.name,
                           namespace: data?.metadata?.namespace,
                           ...values,
-                          tools: [],
+                          tools: values.tools?.map(name => ({ name })),
                         };
-                        delete input.RealTimeSearchUsed;
-                        delete input.RealTimeSearchName;
-                        if (values.RealTimeSearchUsed && values.RealTimeSearchName) {
-                          input.tools = [
-                            {
-                              name: values.RealTimeSearchName,
-                            },
-                          ];
-                        }
                         delete input.metadata;
                         await utils.bff.updateApplicationConfig({
                           input,
@@ -88,38 +80,51 @@ const Body: React.FC<BodyProps> = props => {
                   {I18N.ModelApp.baoCun}
                 </Button>
               </Tooltip>
-            </Flex>
+            }
+            headStyle={{ background: 'transparent', padding: '0 20px' }}
+            title={<Typography.Title level={1}>{I18N.ModelApp.zhiNengTiPeiZhi}</Typography.Title>}
+          >
             <Form form={form}>
-              <ConfigConversationStarter />
-              <ConfigModelService />
-              <ConfigKnowledge />
-              <RealTimeSearch />
-              <ConfigPrompt />
-              {/* <ConfigAudio /> */}
-              <Divider
-                __component_name="Divider"
-                closeIcon={<CaretDownOutlined />}
-                content={
-                  <>
-                    <ConfigNext />
-                    <ViewReference />
-                    <ViewResInfo />
-                  </>
-                }
-                dashed={true}
-                defaultOpen={false}
-                iconPlacement="right"
-                mode="expanded"
-                openIcon={<CaretRightOutlined />}
-                orientation="left"
-                orientationMargin={0}
-              >
-                {I18N.ModelApp.geXingHuaPeiZhi}
-              </Divider>
+              <Flex gap={24}>
+                <div style={{ width: '50%' }}>
+                  <ConfigPrompt />
+                </div>
+                <div style={{ width: '50%' }}>
+                  <ConfigModelService />
+                  <Container title="技能" titleLevel={1}>
+                    <Plugins />
+                  </Container>
+                  <Container title="记忆" titleLevel={1}>
+                    <ConfigKnowledge />
+                  </Container>
+                  {/* <ConfigAudio /> */}
+                  <Divider
+                    __component_name="Divider"
+                    closeIcon={<CaretDownOutlined />}
+                    content={
+                      <>
+                        <ConfigConversationStarter />
+                        <ViewResInfo />
+                        <ViewReference />
+                        <ConfigNext />
+                      </>
+                    }
+                    dashed={true}
+                    defaultOpen={false}
+                    iconPlacement="right"
+                    mode="expanded"
+                    openIcon={<CaretRightOutlined />}
+                    orientation="left"
+                    orientationMargin={0}
+                  >
+                    {I18N.ModelApp.geXingHuaPeiZhi}
+                  </Divider>
+                </div>
+              </Flex>
             </Form>
           </Card>
         </Col>
-        <Col className={styles.dialogue} span={14}>
+        <Col className={styles.dialogue} span={8}>
           <Dialogue saveIng={saveIng} />
         </Col>
       </Row>

@@ -18,8 +18,9 @@
   .setting {
     :global {
       .tenx-ui-materials-card-body {
-        min-height: calc(100vh - 280px);
-        padding: 16px 20px 0 24px;
+        overflow-y: auto;
+        height: calc(100vh - 333px);
+        padding: 0 24px 0 30px;
       }
     }
   }
@@ -45,4 +46,22 @@
 
 .dialogue {
   min-height: calc(100vh - 280px);
+}
+.PromptTextArea {
+  min-height: calc(100vh - 406px) !important;
+}
+.PromptTooltip {
+  min-width: 556px;
+  .PromptTooltipNoMargin {
+    margin-bottom: 0;
+  }
+}
+.greenIcon {
+  color: #09c8aa;
+}
+.orangeIcon {
+  color: #fba240;
+}
+.primaryIcon {
+  color: @primary-color;
 }
