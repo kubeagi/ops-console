@@ -26,7 +26,7 @@ import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin, Tag, UploadFile, message } from 'antd';
 import classNames from 'classnames';
 import { throttle } from 'lodash';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import ChatInputBottomAddons from './ChatInputBottomAddons';
 import PromptStarter from './PromptStarter';
@@ -101,7 +101,9 @@ const Chat: React.FC<IChat> = props => {
     id: props.conversationId,
     data: [],
   });
-
+  const conversationId = useMemo(() => {
+    return props.conversationId || conversation.id;
+  }, [props.conversationId, conversation.id]);
   const application = sdk.useGetApplication({
     name: props.appName,
     namespace: props.appNamespace,
@@ -114,12 +116,14 @@ const Chat: React.FC<IChat> = props => {
       body: {
         app_name: props.appName,
         app_namespace: props.appNamespace,
-        conversation_id: props.conversationId,
+        conversation_id: conversationId,
       },
     },
     initValue: [],
     resStr: 'messages',
-    notFetch: !props.conversationId,
+    notFetch: !conversationId,
+    // 类型为 UPLOAD 的消息, 是发送附件类的消息时单独调用了上传文件接口自动生成的消息, 应该过滤掉
+    format: messages => messages?.filter(msg => msg.action !== 'UPLOAD'),
   });
   const fetchLastReference = useCallback(
     async (cId, mId) => {
@@ -164,19 +168,20 @@ const Chat: React.FC<IChat> = props => {
   useEffect(() => {
     if (conversation.data?.length) return;
     const app = application?.data?.Application?.getApplication;
+    if (!app?.metadata.name) return;
     const defaultPrologue = I18N.template(I18N.Chat.ninHaoWoShiA, {
       val1: `${app?.metadata.displayName || app?.metadata.name}${app?.metadata.description ? `\n\n${app?.metadata.description}` : ''}`,
     });
     let cvList = [
       getCvsMeta(
         app?.prologue || defaultPrologue,
-        props.conversationId || Date.now().toString(),
+        conversationId || Date.now().toString(),
         null,
         false
       ),
     ];
     // 存在会话id, 展示历史聊天内容
-    if (props.conversationId) {
+    if (conversationId) {
       if (messagesLoading || !messages?.length) return;
       cvList = messages?.reduce(
         (pre, cur) => [
@@ -208,7 +213,7 @@ const Chat: React.FC<IChat> = props => {
       })
     );
     scrollToBottom();
-  }, [conversation, application, props.conversationId, messages, messagesLoading]);
+  }, [conversation, application, conversationId, messages, messagesLoading]);
   useEffect(() => {
     application.mutate();
   }, []);
@@ -252,119 +257,141 @@ const Chat: React.FC<IChat> = props => {
     },
     [setConversation]
   );
+  const sendChatFile = useCallback(async () => {
+    const formData = new FormData();
+    for (const [key, value] of Object.entries({
+      app_name: props.appName,
+      app_namespace: props.appNamespace || '',
+      conversation_id: conversationId || '',
+    })) {
+      formData.append(key, value);
+    }
+    for (const file of fileList) {
+      formData.append('file', file.originFileObj, file.originFileObj.name);
+    }
+    const res = await request
+      .post({
+        url: `/chat/conversations/file`,
+        options: {
+          body: formData,
+          timeout: 1000 * 60 * 10,
+        },
+      })
+      .catch(_error => {
+        setFileList([]);
+      });
+    if (res?.conversation_id) {
+      setConversation(conversation => {
+        return {
+          ...conversation,
+          id: res.conversation_id,
+        };
+      });
+    }
+    return res;
+  }, [fileList, setFileList, setConversation, conversationId]);
   const fetchConversation = useCallback(
     async query => {
-      const isDocs = Boolean(fileList?.length);
-      const body = (() => {
-        const _body = {
-          query,
-          response_mode: 'streaming',
-          conversation_id: conversation?.id || '',
-          app_name: props.appName,
-          app_namespace: props.appNamespace,
-          debug: Boolean(props.debug),
-        };
-        if (!isDocs) return JSON.stringify(_body);
-        const formData = new FormData();
-        for (const [key, value] of Object.entries({
-          ..._body,
-          query: 'DOC:ABSTRACT',
-        })) {
-          formData.append(key, value);
-        }
-        for (const file of fileList) {
-          formData.append('docs', file.originFileObj, file.originFileObj.name);
-        }
-        return formData;
-      })();
-      await fetchEventSource(
-        `${window.location.origin}/kubeagi-apis/chat${isDocs ? '/conversations/docs' : ''}`,
-        {
-          method: 'POST',
-          signal: ctrl.signal,
-          openWhenHidden: true,
-          headers: {
-            Authorization: `bearer ${getAuthData()?.token.id_token}`,
-          },
-          body,
-          async onopen(response) {
-            shouldUpdateConversationId = false;
-            if (response.ok) {
-              return; // everything's good
-            } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-              // client-side errors are usually non-retriable:
-              throw new FatalError();
-            } else {
-              throw new RetriableError();
+      const withDocs = Boolean(fileList?.length);
+      const body = {
+        query,
+        response_mode: 'streaming',
+        conversation_id: conversation?.id || '',
+        app_name: props.appName,
+        app_namespace: props.appNamespace,
+        debug: Boolean(props.debug),
+      };
+      if (withDocs) {
+        const fileRes = await sendChatFile();
+        body.files = [fileRes?.document?.object];
+        body.conversation_id = fileRes?.conversation_id;
+      }
+
+      await fetchEventSource(`${window.location.origin}/kubeagi-apis/chat`, {
+        method: 'POST',
+        signal: ctrl.signal,
+        openWhenHidden: true,
+        headers: {
+          Authorization: `bearer ${getAuthData()?.token.id_token}`,
+        },
+        body: JSON.stringify(body),
+        async onopen(response) {
+          shouldUpdateConversationId = false;
+          if (response.ok) {
+            return; // everything's good
+          } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+            // client-side errors are usually non-retriable:
+            throw new FatalError();
+          } else {
+            throw new RetriableError();
+          }
+        },
+        onmessage(event) {
+          const parsedData = JSON.parse(event.data);
+          setConversation(_conversation => {
+            if (parsedData.conversation_id !== _conversation.id) {
+              shouldUpdateConversationId = true;
             }
-          },
-          onmessage(event) {
-            const parsedData = JSON.parse(event.data);
-            setConversation(_conversation => {
-              if (parsedData.conversation_id !== _conversation.id) {
-                shouldUpdateConversationId = true;
-              }
-              return addIndexToCvs({
-                ..._conversation,
-                id: parsedData.conversation_id,
-                data: _conversation.data.map((item, index) => {
-                  if (index < _conversation.data.length - 1) return item;
-                  const last = _conversation.data.at(-1);
-                  return {
-                    ...last,
-                    id: parsedData.message_id || last.id,
-                    content: last.content + (parsedData?.message || ''),
-                    extra: {
-                      ...last?.extra,
-                      latency: parsedData.latency,
-                    },
-                  };
-                }),
-              });
-            });
-            scrollToBottom();
-          },
-          onerror(err) {
-            setFileList([]);
-            const retryRes = retry.retry();
-            if (retryRes === retry.abortFlag) {
-              setLastCvsErr(err);
-              throw err; // rethrow to stop the operation
-            } else {
-              setLastCvsErr(err);
-            }
-          },
-          onclose() {
-            setFileList([]);
-            setConversation(_conversation => {
-              if (shouldUpdateConversationId) {
-                shouldUpdateConversationId = false;
-                props.onNewChat?.(_conversation.id);
-              }
-              fetchLastReference(
-                _conversation.id,
-                // "791d25a6-7102-4f7c-afcd-29eee3624250" ||
-                _conversation.data.at(-1)?.id
-              );
-              const [first, ...rest] = _conversation.data.reverse();
-              return addIndexToCvs({
-                ..._conversation,
-                loadingMsgId: undefined,
-                data: [
-                  ...rest.reverse(),
-                  {
-                    ...first,
-                    extra: {
-                      ...first?.extra,
-                      fileParsing: false,
-                    },
+            return addIndexToCvs({
+              ..._conversation,
+              id: parsedData.conversation_id,
+              data: _conversation.data.map((item, index) => {
+                if (index < _conversation.data.length - 1) return item;
+                const last = _conversation.data.at(-1);
+                return {
+                  ...last,
+                  id: parsedData.message_id || last.id,
+                  content: last.content + (parsedData?.message || ''),
+                  extra: {
+                    ...last?.extra,
+                    latency: parsedData.latency,
                   },
-                ],
-              });
+                };
+              }),
             });
-          },
-        }
-      );
+          });
+          scrollToBottom();
+        },
+        onerror(err) {
+          setFileList([]);
+          const retryRes = retry.retry();
+          if (retryRes === retry.abortFlag) {
+            setLastCvsErr(err);
+            throw err; // rethrow to stop the operation
+          } else {
+            setLastCvsErr(err);
+          }
+        },
+        onclose() {
+          setFileList([]);
+          setConversation(_conversation => {
+            if (shouldUpdateConversationId) {
+              shouldUpdateConversationId = false;
+              props.onNewChat?.(_conversation.id);
+            }
+            fetchLastReference(
+              _conversation.id,
+              // "791d25a6-7102-4f7c-afcd-29eee3624250" ||
+              _conversation.data.at(-1)?.id
+            );
+            const [first, ...rest] = _conversation.data.reverse();
+            return addIndexToCvs({
+              ..._conversation,
+              loadingMsgId: undefined,
+              data: [
+                ...rest.reverse(),
+                {
+                  ...first,
+                  extra: {
+                    ...first?.extra,
+                    fileParsing: false,
+                  },
+                },
+              ],
+            });
+          });
+        },
+      });
     },
     [conversation, setConversation, fileList, setFileList]
   );
@@ -433,7 +460,7 @@ const Chat: React.FC<IChat> = props => {
     (fileList: UploadFile[]) => {
       setFileList(fileList);
     },
-    [onSend]
+    [setFileList]
   );
   return (
     <div className="chatComponent">
@@ -513,7 +540,7 @@ const Chat: React.FC<IChat> = props => {
           />
           <div className="safeArea" id={safeAreaId}></div>
         </div>
-        {!props.conversationId && // 历史对话不展示引导
+        {!conversationId && // 历史对话不展示引导
           appData?.showNextGuide && // 根据智能体个性化配置展示引导
           showNextGuide && ( // 智能体 debug 时, 问过后就不再展示引导
             <PromptStarter
