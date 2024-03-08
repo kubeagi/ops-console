@@ -1,7 +1,6 @@
-import { QuestionCircleOutlined } from '@ant-design/icons';
 import { KubeagiPrompt } from '@tenx-ui/icon';
 import { Modal } from '@tenx-ui/materials';
-import { Alert, Button, Form, Input, Space, Table, Tooltip, Typography } from 'antd';
+import { Alert, Button, Form, Input, Space, Table, Typography } from 'antd';
 import React, { useState } from 'react';
 
 import I18N from '@/utils/kiwiI18N';
@@ -103,7 +102,8 @@ const PROMPTS_MAP: Prompt[] = [
     icon,
     id: 'DocumentAbstract',
     name: I18N.ModelApp.wenDangZhaiYao,
-    prompt: I18N.ModelApp.shengChengYiXiaNei,
+    prompt:
+      '请阅读我上传的文档，并生成一个详细摘要。摘要应包括以下元素：\r\n 1) 文档的主要论点或主题；\r\n 2) 包含的关键数据和统计信息；\r\n 3) 文档中提到的重要事件或发展；\r\n 4) 对这些数据和事件的简要分析，以及它们如何相互关联；\r\n 5) 文档结论部分的概述。\r\n 目标是通过摘要提供一个全面的文档大意，使读者即使没有阅读整个文档，也能理解其核心内容和重要性。字数不限制，但请确保摘要准确、全面且易于理解。\r\n {{.context}} {{.question}} \r\n {{.history}}',
   },
   {
     icon,
@@ -212,7 +212,7 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
         title={
           <Space size={4}>
             角色设定&回复逻辑
-            <Tooltip
+            {/* <Tooltip
               overlayClassName={styles.PromptTooltip}
               title={
                 <div>
@@ -245,7 +245,7 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
               }
             >
               <QuestionCircleOutlined className={styles.tooltip} />
-            </Tooltip>
+            </Tooltip> */}
           </Space>
         }
         configKey={'ConfigPrompt'}
@@ -264,7 +264,9 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
                 },
               });
             }}
-            placeholder={I18N.ModelApp.qingShuRuPR}
+            placeholder={
+              '可使用自然语言设定智能体的角色与工作流程，如：\r\n 角色 \r\n 你是一个能够高效生成文档摘要的智能体。你擅长通过用户提供的文本或文章生成精炼、准确的提要。\r\n 技能：生成文档摘要\r\n - 将用户上传的文档进行分析，识别其主要的观点和主题。\r\n - 编写一份精练却内容丰富的提要，概括文档的核心观点。\r\n 举例格式：\r\n - 💭 主标题：《文档标题》\r\n - 📍 主要观点：文档的核心观点，尽可能用有力度的语言，突出观点的重要性和启发性。\r\n - 📝 摘要：对文档的简短概括，约 100-200 字。\r\n 限制\r\n - 仅讨论与文档内容相关的主题。\r\n - 坚持使用提供的输出格式。\r\n - 尽量不超过 200 字的限制。\r\n - 使用 Markdown 格式引用来源。'
+            }
             rows={3}
           />
         </Form.Item>

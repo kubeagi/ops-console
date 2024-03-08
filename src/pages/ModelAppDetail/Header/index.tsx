@@ -1,4 +1,15 @@
-import { Col, Divider, Dropdown, Image, Row, Space, Typography } from '@tenx-ui/materials';
+import { AntdIconInfoCircleOutlined } from '@tenx-ui/icon-materials';
+import {
+  Col,
+  Divider,
+  Dropdown,
+  Image,
+  Row,
+  Space,
+  Status,
+  Tooltip,
+  Typography,
+} from '@tenx-ui/materials';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Card } from 'antd';
 import React, { useState } from 'react';
@@ -75,8 +86,40 @@ const Header: React.FC<HeaderProps> = props => {
                   </Typography.Title>
                 </Col>
                 <Col span={24}>
+                  <Typography.Text>状态：</Typography.Text>
+                  <Typography.Text>
+                    <Status
+                      __component_name="Status"
+                      id={data?.metadata?.isPublic + ''}
+                      types={[
+                        {
+                          children: '未发布',
+                          id: 'false',
+                          type: 'disabled',
+                        },
+                        {
+                          children: '已发布',
+                          id: 'true',
+                          type: 'success',
+                        },
+                      ]}
+                    />
+                    <Tooltip __component_name="Tooltip" title={data?.metadata?.message || '-'}>
+                      {data?.metadata?.isPublic === 'error' && (
+                        <AntdIconInfoCircleOutlined
+                          __component_name="AntdIconInfoCircleOutlined"
+                          style={{ marginLeft: '20px' }}
+                        />
+                      )}
+                    </Tooltip>
+                  </Typography.Text>
+                  <Divider dashed={false} mode="default" type="vertical" />
+
                   <Typography.Text ellipsis={true}>{I18N.ModelApp.mingCheng}</Typography.Text>
-                  <Typography.Text ellipsis={{ tooltip: 1 }} style={{ maxWidth: 200 }}>
+                  <Typography.Text
+                    ellipsis={{ tooltip: data?.metadata?.name }}
+                    style={{ maxWidth: 200 }}
+                  >
                     {data?.metadata?.name}
                   </Typography.Text>
                   <Divider dashed={false} mode="default" type="vertical" />
@@ -104,7 +147,9 @@ const Header: React.FC<HeaderProps> = props => {
                     relativeTime={false}
                     time={data?.metadata?.creationTimestamp}
                   />
-                  <Divider mode="default" type="vertical" />
+                </Col>
+                <Col span={24}>
+                  {/* <Divider mode="default" type="vertical" /> */}
                   <Typography.Text ellipsis={true} strong={false}>
                     {I18N.ModelApp.chuangJianZhe}
                   </Typography.Text>

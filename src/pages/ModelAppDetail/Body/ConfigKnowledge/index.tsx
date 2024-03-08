@@ -87,7 +87,12 @@ export const Knowledge: React.FC<KnowledgeProps> = props => {
                   {typeof item?.icon === 'string' ? (
                     <img className={styles.img} src={item?.icon} width={canDelete ? 14 : 24} />
                   ) : (
-                    <span className={styles?.icon}>{item?.icon}</span>
+                    <span
+                      className={styles?.icon}
+                      style={item?.color ? { color: item?.color } : {}}
+                    >
+                      {item?.icon}
+                    </span>
                   )}
                 </span>
                 <Typography.Text
@@ -256,6 +261,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
       ]}
       isCollapse={true}
       title={I18N.Chat.zhiShiKu}
+      titleLevel={2}
       configKey="ConfigKnowledge"
       // icon={<KubeagiKnowledge />}
       style={{

@@ -1,5 +1,5 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { KubeagiBing } from '@tenx-ui/icon';
+import { KubeagiBing, KubeagiCalculator, KubeagiWeather, KubeagiWebCrawl } from '@tenx-ui/icon';
 import { Form } from 'antd';
 import React from 'react';
 
@@ -13,9 +13,29 @@ import { linkageReference } from '../linkage';
 
 export const PLUGINS_MAP = [
   {
+    //@todo id: 'Bing Search API',
     id: 'bing',
     name: 'Bing 搜索',
     icon: <KubeagiBing />,
+    color: '#A16BF1',
+  },
+  {
+    id: 'Weather Query API',
+    name: '天气查询',
+    icon: <KubeagiWeather />,
+    color: '#FBA240',
+  },
+  {
+    id: 'Web Scraper',
+    name: '网页抓取',
+    icon: <KubeagiWebCrawl />,
+    color: '#09C8AA',
+  },
+  {
+    id: 'calculator',
+    name: '计算器',
+    icon: <KubeagiCalculator />,
+    color: '#A26CF1',
   },
 ];
 export const PLUGINS_MAP_VALUES = PLUGINS_MAP.map(item => item.id);
@@ -35,7 +55,7 @@ const Plugins: React.FC<PluginsProps> = props => {
             </a>
           ),
           modal: {
-            title: I18N.ModelApp.xuanZeZhiShiKu,
+            title: '选择插件',
             width: 593,
             refresh: () => {},
             type: 'edit',
@@ -70,6 +90,7 @@ const Plugins: React.FC<PluginsProps> = props => {
       configKey="Skill"
       isCollapse={true}
       title="插件"
+      titleLevel={2}
     >
       <Form.Item name="tools" style={{ display: 'none' }}></Form.Item>
       <Knowledge

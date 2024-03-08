@@ -83,7 +83,7 @@ const Container: React.FC<ContainerProps> = props => {
           )}
           {icon && <span className={styles.titleIcon}>{icon}</span>}
           <Typography.Title
-            className={[1, 3].includes(titleLevel) && styles.bold}
+            className={[1, 2].includes(titleLevel) && styles.bold}
             level={titleLevel || 3}
           >
             {title}
