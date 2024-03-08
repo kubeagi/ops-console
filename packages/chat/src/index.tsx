@@ -85,7 +85,7 @@ const addIndexToCvs = data => {
 
 const scrollToBottom = throttle(() => {
   document.querySelector(`#${safeAreaId}`)?.scrollIntoView();
-}, 200);
+}, 1000);
 let scrollToBottomTimeout: undefined | ReturnType<typeof setTimeout>;
 let shouldUpdateConversationId: boolean = false;
 const ctrl = new AbortController();
@@ -212,11 +212,10 @@ const Chat: React.FC<IChat> = props => {
         data: cvList,
       })
     );
-    scrollToBottom();
   }, [conversation, application, conversationId, messages, messagesLoading]);
   useEffect(() => {
-    application.mutate();
-  }, []);
+    scrollToBottom();
+  }, [conversation]);
   const [input, setInput] = useState<string | undefined>();
   const store = useCreateStore();
   const control: ChatListProps | any = useControls(
@@ -350,7 +349,6 @@ const Chat: React.FC<IChat> = props => {
               }),
             });
           });
-          scrollToBottom();
         },
         onerror(err) {
           setFileList([]);
@@ -397,12 +395,11 @@ const Chat: React.FC<IChat> = props => {
   );
 
   useEffect(() => {
+    application.mutate();
     scrollToBottomTimeout = setTimeout(scrollToBottom, 100);
     return () => {
       ctrl.abort();
-      if (scrollToBottomTimeout) {
-        clearTimeout(scrollToBottomTimeout);
-      }
+      scrollToBottomTimeout && clearTimeout(scrollToBottomTimeout);
     };
   }, []);
   const onSend = useCallback(
@@ -442,7 +439,6 @@ const Chat: React.FC<IChat> = props => {
           ],
         });
       });
-      scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
       fetchConversation(_input);
       setInput('');
       setShowNextGuide(false);
