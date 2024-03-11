@@ -15,6 +15,7 @@ import {
   ChatListProps,
   ChatMessage,
   CopyButton,
+  GradientButton,
   Highlighter,
   ThemeProvider,
   useControls,
@@ -26,6 +27,7 @@ import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin, Tag, UploadFile, message } from 'antd';
 import classNames from 'classnames';
 import { throttle } from 'lodash';
+import { StopCircle } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import ChatInputBottomAddons from './ChatInputBottomAddons';
@@ -85,10 +87,10 @@ const addIndexToCvs = data => {
 
 const scrollToBottom = throttle(() => {
   document.querySelector(`#${safeAreaId}`)?.scrollIntoView();
-}, 200);
+}, 1000);
 let scrollToBottomTimeout: undefined | ReturnType<typeof setTimeout>;
 let shouldUpdateConversationId: boolean = false;
-const ctrl = new AbortController();
+let ctrl: undefined | AbortController;
 const retry = new Retry(ctrl, 3);
 const Chat: React.FC<IChat> = props => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -212,11 +214,10 @@ const Chat: React.FC<IChat> = props => {
         data: cvList,
       })
     );
-    scrollToBottom();
   }, [conversation, application, conversationId, messages, messagesLoading]);
   useEffect(() => {
-    application.mutate();
-  }, []);
+    scrollToBottom();
+  }, [conversation]);
   const [input, setInput] = useState<string | undefined>();
   const store = useCreateStore();
   const control: ChatListProps | any = useControls(
@@ -306,7 +307,7 @@ const Chat: React.FC<IChat> = props => {
         body.files = [fileRes?.document?.object];
         body.conversation_id = fileRes?.conversation_id;
       }
-
+      ctrl = new AbortController();
       await fetchEventSource(`${window.location.origin}/kubeagi-apis/chat`, {
         method: 'POST',
         signal: ctrl.signal,
@@ -350,7 +351,6 @@ const Chat: React.FC<IChat> = props => {
               }),
             });
           });
-          scrollToBottom();
         },
         onerror(err) {
           setFileList([]);
@@ -397,12 +397,11 @@ const Chat: React.FC<IChat> = props => {
   );
 
   useEffect(() => {
+    application.mutate();
     scrollToBottomTimeout = setTimeout(scrollToBottom, 100);
     return () => {
-      ctrl.abort();
-      if (scrollToBottomTimeout) {
-        clearTimeout(scrollToBottomTimeout);
-      }
+      ctrl?.abort();
+      scrollToBottomTimeout && clearTimeout(scrollToBottomTimeout);
     };
   }, []);
   const onSend = useCallback(
@@ -442,7 +441,6 @@ const Chat: React.FC<IChat> = props => {
           ],
         });
       });
-      scrollToBottomTimeout = setTimeout(scrollToBottom, 200);
       fetchConversation(_input);
       setInput('');
       setShowNextGuide(false);
@@ -462,6 +460,15 @@ const Chat: React.FC<IChat> = props => {
     },
     [setFileList]
   );
+  const stop = useCallback(() => {
+    ctrl?.abort();
+    setConversation(conversations => {
+      return {
+        ...conversations,
+        loadingMsgId: undefined,
+      };
+    });
+  }, [ctrl, setConversation]);
   return (
     <div className="chatComponent">
       <div
@@ -549,6 +556,17 @@ const Chat: React.FC<IChat> = props => {
               onPromptClick={onPromptClick}
             />
           )}
+        {Boolean(conversation.loadingMsgId) && (
+          <GradientButton
+            className="stop"
+            icon={<StopCircle size={12} />}
+            onClick={stop}
+            size="small"
+            type="dashed"
+          >
+            {I18N.Chat.tingZhi}
+          </GradientButton>
+        )}
         <div className="inputArea">
           <ChatInputArea
             bottomAddons={
@@ -556,6 +574,7 @@ const Chat: React.FC<IChat> = props => {
                 appData={appData}
                 fileList={fileList}
                 input={input}
+                loading={Boolean(conversation.loadingMsgId)}
                 onFileListChange={onFileListChange}
                 onSend={onSend}
               />
@@ -581,7 +600,7 @@ const ChatComponent: React.FC<IChat> = props => {
     setRefresh(true);
     refreshTimeout = setTimeout(setRefresh.bind('', false), 500);
     tmpRefresh = props.refresh;
-    ctrl.abort(); // 正在生成的对话取消
+    ctrl?.abort(); // 正在生成的对话取消
     return () => {
       refreshTimeout && clearTimeout(refreshTimeout);
     };

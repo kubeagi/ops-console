@@ -22,4 +22,5 @@ export default {
   quXiao: '取消',
   xinJianDuiHua: '新建对话',
   shanChuChengGong: '删除成功',
+  tingZhi: '停止',
 };

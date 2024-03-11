@@ -23,4 +23,5 @@ export default {
   quXiao: 'Cancel',
   xinJianDuiHua: 'Create new conversation',
   shanChuChengGong: 'Deleted successfully',
+  tingZhi: 'Stop',
 };

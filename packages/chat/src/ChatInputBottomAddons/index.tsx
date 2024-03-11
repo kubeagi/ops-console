@@ -25,10 +25,11 @@ interface IChatInputBottomAddons {
   input: string;
   onFileListChange: (fileList: UploadFile[]) => void;
   fileList: UploadFile[];
+  loading: boolean;
 }
 
 const ChatInputBottomAddons: React.FC<IChatInputBottomAddons> = props => {
-  const { appData, onSend, onFileListChange, input, fileList } = props;
+  const { appData, onSend, onFileListChange, input, fileList, loading } = props;
   const handleChange: UploadProps['onChange'] = useCallback(
     info => {
       onFileListChange?.(info.fileList);
@@ -55,7 +56,7 @@ const ChatInputBottomAddons: React.FC<IChatInputBottomAddons> = props => {
         <span>{I18N.Chat.huanXing}</span>
       </span>
       <Tooltip title={appData?.llm ? '' : I18N.Chat.zanWeiGuanLianMo}>
-        <Button disabled={!appData?.llm} onClick={onSend.bind('', input)} type="primary">
+        <Button disabled={!appData?.llm || loading} onClick={onSend.bind('', input)} type="primary">
           {I18N.Chat.faSong}
         </Button>
       </Tooltip>
