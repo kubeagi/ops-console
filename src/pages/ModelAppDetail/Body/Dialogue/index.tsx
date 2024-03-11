@@ -1,13 +1,12 @@
 import { useModel } from '@@/exports';
 import { Typography } from '@tenx-ui/materials';
-
+import ChatComponent from '@yuntijs/chat';
 import { Card, Space, Spin, Tag } from 'antd';
 import React, { useState } from 'react';
 
 import Icon from '@/assets/img/model-app-bx.png';
 import I18N from '@/utils/kiwiI18N';
-import ChatComponent from '@yuntijs/chat';
-import '../../../../../packages/chat/src/index.less';
+
 import { useModalAppDetailContext } from '../../index';
 import Modal from '../Modal';
 

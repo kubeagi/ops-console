@@ -20,6 +20,7 @@
     "@tenx-ui/auth-utils": "0.0.1",
     "@tenx-ui/icon": "^2.4.41",
     "@tenx-ui/request": "^1.0.0-beta.6",
+    "antd-style": "^3.6.1",
     "kiwi-intl": "1.2.6-beta.0"
   },
   "devDependencies": {
@@ -31,7 +32,6 @@
     "@lobehub/ui": "^1.128.4",
     "@yuntijs/arcadia-bff-sdk": "^1.1.6",
     "antd": "^5.0.0",
-    "classnames": "^2.2.7",
     "lodash": "^4.17.21",
     "lucide-react": "^0.300.0",
     "react": ">=16.9.0"

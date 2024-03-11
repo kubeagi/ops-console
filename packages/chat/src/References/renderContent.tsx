@@ -21,6 +21,7 @@ import React, { FC, ReactNode } from 'react';
 
 import I18N from '../utils/kiwiI18N';
 import { Reference } from './index';
+import { usePopoverStyles } from './index.style';
 
 // import './index.less';
 
@@ -44,10 +45,11 @@ interface IRefContent {
   loading: boolean;
 }
 const RefContent: FC<IRefContent> = props => {
+  const { styles } = usePopoverStyles();
   const { reference, index, open, loading, debug, children } = props;
   const content = reference.content ? (
     <Spin spinning={loading}>
-      <div className="popContent">
+      <div className={styles.popContent}>
         {reference.content ? (
           <Typography.Title level={4}>
             {I18N.Chat.yinYongShuJu} [{index}]

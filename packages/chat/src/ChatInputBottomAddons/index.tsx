@@ -16,8 +16,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 
 import I18N from '../utils/kiwiI18N';
-
-// import './index.less';
+import useStyles from './index.style';
 
 interface IChatInputBottomAddons {
   appData: any;
@@ -36,8 +35,9 @@ const ChatInputBottomAddons: React.FC<IChatInputBottomAddons> = props => {
     },
     [onFileListChange]
   );
+  const { styles } = useStyles();
   return (
-    <Flex align="center" className="sendAction" gap="large" justify="end">
+    <Flex align="center" className={styles.sendAction} gap="large" justify="end">
       <Upload
         accept=".pdf,.doc,.docx,.mp3,.wav,.wma"
         className="upload-list-inline"
