@@ -24,8 +24,7 @@ import {
 import { getAuthData } from '@tenx-ui/auth-utils';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
-import { Spin, Tag, UploadFile, message } from 'antd';
-import classNames from 'classnames';
+import { Spin, Tag, UploadFile, message, theme } from 'antd';
 import { throttle } from 'lodash';
 import { StopCircle } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -34,7 +33,7 @@ import ChatInputBottomAddons from './ChatInputBottomAddons';
 import PromptStarter from './PromptStarter';
 import RenderReferences, { Reference } from './References';
 import { formatJson, getCvsMeta } from './helper';
-// import './index.less';
+import useStyles, { GlobalStyles, useChatContainerStyles } from './index.style';
 import Retry from './retry';
 import { fetchEventSource } from './utils/fetchEventSource';
 import useGetCommonData from './utils/hooks/useGetCommonData';
@@ -92,7 +91,9 @@ let scrollToBottomTimeout: undefined | ReturnType<typeof setTimeout>;
 let shouldUpdateConversationId: boolean = false;
 let ctrl: undefined | AbortController;
 const retry = new Retry(ctrl, 3);
+
 const Chat: React.FC<IChat> = props => {
+  const { styles, cx } = useStyles();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [showNextGuide, setShowNextGuide] = useState(true);
   const [conversation, setConversation] = useState<{
@@ -470,13 +471,15 @@ const Chat: React.FC<IChat> = props => {
     });
   }, [ctrl, setConversation]);
   return (
-    <div className="chatComponent">
+    <div className={styles.chatComponent}>
+      <GlobalStyles />
       <div
-        className={classNames('chatColumn', {
-          chatDebug: props.debug,
-          chatDark: props.isDark,
-          gpts: props.gpts,
-        })}
+        className={cx(
+          'chatColumn',
+          props.debug && 'chatDebug',
+          props.isDark && 'chatDark',
+          props.gpts && 'gpts'
+        )}
       >
         <div className="chatList">
           <ChatItemsList
@@ -592,6 +595,8 @@ const Chat: React.FC<IChat> = props => {
 let refreshTimeout;
 let tmpRefresh;
 const ChatComponent: React.FC<IChat> = props => {
+  const { styles } = useChatContainerStyles();
+  const themeToken = theme.useToken();
   const [_refresh, setRefresh] = useState(false);
   useEffect(() => {
     if (props.refresh === tmpRefresh) {
@@ -607,13 +612,15 @@ const ChatComponent: React.FC<IChat> = props => {
   }, [setRefresh, props.refresh]);
   if (_refresh)
     return (
-      <div className="chatSpin">
+      <div className={styles.chatSpin}>
         <Spin spinning />
       </div>
     );
-  // return  <Chat {...props} />
   return (
-    <ThemeProvider appearance={props.isDark ? 'dark' : 'light'}>
+    <ThemeProvider
+      appearance={props.isDark ? 'dark' : 'light'}
+      customToken={theme => themeToken.token}
+    >
       <Chat {...props} />
     </ThemeProvider>
   );

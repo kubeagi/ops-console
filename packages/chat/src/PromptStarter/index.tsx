@@ -12,8 +12,7 @@ import { Col, Row, Tag } from 'antd';
 import * as React from 'react';
 
 import useGetCommonData from '../utils/hooks/useGetCommonData';
-
-// import './index.less';
+import useStyles from './index.style';
 
 interface IPromptStarter {
   appName: string;
@@ -22,6 +21,7 @@ interface IPromptStarter {
 }
 
 const PromptStarter: React.FC<IPromptStarter> = props => {
+  const { styles } = useStyles();
   const [promptStarter] = useGetCommonData<string[]>({
     url: '/chat/prompt-starter',
     method: 'post',
@@ -38,7 +38,7 @@ const PromptStarter: React.FC<IPromptStarter> = props => {
   if (!promptStarter?.length) return null;
   return (
     <>
-      <Row className="promptStart">
+      <Row className={styles.promptStart}>
         {promptStarter.map((prompt, index) => {
           return (
             <Col className="Col" key={index} span={11}>

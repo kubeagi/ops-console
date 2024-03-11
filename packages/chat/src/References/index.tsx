@@ -9,11 +9,11 @@
  * @date 2024-01-22
  */
 import { ChatMessage } from '@lobehub/ui';
-import { Divider, Space } from 'antd';
+import { Divider, Space, Typography } from 'antd';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import I18N from '../utils/kiwiI18N';
-// import './index.less';
+import useStyles from './index.style';
 import RefContent from './renderContent';
 
 export type Reference = {
@@ -36,6 +36,7 @@ let mouseEnterTimeout;
 let tempSetNum;
 const getTempSetNum = () => tempSetNum;
 const RenderReferences: FC<IRenderReferences> = props => {
+  const { styles } = useStyles();
   const { chat, debug } = props;
   const [_item, setItem] = useState<{ item: Reference; index: number }>();
   const [clear, setClear] = useState<number>(0);
@@ -66,7 +67,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
     return null;
   }
   return (
-    <div className="references">
+    <div className={styles.references}>
       <Divider className="referencesTxt" dashed orientation="left" />
       <RefContent
         debug={debug}
@@ -90,7 +91,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
           {chat.extra.references.map((item, index) => {
             return (
               <>
-                <a
+                <Typography.Link
                   key={index}
                   onMouseEnter={onMouseEnter.bind('', item, index)}
                   onMouseLeave={() => {
@@ -98,7 +99,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
                   }}
                 >
                   [{index + 1}]
-                </a>
+                </Typography.Link>
 
                 {chat.extra.references.length - 1 > index ? <Divider type="vertical" /> : null}
               </>

@@ -15,7 +15,6 @@ import React, { useCallback, useState } from 'react';
 
 import useConversationList, { setQueryConversationId } from '@/pages/Chat/useConversationList';
 
-import '../../../packages/chat/src/index.less';
 import './index.less';
 
 interface IChat {}
