@@ -21,7 +21,6 @@ import {
   useControls,
   useCreateStore,
 } from '@lobehub/ui';
-import { getAuthData } from '@tenx-ui/auth-utils';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin, Tag, UploadFile, message, theme } from 'antd';
@@ -35,6 +34,7 @@ import RenderReferences, { Reference } from './References';
 import { formatJson, getCvsMeta } from './helper';
 import useStyles, { GlobalStyles, useChatContainerStyles } from './index.style';
 import Retry from './retry';
+import { getAuthData } from './utils/auth-utils';
 import { fetchEventSource } from './utils/fetchEventSource';
 import useGetCommonData from './utils/hooks/useGetCommonData';
 import I18N from './utils/kiwiI18N';

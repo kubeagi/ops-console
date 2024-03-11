@@ -17,8 +17,6 @@
     "pub": "npm run prepublishOnly && npm publish"
   },
   "dependencies": {
-    "@tenx-ui/auth-utils": "0.0.1",
-    "@tenx-ui/icon": "^2.4.41",
     "@tenx-ui/request": "^1.0.0-beta.6",
     "antd-style": "^3.6.1",
     "kiwi-intl": "1.2.6-beta.0"

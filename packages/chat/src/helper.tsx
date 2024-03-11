@@ -3,10 +3,11 @@
  * (C) Copyright 2023 KubeAGI. All Rights Reserved.
  */
 import { ChatMessage } from '@lobehub/ui';
-import { ChatAssistant, ChatUser } from '@tenx-ui/icon';
 import React from 'react';
 
 import { Reference } from './References';
+import ChatAssistant from './assets/icons/ChatAssistant';
+import ChatUser from './assets/icons/ChatUser';
 
 /**
  * helper
@@ -40,7 +41,7 @@ export const getCvsMeta = (
     meta: {
       avatar: (
         <div className="customAvatar">
-          <Icon />
+          <Icon height={32} width={32} />
         </div>
       ),
       title: isUser ? 'You' : 'Assistant',
