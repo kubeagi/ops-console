@@ -74,8 +74,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.1.6
-        version: 1.1.6(antd@5.13.2)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.1.7
+        version: 1.1.7(antd@5.13.2)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/chat':
         specifier: workspace:*
         version: link:packages/chat
@@ -5546,7 +5546,7 @@ packages:
     dev: false
 
   /@tenx-ui/auth-utils@0.0.1:
-    resolution: {integrity: sha512-aCo7kgzZ18i3gZ6ZZryoYP0pBbTDyqKT8nSIwNXgMckL+pxUA+Iy5owvbZ/Hptexn603adg+ppocwxkvGxiBaw==, tarball: http://dev-npm.k8s.com.cn/@tenx-ui%2fauth-utils/-/auth-utils-0.0.1.tgz}
+    resolution: {integrity: sha512-aCo7kgzZ18i3gZ6ZZryoYP0pBbTDyqKT8nSIwNXgMckL+pxUA+Iy5owvbZ/Hptexn603adg+ppocwxkvGxiBaw==}
     dev: false
 
   /@tenx-ui/charts@1.1.2(@babel/core@7.23.7)(antd@5.13.2)(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
@@ -5625,7 +5625,7 @@ packages:
     dev: false
 
   /@tenx-ui/icon@2.4.41(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-P3kyp13DF0baRLGevBi5ZM0KQ8fTAb1ztsutQ9dY6KZiTjhWGGjiC3LbZxLTbLbST4WEvoCUp8E7UGb4PgO4ZA==, tarball: http://dev-npm.k8s.com.cn/@tenx-ui%2ficon/-/icon-2.4.41.tgz}
+    resolution: {integrity: sha512-P3kyp13DF0baRLGevBi5ZM0KQ8fTAb1ztsutQ9dY6KZiTjhWGGjiC3LbZxLTbLbST4WEvoCUp8E7UGb4PgO4ZA==}
     peerDependencies:
       classnames: '>=2.2.5'
       prop-types: '>=15.6.1'
@@ -5718,7 +5718,7 @@ packages:
     dev: false
 
   /@tenx-ui/request@1.0.0-beta.6:
-    resolution: {integrity: sha512-4W4yKKiw+BfXnVOLwpYvJDm/c+csrbR8EyQnDEM7T91KYvSqBB4A60Mh/jR5A7+YQz3LCGgWME4fZEn1Ol3/aw==, tarball: http://dev-npm.k8s.com.cn/@tenx-ui%2frequest/-/request-1.0.0-beta.6.tgz}
+    resolution: {integrity: sha512-4W4yKKiw+BfXnVOLwpYvJDm/c+csrbR8EyQnDEM7T91KYvSqBB4A60Mh/jR5A7+YQz3LCGgWME4fZEn1Ol3/aw==}
     dependencies:
       '@babel/runtime': 7.23.8
       abort-controller: 3.0.0
@@ -7384,14 +7384,14 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.1.6(antd@5.13.2)(react@18.2.0)(swr@2.2.4):
+  /@yuntijs/arcadia-bff-sdk@1.1.6(antd@5.15.0)(react@18.2.0)(swr@2.2.4):
     resolution: {integrity: sha512-cuh2MV7E177pNGPfVZPAgGV34LBrfhomqgdpo2+wvhdzQ7jK8jfp6jBS2Vwe0070ChMHmufeRC2CnLZIWj3n/w==}
     peerDependencies:
       antd: '>=5.4.0'
       react: '>=16.9.0'
       swr: '>=2.0.0'
     dependencies:
-      antd: 5.13.2(react-dom@18.2.0)(react@18.2.0)
+      antd: 5.15.0(react-dom@18.2.0)(react@18.2.0)
       graphql: 16.8.1
       graphql-request: 5.2.0(graphql@16.8.1)
       graphql-tag: 2.12.6(graphql@16.8.1)
@@ -7402,14 +7402,14 @@ packages:
       - encoding
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.1.6(antd@5.15.0)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-cuh2MV7E177pNGPfVZPAgGV34LBrfhomqgdpo2+wvhdzQ7jK8jfp6jBS2Vwe0070ChMHmufeRC2CnLZIWj3n/w==}
+  /@yuntijs/arcadia-bff-sdk@1.1.7(antd@5.13.2)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-ztYjFLNNhow5lWqNycGvOiqigayKyY3csON8AKurp4GbXLdtYxaRj0a8djePb+BPufmJ6ZMZROxsk/W5XRQu4g==}
     peerDependencies:
       antd: '>=5.4.0'
       react: '>=16.9.0'
       swr: '>=2.0.0'
     dependencies:
-      antd: 5.15.0(react-dom@18.2.0)(react@18.2.0)
+      antd: 5.13.2(react-dom@18.2.0)(react@18.2.0)
       graphql: 16.8.1
       graphql-request: 5.2.0(graphql@16.8.1)
       graphql-tag: 2.12.6(graphql@16.8.1)
@@ -16501,7 +16501,7 @@ packages:
       side-channel: 1.0.4
 
   /query-string@6.14.1:
-    resolution: {integrity: sha512-XDxAeVmpfu1/6IjyT/gXHOl+S0vQ9owggJ30hhWKdHAsNPOcasn5o9BW0eejZqL2e4vMjhAxoW3jVHcD6mbcYw==}
+    resolution: {integrity: sha1-esLcpG2n8wlEm6D4ax/SglWwyGo=}
     engines: {node: '>=6'}
     dependencies:
       decode-uri-component: 0.2.2
