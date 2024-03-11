@@ -36,7 +36,7 @@ let mouseEnterTimeout;
 let tempSetNum;
 const getTempSetNum = () => tempSetNum;
 const RenderReferences: FC<IRenderReferences> = props => {
-  const { styles } = useStyles();
+  const { styles, cx } = useStyles();
   const { chat, debug } = props;
   const [_item, setItem] = useState<{ item: Reference; index: number }>();
   const [clear, setClear] = useState<number>(0);
@@ -67,7 +67,7 @@ const RenderReferences: FC<IRenderReferences> = props => {
     return null;
   }
   return (
-    <div className={styles.references}>
+    <div className={cx(styles.references, 'references')}>
       <Divider className="referencesTxt" dashed orientation="left" />
       <RefContent
         debug={debug}
