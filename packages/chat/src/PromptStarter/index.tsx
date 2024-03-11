@@ -21,7 +21,7 @@ interface IPromptStarter {
 }
 
 const PromptStarter: React.FC<IPromptStarter> = props => {
-  const { styles } = useStyles();
+  const { styles, cx } = useStyles();
   const [promptStarter] = useGetCommonData<string[]>({
     url: '/chat/prompt-starter',
     method: 'post',
@@ -38,7 +38,7 @@ const PromptStarter: React.FC<IPromptStarter> = props => {
   if (!promptStarter?.length) return null;
   return (
     <>
-      <Row className={styles.promptStart}>
+      <Row className={cx(styles.promptStart, 'promptStart')}>
         {promptStarter.map((prompt, index) => {
           return (
             <Col className="Col" key={index} span={11}>

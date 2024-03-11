@@ -45,11 +45,11 @@ interface IRefContent {
   loading: boolean;
 }
 const RefContent: FC<IRefContent> = props => {
-  const { styles } = usePopoverStyles();
+  const { styles, cx } = usePopoverStyles();
   const { reference, index, open, loading, debug, children } = props;
   const content = reference.content ? (
     <Spin spinning={loading}>
-      <div className={styles.popContent}>
+      <div className={cx(styles.popContent, 'popContent')}>
         {reference.content ? (
           <Typography.Title level={4}>
             {I18N.Chat.yinYongShuJu} [{index}]

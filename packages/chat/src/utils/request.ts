@@ -9,10 +9,11 @@
  * @author zhangpc
  * @date 2023-07-14
  */
-import { getAuthData } from '@tenx-ui/auth-utils';
 import { IOptions, IRequest, IRequestResponse, IUploadRequestOptions } from '@tenx-ui/request';
 import RequestCore from '@tenx-ui/request/es/core';
 import { mergeHeaders } from '@tenx-ui/request/es/helpers';
+
+import { getAuthData } from './auth-utils';
 
 const apiUrl = '/kubeagi-apis';
 

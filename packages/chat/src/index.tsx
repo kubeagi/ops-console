@@ -21,7 +21,6 @@ import {
   useControls,
   useCreateStore,
 } from '@lobehub/ui';
-import { getAuthData } from '@tenx-ui/auth-utils';
 // @ts-ignore
 import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin, Tag, UploadFile, message, theme } from 'antd';
@@ -35,6 +34,7 @@ import RenderReferences, { Reference } from './References';
 import { formatJson, getCvsMeta } from './helper';
 import useStyles, { GlobalStyles, useChatContainerStyles } from './index.style';
 import Retry from './retry';
+import { getAuthData } from './utils/auth-utils';
 import { fetchEventSource } from './utils/fetchEventSource';
 import useGetCommonData from './utils/hooks/useGetCommonData';
 import I18N from './utils/kiwiI18N';
@@ -471,7 +471,7 @@ const Chat: React.FC<IChat> = props => {
     });
   }, [ctrl, setConversation]);
   return (
-    <div className={styles.chatComponent}>
+    <div className={cx(styles.chatComponent, 'chatComponent')}>
       <GlobalStyles />
       <div
         className={cx(
@@ -595,7 +595,7 @@ const Chat: React.FC<IChat> = props => {
 let refreshTimeout;
 let tmpRefresh;
 const ChatComponent: React.FC<IChat> = props => {
-  const { styles } = useChatContainerStyles();
+  const { styles, cx } = useChatContainerStyles();
   const themeToken = theme.useToken();
   const [_refresh, setRefresh] = useState(false);
   useEffect(() => {
@@ -612,7 +612,7 @@ const ChatComponent: React.FC<IChat> = props => {
   }, [setRefresh, props.refresh]);
   if (_refresh)
     return (
-      <div className={styles.chatSpin}>
+      <div className={cx(styles.chatSpin, 'chatSpin')}>
         <Spin spinning />
       </div>
     );

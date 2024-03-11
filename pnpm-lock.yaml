@@ -423,16 +423,10 @@ importers:
     dependencies:
       '@ant-design/icons':
         specifier: ^5.0.0
-        version: 5.2.6(react-dom@18.2.0)(react@18.2.0)
+        version: 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@lobehub/ui':
         specifier: ^1.128.4
         version: 1.128.4(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd-style@3.6.1)(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
-      '@tenx-ui/auth-utils':
-        specifier: 0.0.1
-        version: 0.0.1
-      '@tenx-ui/icon':
-        specifier: ^2.4.41
-        version: 2.4.41(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@tenx-ui/request':
         specifier: ^1.0.0-beta.6
         version: 1.0.0-beta.6
@@ -849,7 +843,7 @@ packages:
       antd: ^4.24.15 || ^5.11.2
       react: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-utils': 2.15.4(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
@@ -869,7 +863,7 @@ packages:
       antd: ^4.24.15 || ^5.11.2
       react: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-utils': 2.15.4(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
@@ -983,7 +977,7 @@ packages:
       antd: ^4.24.15 || ^5.11.2
       react: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-utils': 2.15.4(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
@@ -1006,7 +1000,7 @@ packages:
       antd: ^4.24.15 || ^5.11.2
       react: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-utils': 2.15.4(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
@@ -1035,7 +1029,7 @@ packages:
       '@types/lodash.merge':
         optional: true
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-field': 2.14.5(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-utils': 2.15.4(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
@@ -1066,7 +1060,7 @@ packages:
       '@types/lodash.merge':
         optional: true
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-field': 2.14.5(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-utils': 2.15.4(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
@@ -1092,7 +1086,7 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-utils': 2.15.4(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
@@ -1118,7 +1112,7 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-utils': 2.15.4(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
@@ -1144,7 +1138,7 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-card': 2.5.29(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-field': 2.14.5(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-table': 3.14.1(antd@5.13.2)(rc-field-form@1.42.0)(react-dom@18.2.0)(react@18.2.0)
@@ -1169,7 +1163,7 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-card': 2.5.29(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-field': 2.14.5(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-table': 3.14.1(antd@5.15.0)(rc-field-form@1.42.0)(react-dom@18.2.0)(react@18.2.0)
@@ -1255,7 +1249,7 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-card': 2.5.29(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-field': 2.14.5(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-form': 2.24.3(antd@5.13.2)(rc-field-form@1.42.0)(react-dom@18.2.0)(react@18.2.0)
@@ -1288,7 +1282,7 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-card': 2.5.29(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-field': 2.14.5(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-form': 2.24.3(antd@5.15.0)(rc-field-form@1.42.0)(react-dom@18.2.0)(react@18.2.0)
@@ -1320,7 +1314,7 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
       antd: 5.13.2(react-dom@18.2.0)(react@18.2.0)
@@ -1341,7 +1335,7 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
     dependencies:
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-provider': 2.13.5(antd@5.15.0)(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
       antd: 5.15.0(react-dom@18.2.0)(react@18.2.0)
@@ -3952,7 +3946,7 @@ packages:
       react-dom: '>=18'
     dependencies:
       '@ant-design/colors': 7.0.2
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
       '@dnd-kit/core': 6.1.0(react-dom@18.2.0)(react@18.2.0)
       '@dnd-kit/modifiers': 7.0.0(@dnd-kit/core@6.1.0)(react@18.2.0)
@@ -4016,7 +4010,7 @@ packages:
       react-dom: '>=18'
     dependencies:
       '@ant-design/colors': 7.0.2
-      '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
       '@babel/runtime': 7.23.8
       '@dnd-kit/core': 6.1.0(react-dom@18.2.0)(react@18.2.0)
       '@dnd-kit/modifiers': 7.0.0(@dnd-kit/core@6.1.0)(react@18.2.0)
@@ -5210,7 +5204,7 @@ packages:
     dev: true
 
   /@semantic-release/error@3.0.0:
-    resolution: {integrity: sha1-MKO5e7tYRNaV6yL506pA9qkncMI=}
+    resolution: {integrity: sha512-5hiM4Un+tpl4cKw3lV4UgzJj+SmfNIDCLLw0TepzQxz9ZGV5ixnqkzIVF+3tp0ZHgcMKE+VNGHJjEeyFG2dcSw==}
     engines: {node: '>=14.17'}
     dev: true
 
@@ -5621,20 +5615,6 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 17.0.2(react@18.2.0)
-    dev: false
-
-  /@tenx-ui/icon@2.4.41(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-P3kyp13DF0baRLGevBi5ZM0KQ8fTAb1ztsutQ9dY6KZiTjhWGGjiC3LbZxLTbLbST4WEvoCUp8E7UGb4PgO4ZA==}
-    peerDependencies:
-      classnames: '>=2.2.5'
-      prop-types: '>=15.6.1'
-      react: '>=16.0.0'
-      react-dom: '>=16.0.0'
-    dependencies:
-      classnames: 2.5.1
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@tenx-ui/icon@2.4.42(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
