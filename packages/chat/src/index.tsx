@@ -616,11 +616,11 @@ const ChatComponent: React.FC<IChat> = props => {
         <Spin spinning />
       </div>
     );
+  if (!props.isDark || props.gpts) {
+    return <Chat {...props} />;
+  }
   return (
-    <ThemeProvider
-      appearance={props.isDark ? 'dark' : 'light'}
-      customToken={theme => themeToken.token}
-    >
+    <ThemeProvider appearance="dark" customToken={theme => themeToken.token}>
       <Chat {...props} />
     </ThemeProvider>
   );
