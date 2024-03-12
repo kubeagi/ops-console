@@ -8,7 +8,6 @@ export default defineConfig({
       'src/index.tsx': {
         name: 'yunti-chat',
       },
-      'src/index.less': {},
     },
   },
   // prebundle: {},

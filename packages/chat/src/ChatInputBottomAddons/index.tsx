@@ -39,7 +39,6 @@ const ChatInputBottomAddons: React.FC<IChatInputBottomAddons> = props => {
   return (
     <Flex align="center" className={cx(styles.sendAction, 'sendAction')} gap="large" justify="end">
       <Upload
-        accept=".pdf,.doc,.docx,.mp3,.wav,.wma"
         className="upload-list-inline"
         fileList={fileList}
         listType="picture"
