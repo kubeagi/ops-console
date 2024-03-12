@@ -619,6 +619,7 @@ const ChatComponent: React.FC<IChat> = props => {
   if (!props.isDark || props.gpts) {
     return <Chat {...props} />;
   }
+  // FIXME: 在ops-console 黑暗模式下必须加上lobe-ui的ThemeProvider, 才能真正的黑暗模式, 但会导致 antd的colorPrimary变成 #222222
   return (
     <ThemeProvider appearance="dark" customToken={theme => themeToken.token}>
       <Chat {...props} />
