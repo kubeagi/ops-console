@@ -5,7 +5,7 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import { KubeagiKnowledge } from '@tenx-ui/icon';
-import { Empty, Flex, Form, Input, Space, Tooltip, Typography } from 'antd';
+import { Empty, Flex, Form, Space, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import I18N from '@/utils/kiwiI18N';
@@ -198,7 +198,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
             refresh: () => {},
             type: 'edit',
             data: {},
-            validateNames: ['scoreThreshold', 'numDocuments', 'docNullReturn'],
+            validateNames: ['scoreThreshold', 'numDocuments'],
             children: (
               <>
                 <SliderItem
@@ -235,24 +235,6 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
                   }
                   name="numDocuments"
                 />
-                <Form.Item
-                  initialValue={I18N.ModelApp.weiZhaoDaoNinXun}
-                  label={I18N.ModelApp.kongSouSuoHuiFu}
-                  name="docNullReturn"
-                  rules={[
-                    {
-                      validator: (_, value, callback) => {
-                        if (value && value.length > 200) {
-                          return callback(I18N.ModelApp.zuiDuoKeShuRu);
-                        }
-                        return callback();
-                      },
-                    },
-                  ]}
-                  style={{ marginBottom: 0, marginTop: 10 }}
-                >
-                  <Input.TextArea placeholder={I18N.ModelApp.meiYouSouSuoDao} rows={3} />
-                </Form.Item>
               </>
             ),
             handleSave: (values: any) => {},

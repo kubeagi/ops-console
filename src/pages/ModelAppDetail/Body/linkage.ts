@@ -3,5 +3,8 @@ export const linkageReference = (form, configs) => {
     showRetrievalInfo: !!(
       configs?.Skill?.tools?.includes('Bing Search API') || configs?.ConfigKnowledge?.knowledgebase
     ),
+    showDocNullReturn: !!(
+      configs?.Skill?.tools?.length > 0 || configs?.ConfigKnowledge?.knowledgebase
+    ),
   });
 };
