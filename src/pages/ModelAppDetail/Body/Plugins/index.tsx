@@ -13,8 +13,7 @@ import { linkageReference } from '../linkage';
 
 export const PLUGINS_MAP = [
   {
-    //@todo id: 'Bing Search API',
-    id: 'bing',
+    id: 'Bing Search API',
     name: 'Bing 搜索',
     icon: <KubeagiBing />,
     color: '#A16BF1',

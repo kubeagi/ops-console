@@ -155,7 +155,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
                 onChange={v => {
                   forceUpdate();
                   const llm = llmList?.find(item => item.name === v);
-                  const model = llm?.provider === 'worker' ? llm?.models?.[0] : undefined;
+                  const model = llm?.provider === 'worker' ? undefined : llm?.models?.[0];
                   form.setFieldsValue({
                     model,
                   });

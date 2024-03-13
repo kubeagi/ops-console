@@ -47,7 +47,6 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
         knowledgebase: Application?.knowledgebase || undefined,
         scoreThreshold: Application?.scoreThreshold,
         numDocuments: Application?.numDocuments,
-        docNullReturn: Application?.docNullReturn || undefined,
       },
       ConfigPrompt: {
         userPrompt: Application?.userPrompt || undefined,
@@ -64,6 +63,10 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
       },
       Skill: {
         tools: Application?.tools?.map(item => item.name),
+      },
+      DocNullReturn: {
+        docNullReturn: Application?.docNullReturn || undefined,
+        showDocNullReturn: !!Application?.docNullReturn,
       },
     };
     setConfigs(Config);
