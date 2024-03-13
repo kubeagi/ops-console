@@ -15,6 +15,7 @@ import ConfigNext from './ConfigNext';
 import ConfigPrompt from './ConfigPrompt';
 import Container from './Container';
 import Dialogue from './Dialogue';
+import DocNullReturn from './DocNullReturn';
 import Plugins from './Plugins';
 import ViewReference from './ViewReference';
 import ViewResInfo from './ViewResInfo';
@@ -55,8 +56,10 @@ const Body: React.FC<BodyProps> = props => {
                           namespace: data?.metadata?.namespace,
                           ...values,
                           tools: values.tools?.map(name => ({ name })),
+                          docNullReturn: values.showDocNullReturn ? values.docNullReturn : '',
                         };
                         delete input.metadata;
+                        delete input.showDocNullReturn;
                         await utils.bff.updateApplicationConfig({
                           input,
                         });
@@ -104,6 +107,7 @@ const Body: React.FC<BodyProps> = props => {
                     content={
                       <>
                         <ConfigConversationStarter />
+                        <DocNullReturn />
                         <ViewResInfo />
                         <ViewReference />
                         <ConfigNext />
