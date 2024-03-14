@@ -16,10 +16,10 @@ import {
   Tooltip,
   Space,
   Tabs,
+  Input,
   Descriptions,
   UnifiedLink,
   Flex,
-  Input,
 } from '@tenx-ui/materials';
 
 import LccComponentChj61 from 'kubeagi-knowledge-delete-modal';
@@ -527,6 +527,231 @@ class KnowledgeDetail$$Page extends React.Component {
                     items={[
                       {
                         children: (
+                          <Row __component_name="Row" wrap={true}>
+                            <Col
+                              __component_name="Col"
+                              span={24}
+                              style={{
+                                alignItem: 'center',
+                                alignItems: 'center',
+                                dispalay: 'flex',
+                                display: 'flex',
+                                flexDirection: 'row',
+                                flexWrap: 'nowrap',
+                                height: '32px',
+                                justifyContent: 'flex-start',
+                              }}
+                            >
+                              <Button
+                                __component_name="Button"
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
+                                icon={
+                                  <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
+                                }
+                                onClick={function () {
+                                  return this.openAddFilesModal.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                shape="default"
+                                style={{ height: '32px', marginRight: '12px' }}
+                                type="primary"
+                              >
+                                新增文件
+                              </Button>
+                              <Button
+                                __component_name="Button"
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
+                                icon={
+                                  <AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />
+                                }
+                                onClick={function () {
+                                  return this.refreshData.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                shape="default"
+                                style={{ height: '32px', marginRight: '12px' }}
+                              >
+                                刷新
+                              </Button>
+                              <Input.Search
+                                __component_name="Input.Search"
+                                placeholder="请输入文件名称搜索"
+                                style={{ height: '32px', marginRight: '12px', width: '240px' }}
+                              />
+                              <Space __component_name="Space" align="center" direction="horizontal">
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                >
+                                  {__$$eval(
+                                    () => `共有文件：${this.countFileGroupDetail().total} 个`
+                                  )}
+                                </Typography.Text>
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      `文件向量化中：${this.countFileGroupDetail().processing} 个`
+                                  )}
+                                </Typography.Text>
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      `文件向量化成功：${this.countFileGroupDetail().succeeded} 个`
+                                  )}
+                                </Typography.Text>
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                >
+                                  {__$$eval(
+                                    () => `文件向量化失败：${this.countFileGroupDetail().failed} 个`
+                                  )}
+                                </Typography.Text>
+                              </Space>
+                            </Col>
+                            <Col __component_name="Col" span={24}>
+                              <Table
+                                __component_name="Table"
+                                columns={[
+                                  { dataIndex: 'path', key: 'path', title: '文件名称' },
+                                  {
+                                    dataIndex: 'phase',
+                                    key: 'age',
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Status
+                                          __component_name="Status"
+                                          id={__$$eval(() => text)}
+                                          types={[
+                                            { children: '跳过', id: 'Skipped', type: 'disabled' },
+                                            { children: '待处理', id: 'Pending', type: 'disabled' },
+                                            { children: '失败', id: 'Failed', type: 'error' },
+                                            {
+                                              children: '已完成',
+                                              id: 'Succeeded',
+                                              type: 'success',
+                                            },
+                                            {
+                                              children: '处理中',
+                                              id: 'Processing',
+                                              type: 'primary',
+                                            },
+                                          ]}
+                                        />
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
+                                    title: '状态',
+                                  },
+                                  { dataIndex: 'source', title: '文件来源' },
+                                  { dataIndex: 'fileType', title: '类型' },
+                                  { dataIndex: 'count', title: '数据量' },
+                                  { dataIndex: 'size', title: '文件大小' },
+                                  {
+                                    dataIndex: 'updateTimestamp',
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Typography.Time
+                                          __component_name="Typography.Time"
+                                          format=""
+                                          relativeTime={true}
+                                          time={__$$eval(() => text)}
+                                        />
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
+                                    title: '导入时间',
+                                  },
+                                  {
+                                    dataIndex: 'operator',
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Space
+                                          __component_name="Space"
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Button
+                                            __component_name="Button"
+                                            block={false}
+                                            danger={false}
+                                            disabled={false}
+                                            ghost={false}
+                                            shape="default"
+                                          >
+                                            日志
+                                          </Button>
+                                          <Button
+                                            __component_name="Button"
+                                            block={false}
+                                            danger={true}
+                                            disabled={true}
+                                            ghost={false}
+                                            shape="default"
+                                          >
+                                            删除
+                                          </Button>
+                                        </Space>
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
+                                    title: '操作',
+                                  },
+                                ]}
+                                dataSource={__$$eval(() => this.getFileGroupDetail())}
+                                pagination={{
+                                  current: 1,
+                                  pageSize: 20,
+                                  pagination: { pageSize: 10 },
+                                  position: ['bottomRight'],
+                                  showQuickJumper: false,
+                                  showSizeChanger: false,
+                                  simple: false,
+                                  size: 'default',
+                                  total: __$$eval(() => this.getFileGroupDetail().length),
+                                }}
+                                rowKey="path"
+                                scroll={{ scrollToFirstRowOnChange: true }}
+                                showHeader={true}
+                                size="middle"
+                                style={{}}
+                              />
+                            </Col>
+                          </Row>
+                        ),
+                        key: 'tab-item-1',
+                        label: '数据来源',
+                      },
+                      {
+                        children: (
                           <Descriptions
                             __component_name="Descriptions"
                             bordered={false}
@@ -551,6 +776,43 @@ class KnowledgeDetail$$Page extends React.Component {
                                 ),
                                 key: '4xwzwtp0wd2',
                                 label: 'ID',
+                                span: 1,
+                              },
+                              {
+                                _unsafe_MixedSetter_children_select: 'SlotSetter',
+                                children: (
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '' }}
+                                  >
+                                    {__$$eval(
+                                      () => this.getKnowledge()?.chunkSize + ' 字符' || '-'
+                                    )}
+                                  </Typography.Text>
+                                ),
+                                key: '25nyuq5iamm',
+                                label: '文本分段长度',
+                                span: 1,
+                              },
+                              {
+                                children: (
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '' }}
+                                  >
+                                    {__$$eval(
+                                      () => this.getKnowledge()?.chunkOverlap + ' 字符' || '-'
+                                    )}
+                                  </Typography.Text>
+                                ),
+                                key: 'jyxi1y2h6ia',
+                                label: '分段重叠长度',
                                 span: 1,
                               },
                               {
@@ -782,233 +1044,8 @@ class KnowledgeDetail$$Page extends React.Component {
                             title=""
                           />
                         ),
-                        key: 'tab-item-1',
-                        label: '详细信息',
-                      },
-                      {
-                        children: (
-                          <Row __component_name="Row" wrap={true}>
-                            <Col
-                              __component_name="Col"
-                              span={24}
-                              style={{
-                                alignItem: 'center',
-                                alignItems: 'center',
-                                dispalay: 'flex',
-                                display: 'flex',
-                                flexDirection: 'row',
-                                flexWrap: 'nowrap',
-                                height: '32px',
-                                justifyContent: 'flex-start',
-                              }}
-                            >
-                              <Button
-                                __component_name="Button"
-                                block={false}
-                                danger={false}
-                                disabled={false}
-                                ghost={false}
-                                icon={
-                                  <AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />
-                                }
-                                onClick={function () {
-                                  return this.openAddFilesModal.apply(
-                                    this,
-                                    Array.prototype.slice.call(arguments).concat([])
-                                  );
-                                }.bind(this)}
-                                shape="default"
-                                style={{ height: '32px', marginRight: '12px' }}
-                                type="primary"
-                              >
-                                新增文件
-                              </Button>
-                              <Button
-                                __component_name="Button"
-                                block={false}
-                                danger={false}
-                                disabled={false}
-                                ghost={false}
-                                icon={
-                                  <AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />
-                                }
-                                onClick={function () {
-                                  return this.refreshData.apply(
-                                    this,
-                                    Array.prototype.slice.call(arguments).concat([])
-                                  );
-                                }.bind(this)}
-                                shape="default"
-                                style={{ height: '32px', marginRight: '12px' }}
-                              >
-                                刷新
-                              </Button>
-                              <Input.Search
-                                __component_name="Input.Search"
-                                placeholder="请输入文件名称搜索"
-                                style={{ height: '32px', marginRight: '12px', width: '240px' }}
-                              />
-                              <Space __component_name="Space" align="center" direction="horizontal">
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '', paddingRight: '12px' }}
-                                >
-                                  {__$$eval(
-                                    () => `共有文件：${this.countFileGroupDetail().total} 个`
-                                  )}
-                                </Typography.Text>
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '', paddingRight: '12px' }}
-                                >
-                                  {__$$eval(
-                                    () =>
-                                      `文件向量化中：${this.countFileGroupDetail().processing} 个`
-                                  )}
-                                </Typography.Text>
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '', paddingRight: '12px' }}
-                                >
-                                  {__$$eval(
-                                    () =>
-                                      `文件向量化成功：${this.countFileGroupDetail().succeeded} 个`
-                                  )}
-                                </Typography.Text>
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '', paddingRight: '12px' }}
-                                >
-                                  {__$$eval(
-                                    () => `文件向量化失败：${this.countFileGroupDetail().failed} 个`
-                                  )}
-                                </Typography.Text>
-                              </Space>
-                            </Col>
-                            <Col __component_name="Col" span={24}>
-                              <Table
-                                __component_name="Table"
-                                columns={[
-                                  { dataIndex: 'path', key: 'path', title: '文件名称' },
-                                  {
-                                    dataIndex: 'phase',
-                                    key: 'age',
-                                    render: (text, record, index) =>
-                                      (__$$context => (
-                                        <Status
-                                          __component_name="Status"
-                                          id={__$$eval(() => text)}
-                                          types={[
-                                            { children: '跳过', id: 'Skipped', type: 'disabled' },
-                                            { children: '待处理', id: 'Pending', type: 'disabled' },
-                                            { children: '失败', id: 'Failed', type: 'error' },
-                                            {
-                                              children: '已完成',
-                                              id: 'Succeeded',
-                                              type: 'success',
-                                            },
-                                            {
-                                              children: '处理中',
-                                              id: 'Processing',
-                                              type: 'primary',
-                                            },
-                                          ]}
-                                        />
-                                      ))(
-                                        __$$createChildContext(__$$context, { text, record, index })
-                                      ),
-                                    title: '状态',
-                                  },
-                                  { dataIndex: 'source', title: '文件来源' },
-                                  { dataIndex: 'fileType', title: '类型' },
-                                  { dataIndex: 'count', title: '数据量' },
-                                  { dataIndex: 'size', title: '文件大小' },
-                                  {
-                                    dataIndex: 'updateTimestamp',
-                                    render: (text, record, index) =>
-                                      (__$$context => (
-                                        <Typography.Time
-                                          __component_name="Typography.Time"
-                                          format=""
-                                          relativeTime={true}
-                                          time={__$$eval(() => text)}
-                                        />
-                                      ))(
-                                        __$$createChildContext(__$$context, { text, record, index })
-                                      ),
-                                    title: '导入时间',
-                                  },
-                                  {
-                                    dataIndex: 'operator',
-                                    render: (text, record, index) =>
-                                      (__$$context => (
-                                        <Space
-                                          __component_name="Space"
-                                          align="center"
-                                          direction="horizontal"
-                                        >
-                                          <Button
-                                            __component_name="Button"
-                                            block={false}
-                                            danger={false}
-                                            disabled={false}
-                                            ghost={false}
-                                            shape="default"
-                                          >
-                                            日志
-                                          </Button>
-                                          <Button
-                                            __component_name="Button"
-                                            block={false}
-                                            danger={true}
-                                            disabled={true}
-                                            ghost={false}
-                                            shape="default"
-                                          >
-                                            删除
-                                          </Button>
-                                        </Space>
-                                      ))(
-                                        __$$createChildContext(__$$context, { text, record, index })
-                                      ),
-                                    title: '操作',
-                                  },
-                                ]}
-                                dataSource={__$$eval(() => this.getFileGroupDetail())}
-                                pagination={{
-                                  current: 1,
-                                  pageSize: 20,
-                                  pagination: { pageSize: 10 },
-                                  position: ['bottomRight'],
-                                  showQuickJumper: false,
-                                  showSizeChanger: false,
-                                  simple: false,
-                                  size: 'default',
-                                  total: __$$eval(() => this.getFileGroupDetail().length),
-                                }}
-                                rowKey="path"
-                                scroll={{ scrollToFirstRowOnChange: true }}
-                                showHeader={true}
-                                size="middle"
-                                style={{}}
-                              />
-                            </Col>
-                          </Row>
-                        ),
                         key: 'tab-item-2',
-                        label: '数据来源',
+                        label: '详细信息',
                       },
                     ]}
                     size="default"

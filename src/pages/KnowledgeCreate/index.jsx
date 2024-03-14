@@ -15,6 +15,7 @@ import {
   FormilyForm,
   FormilyInput,
   FormilySelect,
+  FormilyNumberPicker,
   FormilyTextArea,
   FormilyFormItem,
   Typography,
@@ -80,6 +81,8 @@ class KnowledgeCreate$$Page extends React.Component {
           dataset: null,
         },
         embedder: undefined,
+        chunkSize: 1024,
+        chunkOverlap: 100,
         description: '',
       },
       nextFileList: [],
@@ -101,11 +104,23 @@ class KnowledgeCreate$$Page extends React.Component {
     try {
       const form = this.getFormInstence();
       form.submit(async values => {
-        const { name, displayName, dataSetContain, description, embedder } = values;
+        const {
+          name,
+          displayName,
+          dataSetContain,
+          chunkSize,
+          chunkOverlap,
+          description,
+          embedder,
+        } = values;
         const { dataset, version } = dataSetContain;
         if (this.state.currentStep === 0) {
           if (this.state.selectFiles.length === 0) {
             this.utils.message.info('请选择文件');
+            return;
+          }
+          if (chunkOverlap > chunkSize) {
+            this.utils.message.info('分段重叠长度必须小于文本分段长度');
             return;
           }
         }
@@ -115,6 +130,8 @@ class KnowledgeCreate$$Page extends React.Component {
             name,
             displayName,
             dataSetContain,
+            chunkSize,
+            chunkOverlap,
             description,
             embedder,
           },
@@ -276,7 +293,15 @@ class KnowledgeCreate$$Page extends React.Component {
       },
       async () => {
         const { embedderList, selectFiles, dataSetFileList, form } = this.state;
-        const { name, displayName, dataSetContain, description, embedder } = form;
+        const {
+          name,
+          displayName,
+          dataSetContain,
+          chunkSize,
+          chunkOverlap,
+          description,
+          embedder,
+        } = form;
         const { dataset, version } = dataSetContain;
         const embedderItem = embedderList.find(item => item.value === embedder);
         const fileGroups = [
@@ -295,6 +320,8 @@ class KnowledgeCreate$$Page extends React.Component {
               name,
               displayName,
               // name: displayName,
+              chunkSize,
+              chunkOverlap,
               description,
               embedder: embedderItem.name,
               fileGroups,
@@ -450,6 +477,7 @@ class KnowledgeCreate$$Page extends React.Component {
                         layout: 'horizontal',
                         wrapperCol: 12,
                       }}
+                      createFormProps={{ initialValues: { chunkOverlap: 100, chunkSize: 1024 } }}
                       formHelper={{ autoFocus: true }}
                       ref={this._refsManager.linkRef('formily_iwuyzsdvrhg')}
                     >
@@ -515,6 +543,40 @@ class KnowledgeCreate$$Page extends React.Component {
                           'name': 'embedder',
                           'required': true,
                           'title': '向量化模型',
+                          'x-validator': [],
+                        }}
+                      />
+                      <FormilyNumberPicker
+                        __component_name="FormilyNumberPicker"
+                        componentProps={{
+                          'x-component-props': {
+                            addonAfter: '字符',
+                            min: 1,
+                            placeholder: '请输入文本分段长度',
+                          },
+                        }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        fieldProps={{
+                          'name': 'chunkSize',
+                          'required': true,
+                          'title': '文本分段长度',
+                          'x-validator': [],
+                        }}
+                      />
+                      <FormilyNumberPicker
+                        __component_name="FormilyNumberPicker"
+                        componentProps={{
+                          'x-component-props': {
+                            addonAfter: '字符',
+                            min: 1,
+                            placeholder: '请输入分段重叠长度',
+                          },
+                        }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        fieldProps={{
+                          'name': 'chunkOverlap',
+                          'required': true,
+                          'title': '分段重叠长度',
                           'x-validator': [],
                         }}
                       />
