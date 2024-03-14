@@ -74,8 +74,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.1.7
-        version: 1.1.7(antd@5.13.2)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.1.8
+        version: 1.1.8(antd@5.13.2)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/chat':
         specifier: workspace:*
         version: link:packages/chat
@@ -3971,7 +3971,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.354.0(react@18.2.0)
+      lucide-react: 0.357.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.1(react@18.2.0)
       query-string: 8.1.0
@@ -4035,7 +4035,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.354.0(react@18.2.0)
+      lucide-react: 0.357.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.1(react@18.2.0)
       query-string: 8.1.0
@@ -5615,20 +5615,6 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 17.0.2(react@18.2.0)
-    dev: false
-
-  /@tenx-ui/icon@2.4.41(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-P3kyp13DF0baRLGevBi5ZM0KQ8fTAb1ztsutQ9dY6KZiTjhWGGjiC3LbZxLTbLbST4WEvoCUp8E7UGb4PgO4ZA==}
-    peerDependencies:
-      classnames: '>=2.2.5'
-      prop-types: '>=15.6.1'
-      react: '>=16.0.0'
-      react-dom: '>=16.0.0'
-    dependencies:
-      classnames: 2.5.1
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@tenx-ui/icon@2.4.42(classnames@2.5.1)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
@@ -7395,8 +7381,8 @@ packages:
       - encoding
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.1.7(antd@5.13.2)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-ztYjFLNNhow5lWqNycGvOiqigayKyY3csON8AKurp4GbXLdtYxaRj0a8djePb+BPufmJ6ZMZROxsk/W5XRQu4g==}
+  /@yuntijs/arcadia-bff-sdk@1.1.8(antd@5.13.2)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-ebkAEUMtcP+PmrIKHxhXSTjChRKQchu517J/X5yz3piqU70DAeW0bgPfQDqy0tSQmG2f9/2rdsZ3FarHJ4SpZA==}
     peerDependencies:
       antd: '>=5.4.0'
       react: '>=16.9.0'
@@ -13888,8 +13874,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /lucide-react@0.354.0(react@18.2.0):
-    resolution: {integrity: sha512-qI0x/hhcuHieaUUxFejesm5T/ditszQ2x1gUkqKnTMZRAOdxT2nGzbOFYrhc0wRjuA2MN1o5JCrcRPYcHH3l8A==}
+  /lucide-react@0.357.0(react@18.2.0):
+    resolution: {integrity: sha512-ILK6Ye6BMFyXyIHqG8FwMit1XKrj4KocLLLW4fDAAwsFjt6gSL9U6e3sZlbARIOqv0oP5XzLVacHEcb2SxuWkw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -18899,7 +18885,6 @@ packages:
       object-assign: 4.1.1
       prop-types: 15.8.1
     dev: false
-    bundledDependencies: false
 
   /react@18.1.0:
     resolution: {integrity: sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ==}
