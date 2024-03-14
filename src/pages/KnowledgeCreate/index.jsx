@@ -240,8 +240,7 @@ class KnowledgeCreate$$Page extends React.Component {
       const { files } = getVersionedDataset;
       this.setState(
         {
-          // 过滤非 QA 文件
-          dataSetFileList: (files.nodes || []).filter(file => file.fileType === 'QA'),
+          dataSetFileList: files.nodes || [],
         },
         () => {
           // console.log(files,  this.state)
