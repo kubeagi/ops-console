@@ -755,6 +755,7 @@ class KnowledgeDetail$$Page extends React.Component {
                                   },
                                 ]}
                                 dataSource={__$$eval(() => this.getFileGroupDetail())}
+                                loading={__$$eval(() => this.props.useGetKnowledgeBase?.loading)}
                                 pagination={{
                                   current: 1,
                                   pageSize: 20,
