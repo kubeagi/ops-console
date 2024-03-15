@@ -21,7 +21,6 @@ export const getCvsMeta = (
   extra: {
     references?: Reference[];
     latency?: number;
-    fileParsing?: boolean;
     fileList?: {
       name: string;
       size?: number;

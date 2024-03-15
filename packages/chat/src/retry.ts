@@ -23,11 +23,11 @@ export default class Retry {
       this.sum++;
       return;
     }
-    this.abort();
+    this?.abortInstance?.abort?.();
     return this.abortFlag;
   }
   abort() {
-    this.abortInstance.abort();
+    this.abortInstance?.abort?.();
     this.sum = 0;
   }
 }

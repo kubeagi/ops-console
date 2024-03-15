@@ -8,7 +8,7 @@
  * @author zggmd
  * @date 2023-12-18
  */
-import { FileOutlined, LoadingOutlined } from '@ant-design/icons';
+import { FileOutlined } from '@ant-design/icons';
 import {
   ChatInputArea,
   ChatList as ChatItemsList,
@@ -31,6 +31,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ChatInputBottomAddons from './ChatInputBottomAddons';
 import PromptStarter from './PromptStarter';
 import RenderReferences, { Reference } from './References';
+import LoadingText from './components/LoadingText';
 import { formatJson, getCvsMeta } from './helper';
 import useStyles, { GlobalStyles, useChatContainerStyles } from './index.style';
 import Retry from './retry';
@@ -245,7 +246,6 @@ const Chat: React.FC<IChat> = props => {
               ...first,
               extra: {
                 ...first?.extra,
-                fileParsing: false,
               },
               error: {
                 message: I18N.Chat.qingQiuChuCuo,
@@ -390,7 +390,6 @@ const Chat: React.FC<IChat> = props => {
                   ...first,
                   extra: {
                     ...first?.extra,
-                    fileParsing: false,
                   },
                 },
               ],
@@ -437,14 +436,7 @@ const Chat: React.FC<IChat> = props => {
                 : null,
               true
             ),
-            getCvsMeta(
-              '',
-              assistantMsgId,
-              {
-                fileParsing: Boolean(_fileList?.length),
-              },
-              false
-            ),
+            getCvsMeta('', assistantMsgId, {}, false),
           ],
         });
       });
@@ -517,13 +509,9 @@ const Chat: React.FC<IChat> = props => {
               default: chat => {
                 return (
                   <>
-                    {chat.extra?.fileParsing && (
-                      <span>
-                        <Spin indicator={<LoadingOutlined spin />} />
-                        <span>&nbsp;</span>
-                        文档解析中
-                      </span>
-                    )}
+                    {!chat.content && conversation.loadingMsgId ? (
+                      <LoadingText delay={400} />
+                    ) : undefined}
                     {Boolean(chat.extra.fileList?.length) && (
                       <div>
                         {chat.extra.fileList.map((file, index) => (
