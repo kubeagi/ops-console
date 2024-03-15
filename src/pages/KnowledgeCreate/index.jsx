@@ -72,6 +72,7 @@ class KnowledgeCreate$$Page extends React.Component {
       dataSet: '',
       dataSetDataList: [],
       dataSetFileList: [],
+      dataSetFileListLoading: false,
       embedderList: [],
       form: {
         name: '',
@@ -81,8 +82,9 @@ class KnowledgeCreate$$Page extends React.Component {
           dataset: null,
         },
         embedder: undefined,
-        chunkSize: 1024,
-        chunkOverlap: 100,
+        chunkSize: 300,
+        chunkOverlap: 30,
+        batchSize: 10,
         description: '',
       },
       nextFileList: [],
@@ -110,6 +112,7 @@ class KnowledgeCreate$$Page extends React.Component {
           dataSetContain,
           chunkSize,
           chunkOverlap,
+          batchSize,
           description,
           embedder,
         } = values;
@@ -132,6 +135,7 @@ class KnowledgeCreate$$Page extends React.Component {
             dataSetContain,
             chunkSize,
             chunkOverlap,
+            batchSize,
             description,
             embedder,
           },
@@ -160,17 +164,21 @@ class KnowledgeCreate$$Page extends React.Component {
       const form = this.getFormInstence();
       const res = await this.utils.bff.listDatasets({
         input: {
-          namespace: this.utils.getAuthData().project, //'abc'
+          namespace: this.utils.getAuthData().project,
+          //'abc'
+          page: 1,
+          pageSize: 1000,
         },
-
         versionsInput: {
-          namespace: this.utils.getAuthData().project, //'abc'
+          namespace: this.utils.getAuthData().project,
+          //'abc'
+          page: 1,
+          pageSize: 1000,
         },
-
         filesInput: {
           keyword: '',
           pageSize: 1,
-          page: 999999,
+          page: 1,
         },
       });
       const datasetlist = res.Dataset.listDatasets.nodes.map(item => {
@@ -248,6 +256,9 @@ class KnowledgeCreate$$Page extends React.Component {
   }
 
   async getTableList(pre_data_set_name, pre_data_set_version) {
+    this.setState({
+      dataSetFileListLoading: true,
+    });
     try {
       const res = await this.utils.bff.getVersionedDataset({
         name: pre_data_set_version,
@@ -263,7 +274,12 @@ class KnowledgeCreate$$Page extends React.Component {
           // console.log(files,  this.state)
         }
       );
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      this.setState({
+        dataSetFileListLoading: false,
+      });
+    }
   }
 
   handleSave(v) {
@@ -299,6 +315,7 @@ class KnowledgeCreate$$Page extends React.Component {
           dataSetContain,
           chunkSize,
           chunkOverlap,
+          batchSize,
           description,
           embedder,
         } = form;
@@ -322,6 +339,7 @@ class KnowledgeCreate$$Page extends React.Component {
               // name: displayName,
               chunkSize,
               chunkOverlap,
+              batchSize,
               description,
               embedder: embedderItem.name,
               fileGroups,
@@ -477,7 +495,9 @@ class KnowledgeCreate$$Page extends React.Component {
                         layout: 'horizontal',
                         wrapperCol: 12,
                       }}
-                      createFormProps={{ initialValues: { chunkOverlap: 100, chunkSize: 1024 } }}
+                      createFormProps={{
+                        initialValues: { batchSize: 10, chunkOverlap: 30, chunkSize: 300 },
+                      }}
                       formHelper={{ autoFocus: true }}
                       ref={this._refsManager.linkRef('formily_iwuyzsdvrhg')}
                     >
@@ -579,6 +599,24 @@ class KnowledgeCreate$$Page extends React.Component {
                           'title': '分段重叠长度',
                           'x-validator': [],
                         }}
+                      />
+                      <FormilyNumberPicker
+                        __component_name="FormilyNumberPicker"
+                        componentProps={{
+                          'x-component-props': {
+                            addonAfter: '',
+                            min: 1,
+                            placeholder: '请输入批处理数',
+                          },
+                        }}
+                        decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                        fieldProps={{
+                          'name': 'batchSize',
+                          'required': true,
+                          'title': '批处理',
+                          'x-validator': [],
+                        }}
+                        style={{ width: '205px' }}
                       />
                       <FormilyTextArea
                         __component_name="FormilyTextArea"
@@ -719,6 +757,7 @@ class KnowledgeCreate$$Page extends React.Component {
                         { dataIndex: 'size', title: '大小' },
                       ]}
                       dataSource={__$$eval(() => this.state.dataSetFileList)}
+                      loading={__$$eval(() => this.state.dataSetFileListLoading)}
                       pagination={false}
                       rowKey="path"
                       rowSelection={{

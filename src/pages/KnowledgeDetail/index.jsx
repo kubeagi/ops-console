@@ -143,6 +143,16 @@ class KnowledgeDetail$$Page extends React.Component {
     return 'process';
   }
 
+  getTimeCost(timeCost) {
+    if (!timeCost) {
+      return '-';
+    }
+    if (timeCost < 1000) {
+      return `${timeCost} ms`;
+    }
+    return `${(timeCost / 1000).toFixed(2)} s`;
+  }
+
   async getVersionedDataset() {
     const knowledge = this.getKnowledge();
     const fileGroupDetail = knowledge?.fileGroupDetails?.[0] || {};
@@ -676,6 +686,24 @@ class KnowledgeDetail$$Page extends React.Component {
                                   { dataIndex: 'count', title: '数据量' },
                                   { dataIndex: 'size', title: '文件大小' },
                                   {
+                                    dataIndex: 'timeCost',
+                                    render: (text, record, index) =>
+                                      (__$$context => (
+                                        <Typography.Text
+                                          __component_name="Typography.Text"
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                        >
+                                          {__$$eval(() => __$$context.getTimeCost(text))}
+                                        </Typography.Text>
+                                      ))(
+                                        __$$createChildContext(__$$context, { text, record, index })
+                                      ),
+                                    title: '耗时',
+                                  },
+                                  {
                                     dataIndex: 'updateTimestamp',
                                     render: (text, record, index) =>
                                       (__$$context => (
@@ -813,6 +841,22 @@ class KnowledgeDetail$$Page extends React.Component {
                                 ),
                                 key: 'jyxi1y2h6ia',
                                 label: '分段重叠长度',
+                                span: 1,
+                              },
+                              {
+                                children: (
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '' }}
+                                  >
+                                    {__$$eval(() => this.getKnowledge()?.batchSize || '-')}
+                                  </Typography.Text>
+                                ),
+                                key: 'xb4gcoxyqlp',
+                                label: '批处理',
                                 span: 1,
                               },
                               {
