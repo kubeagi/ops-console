@@ -17,7 +17,7 @@
     "pub": "npm run prepublishOnly && npm publish"
   },
   "dependencies": {
-    "@tenx-ui/request": "^1.0.0-beta.6",
+    "@yuntijs/request": "^1.0.0",
     "antd-style": "^3.6.1",
     "kiwi-intl": "1.2.6-beta.0"
   },
