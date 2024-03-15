@@ -11,7 +11,7 @@
 import { useModel } from '@@/exports';
 import { history } from '@umijs/max';
 import ChatComponent from '@yuntijs/chat';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import useConversationList, { setQueryConversationId } from '@/pages/Chat/useConversationList';
 
@@ -33,6 +33,27 @@ const Chat: React.FC<IChat> = props => {
     },
     [setNewConversationId]
   );
+
+  // Fix new conversation force refresh experience issue
+  const refresh = useMemo(() => {
+    if (!selectedConversationId) {
+      return '';
+    }
+    if (newConversationId) {
+      return '';
+    }
+    return selectedConversationId;
+  }, [newConversationId, selectedConversationId]);
+  useEffect(() => {
+    if (
+      newConversationId &&
+      selectedConversationId &&
+      newConversationId !== selectedConversationId
+    ) {
+      setNewConversationId();
+    }
+  }, [newConversationId, selectedConversationId, setNewConversationId]);
+
   const { qiankun }: { qiankun: Record<string, any> } = useModel('qiankun');
   return (
     <div className="chatContainer">
@@ -44,7 +65,7 @@ const Chat: React.FC<IChat> = props => {
           conversationId={selectedConversationId}
           isDark={qiankun?.theme?.isDark}
           onNewChat={onNewChat}
-          refresh={selectedConversationId || selectedConversationIdEmpty}
+          refresh={refresh}
         />
       </div>
     </div>
