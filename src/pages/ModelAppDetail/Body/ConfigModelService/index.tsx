@@ -182,7 +182,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
               rules={[
                 {
                   validator: (_, value, callback) => {
-                    if (!value) {
+                    if (!value && !noModelSelect) {
                       return callback(I18N.ModelApp.qingXuanZeMoXing);
                     }
                     return callback();
