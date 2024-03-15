@@ -9,9 +9,9 @@
  * @author zhangpc
  * @date 2023-07-14
  */
-import { IOptions, IRequest, IRequestResponse, IUploadRequestOptions } from '@tenx-ui/request';
-import RequestCore from '@tenx-ui/request/es/core';
-import { mergeHeaders } from '@tenx-ui/request/es/helpers';
+import { IOptions, IRequest, IRequestResponse, IUploadRequestOptions } from '@yuntijs/request';
+import RequestCore from '@yuntijs/request/es/core';
+import { mergeHeaders } from '@yuntijs/request/es/helpers';
 
 import { getAuthData } from './auth-utils';
 

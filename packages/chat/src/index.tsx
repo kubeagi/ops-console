@@ -8,7 +8,7 @@
  * @author zggmd
  * @date 2023-12-18
  */
-import { FileOutlined, LoadingOutlined } from '@ant-design/icons';
+import { FileOutlined } from '@ant-design/icons';
 import {
   ChatInputArea,
   ChatList as ChatItemsList,
@@ -31,6 +31,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ChatInputBottomAddons from './ChatInputBottomAddons';
 import PromptStarter from './PromptStarter';
 import RenderReferences, { Reference } from './References';
+import LoadingText from './components/LoadingText';
 import { formatJson, getCvsMeta } from './helper';
 import useStyles, { GlobalStyles, useChatContainerStyles } from './index.style';
 import Retry from './retry';
@@ -245,7 +246,6 @@ const Chat: React.FC<IChat> = props => {
               ...first,
               extra: {
                 ...first?.extra,
-                fileParsing: false,
               },
               error: {
                 message: I18N.Chat.qingQiuChuCuo,
@@ -259,42 +259,47 @@ const Chat: React.FC<IChat> = props => {
     },
     [setConversation]
   );
-  const sendChatFile = useCallback(async () => {
-    const formData = new FormData();
-    for (const [key, value] of Object.entries({
-      app_name: props.appName,
-      app_namespace: props.appNamespace || '',
-      conversation_id: conversationId || '',
-    })) {
-      formData.append(key, value);
-    }
-    for (const file of fileList) {
-      formData.append('file', file.originFileObj, file.originFileObj.name);
-    }
-    const res = await request
-      .post({
-        url: `/chat/conversations/file`,
-        options: {
-          body: formData,
-          timeout: 1000 * 60 * 10,
-        },
-      })
-      .catch(_error => {
-        setFileList([]);
-      });
-    if (res?.conversation_id) {
-      setConversation(conversation => {
-        return {
-          ...conversation,
-          id: res.conversation_id,
-        };
-      });
-    }
-    return res;
-  }, [fileList, setFileList, setConversation, conversationId]);
+  const sendChatFile = useCallback(
+    async (__fileList: UploadFile[]) => {
+      const _fileList = __fileList || fileList;
+      const formData = new FormData();
+      for (const [key, value] of Object.entries({
+        app_name: props.appName,
+        app_namespace: props.appNamespace || '',
+        conversation_id: conversationId || '',
+      })) {
+        formData.append(key, value);
+      }
+      for (const file of _fileList) {
+        formData.append('file', file.originFileObj, file.originFileObj.name);
+      }
+      const res = await request
+        .post({
+          url: `/chat/conversations/file`,
+          options: {
+            body: formData,
+            timeout: 1000 * 60 * 10,
+          },
+        })
+        .catch(_error => {
+          setFileList([]);
+        });
+      if (res?.conversation_id) {
+        setConversation(conversation => {
+          return {
+            ...conversation,
+            id: res.conversation_id,
+          };
+        });
+      }
+      return res;
+    },
+    [fileList, setFileList, setConversation, conversationId]
+  );
   const fetchConversation = useCallback(
-    async query => {
-      const withDocs = Boolean(fileList?.length);
+    async (query: string, __fileList: UploadFile[]) => {
+      const _fileList = __fileList || fileList;
+      const withDocs = Boolean(_fileList?.length);
       const body = {
         query,
         response_mode: 'streaming',
@@ -304,7 +309,7 @@ const Chat: React.FC<IChat> = props => {
         debug: Boolean(props.debug),
       };
       if (withDocs) {
-        const fileRes = await sendChatFile();
+        const fileRes = await sendChatFile(_fileList);
         body.files = [fileRes?.document?.object];
         body.conversation_id = fileRes?.conversation_id;
       }
@@ -385,7 +390,6 @@ const Chat: React.FC<IChat> = props => {
                   ...first,
                   extra: {
                     ...first?.extra,
-                    fileParsing: false,
                   },
                 },
               ],
@@ -406,8 +410,9 @@ const Chat: React.FC<IChat> = props => {
     };
   }, []);
   const onSend = useCallback(
-    (__input: string) => {
+    (__input: string, __fileList: UploadFile[]) => {
       const _input = __input?.trim();
+      const _fileList = __fileList || fileList;
       if (!_input) return;
       setConversation(conversation => {
         const userMsgId = Date.now().toString();
@@ -420,9 +425,9 @@ const Chat: React.FC<IChat> = props => {
             getCvsMeta(
               _input,
               userMsgId,
-              fileList?.length
+              _fileList?.length
                 ? {
-                    fileList: fileList.map(file => ({
+                    fileList: _fileList.map(file => ({
                       name: file.name,
                       size: file.size,
                       type: file.type,
@@ -431,18 +436,11 @@ const Chat: React.FC<IChat> = props => {
                 : null,
               true
             ),
-            getCvsMeta(
-              '',
-              assistantMsgId,
-              {
-                fileParsing: Boolean(fileList?.length),
-              },
-              false
-            ),
+            getCvsMeta('', assistantMsgId, {}, false),
           ],
         });
       });
-      fetchConversation(_input);
+      fetchConversation(_input, _fileList);
       setInput('');
       setShowNextGuide(false);
     },
@@ -456,10 +454,11 @@ const Chat: React.FC<IChat> = props => {
     [onSend, setShowNextGuide]
   );
   const onFileListChange = useCallback(
-    (fileList: UploadFile[]) => {
+    async (fileList: UploadFile[]) => {
       setFileList(fileList);
+      onSend(input || '总结一下', fileList);
     },
-    [setFileList]
+    [setFileList, input, fileList]
   );
   const stop = useCallback(() => {
     ctrl?.abort();
@@ -510,13 +509,9 @@ const Chat: React.FC<IChat> = props => {
               default: chat => {
                 return (
                   <>
-                    {chat.extra?.fileParsing && (
-                      <span>
-                        <Spin indicator={<LoadingOutlined spin />} />
-                        <span>&nbsp;</span>
-                        文档解析中
-                      </span>
-                    )}
+                    {!chat.content && conversation.loadingMsgId ? (
+                      <LoadingText delay={400} />
+                    ) : undefined}
                     {Boolean(chat.extra.fileList?.length) && (
                       <div>
                         {chat.extra.fileList.map((file, index) => (
