@@ -335,17 +335,17 @@ class $$Page extends React.Component {
                             item =>
                               item.value ===
                               this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
-                          ).namespace,
+                          )?.namespace,
                           embedding_model: this.state.embedderList.find(
                             item =>
                               item.value ===
                               this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
-                          ).models[0],
+                          )?.models[0],
                           embedding_provider: this.state.embedderList.find(
                             item =>
                               item.value ===
                               this.state.qaSplitHighConfig.removeDuplicateConfigEmbedding
-                          ).provider,
+                          )?.provider,
                           similarity: this.state.qaSplitHighConfig.removeDuplicateConfigSimilarity,
                         },
                       }
@@ -496,12 +496,13 @@ class $$Page extends React.Component {
           dataSource: _list,
         });
       })
-      .catch(err => [
+      .catch(err => {
+        console.warn(err);
         this.utils.notification.warn({
           message: '获取模型服务失败',
           errors: err?.response?.errors,
-        }),
-      ]);
+        });
+      });
   }
 
   getStep1Data() {
@@ -625,15 +626,25 @@ class $$Page extends React.Component {
       selectedFileList: [],
       dataSetFileTotal: '0',
     });
+    // this.form('createDataHandleStep2').setValues({ "pre_data_set_version": undefined, "post_data_set_version": undefined, "post_data_set_name": v })
+    const obj = this.state.dataSetDataList.find(item => item.value === v);
+    const genOptionList = obj.versions;
+    this.form('createDataHandleStep2').setFieldState('pre_data_set_version', {
+      dataSource: genOptionList,
+    });
+    this.form('createDataHandleStep2').setFieldState('post_data_set_version', {
+      dataSource: genOptionList,
+    });
     this.form('createDataHandleStep2').setValues({
-      pre_data_set_version: undefined,
-      post_data_set_version: undefined,
+      pre_data_set_version: genOptionList[0]?.value,
+      post_data_set_version: genOptionList[0]?.value,
       post_data_set_name: v,
     });
-    this.setDataSetVersionsSource(v);
+    this.onDataSetVersionChange(genOptionList[0]?.value);
   }
 
   onDataSetVersionChange(v) {
+    if (!v) return;
     this.form('createDataHandleStep2').setValues({
       post_data_set_version: v,
     });
@@ -716,6 +727,9 @@ class $$Page extends React.Component {
           () => {
             this.form('qa_split').setFieldState('model', {
               dataSource: cur.models,
+            });
+            this.form('qa_split').setValues({
+              model: cur.models[0]?.value,
             });
           }
         );
