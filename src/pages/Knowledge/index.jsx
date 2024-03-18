@@ -105,6 +105,7 @@ class Knowledge$$Page extends React.Component {
       name: this.state.searchName,
       page: currentPage,
       pageSize,
+      labelSelector: 'arcadia.kubeagi.k8s.com.cn/knowledgebase-type!=conversation',
     };
     this.utils.bff
       .listKnowledgeBases({
