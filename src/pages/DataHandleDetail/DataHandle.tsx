@@ -25,6 +25,8 @@ import I18N from '@/utils/kiwiI18N';
 import styles from './datahandle.less';
 
 const SPLIT_TYPE_NAME = '拆分处理';
+const QA_SPLIT_NAME = 'QA拆分';
+const DOCUMENT_CHUNK_NAME = '文本分段';
 const layout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 },
@@ -90,8 +92,9 @@ const DataHandle: React.FC<Iprops> = props => {
         render(text, record) {
           return (
             <>
-              <p>Q：{text.pre}</p>
-              <p>A：{text.post}</p>
+              {text.pre && text.post && <p>Q：{text.pre}</p>}
+              {text.pre && text.post && <p>A：{text.post}</p>}
+              {(!text.pre || !text.post) && <p>{text.post}</p>}
             </>
           );
         },
@@ -111,7 +114,17 @@ const DataHandle: React.FC<Iprops> = props => {
     // 顺便计算处理了多少文件
     const _dataSource = [];
     const _data = data.map(item => {
-      _dataSource.push(...item.preview);
+      // 收集一个分类下面所以的perview数据，用来做table的数据
+      // 如果有‘QA拆分’和”文本分段“，只需要存储“QA拆分”，否则就正常存储
+      if (item.zh_name === DOCUMENT_CHUNK_NAME) {
+        // 没有qa拆分的情况下就存储自己的
+        if (!data.some(i => i.zh_name === QA_SPLIT_NAME)) {
+          _dataSource.push(...item.preview);
+        }
+      } else {
+        _dataSource.push(...item.preview);
+      }
+
       return (
         <Col
           key={item.zh_name}
@@ -124,7 +137,7 @@ const DataHandle: React.FC<Iprops> = props => {
               <div className={styles.cardTitle}>{item.zh_name}</div>
             </div>
             <p className={styles.desc}>{item.description}</p>
-            {type === SPLIT_TYPE_NAME && (
+            {type === SPLIT_TYPE_NAME && item.zh_name === QA_SPLIT_NAME && (
               <div style={{ display: 'flex' }}>
                 <div style={{ textAlign: 'left', flex: 1 }}>
                   {I18N.DataHandle.moXing}{' '}
@@ -139,13 +152,23 @@ const DataHandle: React.FC<Iprops> = props => {
                 </div>
               </div>
             )}
+            {type === SPLIT_TYPE_NAME && item.zh_name === DOCUMENT_CHUNK_NAME && (
+              <div style={{ display: 'flex' }}>
+                <div style={{ textAlign: 'left', flex: 1 }}>
+                  {I18N.DataHandle.fenDuanChangDu} <span>{item.chunk_size}</span>
+                </div>
+                <div style={{ textAlign: 'right', flex: 1 }}>
+                  {I18N.DataHandle.fenDuanChongFuChangDu} <span>{item.chunk_overlap}</span>
+                </div>
+              </div>
+            )}
           </Card>
         </Col>
       );
     });
 
     const dataSource = [];
-    // 拆分处理的表格只展示文件名和拆分后
+    // 拆分处理的表格只展示文件名和拆分后，这里组合表格需要展示的的datasource
     if (type === SPLIT_TYPE_NAME) {
       for (const item of _dataSource) {
         const content = item?.content || [];
