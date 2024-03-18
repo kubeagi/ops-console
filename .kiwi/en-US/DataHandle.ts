@@ -17,6 +17,8 @@ export default {
   weiChuLi: 'Unprocessed',
   gaoJiPeiZhi: 'Advanced Configuration ',
   moXing: 'Model:',
+  fenDuanChangDu: 'chunk size:',
+  fenDuanChongFuChangDu: 'chunk overlap:',
   chuLiHou: 'Processed',
   wenJianMing: 'File Name',
   chuLiQian: 'Before processing',

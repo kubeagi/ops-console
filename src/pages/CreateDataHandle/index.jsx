@@ -100,6 +100,18 @@ class $$Page extends React.Component {
           after: `Q：为什么要做 QA 拆分？<br />A：为了保证知识库问答质量。<br />Q：QA 拆分需要注意什么？<br /> A：QA 拆分时需要选择对应的模型服务。`,
         },
         {
+          _type: 'document_chunk',
+          type: '文本分段',
+          before: `原始文件是：这是一段长文本，由于文本文字很长，需要做文本分段处理，分段配置设置为：分段长度 20 字符，分段重叠长度 10 字符。`,
+          after: `
+        <p>这是一段长文本，由于文文本，由于文本文字很长，</p>
+        <p>本文字很长，需要做文本需要做文本分段处理，分</p>
+        <p>分段处理，分段配置设置段配置设置为：分段长度</p>
+        <p>为：分段长度 20 字符，分度 20 字符，分段重叠长</p>
+        <p>分段重叠长度 10 字符</p>
+        `,
+        },
+        {
           _type: 'remove_invisible_characters',
           type: '移除不可见字符',
           before:
@@ -231,15 +243,17 @@ class $$Page extends React.Component {
           type: undefined,
           model: undefined,
         },
-        TextSegmentationChecked: false,
-        TextSegmentationSegmentationLen: undefined,
-        TextSegmentationSegmentationRepeatLen: undefined,
-        RemoveInvisibleCharactersChecked: false,
-        SpaceHandleChecked: false,
-        RemoveGarbledCodeChecked: false,
-        ConvertComplexityToSimplicityChecked: false,
-        RemoveHtmlIdentifyingChecked: false,
-        RemoveEmoteChecked: false,
+        TextSegmentationChecked: true,
+        TextSegmentationForm: {
+          chunk_size: 1024,
+          chunk_overlap: 100,
+        },
+        RemoveInvisibleCharactersChecked: true,
+        SpaceHandleChecked: true,
+        RemoveGarbledCodeChecked: true,
+        ConvertComplexityToSimplicityChecked: true,
+        RemoveHtmlIdentifyingChecked: true,
+        RemoveEmoteChecked: true,
         CharacterRepeatFilterChecked: false,
         CharacterRepeatFilterRate: 0.5,
         WordRepeatFilterChecked: false,
@@ -250,9 +264,9 @@ class $$Page extends React.Component {
         PornographicViolenceRateRate: 0.5,
         SimhashOperatorChecked: false,
         SimhashOperatorRate: 5,
-        RemoveEmailChecked: false,
-        RemoveIPAddressChecked: false,
-        RemoveNumberChecked: false,
+        RemoveEmailChecked: true,
+        RemoveIPAddressChecked: true,
+        RemoveNumberChecked: true,
       },
       step4Data: [],
       temperature_marks: {
@@ -294,6 +308,13 @@ class $$Page extends React.Component {
         model,
       });
     }
+    if (this.state.step3Data.TextSegmentationChecked) {
+      const { chunk_size, chunk_overlap } = this.state.step3Data.TextSegmentationForm;
+      this.form('textSegmentationForm').setValues({
+        chunk_size,
+        chunk_overlap,
+      });
+    }
   }
 
   convertStep3Data() {
@@ -302,24 +323,24 @@ class $$Page extends React.Component {
     const vTk = this.valToKey(this.state.configMap);
     for (let k in step3Data) {
       if (k.endsWith('Checked')) {
-        const extra =
+        const qaSplit =
           k === 'QAsplitChecked' && step3Data.QAsplitChecked
             ? {
                 llm_config: {
                   name: this.state.step3Data.QAsplitForm.type,
                   namespace: this.state.llmList.find(
                     item => item.value === this.state.step3Data.QAsplitForm.type
-                  ).namespace,
+                  )?.namespace,
                   provider: this.state.llmList.find(
                     item => item.value === this.state.step3Data.QAsplitForm.type
-                  ).provider,
+                  )?.provider,
                   model:
                     this.state.llmList.find(
                       item => item.value === this.state.step3Data.QAsplitForm.type
-                    ).provider === 'worker'
+                    )?.provider === 'worker'
                       ? this.state.llmList.find(
                           item => item.value === this.state.step3Data.QAsplitForm.type
-                        )._models[0]
+                        )?._models[0]
                       : this.state.step3Data.QAsplitForm.model,
                   prompt_template: this.state.qaSplitHighConfig.prompt_template,
                   max_tokens: this.state.qaSplitHighConfig.max_tokens,
@@ -353,10 +374,18 @@ class $$Page extends React.Component {
                 },
               }
             : {};
+        const textSegmentation =
+          k === 'TextSegmentationChecked' && step3Data.TextSegmentationChecked
+            ? {
+                chunk_size: this.state.step3Data.TextSegmentationForm.chunk_size,
+                chunk_overlap: this.state.step3Data.TextSegmentationForm.chunk_overlap,
+              }
+            : {};
         if (step3Data[k]) {
           list.push({
             type: vTk[k],
-            ...extra,
+            ...qaSplit,
+            ...textSegmentation,
           });
         }
       }
@@ -535,24 +564,41 @@ class $$Page extends React.Component {
       return this.onNextStep();
     }
     const promiseList = [];
+    // 收集step3Data需要修改的state，一次性修改
+    const collectionStep3DataState = {};
     // 如果选择了QA拆分
     if (this.state.step3Data.QAsplitChecked) {
       const qaPromise = this.form('qa_split')
         ?.validate()
         .then(res => {
           const values = this.form('qa_split').values;
-          this.setState({
-            step3Data: {
-              ...this.state.step3Data,
-              QAsplitForm: {
-                ...values,
-              },
-            },
-          });
+          collectionStep3DataState.QAsplitForm = {
+            ...values,
+          };
         });
       promiseList.push(qaPromise);
     }
+
+    // 如果选择了文本分段
+    if (this.state.step3Data.TextSegmentationChecked) {
+      const textSegmentationPromise = this.form('textSegmentationForm')
+        ?.validate()
+        .then(res => {
+          const values = this.form('textSegmentationForm').values;
+          collectionStep3DataState.TextSegmentationForm = {
+            ...values,
+          };
+        });
+      promiseList.push(textSegmentationPromise);
+    }
     Promise.all(promiseList).then(() => {
+      // 统一更新step3Data
+      this.setState({
+        step3Data: {
+          ...this.state.step3Data,
+          ...collectionStep3DataState,
+        },
+      });
       this.onNextStep();
     });
   }
@@ -3385,7 +3431,7 @@ class $$Page extends React.Component {
                             __component_name="Card"
                             actions={[]}
                             bordered={true}
-                            className="step3_disabled_style"
+                            className=""
                             hoverable={false}
                             loading={false}
                             size="default"
@@ -3437,7 +3483,7 @@ class $$Page extends React.Component {
                                             () => this.state.step3Data.TextSegmentationChecked
                                           )}
                                           defaultChecked={false}
-                                          disabled={true}
+                                          disabled={false}
                                           loading={false}
                                           onChange={function () {
                                             return this.updateStep3State.apply(
@@ -3549,13 +3595,14 @@ class $$Page extends React.Component {
                                     wrapperCol: 20,
                                   }}
                                   formHelper={{ autoFocus: false, style: { textAlign: 'right' } }}
-                                  ref={this._refsManager.linkRef('formily_xv445n80qw')}
+                                  ref={this._refsManager.linkRef('textSegmentationForm')}
                                 >
                                   <FormilyNumberPicker
                                     __component_name="FormilyNumberPicker"
                                     componentProps={{
                                       'x-component-props': {
                                         addonAfter: '',
+                                        min: 1,
                                         onChange: function () {
                                           return this.updateStep3State.apply(
                                             this,
@@ -3566,6 +3613,7 @@ class $$Page extends React.Component {
                                             ])
                                           );
                                         }.bind(this),
+                                        placeholder: '1024',
                                         suffix: '',
                                       },
                                     }}
@@ -3590,10 +3638,7 @@ class $$Page extends React.Component {
                                     }}
                                     fieldProps={{
                                       '_unsafe_MixedSetter_default_select': 'VariableSetter',
-                                      'default': __$$eval(
-                                        () => this.state.step3Data.TextSegmentationSegmentationLen
-                                      ),
-                                      'name': null,
+                                      'name': 'chunk_size',
                                       'required': true,
                                       'title': '分段长度',
                                       'x-validator': [],
@@ -3608,6 +3653,7 @@ class $$Page extends React.Component {
                                     __component_name="FormilyNumberPicker"
                                     componentProps={{
                                       'x-component-props': {
+                                        min: 1,
                                         onChange: function () {
                                           return this.updateStep3State.apply(
                                             this,
@@ -3618,7 +3664,7 @@ class $$Page extends React.Component {
                                             ])
                                           );
                                         }.bind(this),
-                                        placeholder: '',
+                                        placeholder: '100',
                                       },
                                     }}
                                     decoratorProps={{
@@ -3634,11 +3680,7 @@ class $$Page extends React.Component {
                                     }}
                                     fieldProps={{
                                       '_unsafe_MixedSetter_default_select': 'VariableSetter',
-                                      'default': __$$eval(
-                                        () =>
-                                          this.state.step3Data.TextSegmentationSegmentationRepeatLen
-                                      ),
-                                      'name': null,
+                                      'name': 'chunk_overlap',
                                       'required': true,
                                       'title': '分段重叠长度',
                                       'x-validator': [],
@@ -3687,6 +3729,20 @@ class $$Page extends React.Component {
                                 </Row>
                               </Col>
                             </Row>
+                            <Typography.Paragraph
+                              code={false}
+                              delete={false}
+                              disabled={false}
+                              editable={false}
+                              ellipsis={{ rows: 2 }}
+                              mark={false}
+                              strong={false}
+                              style={{ fontSize: '', paddingTop: '10px' }}
+                              type="secondary"
+                              underline={false}
+                            >
+                              根据文件中的文档内容，自动将文件做 QA 拆分处理。
+                            </Typography.Paragraph>
                           </Card>
                         </Tooltip>
                       </Col>

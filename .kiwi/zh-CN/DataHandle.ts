@@ -17,6 +17,8 @@ export default {
   weiChuLi: '未处理',
   gaoJiPeiZhi: '高级配置',
   moXing: '模型:',
+  fenDuanChangDu: '分段长度：',
+  fenDuanChongFuChangDu: '分段重叠长度：',
   chuLiHou: '处理后',
   wenJianMing: '文件名',
   chuLiQian: '处理前',
