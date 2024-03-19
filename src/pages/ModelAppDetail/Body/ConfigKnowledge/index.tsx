@@ -132,6 +132,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
       page: 1,
       pageSize: 999_999,
       namespace: utils.getAuthData().project,
+      labelSelector: 'arcadia.kubeagi.k8s.com.cn/knowledgebase-type!=conversation',
     },
   });
   const knowledges = knowledgesRes?.data?.KnowledgeBase?.listKnowledgeBases?.nodes?.map(item => ({
