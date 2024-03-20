@@ -1721,6 +1721,9 @@ const PageWrapper = (props = {}) => {
               namespace: this.utils.getAuthData?.()?.project,
               fileInput: {
                 pageSize: 10,
+                page:
+                  JSON.parse(new URL(window.location.href).searchParams.get('_search') || '{}')
+                    ?.fileInput?.page || 1,
               },
             };
           }.apply(self),
