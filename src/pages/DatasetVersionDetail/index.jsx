@@ -6,17 +6,19 @@ import {
   Page,
   Modal,
   FormilyForm,
-  FormilyRadio,
-  FormilySelect,
+  FormilyTextArea,
   Row,
   Col,
-  Typography,
+  FormilyInput,
   FormilyNumberPicker,
+  FormilyRadio,
+  FormilySelect,
+  Typography,
   Drawer,
-  Table,
-  Alert,
   Space,
   Button,
+  Table,
+  Alert,
   Card,
   Image,
   Status,
@@ -30,7 +32,12 @@ import LccComponentQlsmm from 'KubeAGIUpload';
 
 import LccComponentSbva0 from 'confirm';
 
-import { AntdIconInfoCircleOutlined } from '@tenx-ui/icon-materials';
+import {
+  AntdIconPlusOutlined,
+  AntdIconEditOutlined,
+  AntdIconDeleteOutlined,
+  AntdIconInfoCircleOutlined,
+} from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -75,6 +82,10 @@ class DatasetVersionDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      addCsvform: {},
+      addCsvIsEdit: false,
+      addCsvOriginData: {},
+      addCsvVisible: false,
       addFileDatasource: undefined,
       addFileDataSourceList: [],
       addFileLoading: false,
@@ -111,12 +122,58 @@ class DatasetVersionDetail$$Page extends React.Component {
     ) {
       this.setState({
         versionDetail:
-        this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset,
+          this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset,
       });
     }
   }
 
   componentWillUnmount() {}
+
+  addCvsClick(event) {
+    this.setState({
+      addCsvVisible: true,
+    });
+  }
+
+  addCvsOk() {
+    const fetch = async values => {
+      const isEdit = this.state.addCsvIsEdit;
+      const line = [
+        values.q || '',
+        values.a || '',
+        values.fileName || '',
+        String(values.pageNumber || ''),
+        values.chunkContent || '',
+      ];
+      const body = isEdit
+        ? {
+            updateLines: [
+              {
+                lineNumber: this.state.addCsvOriginData?.lineNumber,
+                values: line,
+              },
+            ],
+          }
+        : {
+            newLines: [line],
+          };
+      const errorMsg = isEdit ? '编辑数据失败' : '新增数据失败';
+      const res = await this.updateCsv(body, errorMsg);
+      if (res.status === 200) {
+        this.getFile();
+        this.onAddCsvCancel();
+        this.utils.notification.success({
+          message: isEdit ? '编辑数据成功' : '新增数据成功',
+        });
+      } else {
+        this.utils.notification.warn({
+          message: errorMsg,
+        });
+      }
+    };
+    // 点击确定回调
+    this.form('cvsForm').submit(fetch);
+  }
 
   addFileClick(event) {
     this.setState({
@@ -206,6 +263,36 @@ class DatasetVersionDetail$$Page extends React.Component {
       ...this.props.useGetVersionedDataset,
       data: data?.version ? data : this.state.versionDetail || {},
     };
+  }
+
+  delCsvClick(event, { data }) {
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '删除数据',
+        content: `确定删除数据：${data?.q} ？`,
+        onOk: async () => {
+          const errorMsg = '删除数据失败';
+          const res = await this.updateCsv(
+            {
+              delLines: [data.lineNumber],
+            },
+            errorMsg
+          );
+          if (res.status === 200) {
+            this.getFile();
+            this.onAddCsvCancel();
+            this.utils.notification.success({
+              message: '删除数据成功',
+            });
+          } else {
+            this.utils.notification.warn({
+              message: errorMsg,
+            });
+          }
+        },
+      },
+    });
   }
 
   delFileClick(event, { data }) {
@@ -342,11 +429,19 @@ class DatasetVersionDetail$$Page extends React.Component {
     this.setState({
       cvsData: {
         ...this.state.cvsData,
-        list: res?.data?.rows?.map(row => ({
-          q: row?.[0],
-          a: row?.[1],
-        })),
+        list: res?.data?.rows
+          ?.map((row, index) => ({
+            q: row?.[0],
+            a: row?.[1],
+            fileName: row?.[2],
+            pageNumber: row?.[3],
+            chunkContent: row?.[4],
+            lineNumber: index,
+            version: res?.data?.version,
+          }))
+          .filter(item => item.lineNumber !== 0),
         total: res?.data?.total,
+        version: res?.data?.version,
         loading: false,
       },
     });
@@ -383,6 +478,15 @@ class DatasetVersionDetail$$Page extends React.Component {
     });
   }
 
+  onAddCsvCancel() {
+    this.setState({
+      addCsvVisible: false,
+      addCsvIsEdit: false,
+      addCsvform: {},
+      addCsvOriginData: {},
+    });
+  }
+
   onAddFileTypeChange(v) {
     this.setState({
       addFileLocal: v.target.value === 'local',
@@ -392,6 +496,19 @@ class DatasetVersionDetail$$Page extends React.Component {
   onDatasourceChange(v) {
     this.setState({
       addFileDatasource: v,
+    });
+  }
+
+  onEditCsvClick(event, { data }) {
+    this.setState({
+      addCsvform: {
+        ...data,
+      },
+      addCsvOriginData: {
+        ...data,
+      },
+      addCsvIsEdit: true,
+      addCsvVisible: true,
     });
   }
 
@@ -462,9 +579,9 @@ class DatasetVersionDetail$$Page extends React.Component {
     ) {
       this.fileUploadSuccessList = [];
       this.state.upload.uploadThis?.state?.fileList?.length >= 2 &&
-      this.utils.notification.success({
-        message: '所有文件上传完成',
-      });
+        this.utils.notification.success({
+          message: '所有文件上传完成',
+        });
       this.clearFileBuffer();
       this.setState({
         addFileLoading: false,
@@ -481,6 +598,33 @@ class DatasetVersionDetail$$Page extends React.Component {
     });
   }
 
+  async updateCsv(otherBody = {}, errorMsg) {
+    const res = await this.utils.axios
+      .put(
+        `${this.constants.FILES_API_ORIGIN}/kubeagi-apis/bff/versioneddataset/files/edit`,
+        {
+          fileName: this.state.fileData?.path,
+          bucket: this.utils.getAuthData?.()?.project,
+          bucketPath: this.getBucketPath(),
+          version: this.state.cvsData.version,
+          ...otherBody,
+        },
+        {
+          headers: {
+            Authorization: this.utils.getAuthorization(),
+            namespace: this.utils.getAuthData?.()?.project,
+          },
+        }
+      )
+      .catch(e => {
+        errorMsg &&
+          this.utils.notification.warn({
+            message: errorMsg,
+          });
+      });
+    return res;
+  }
+
   componentDidMount() {
     this.getDataSource();
   }
@@ -490,6 +634,123 @@ class DatasetVersionDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        <Modal
+          __component_name="Modal"
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.onAddCsvCancel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.addCvsOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          open={__$$eval(() => this.state.addCsvVisible)}
+          title={__$$eval(() => (this.state.addCsvIsEdit ? '编辑数据' : '新增数据'))}
+          width="70%"
+        >
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 4,
+              layout: 'horizontal',
+              wrapperCol: 20,
+            }}
+            createFormProps={{ values: __$$eval(() => this.state.addCsvform) }}
+            formHelper={{ autoFocus: true }}
+            ref={this._refsManager.linkRef('cvsForm')}
+          >
+            <FormilyTextArea
+              __component_name="FormilyTextArea"
+              componentProps={{
+                'x-component-props': {
+                  placeholder:
+                    '1. 当前数据为被向量化的内容，该部分内容的质量决定了在对话时，能否高效、准确的找到合适的知识；2. 此处内容一般是搜索的问题，最多可输入 2000 字。',
+                  rows: 3,
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, layout: 'vertical' } }}
+              fieldProps={{
+                'name': 'q',
+                'required': true,
+                'title': '被搜索的内容（Q）',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+            />
+            <FormilyTextArea
+              __component_name="FormilyTextArea"
+              componentProps={{
+                'x-component-props': {
+                  placeholder: ' 此处内容一般是搜索匹配的内容，最多可输入 2000 字。',
+                  rows: 5,
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, layout: 'vertical' } }}
+              fieldProps={{
+                'name': 'a',
+                'required': true,
+                'title': '匹配内容（A）',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+            />
+            <Row __component_name="Row" justify="space-between" wrap={false}>
+              <Col __component_name="Col" span={12}>
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{
+                    'x-component-props': { placeholder: '此处填写 QA 内容引用的源文件名称。' },
+                  }}
+                  decoratorProps={{
+                    'x-decorator-props': { labelEllipsis: true, layout: 'vertical' },
+                  }}
+                  fieldProps={{ 'name': 'fileName', 'title': '文件名称', 'x-validator': [] }}
+                />
+              </Col>
+              <Col __component_name="Col" span={12}>
+                <FormilyNumberPicker
+                  __component_name="FormilyNumberPicker"
+                  componentProps={{
+                    'x-component-props': {
+                      min: 1,
+                      placeholder: '此处填写 QA 内容引用的原文段落所在页码。',
+                    },
+                  }}
+                  decoratorProps={{
+                    'x-decorator-props': { labelEllipsis: true, layout: 'vertical' },
+                  }}
+                  fieldProps={{ 'name': 'pageNumber', 'title': '页码', 'x-validator': [] }}
+                />
+              </Col>
+            </Row>
+            <FormilyTextArea
+              __component_name="FormilyTextArea"
+              componentProps={{
+                'x-component-props': {
+                  placeholder: '此处填写 QA 引用的原文段落，最多可输入 2000 字。',
+                  rows: 11,
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true, layout: 'vertical' } }}
+              fieldProps={{
+                'name': 'chunkContent',
+                'title': '原文段落',
+                'x-component': 'Input.TextArea',
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+        </Modal>
         {!!__$$eval(() => !this.state.clearFile) && (
           <Modal
             __component_name="Modal"
@@ -778,6 +1039,10 @@ class DatasetVersionDetail$$Page extends React.Component {
             </FormilyForm>
           </Modal>
         )}
+        <LccComponentSbva0
+          __component_name="LccComponentSbva0"
+          data={__$$eval(() => this.state.confirm)}
+        />
         <Drawer
           __component_name="Drawer"
           destroyOnClose={true}
@@ -793,6 +1058,40 @@ class DatasetVersionDetail$$Page extends React.Component {
           title={__$$eval(() => this.state.fileData.path)}
           width="70%"
         >
+          <Row __component_name="Row" style={{ marginBottom: '8px' }} wrap={false}>
+            <Col __component_name="Col" flex="270px">
+              <Space __component_name="Space" align="center" direction="horizontal">
+                <Button
+                  __component_name="Button"
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
+                  onClick={function () {
+                    return this.addCvsClick.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                  type="primary"
+                >
+                  新增数据
+                </Button>
+              </Space>
+            </Col>
+            <Col __component_name="Col" flex="auto">
+              <Typography.Text
+                __component_name="Typography.Text"
+                children=""
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              />
+            </Col>
+          </Row>
           <Table
             __component_name="Table"
             bordered={true}
@@ -803,7 +1102,7 @@ class DatasetVersionDetail$$Page extends React.Component {
                 dataIndex: 'q',
                 key: 'q',
                 title: 'Q',
-                width: '50%',
+                width: '40%',
               },
               {
                 _unsafe_MixedSetter_width_select: 'StringSetter',
@@ -812,13 +1111,63 @@ class DatasetVersionDetail$$Page extends React.Component {
                 title: 'A',
                 width: '50%',
               },
+              {
+                dataIndex: '',
+                key: 'action',
+                render: (text, record, index) =>
+                  (__$$context =>
+                    !!__$$eval(() => text.lineNumber !== 0) && (
+                      <Space __component_name="Space" align="center" direction="horizontal">
+                        <Button
+                          __component_name="Button"
+                          block={false}
+                          children=""
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
+                          icon={<AntdIconEditOutlined __component_name="AntdIconEditOutlined" />}
+                          onClick={function () {
+                            return this.onEditCsvClick.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([
+                                {
+                                  data: record,
+                                },
+                              ])
+                            );
+                          }.bind(__$$context)}
+                          shape="default"
+                          type="link"
+                        />
+                        <Button
+                          __component_name="Button"
+                          block={false}
+                          children=""
+                          danger={true}
+                          disabled={false}
+                          ghost={true}
+                          icon={
+                            <AntdIconDeleteOutlined __component_name="AntdIconDeleteOutlined" />
+                          }
+                          onClick={function () {
+                            return this.delCsvClick.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([
+                                {
+                                  data: record,
+                                },
+                              ])
+                            );
+                          }.bind(__$$context)}
+                          shape="default"
+                          type="link"
+                        />
+                      </Space>
+                    ))(__$$createChildContext(__$$context, { text, record, index })),
+                title: '操作',
+              },
             ]}
-            dataSource={__$$eval(() =>
-              (() => {
-                console.log(this.state.cvsData?.list || []);
-                return this.state.cvsData?.list || [];
-              })()
-            )}
+            dataSource={__$$eval(() => this.state.cvsData?.list || [])}
             loading={__$$eval(() => this.state.cvsData.loading)}
             pagination={{
               current: __$$eval(() => this.state.cvsData?.current || 1),
@@ -874,10 +1223,6 @@ class DatasetVersionDetail$$Page extends React.Component {
             />
           </Modal>
         )}
-        <LccComponentSbva0
-          __component_name="LccComponentSbva0"
-          data={__$$eval(() => this.state.confirm)}
-        />
         <Row __component_name="Row" wrap={true}>
           <Col __component_name="Col" span={24} style={{ marginBottom: '16px' }}>
             <Space __component_name="Space" align="center" direction="horizontal">
@@ -1016,8 +1361,199 @@ class DatasetVersionDetail$$Page extends React.Component {
           <Tabs
             __component_name="Tabs"
             activeKey=""
+            defaultActiveKey="file"
             destroyInactiveTabPane="true"
             items={[
+              {
+                children: [
+                  <Row __component_name="Row" wrap={false} key="node_ocltqx63ys1">
+                    <Col __component_name="Col" flex="270px">
+                      <Space
+                        __component_name="Space"
+                        align="center"
+                        direction="horizontal"
+                        style={{}}
+                      >
+                        <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
+                          onClick={function () {
+                            return this.addFileClick.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          shape="default"
+                          type="primary"
+                        >
+                          新增文件
+                        </Button>
+                        <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
+                          onClick={function () {
+                            return this.refresh.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          shape="default"
+                        >
+                          刷新
+                        </Button>
+                      </Space>
+                    </Col>
+                  </Row>,
+                  <Table
+                    __component_name="Table"
+                    columns={[
+                      {
+                        dataIndex: 'path',
+                        ellipsis: { showTitle: true },
+                        key: 'path',
+                        render: (text, record, index) =>
+                          (__$$context => (
+                            <Row
+                              __component_name="Row"
+                              onClick={function () {
+                                return this.openFileDetail.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      data: record,
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
+                              wrap={true}
+                            >
+                              <Col __component_name="Col" span={24}>
+                                {!!__$$eval(() => record.fileType !== 'QA') && (
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '', paddingLeft: '16px' }}
+                                  >
+                                    {__$$eval(() => record.path || '-')}
+                                  </Typography.Text>
+                                )}
+                                {!!__$$eval(() => record.fileType === 'QA') && (
+                                  <Button
+                                    __component_name="Button"
+                                    block={false}
+                                    danger={false}
+                                    disabled={__$$eval(() => record.fileType !== 'QA')}
+                                    ghost={false}
+                                    onClick={function () {
+                                      return this.openFileDetail.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([
+                                          {
+                                            data: record,
+                                          },
+                                        ])
+                                      );
+                                    }.bind(__$$context)}
+                                    shape="default"
+                                    type="link"
+                                  >
+                                    {__$$eval(() => record.path || '-')}
+                                  </Button>
+                                )}
+                              </Col>
+                            </Row>
+                          ))(__$$createChildContext(__$$context, { text, record, index })),
+                        title: '文件',
+                      },
+                      {
+                        dataIndex: 'fileType',
+                        key: 'fileType',
+                        render: (text, record) => record.fileType || '-',
+                        title: '标签',
+                        width: 150,
+                      },
+                      { dataIndex: 'size', key: 'size', title: '文件大小', width: 150 },
+                      {
+                        dataIndex: 'count',
+                        key: 'count',
+                        render: (text, record) => record.count || 0,
+                        title: '数据量',
+                        width: 150,
+                      },
+                      {
+                        dataIndex: 'time',
+                        key: 'time',
+                        render: (text, record, index) =>
+                          (__$$context => (
+                            <Typography.Time
+                              __component_name="Typography.Time"
+                              format=""
+                              relativeTime={true}
+                              time={__$$eval(() => record.time)}
+                            />
+                          ))(__$$createChildContext(__$$context, { text, record, index })),
+                        title: '创建时间',
+                        width: 100,
+                      },
+                      {
+                        dataIndex: '',
+                        key: 'action',
+                        render: (text, record, index) =>
+                          (__$$context => (
+                            <Button
+                              __component_name="Button"
+                              block={false}
+                              danger={false}
+                              disabled={false}
+                              ghost={false}
+                              icon=""
+                              onClick={function () {
+                                return this.delFileClick.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      data: record,
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
+                              shape="default"
+                            >
+                              删除
+                            </Button>
+                          ))(__$$createChildContext(__$$context, { text, record, index })),
+                        title: '操作',
+                        width: 150,
+                      },
+                    ]}
+                    dataSource={__$$eval(() => this.data().data?.files?.nodes || [])}
+                    pagination={{
+                      pageSize: 10,
+                      pagination: { pageSize: 10 },
+                      showQuickJumper: false,
+                      showSizeChanger: false,
+                      simple: false,
+                      size: 'default',
+                    }}
+                    rowKey="id"
+                    scroll={{ scrollToFirstRowOnChange: true }}
+                    showHeader={true}
+                    size="middle"
+                    style={{}}
+                    key="node_ocltqx63ys6"
+                  />,
+                ],
+                key: 'file',
+                label: '文件',
+              },
               {
                 children: (
                   <Descriptions
@@ -1130,185 +1666,8 @@ class DatasetVersionDetail$$Page extends React.Component {
                     title=""
                   />
                 ),
-                key: 'tab-item-1',
+                key: 'info',
                 label: this.i18n('i18n-1gikmooh') /* 详细信息 */,
-              },
-              {
-                children: [
-                  <Row __component_name="Row" wrap={false} key="node_oclpkviwvr1">
-                    <Col __component_name="Col" flex="270px">
-                      <Space
-                        __component_name="Space"
-                        align="center"
-                        direction="horizontal"
-                        style={{}}
-                      >
-                        <Button
-                          __component_name="Button"
-                          block={false}
-                          danger={false}
-                          disabled={false}
-                          ghost={false}
-                          onClick={function () {
-                            return this.addFileClick.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          shape="default"
-                          type="primary"
-                        >
-                          新增文件
-                        </Button>
-                        <Button
-                          __component_name="Button"
-                          block={false}
-                          danger={false}
-                          disabled={false}
-                          ghost={false}
-                          onClick={function () {
-                            return this.refresh.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          shape="default"
-                        >
-                          刷新
-                        </Button>
-                      </Space>
-                    </Col>
-                  </Row>,
-                  <Table
-                    __component_name="Table"
-                    columns={[
-                      {
-                        dataIndex: 'path',
-                        ellipsis: { showTitle: true },
-                        key: 'path',
-                        render: (text, record, index) =>
-                          (__$$context => (
-                            <Row
-                              __component_name="Row"
-                              onClick={function () {
-                                return this.openFileDetail.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([
-                                    {
-                                      data: record,
-                                    },
-                                  ])
-                                );
-                              }.bind(__$$context)}
-                              wrap={true}
-                            >
-                              <Col __component_name="Col" span={24}>
-                                <Button
-                                  __component_name="Button"
-                                  block={false}
-                                  danger={false}
-                                  disabled={__$$eval(() => record.fileType !== 'QA')}
-                                  ghost={false}
-                                  onClick={function () {
-                                    return this.openFileDetail.apply(
-                                      this,
-                                      Array.prototype.slice.call(arguments).concat([
-                                        {
-                                          data: record,
-                                        },
-                                      ])
-                                    );
-                                  }.bind(__$$context)}
-                                  shape="default"
-                                  type="link"
-                                >
-                                  {__$$eval(() => record.path || '-')}
-                                </Button>
-                              </Col>
-                            </Row>
-                          ))(__$$createChildContext(__$$context, { text, record, index })),
-                        title: '文件',
-                      },
-                      {
-                        dataIndex: 'fileType',
-                        key: 'fileType',
-                        render: (text, record) => record.fileType || '-',
-                        title: '标签',
-                        width: 150,
-                      },
-                      { dataIndex: 'size', key: 'size', title: '文件大小', width: 150 },
-                      {
-                        dataIndex: 'count',
-                        key: 'count',
-                        render: (text, record) => record.count || 0,
-                        title: '数据量',
-                        width: 150,
-                      },
-                      {
-                        dataIndex: 'time',
-                        key: 'time',
-                        render: (text, record, index) =>
-                          (__$$context => (
-                            <Typography.Time
-                              __component_name="Typography.Time"
-                              format=""
-                              relativeTime={true}
-                              time={__$$eval(() => record.time)}
-                            />
-                          ))(__$$createChildContext(__$$context, { text, record, index })),
-                        title: '创建时间',
-                        width: 100,
-                      },
-                      {
-                        dataIndex: '',
-                        key: 'action',
-                        render: (text, record, index) =>
-                          (__$$context => (
-                            <Button
-                              __component_name="Button"
-                              block={false}
-                              danger={false}
-                              disabled={false}
-                              ghost={false}
-                              icon=""
-                              onClick={function () {
-                                return this.delFileClick.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([
-                                    {
-                                      data: record,
-                                    },
-                                  ])
-                                );
-                              }.bind(__$$context)}
-                              shape="default"
-                            >
-                              删除
-                            </Button>
-                          ))(__$$createChildContext(__$$context, { text, record, index })),
-                        title: '操作',
-                        width: 150,
-                      },
-                    ]}
-                    dataSource={__$$eval(() => this.data().data?.files?.nodes || [])}
-                    pagination={{
-                      pageSize: 10,
-                      pagination: { pageSize: 10 },
-                      showQuickJumper: false,
-                      showSizeChanger: false,
-                      simple: false,
-                      size: 'default',
-                    }}
-                    rowKey="id"
-                    scroll={{ scrollToFirstRowOnChange: true }}
-                    showHeader={true}
-                    size="middle"
-                    style={{}}
-                    key="node_oclpktaw526"
-                  />,
-                ],
-                key: 'fxyz5e43ztm',
-                label: '文件',
               },
             ]}
             size="default"
