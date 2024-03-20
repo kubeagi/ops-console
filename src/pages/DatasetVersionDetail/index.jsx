@@ -527,15 +527,15 @@ class DatasetVersionDetail$$Page extends React.Component {
 
   onFilePageChange(page, pageSize) {
     // 页码或 pageSize 改变的回调
-    this.setState(
-      {
-        cvsData: {
-          ...this.state.cvsData,
-          current: page,
-        },
+    this.utils?.changeLocationQuery(this, 'useGetVersionedDataset', {
+      _: new Date().getTime(),
+      name: this.match?.params?.versionId,
+      namespace: this.utils.getAuthData?.()?.project,
+      fileInput: {
+        pageSize: 10,
+        page,
       },
-      this.getFile.bind(this)
-    );
+    });
   }
 
   onFileUploaded(file) {
@@ -1536,12 +1536,19 @@ class DatasetVersionDetail$$Page extends React.Component {
                     ]}
                     dataSource={__$$eval(() => this.data().data?.files?.nodes || [])}
                     pagination={{
+                      onChange: function () {
+                        return this.onFilePageChange.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
                       pageSize: 10,
                       pagination: { pageSize: 10 },
                       showQuickJumper: false,
                       showSizeChanger: false,
                       simple: false,
                       size: 'default',
+                      total: __$$eval(() => this.data().data?.files?.totalCount),
                     }}
                     rowKey="id"
                     scroll={{ scrollToFirstRowOnChange: true }}
@@ -1712,6 +1719,9 @@ const PageWrapper = (props = {}) => {
             return {
               name: this.match?.params?.versionId,
               namespace: this.utils.getAuthData?.()?.project,
+              fileInput: {
+                pageSize: 10,
+              },
             };
           }.apply(self),
           enableLocationSearch: function applyThis() {
