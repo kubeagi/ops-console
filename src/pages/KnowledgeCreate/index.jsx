@@ -263,6 +263,9 @@ class KnowledgeCreate$$Page extends React.Component {
       const res = await this.utils.bff.getVersionedDataset({
         name: pre_data_set_version,
         namespace: this.utils.getAuthData().project,
+        fileInput: {
+          pageSize: 999,
+        },
       });
       const { getVersionedDataset } = res.VersionedDataset || {};
       const { files } = getVersionedDataset;
@@ -392,9 +395,14 @@ class KnowledgeCreate$$Page extends React.Component {
         dataSetFileList: [], // 清空表格
       });
 
+      const dataset = this.state.dataSetDataList.find(item => item.value === v);
+      const version = dataset?.versions?.[0]?.value;
+      if (version) {
+        this.onVersionChange(version);
+      }
       form.setValues({
         dataSetContain: {
-          version: null,
+          version,
         },
       });
       this.setDataSetAndDataSetVersionsSource(v);
@@ -758,7 +766,7 @@ class KnowledgeCreate$$Page extends React.Component {
                       ]}
                       dataSource={__$$eval(() => this.state.dataSetFileList)}
                       loading={__$$eval(() => this.state.dataSetFileListLoading)}
-                      pagination={false}
+                      pagination={{ pageSize: 10 }}
                       rowKey="path"
                       rowSelection={{
                         onChange: function () {

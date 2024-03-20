@@ -159,6 +159,9 @@ class KnowledgeDetail$$Page extends React.Component {
     const res = await this.utils.bff.getVersionedDataset({
       namespace: knowledge?.namespace,
       name: fileGroupDetail.source?.name,
+      fileInput: {
+        pageSize: 999,
+      },
     });
     this.setState({
       modalFilesList: res?.VersionedDataset?.getVersionedDataset?.files?.nodes || [],
@@ -305,17 +308,7 @@ class KnowledgeDetail$$Page extends React.Component {
               { dataIndex: 'size', title: '大小' },
             ]}
             dataSource={__$$eval(() => this.state.modalFilesList)}
-            pagination={{
-              current: 1,
-              pageSize: 20,
-              pagination: { pageSize: 10 },
-              position: [],
-              showQuickJumper: false,
-              showSizeChanger: false,
-              simple: false,
-              size: 'default',
-              total: __$$eval(() => this.state.modalFilesList.length),
-            }}
+            pagination={{ pageSize: 10 }}
             rowKey="path"
             rowSelection={{
               getCheckboxProps: function () {
