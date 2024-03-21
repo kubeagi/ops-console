@@ -1,6 +1,6 @@
 export default {
   yinYong: '引用：',
-  yeMa: '页码:',
+  yeMa: '页码',
   yuanWen: '原文',
   biaoTi: '标题',
   xiangSiDu: '相似度:',

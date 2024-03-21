@@ -1,6 +1,6 @@
 export default {
   yinYong: 'Reference:',
-  yeMa: 'Page:',
+  yeMa: 'Page',
   yuanWen: 'The Original',
   biaoTi: 'Title',
   xiangSiDu: 'Similarity:',
