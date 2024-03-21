@@ -71,8 +71,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.1.11
-        version: 1.1.11(antd@5.13.2)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.1.12
+        version: 1.1.12(antd@5.13.2)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/chat':
         specifier: workspace:*
         version: link:packages/chat
@@ -2517,7 +2517,7 @@ packages:
       '@dnd-kit/core': ^6.0.7
       react: '>=16.8.0'
     dependencies:
-      '@dnd-kit/core': 6.1.0(react-dom@17.0.2)(react@18.2.0)
+      '@dnd-kit/core': 6.1.0(react-dom@18.2.0)(react@18.2.0)
       '@dnd-kit/utilities': 3.2.2(react@18.2.0)
       react: 18.2.0
       tslib: 2.6.2
@@ -3971,7 +3971,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.358.0(react@18.2.0)
+      lucide-react: 0.359.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.1(react@18.2.0)
       query-string: 8.1.0
@@ -4035,7 +4035,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.358.0(react@18.2.0)
+      lucide-react: 0.359.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.1(react@18.2.0)
       query-string: 8.1.0
@@ -5793,7 +5793,7 @@ packages:
     dev: true
 
   /@tootallnate/once@1.1.2:
-    resolution: {integrity: sha1-zLkURTYBeaBOf+av94wA/8Hur4I=}
+    resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
     engines: {node: '>= 6'}
 
   /@tootallnate/once@2.0.0:
@@ -7351,8 +7351,8 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.1.11(antd@5.13.2)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-Y/9xE9pHAwJr0b6ey7B4MWO4pTB7VpzUvl8/UryFLcF7hzkfG8LwkeG1wQ71GM7HMAYUy+eDUN9Eej9QQe4dBA==}
+  /@yuntijs/arcadia-bff-sdk@1.1.12(antd@5.13.2)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-zqv7JodQ3HeTXx1khgIlX5Sj5Tnq3gyYw9fsxY9Sgbjt5ubz551iyw9u0OCK4PWRR6Ld7d30eQEM8EIS+5miAQ==}
     peerDependencies:
       antd: '>=5.4.0'
       react: '>=16.9.0'
@@ -7576,7 +7576,7 @@ packages:
     dev: true
 
   /agent-base@6.0.2:
-    resolution: {integrity: sha1-Sf/1hXfP7j83F2/qtMIuAPhtf3c=}
+    resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
     dependencies:
       debug: 4.3.4
@@ -11912,7 +11912,7 @@ packages:
     resolution: {integrity: sha1-+nFolEq5pRnTN8sL7HKE3D5yPYc=}
 
   /http-proxy-agent@4.0.1:
-    resolution: {integrity: sha1-ioyO9/WTLM+VPClsqCkblap0qjo=}
+    resolution: {integrity: sha512-k0zdNgqWTGA6aeIRVpvfVob4fL52dTfaehylg0Y4UvSySvOq/Y+BOyPrgpUrA7HylqvU8vIZGsRuXmspskV0Tg==}
     engines: {node: '>= 6'}
     dependencies:
       '@tootallnate/once': 1.1.2
@@ -12483,7 +12483,7 @@ packages:
     engines: {node: '>=12'}
 
   /is-plain-object@2.0.4:
-    resolution: {integrity: sha1-LBY7P6+xtgbZ0Xko8FwqHDjgdnc=}
+    resolution: {integrity: sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og==}
     engines: {node: '>=0.10.0'}
     dependencies:
       isobject: 3.0.1
@@ -13338,12 +13338,12 @@ packages:
     hasBin: true
 
   /jsonfile@4.0.0:
-    resolution: {integrity: sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=}
+    resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
     optionalDependencies:
       graceful-fs: 4.2.11
 
   /jsonfile@6.1.0:
-    resolution: {integrity: sha1-vFWyY0eTxnnsZAMJTrE2mKbsCq4=}
+    resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}
     dependencies:
       universalify: 2.0.1
     optionalDependencies:
@@ -13863,8 +13863,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /lucide-react@0.358.0(react@18.2.0):
-    resolution: {integrity: sha512-rBSptRjZTMBm24zsFhR6pK/NgbT18JegZGKcH4+1H3+UigMSRpeoWLtR/fAwMYwYnlJOZB+y8WpeHne9D6X6Kg==}
+  /lucide-react@0.359.0(react@18.2.0):
+    resolution: {integrity: sha512-bxVL+rM/wacjpT0BKShA6r5IIKb6LCRg+ltFG9pnnIwaRX8kK3hq8v5JwMpT7RC6XeqB5cSaaV6GapPWWmtliw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -15389,7 +15389,7 @@ packages:
     resolution: {integrity: sha512-dqaz3u44QbRXQooZLTUKU41ZrzYrcvLISVgbrzbyCMxpmSLJvZ3ZamIJIZ29P6OhZIkNIQKosdeM6t1LYbA9hg==}
 
   /once@1.4.0:
-    resolution: {integrity: sha1-WDsap3WWHUsROsF9nFC6753Xa9E=}
+    resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
     dependencies:
       wrappy: 1.0.2
 
@@ -16469,7 +16469,7 @@ packages:
       side-channel: 1.0.4
 
   /query-string@6.14.1:
-    resolution: {integrity: sha1-esLcpG2n8wlEm6D4ax/SglWwyGo=}
+    resolution: {integrity: sha512-XDxAeVmpfu1/6IjyT/gXHOl+S0vQ9owggJ30hhWKdHAsNPOcasn5o9BW0eejZqL2e4vMjhAxoW3jVHcD6mbcYw==}
     engines: {node: '>=6'}
     dependencies:
       decode-uri-component: 0.2.2
@@ -18874,6 +18874,7 @@ packages:
       object-assign: 4.1.1
       prop-types: 15.8.1
     dev: false
+    bundledDependencies: false
 
   /react@18.1.0:
     resolution: {integrity: sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ==}
@@ -22094,11 +22095,11 @@ packages:
     dev: true
 
   /universalify@0.1.2:
-    resolution: {integrity: sha1-tkb2m+OULavOzJ1mOcgNwQXvqmY=}
+    resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
     engines: {node: '>= 4.0.0'}
 
   /universalify@0.2.0:
-    resolution: {integrity: sha1-ZFF2BWb6hXU0dFqx3elS0bF2G+A=}
+    resolution: {integrity: sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg==}
     engines: {node: '>= 4.0.0'}
 
   /universalify@2.0.1:
@@ -22614,7 +22615,7 @@ packages:
     dev: true
 
   /wrappy@1.0.2:
-    resolution: {integrity: sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=}
+    resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
   /write-file-atomic@3.0.3:
     resolution: {integrity: sha1-Vr1cWlxwSBzRnFcb05q5ZaXeVug=}

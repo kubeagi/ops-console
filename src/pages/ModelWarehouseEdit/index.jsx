@@ -10,12 +10,17 @@ import {
   Button,
   Typography,
   Spin,
+  Card,
   FormilyForm,
   FormilyInput,
+  FormilyFormItem,
+  FormilySelect,
   FormilyCheckbox,
   FormilyTextArea,
   Divider,
 } from '@tenx-ui/materials';
+
+import LccComponentC6ipk from 'SelectCard';
 
 import { useLocation, matchPath } from '@umijs/max';
 import { DataProvider } from 'shared-components';
@@ -59,7 +64,7 @@ class ModelWarehouseEdit$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { data: {}, loading: false };
+    this.state = { branchList: [], data: {}, loading: false };
   }
 
   $ = refName => {
@@ -93,21 +98,92 @@ class ModelWarehouseEdit$$Page extends React.Component {
       .then(res => {
         const { Model } = res;
         const { getModel } = Model || {};
-        console.log(getModel);
-        this.setState(
-          {
-            loading: false,
-            data: getModel,
-          },
-          () => {
-            this.setFormData(this.state.data);
-          }
-        );
+        this.setState({
+          loading: false,
+          data: getModel,
+        });
+        this.setFormData(getModel);
+        if (getModel.modelSource && getModel.modelSource !== 'local') {
+          this.getModelscopeBranchList(
+            getModel.modelSource,
+            getModel.modelSource !== 'local' &&
+              (getModel.huggingFaceRepo || getModel.modelScopeRepo),
+            getModel.token
+          );
+        }
       })
       .catch(error => {
         this.setState({
           loading: false,
           data: {},
+        });
+      });
+  }
+
+  getDataSourceTypes(pageThis, labelKey = 'children') {
+    const valueKey = 'value';
+    return [
+      {
+        [valueKey]: 'modelscope',
+        [labelKey]: '魔塔社区',
+        forms: ['url', 'branch'],
+        icon: this.constants.ModelSourceImg_MODELSCOPE,
+      },
+      {
+        [valueKey]: 'huggingface',
+        [labelKey]: 'Hugging Face',
+        forms: ['url', 'branch', 'token'],
+        icon: this.constants.ModelSorceImg_HUGGINGFACE,
+      },
+      {
+        [valueKey]: 'local',
+        [labelKey]: '本地模型',
+        forms: [],
+        icon: this.constants.ModelSorceImg_LOCAL,
+      },
+    ];
+  }
+
+  getModelscopeBranchList(type, modelId, token) {
+    if (!modelId) return;
+    this.utils.axios
+      .get(`/kubeagi-apis/forward/${type}/revisions?modelid=${modelId}`, {
+        headers: {
+          REPOTOKEN: token,
+          namespace: this.utils.getAuthData()?.project,
+          Authorization: this.utils.getAuthorization(),
+        },
+      })
+      .then(res => {
+        const data = res.data;
+        const list = [...(data.branches || []), ...(data.tags || [])];
+        this.setState(
+          {
+            branchList: list.map(item => ({
+              label: item.name,
+              value: item.name,
+            })),
+          },
+          () => {
+            this.form('model_edit')?.setFieldState('branch', {
+              dataSource: this.state.branchList,
+            });
+          }
+        );
+      })
+      .catch(err => {
+        console.log(err);
+        this.utils.notification.warn({
+          message: err?.response?.data.message || '获取分支数据失败',
+        });
+        this.setState({
+          branchList: [],
+        });
+        this.form('model_edit')?.setFieldState('branch', {
+          dataSource: [],
+        });
+        this.form('model_edit')?.setValues({
+          branch: undefined,
         });
       });
   }
@@ -124,10 +200,14 @@ class ModelWarehouseEdit$$Page extends React.Component {
           loading: true,
         });
         const values = this.form('model_edit').values;
+        const { branch, url, token, ...otherCommonParams } = values;
         const params = {
           namespace: this.utils.getAuthData().project,
-          ...values,
+          ...otherCommonParams,
           types: values.types.join(','),
+          huggingFaceRepo: values.modelSource === 'huggingface' ? url : undefined,
+          modelScopeRepo: values.modelSource === 'modelscope' ? url : undefined,
+          revision: branch,
         };
         this.utils.bff
           .updateModel({
@@ -158,18 +238,63 @@ class ModelWarehouseEdit$$Page extends React.Component {
       });
   }
 
+  onTokenChange(e) {
+    const value = e.target.value;
+    if (value) {
+      if (this.form('model_edit').values?.name) {
+        this.getModelscopeBranchList(
+          this.state.data.modelSource,
+          this.form('model_edit').values?.name,
+          value
+        );
+      }
+    }
+  }
+
   setFormData(data) {
     this.form('model_edit').setValues({
       types: data?.types?.split(','),
       name: data.name,
       displayName: data.displayName,
       description: data.description,
+      modelSource: data.modelSource || 'local',
+      url:
+        data.modelSource &&
+        data.modelSource !== 'local' &&
+        (data.huggingFaceRepo || data.modelScopeRepo),
+      branch: data.revision,
+      token: data.token,
     });
   }
 
   testFunc() {
     console.log('test aliLowcode func');
     return <div className="test-aliLowcode-func">{this.state.test}</div>;
+  }
+
+  urlChange(e) {
+    const value = e.target.value;
+    const modelSource = this.state.data.modelSource;
+    if (modelSource !== 'local' && value) {
+      this.setState(
+        {
+          branchList: [],
+        },
+        () => {
+          if (modelSource === 'huggingface') {
+            this.getModelscopeBranchList(modelSource, value, this.form('model_edit').values?.token);
+          } else {
+            this.getModelscopeBranchList(modelSource, value);
+          }
+        }
+      );
+      this.form('model_edit')?.setFieldState('branch', {
+        dataSource: [],
+      });
+      this.form('model_edit')?.setValues({
+        branch: undefined,
+      });
+    }
   }
 
   componentDidMount() {
@@ -217,106 +342,241 @@ class ModelWarehouseEdit$$Page extends React.Component {
               编辑模型
             </Typography.Title>
           </Col>
-          <Col
-            __component_name="Col"
-            span={24}
-            style={{ backgroundColor: '#ffffff', marginTop: '16px' }}
-          >
+          <Col __component_name="Col" span={24} style={{ marginTop: '16px' }}>
             <Spin __component_name="Spin" spinning={__$$eval(() => this.state.loading)}>
-              <Row
-                __component_name="Row"
-                style={{ marginTop: '24px', paddingLeft: '24px', paddingTop: '24px' }}
-                wrap={true}
+              <Card
+                __component_name="Card"
+                actions={[]}
+                bordered={false}
+                hoverable={false}
+                loading={false}
+                size="default"
+                type="default"
               >
-                <Col __component_name="Col" span={24}>
-                  <FormilyForm
-                    __component_name="FormilyForm"
-                    componentProps={{ colon: false, labelAlign: 'left', layout: 'horizontal' }}
-                    formHelper={{ autoFocus: true, style: {} }}
-                    ref={this._refsManager.linkRef('model_edit')}
-                  >
-                    <FormilyInput
-                      __component_name="FormilyInput"
-                      componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-                      decoratorProps={{
-                        'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
-                      }}
-                      fieldProps={{
-                        '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
-                        'name': 'name',
-                        'required': true,
-                        'title': '模型名称',
-                        'x-pattern': 'disabled',
-                        'x-validator': [
-                          {
-                            children: '未知',
-                            id: 'disabled',
-                            message:
-                              "必须由小写字母数字和'-'或'.'组成，并且必须以字母数字开头和结尾",
-                            pattern: '^[a-z0-9][a-z0-9.-]*[a-z0-9]$',
-                            type: 'disabled',
-                          },
-                        ],
-                      }}
-                      style={{ width: '500px' }}
-                    />
-                    <FormilyInput
-                      __component_name="FormilyInput"
-                      componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-                      decoratorProps={{
-                        'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
-                      }}
-                      fieldProps={{
-                        'name': 'displayName',
-                        'required': true,
-                        'title': '模型别名',
-                        'x-validator': [],
-                      }}
-                      style={{ width: '500px' }}
-                    />
-                    <FormilyCheckbox
-                      __component_name="FormilyCheckbox"
-                      componentProps={{ 'x-component-props': { _sdkSwrGetFunc: {} } }}
-                      decoratorProps={{
-                        'x-decorator-props': {
-                          labelAlign: 'left',
-                          labelEllipsis: true,
-                          labelWidth: '100px',
-                          wrapperAlign: 'left',
+                <FormilyForm
+                  __component_name="FormilyForm"
+                  componentProps={{ colon: false, labelAlign: 'left', layout: 'horizontal' }}
+                  formHelper={{ autoFocus: true, style: {} }}
+                  ref={this._refsManager.linkRef('model_edit')}
+                >
+                  <FormilyInput
+                    __component_name="FormilyInput"
+                    componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+                    decoratorProps={{
+                      'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
+                    }}
+                    fieldProps={{
+                      '_unsafe_MixedSetter_x-validator_select': 'ArraySetter',
+                      'name': 'name',
+                      'required': true,
+                      'title': '模型名称',
+                      'x-pattern': 'disabled',
+                      'x-validator': [
+                        {
+                          children: '未知',
+                          id: 'disabled',
+                          message: "必须由小写字母数字和'-'或'.'组成，并且必须以字母数字开头和结尾",
+                          pattern: '^[a-z0-9][a-z0-9.-]*[a-z0-9]$',
+                          type: 'disabled',
                         },
-                      }}
-                      fieldProps={{
-                        'enum': [
-                          { label: 'LLM', value: 'llm' },
-                          { label: 'Reranking', value: 'reranking' },
-                          { label: 'Embedding', value: 'embedding' },
-                        ],
-                        'name': 'types',
-                        'required': true,
-                        'title': '模型类型',
-                        'x-validator': [],
-                      }}
-                    />
-                    <FormilyTextArea
-                      __component_name="FormilyTextArea"
-                      componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
-                      decoratorProps={{
-                        'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
-                      }}
-                      fieldProps={{
-                        'name': 'description',
-                        'title': '描述',
-                        'x-component': 'Input.TextArea',
-                        'x-validator': [],
-                      }}
-                      style={{ width: '500px' }}
-                    />
-                  </FormilyForm>
-                </Col>
-              </Row>
-            </Spin>
-            <Row __component_name="Row" wrap={true}>
-              <Col __component_name="Col" span={24}>
+                      ],
+                    }}
+                    style={{ width: '500px' }}
+                  />
+                  <FormilyInput
+                    __component_name="FormilyInput"
+                    componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+                    decoratorProps={{
+                      'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
+                    }}
+                    fieldProps={{
+                      'name': 'displayName',
+                      'required': true,
+                      'title': '模型别名',
+                      'x-validator': [],
+                    }}
+                    style={{ width: '500px' }}
+                  />
+                  <Row
+                    __component_name="Row"
+                    style={{
+                      marginBottom: '0px',
+                      marginLeft: '0px',
+                      marginRight: '0px',
+                      marginTop: '0px',
+                      paddingBottom: '0px',
+                      paddingLeft: '0px',
+                      paddingRight: '0px',
+                      paddingTop: '0px',
+                    }}
+                    wrap={true}
+                  >
+                    <Col __component_name="Col" span={24}>
+                      <Row
+                        __component_name="Row"
+                        justify="start"
+                        style={{ marginBottom: '16px' }}
+                        wrap={false}
+                      >
+                        <Col
+                          __component_name="Col"
+                          style={{
+                            marginLeft: '0px',
+                            marginRight: '0px',
+                            paddingLeft: '0px',
+                            paddingRight: '0px',
+                          }}
+                        >
+                          <FormilyFormItem
+                            __component_name="FormilyFormItem"
+                            decoratorProps={{
+                              'x-decorator-props': {
+                                labelEllipsis: true,
+                                labelWidth: '100px',
+                                style: { marginBottom: '16px' },
+                                wrapperWidth: '0',
+                              },
+                            }}
+                            fieldProps={{
+                              'name': 'modelSource',
+                              'title': '模型来源',
+                              'type': 'object',
+                              'x-component': 'FormilyFormItem',
+                              'x-validator': [],
+                            }}
+                          />
+                        </Col>
+                        <Col
+                          __component_name="Col"
+                          style={{
+                            marginLeft: '0px',
+                            marginRight: '0px',
+                            paddingLeft: '0px',
+                            paddingRight: '0px',
+                          }}
+                        >
+                          <LccComponentC6ipk
+                            __component_name="LccComponentC6ipk"
+                            dataSource={__$$eval(() => this.getDataSourceTypes(this, 'label'))}
+                            value={__$$eval(() => this.state.data.modelSource || 'local')}
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                  <FormilyInput
+                    __component_name="FormilyInput"
+                    componentProps={{
+                      'x-component-props': {
+                        addonBefore: '',
+                        onBlur: function () {
+                          return this.urlChange.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
+                        }.bind(this),
+                        placeholder: '请输入',
+                      },
+                    }}
+                    decoratorProps={{
+                      'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
+                    }}
+                    fieldProps={{
+                      'name': 'url',
+                      'required': true,
+                      'title': '模型文件地址',
+                      'x-display': "{{$form.values?.modelSource !== 'local' ?'visible':'hidden'}}",
+                      'x-validator': [],
+                    }}
+                    style={{ width: '500px' }}
+                  />
+                  <FormilySelect
+                    __component_name="FormilySelect"
+                    componentProps={{
+                      'x-component-props': {
+                        _sdkSwrGetFunc: {},
+                        allowClear: false,
+                        disabled: false,
+                        placeholder: '请选择',
+                      },
+                    }}
+                    decoratorProps={{
+                      'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
+                    }}
+                    fieldProps={{
+                      'name': 'branch',
+                      'required': true,
+                      'title': '分支',
+                      'x-display': "{{$form.values?.modelSource !== 'local' ?'visible':'hidden'}}",
+                      'x-validator': [],
+                    }}
+                    style={{ width: '500px' }}
+                  />
+                  <FormilyInput
+                    __component_name="FormilyInput"
+                    componentProps={{
+                      'x-component-props': {
+                        addonBefore: '',
+                        onBlur: function () {
+                          return this.onTokenChange.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
+                        }.bind(this),
+                        placeholder: '请输入',
+                      },
+                    }}
+                    decoratorProps={{
+                      'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
+                    }}
+                    fieldProps={{
+                      'name': 'token',
+                      'required': false,
+                      'title': 'Token',
+                      'x-display':
+                        "{{$form.values?.modelSource === 'huggingface' ?'visible':'hidden'}}",
+                      'x-validator': [],
+                    }}
+                    style={{ width: '500px' }}
+                  />
+                  <FormilyCheckbox
+                    __component_name="FormilyCheckbox"
+                    componentProps={{ 'x-component-props': { _sdkSwrGetFunc: {} } }}
+                    decoratorProps={{
+                      'x-decorator-props': {
+                        labelAlign: 'left',
+                        labelEllipsis: true,
+                        labelWidth: '100px',
+                        wrapperAlign: 'left',
+                      },
+                    }}
+                    fieldProps={{
+                      'enum': [
+                        { label: 'LLM', value: 'llm' },
+                        { label: 'Reranking', value: 'reranking' },
+                        { label: 'Embedding', value: 'embedding' },
+                      ],
+                      'name': 'types',
+                      'required': true,
+                      'title': '模型类型',
+                      'x-validator': [],
+                    }}
+                  />
+                  <FormilyTextArea
+                    __component_name="FormilyTextArea"
+                    componentProps={{ 'x-component-props': { placeholder: '请输入' } }}
+                    decoratorProps={{
+                      'x-decorator-props': { labelEllipsis: true, labelWidth: '100px' },
+                    }}
+                    fieldProps={{
+                      'name': 'description',
+                      'title': '描述',
+                      'x-component': 'Input.TextArea',
+                      'x-validator': [],
+                    }}
+                    style={{ width: '500px' }}
+                  />
+                </FormilyForm>
                 <Divider
                   __component_name="Divider"
                   dashed={false}
@@ -324,33 +584,23 @@ class ModelWarehouseEdit$$Page extends React.Component {
                   mode="line"
                   style={{ height: '2px' }}
                 />
-              </Col>
-            </Row>
-            <Row __component_name="Row" wrap={true}>
-              <Col
-                __component_name="Col"
-                span={24}
-                style={{ paddingBottom: '24px', paddingLeft: '132px' }}
-              >
-                <Space __component_name="Space" align="center" direction="horizontal">
-                  <Button
-                    __component_name="Button"
-                    block={false}
-                    danger={false}
-                    disabled={false}
-                    ghost={false}
-                    onClick={function () {
-                      return this.linkToList.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    shape="default"
-                    style={{ marginRight: '12px' }}
-                  >
-                    取消
-                  </Button>
-                </Space>
+                <Button
+                  __component_name="Button"
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  onClick={function () {
+                    return this.linkToList.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                  style={{ marginLeft: '100px', marginRight: '12px' }}
+                >
+                  取消
+                </Button>
                 <Button
                   __component_name="Button"
                   block={false}
@@ -369,8 +619,8 @@ class ModelWarehouseEdit$$Page extends React.Component {
                 >
                   确定
                 </Button>
-              </Col>
-            </Row>
+              </Card>
+            </Spin>
           </Col>
         </Row>
       </Page>
