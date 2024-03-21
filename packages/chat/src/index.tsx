@@ -122,6 +122,9 @@ const Chat: React.FC<IChat> = props => {
         app_namespace: props.appNamespace,
         conversation_id: conversationId,
       },
+      headers: {
+        namespace: props.appNamespace,
+      },
     },
     initValue: [],
     resStr: 'messages',
@@ -141,6 +144,9 @@ const Chat: React.FC<IChat> = props => {
               app_namespace: props.appNamespace,
               conversation_id: cId,
               message_id: mId,
+            },
+            headers: {
+              namespace: props.appNamespace,
             },
           },
         })
@@ -279,6 +285,9 @@ const Chat: React.FC<IChat> = props => {
           options: {
             body: formData,
             timeout: 1000 * 60 * 10,
+            headers: {
+              namespace: props.appNamespace,
+            },
           },
         })
         .catch(_error => {
@@ -320,6 +329,7 @@ const Chat: React.FC<IChat> = props => {
         openWhenHidden: true,
         headers: {
           Authorization: `bearer ${getAuthData()?.token.id_token}`,
+          Namespace: props.appNamespace,
         },
         body: JSON.stringify(body),
         async onopen(response) {

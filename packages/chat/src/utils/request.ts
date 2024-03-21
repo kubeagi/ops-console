@@ -52,9 +52,9 @@ const addAuthHeaders = <T extends addAuthHeadersOptions>(options: T, url: string
       authHeaders.token = token;
     }
   } */
-  if (project) {
-    authHeaders.project = project;
-  }
+  // if (project) {
+  //   authHeaders.project = project;
+  // }
   options.headers = mergeHeaders(authHeaders, options.headers);
   return options;
 };

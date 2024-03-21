@@ -30,6 +30,9 @@ const PromptStarter: React.FC<IPromptStarter> = props => {
         app_name: props.appName,
         app_namespace: props.appNamespace,
       },
+      headers: {
+        namespace: props.appNamespace,
+      },
     },
     initValue: [],
     resStr: '',
