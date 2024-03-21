@@ -14,6 +14,7 @@ import {
   Input,
   Select,
   List,
+  Image,
   Dropdown,
   Divider,
   Descriptions,
@@ -28,7 +29,6 @@ import {
 import {
   AntdIconPlusOutlined,
   AntdIconReloadOutlined,
-  AntdIconCodeSandboxCircleFilled,
   AntdIconSettingOutlined,
   AntdIconInfoCircleOutlined,
 } from '@tenx-ui/icon-materials';
@@ -78,6 +78,11 @@ class ModelWarehouse$$Page extends React.Component {
       deleteBtnLoading: false,
       deleteLoading: false,
       deleteModalVisible: false,
+      iconMap: {
+        modelscope: this.constants.ModelSourceImg_MODELSCOPE,
+        huggingface: this.constants.ModelSorceImg_HUGGINGFACE,
+        local: this.constants.ModelSorceImg_LOCAL,
+      },
       keyword: '',
       loading: false,
       modelList: [],
@@ -241,7 +246,9 @@ class ModelWarehouse$$Page extends React.Component {
     // 事件的 handler
 
     this.history.push(
-      `/model-warehouse/detail/${extParams.data.name}?namespace=${extParams.data.namespace}`
+      `/model-warehouse/detail/${extParams.data.name}?namespace=${
+        extParams.data.namespace
+      }&modelSource=${extParams.data.modelSource || 'local'}`
     );
   }
 
@@ -528,9 +535,16 @@ class ModelWarehouse$$Page extends React.Component {
                               <Col __component_name="Col" span={24}>
                                 <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
                                   <Col __component_name="Col" flex="56px">
-                                    <AntdIconCodeSandboxCircleFilled
-                                      __component_name="AntdIconCodeSandboxCircleFilled"
-                                      style={{ color: '#4a90e2', fontSize: 56 }}
+                                    <Image
+                                      __component_name="Image"
+                                      fallback=""
+                                      height={56}
+                                      preview={false}
+                                      src={__$$eval(
+                                        () => __$$context.state.iconMap[item.modelSource || 'local']
+                                      )}
+                                      style={{ borderRadius: '56px' }}
+                                      width={56}
                                     />
                                   </Col>
                                   <Col __component_name="Col" flex="1">
