@@ -209,6 +209,10 @@ class KnowledgeDetail$$Page extends React.Component {
     }
   }
 
+  onBackBtnClick() {
+    this.history.push('/knowledge');
+  }
+
   onDeleteModalCancel() {
     this.setState({
       deleteModalOpen: false,
@@ -372,7 +376,18 @@ class KnowledgeDetail$$Page extends React.Component {
             open="true"
           />
         )}
-        <Button.Back __component_name="Button.Back" style={{}} title="知识库详情" type="primary" />
+        <Button.Back
+          __component_name="Button.Back"
+          onClick={function () {
+            return this.onBackBtnClick.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          style={{}}
+          title="知识库详情"
+          type="primary"
+        />
         <Row __component_name="Row" wrap={true}>
           <Col __component_name="Col" span={24}>
             <Card

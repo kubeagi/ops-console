@@ -21,7 +21,6 @@ import {
   Typography,
   Table,
   Input,
-  Status,
   Divider,
 } from '@tenx-ui/materials';
 
@@ -350,9 +349,13 @@ class KnowledgeCreate$$Page extends React.Component {
             },
           });
           this.utils.message.success('新增知识库成功');
+          this.history.push(`/knowledge/detail/${name}`);
         } catch (err) {
           console.error('新增知识库失败', err);
           this.utils.message.warning('新增知识库失败');
+          this.setState({
+            submited: false,
+          });
         }
       }
     );
@@ -784,7 +787,7 @@ class KnowledgeCreate$$Page extends React.Component {
                   </Col>
                 </Row>
               </Container>
-              {!!__$$eval(() => this.state.currentStep === 1 && !this.state.submited) && (
+              {!!__$$eval(() => this.state.currentStep === 1) && (
                 <Flex __component_name="Flex" justify="right" vertical={true} wrap="nowrap">
                   <Row
                     __component_name="Row"
@@ -887,136 +890,6 @@ class KnowledgeCreate$$Page extends React.Component {
                   )}
                 </Flex>
               )}
-              {!!__$$eval(() => this.state.submited) && (
-                <Flex __component_name="Flex" justify="right" vertical={true} wrap="nowrap">
-                  <Row
-                    __component_name="Row"
-                    justify="space-between"
-                    style={{ marginBottom: '25px' }}
-                    wrap={false}
-                  >
-                    <Col __component_name="Col">
-                      <Typography.Text
-                        __component_name="Typography.Text"
-                        disabled={false}
-                        ellipsis={true}
-                        strong={false}
-                        style={{ fontSize: '' }}
-                      >
-                        {__$$eval(() => `共有文件：${this.state.nextFileList.length}`)}
-                      </Typography.Text>
-                    </Col>
-                    <Col __component_name="Col">
-                      <Input.Search __component_name="Input.Search" placeholder="请输入" />
-                    </Col>
-                  </Row>
-                  {__$$evalArray(() => this.state.nextFileList).map((item, index) =>
-                    (__$$context => (
-                      <Row __component_name="Row" style={{ marginBottom: '8px' }} wrap={false}>
-                        <Col
-                          __component_name="Col"
-                          flex="20px"
-                          style={{ lineHeight: '44px', marginRight: '12px' }}
-                        >
-                          <Status
-                            __component_name="Status"
-                            getTypes={function () {
-                              return this.getStatus.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([])
-                              );
-                            }.bind(__$$context)}
-                            id="disabled"
-                            types={[{ children: '未知', id: 'disabled', type: 'disabled' }]}
-                          />
-                        </Col>
-                        <Col __component_name="Col" flex="auto">
-                          <Row
-                            __component_name="Row"
-                            align="stretch"
-                            style={{
-                              background: '#FAFAFA',
-                              borderRadius: '0px 0px 0px 0px',
-                              height: '44px',
-                              lineHeight: '44px',
-                            }}
-                            wrap={true}
-                          >
-                            <Col __component_name="Col" span={4}>
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(() => item.path)}
-                              </Typography.Text>
-                            </Col>
-                            <Col __component_name="Col" span={4}>
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(() => `文件来源：${item.version || '-'}`)}
-                              </Typography.Text>
-                            </Col>
-                            <Col __component_name="Col" span={4}>
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(() => `类型：${__$$context.getType() || '-'}`)}
-                              </Typography.Text>
-                            </Col>
-                            <Col __component_name="Col" span={4}>
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(() => `数据量：${item.count?.toString() || '-'}`)}
-                              </Typography.Text>
-                            </Col>
-                            <Col __component_name="Col" span={4}>
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(() => item.fileSize?.toString())}
-                              </Typography.Text>
-                            </Col>
-                            <Col __component_name="Col" span={4}>
-                              <Button
-                                __component_name="Button"
-                                block={false}
-                                danger={false}
-                                disabled={false}
-                                ghost={false}
-                                icon=""
-                                shape="default"
-                              >
-                                日志
-                              </Button>
-                            </Col>
-                          </Row>
-                        </Col>
-                      </Row>
-                    ))(__$$createChildContext(__$$context, { item, index }))
-                  )}
-                </Flex>
-              )}
               <Divider
                 __component_name="Divider"
                 dashed={false}
@@ -1029,21 +902,21 @@ class KnowledgeCreate$$Page extends React.Component {
                   __component_name="Button"
                   block={false}
                   danger={false}
-                  disabled={false}
+                  disabled={__$$eval(() => this.state.submited)}
                   ghost={false}
                   href="/knowledge"
                   icon=""
                   shape="default"
                   style={{ marginRight: '10px' }}
                 >
-                  {__$$eval(() => `${this.state.submited ? '返回' : '取消'}`)}
+                  取消
                 </Button>
-                {!!__$$eval(() => this.state.currentStep > 0 && !this.state.submited) && (
+                {!!__$$eval(() => this.state.currentStep > 0) && (
                   <Button
                     __component_name="Button"
                     block={false}
                     danger={false}
-                    disabled={false}
+                    disabled={__$$eval(() => this.state.submited)}
                     ghost={false}
                     onClick={function () {
                       return this.handleStep.apply(
@@ -1084,7 +957,7 @@ class KnowledgeCreate$$Page extends React.Component {
                     下一步
                   </Button>
                 )}
-                {!!__$$eval(() => this.state.currentStep === 1 && !this.state.submited) && (
+                {!!__$$eval(() => this.state.currentStep === 1) && (
                   <Button
                     __component_name="Button"
                     block={false}
@@ -1092,6 +965,7 @@ class KnowledgeCreate$$Page extends React.Component {
                     disabled={false}
                     ghost={false}
                     icon=""
+                    loading={__$$eval(() => this.state.submited)}
                     onClick={function () {
                       return this.handleSubmit.apply(
                         this,
