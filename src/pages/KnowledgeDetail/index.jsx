@@ -161,8 +161,10 @@ class KnowledgeDetail$$Page extends React.Component {
         versions: versions,
       };
     });
+    const dataset = this.getCurrentDatasetAndVersion().dataset;
     this.setState({
       datasetList,
+      datasetVersionList: datasetList.find(d => d.value === dataset)?.versions,
     });
   }
 
@@ -469,7 +471,7 @@ class KnowledgeDetail$$Page extends React.Component {
               <Select
                 __component_name="Select"
                 _sdkSwrGetFunc={{}}
-                allowClear={true}
+                allowClear={false}
                 disabled={false}
                 onChange={function () {
                   return this.onDatasetChange.apply(
@@ -488,7 +490,7 @@ class KnowledgeDetail$$Page extends React.Component {
               <Select
                 __component_name="Select"
                 _sdkSwrGetFunc={{}}
-                allowClear={true}
+                allowClear={false}
                 disabled={false}
                 onChange={function () {
                   return this.onDatasetVersionChange.apply(
