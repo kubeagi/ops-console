@@ -12,13 +12,12 @@ import { FieldNumberOutlined, FileSearchOutlined, FileTextOutlined } from '@ant-
 import '@lobehub/ui';
 // @ts-ignore
 import { ConfigProvider, Divider, Popover, Space, Spin, Tag, Typography } from 'antd';
-import React, { FC, ReactNode } from 'react';
+import React, { FC, ReactNode, useCallback, useState } from 'react';
 
 import I18N from '../utils/kiwiI18N';
+import EditModal, { type EditData } from './EditModal';
 import { Reference } from './index';
 import { usePopoverStyles } from './index.style';
-
-// import './index.less';
 
 const getRelColor = (score: number) => {
   if (score < 0.5) {
@@ -42,6 +41,20 @@ interface IRefContent {
 const RefContent: FC<IRefContent> = props => {
   const { styles, cx } = usePopoverStyles();
   const { reference, index, open, loading, debug, children } = props;
+
+  const [editData, setEditData] = useState<EditData>({
+    visible: false,
+    reference: undefined,
+  });
+  const onEditRefClick = useCallback(
+    (ref: Reference) => {
+      setEditData({
+        visible: true,
+        reference: ref,
+      });
+    },
+    [setEditData]
+  );
 
   const content = (
     <Spin spinning={loading}>
@@ -79,10 +92,12 @@ const RefContent: FC<IRefContent> = props => {
               <div>
                 <Typography.Paragraph
                   className="q"
-                  editable={{
-                    editing: false,
-                    onStart: () => {},
-                  }}
+                  editable={
+                    Boolean(reference.qa_file_path) && {
+                      editing: false,
+                      onStart: onEditRefClick.bind('', reference),
+                    }
+                  }
                   ellipsis={{ rows: 4, expandable: true, tooltip: reference.question }}
                   strong
                 >
@@ -140,29 +155,32 @@ const RefContent: FC<IRefContent> = props => {
     </Spin>
   );
   return (
-    <Popover
-      content={
-        <ConfigProvider
-          theme={{
-            components: {
-              Descriptions: {
-                titleMarginBottom: 0,
-                itemPaddingBottom: 0,
+    <>
+      {Boolean(editData?.visible) && <EditModal data={editData} setData={setEditData} />}
+      <Popover
+        content={
+          <ConfigProvider
+            theme={{
+              components: {
+                Descriptions: {
+                  titleMarginBottom: 0,
+                  itemPaddingBottom: 0,
+                },
               },
-            },
-          }}
-        >
-          {content}
-        </ConfigProvider>
-      }
-      destroyTooltipOnHide
-      onOpenChange={props.onMouseLeaveCallback}
-      open={open}
-      placement="left"
-      title={null}
-    >
-      {children}
-    </Popover>
+            }}
+          >
+            {content}
+          </ConfigProvider>
+        }
+        destroyTooltipOnHide
+        onOpenChange={props.onMouseLeaveCallback}
+        open={open}
+        placement="left"
+        title={null}
+      >
+        {children}
+      </Popover>
+    </>
   );
 };
 export default RefContent;

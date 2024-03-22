@@ -24,4 +24,22 @@ export default {
   xinJianDuiHua: 'Create new conversation',
   shanChuChengGong: 'Deleted successfully',
   tingZhi: 'Stop',
+  bianJiShuJu: 'Edit Data',
+  beiSouSuoDe: 'Content to be searched (Q)',
+  QingShuRuBeiSouSuoDe: 'Please enter the content to be searched (Q)',
+  oneDangQian:
+    '1. The current data is the vectorized content, and the quality of this part determines whether suitable knowledge can be found efficiently and accurately during the conversation; 2. The content here is generally the question being searched, with a maximum input limit of 2000 characters. The content here is generally the matching content for the search, with a maximum input limit of 2000 characters.',
+  piPeiNeiRong: 'Matching Content (A)',
+  qingShuRuPiPeiNeiRong: 'Please enter the matching content (A)',
+  ciChu:
+    'The content here is generally the matching content for the search, with a maximum input limit of 2000 characters.',
+  ciChuTian: 'Fill in the source file name referenced by the QA content here.',
+  ciChuTianYuanWen:
+    'Fill in the page number where the original passage referenced by the QA content is located here.',
+  yuanWenDuanLuo: 'Original Passage',
+  ciChuYuanWen:
+    'Fill in the original passage referenced by the QA here, with a maximum input limit of 2000 characters.',
+  wenJianMing: 'File Name',
+  bianJiShuJuShiBai: 'Failed to edit data',
+  bianJiShuJuChengGong: 'Successfully edited data',
 };
