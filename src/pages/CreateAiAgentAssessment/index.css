@@ -5,3 +5,8 @@ body {
 .index-card .tenx-ui-materials-formily-item-label-content {
   padding-left: 0;
 }
+.dataset-table .tenx-ui-materials-table-pagination {
+  position: absolute;
+  top: -50px;
+  right: 0px;
+}

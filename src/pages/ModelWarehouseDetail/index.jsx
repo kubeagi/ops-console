@@ -11,10 +11,10 @@ import {
   Col,
   Image,
   Descriptions,
-  Typography,
-  Tag,
   Status,
   Tooltip,
+  Typography,
+  Tag,
   Dropdown,
   Tabs,
   Modal,
@@ -815,8 +815,36 @@ class ModelWarehouseDetail$$Page extends React.Component {
                     borderedBottom={false}
                     borderedBottomDashed={false}
                     colon={true}
-                    column={5}
+                    column={8}
                     items={[
+                      {
+                        children: [
+                          <Status
+                            __component_name="Status"
+                            id={__$$eval(() => this.state.data.status)}
+                            types={[
+                              { children: '异常', id: 'False', type: 'error' },
+                              { children: '正常', id: 'True', type: 'success' },
+                            ]}
+                            key="node_oclu0miditz"
+                          />,
+                          <Tooltip
+                            __component_name="Tooltip"
+                            title={__$$eval(() => this.state.data.message)}
+                            key="node_oclu0midit10"
+                          >
+                            {!!__$$eval(() => this.state.data.status === 'False') && (
+                              <AntdIconInfoCircleOutlined
+                                __component_name="AntdIconInfoCircleOutlined"
+                                style={{ marginLeft: '20px' }}
+                              />
+                            )}
+                          </Tooltip>,
+                        ],
+                        key: '918t94n9pza',
+                        label: '状态',
+                        span: 1,
+                      },
                       {
                         children: (
                           <Typography.Text
@@ -831,7 +859,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                           </Typography.Text>
                         ),
                         key: 'qts1prkau6',
-                        label: '来源',
+                        label: '模型地址',
                         span: 1,
                       },
                       {
@@ -870,27 +898,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
                             {__$$eval(() => this.utils.getFullName(this.state.data) || '-')}
                           </Typography.Title>
                         </Col>
-                        <Col __component_name="Col" span={24} style={{ marginBottom: '0px' }}>
-                          <Status
-                            __component_name="Status"
-                            id={__$$eval(() => this.state.data.status)}
-                            types={[
-                              { children: '异常', id: 'False', type: 'error' },
-                              { children: '正常', id: 'True', type: 'success' },
-                            ]}
-                          />
-                          <Tooltip
-                            __component_name="Tooltip"
-                            title={__$$eval(() => this.state.data.message)}
-                          >
-                            {!!__$$eval(() => this.state.data.status === 'False') && (
-                              <AntdIconInfoCircleOutlined
-                                __component_name="AntdIconInfoCircleOutlined"
-                                style={{ marginLeft: '20px' }}
-                              />
-                            )}
-                          </Tooltip>
-                        </Col>
                       </Row>
                     }
                   />
@@ -902,8 +909,36 @@ class ModelWarehouseDetail$$Page extends React.Component {
                     borderedBottom={false}
                     borderedBottomDashed={false}
                     colon={true}
-                    column={5}
+                    column={6}
                     items={[
+                      {
+                        children: [
+                          <Status
+                            __component_name="Status"
+                            id={__$$eval(() => this.state.data.status)}
+                            types={[
+                              { children: '异常', id: 'False', type: 'error' },
+                              { children: '正常', id: 'True', type: 'success' },
+                            ]}
+                            key="node_oclu0miditn"
+                          />,
+                          <Tooltip
+                            __component_name="Tooltip"
+                            title={__$$eval(() => this.state.data.message)}
+                            key="node_oclu0miditw"
+                          >
+                            {!!__$$eval(() => this.state.data.status === 'False') && (
+                              <AntdIconInfoCircleOutlined
+                                __component_name="AntdIconInfoCircleOutlined"
+                                style={{ marginLeft: '20px' }}
+                              />
+                            )}
+                          </Tooltip>,
+                        ],
+                        key: 'vf42cdbq3y',
+                        label: '状态',
+                        span: 1,
+                      },
                       {
                         children: (
                           <Typography.Text
@@ -918,8 +953,8 @@ class ModelWarehouseDetail$$Page extends React.Component {
                           </Typography.Text>
                         ),
                         key: 'qts1prkau6',
-                        label: '来源',
-                        span: 2,
+                        label: '模型地址',
+                        span: 1,
                       },
                       {
                         children: (
@@ -972,27 +1007,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
                           >
                             {__$$eval(() => this.utils.getFullName(this.state.data) || '-')}
                           </Typography.Title>
-                        </Col>
-                        <Col __component_name="Col" span={24} style={{ marginBottom: '0px' }}>
-                          <Status
-                            __component_name="Status"
-                            id={__$$eval(() => this.state.data.status)}
-                            types={[
-                              { children: '异常', id: 'False', type: 'error' },
-                              { children: '正常', id: 'True', type: 'success' },
-                            ]}
-                          />
-                          <Tooltip
-                            __component_name="Tooltip"
-                            title={__$$eval(() => this.state.data.message)}
-                          >
-                            {!!__$$eval(() => this.state.data.status === 'False') && (
-                              <AntdIconInfoCircleOutlined
-                                __component_name="AntdIconInfoCircleOutlined"
-                                style={{ marginLeft: '20px' }}
-                              />
-                            )}
-                          </Tooltip>
                         </Col>
                       </Row>
                     }
@@ -1483,26 +1497,10 @@ class ModelWarehouseDetail$$Page extends React.Component {
           __component_name="Modal"
           cancelButtonProps={{ disabled: false }}
           centered={false}
+          className="modal_not_footer"
           confirmLoading={false}
           destroyOnClose={true}
-          footer={
-            <Button
-              __component_name="Button"
-              block={false}
-              danger={false}
-              disabled={false}
-              ghost={false}
-              onClick={function () {
-                return this.closeOpenBaseInfoModal.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this)}
-              shape="default"
-            >
-              取消
-            </Button>
-          }
+          footer={null}
           forceRender={false}
           keyboard={true}
           mask={true}
@@ -1516,6 +1514,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(this)}
           open={__$$eval(() => this.state.baseInfoModalVisible)}
           title="基本信息"
+          width="680px"
         >
           {!!__$$eval(() => this.history?.query.modelSource === 'local') && (
             <Descriptions
@@ -1621,7 +1620,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   span: 2,
                 },
               ]}
-              labelStyle={{ width: 100 }}
+              labelStyle={{ width: 80 }}
               layout="horizontal"
               size="default"
               style={{}}
@@ -1748,10 +1747,10 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   span: 2,
                 },
               ]}
-              labelStyle={{ width: 100 }}
+              labelStyle={{ textAlign: 'right', width: 80 }}
               layout="horizontal"
-              size="default"
-              style={{}}
+              size="small"
+              style={{ textAlign: 'left' }}
               title=""
             />
           )}

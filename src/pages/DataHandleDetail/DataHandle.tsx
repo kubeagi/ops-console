@@ -237,7 +237,9 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0', color: '#000' }}>
             {' '}
-            {I18N.template(I18N.DataHandle.duiSOUR, { val1: sourceItem.file_num, val2: type })}
+            {sourceItem.file_num
+              ? I18N.template(I18N.DataHandle.duiSOUR, { val1: sourceItem.file_num, val2: type })
+              : I18N.template(I18N.DataHandle.duiSOUR3, { val1: sourceItem.file_num, val2: type })}
           </div>
           <Table columns={getSplitColumns} dataSource={dataSource} pagination={false} />
         </div>
@@ -249,13 +251,19 @@ const DataHandle: React.FC<Iprops> = props => {
           <Row gutter={16}>{_data}</Row>
           <div style={{ padding: '8px 0', color: '#000' }}>
             {' '}
-            {I18N.template(I18N.DataHandle.duiSOUR, { val1: sourceItem.file_num, val2: type })}
+            {sourceItem.file_num
+              ? I18N.template(I18N.DataHandle.duiSOUR, { val1: sourceItem.file_num, val2: type })
+              : I18N.template(I18N.DataHandle.duiSOUR3, { val1: sourceItem.file_num, val2: type })}
           </div>
-          <Table
-            columns={type === SPLIT_TYPE_NAME ? getSplitColumns : getColumns}
-            dataSource={dataSource}
-            pagination={false}
-          />
+          {sourceItem.file_num ? (
+            <Table
+              columns={type === SPLIT_TYPE_NAME ? getSplitColumns : getColumns}
+              dataSource={dataSource}
+              pagination={false}
+            />
+          ) : (
+            ''
+          )}
         </div>
       )
     );
