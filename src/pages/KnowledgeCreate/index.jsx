@@ -83,7 +83,7 @@ class KnowledgeCreate$$Page extends React.Component {
         embedder: undefined,
         chunkSize: 300,
         chunkOverlap: 30,
-        batchSize: 10,
+        batchSize: 1,
         description: '',
       },
       nextFileList: [],
@@ -507,7 +507,7 @@ class KnowledgeCreate$$Page extends React.Component {
                         wrapperCol: 12,
                       }}
                       createFormProps={{
-                        initialValues: { batchSize: 10, chunkOverlap: 30, chunkSize: 300 },
+                        initialValues: { batchSize: 1, chunkOverlap: 30, chunkSize: 300 },
                       }}
                       formHelper={{ autoFocus: true }}
                       ref={this._refsManager.linkRef('formily_iwuyzsdvrhg')}
