@@ -8,22 +8,16 @@
  * @author zggmd
  * @date 2024-01-22
  */
-import {
-  EditOutlined,
-  FieldNumberOutlined,
-  FileSearchOutlined,
-  FileTextOutlined,
-} from '@ant-design/icons';
+import { FieldNumberOutlined, FileSearchOutlined, FileTextOutlined } from '@ant-design/icons';
 import '@lobehub/ui';
 // @ts-ignore
-import { Button, Divider, Popover, Space, Spin, Tag, Typography } from 'antd';
-import React, { FC, ReactNode } from 'react';
+import { ConfigProvider, Divider, Popover, Space, Spin, Tag, Typography } from 'antd';
+import React, { FC, ReactNode, useCallback, useState } from 'react';
 
 import I18N from '../utils/kiwiI18N';
+import EditModal, { type EditData } from './EditModal';
 import { Reference } from './index';
 import { usePopoverStyles } from './index.style';
-
-// import './index.less';
 
 const getRelColor = (score: number) => {
   if (score < 0.5) {
@@ -47,40 +41,77 @@ interface IRefContent {
 const RefContent: FC<IRefContent> = props => {
   const { styles, cx } = usePopoverStyles();
   const { reference, index, open, loading, debug, children } = props;
-  const content = reference.content ? (
+
+  const [editData, setEditData] = useState<EditData>({
+    visible: false,
+    reference: undefined,
+  });
+  const onEditRefClick = useCallback(
+    (ref: Reference) => {
+      setEditData({
+        visible: true,
+        reference: ref,
+      });
+    },
+    [setEditData]
+  );
+
+  const content = (
     <Spin spinning={loading}>
       <div className={cx(styles.popContent, 'popContent')}>
-        {reference.content ? (
-          <Typography.Title level={4}>
-            {I18N.Chat.yinYongShuJu} [{index}]
-          </Typography.Title>
-        ) : (
-          '-'
-        )}
+        <Typography.Title level={4}>
+          {I18N.Chat.yinYongShuJu} [{index}]
+        </Typography.Title>
         <Divider className="divider" />
         {Boolean(debug) && (
           <>
             <Typography.Title level={5}>{I18N.Chat.zhiShiKu}</Typography.Title>
-            <Space>
-              <FileTextOutlined />
-              <Typography.Text code ellipsis strong>
-                {reference.qa_file_path}
-              </Typography.Text>
-            </Space>
-            <Space className="relLine">
-              <FieldNumberOutlined />
-              <Tag color={getRelColor(reference.score)}>
-                {I18N.Chat.xiangSiDu}
-                {(reference.score * 100).toFixed(2)}%
-              </Tag>
-            </Space>
-            <div>
-              <Typography.Text className="q" strong>
-                {reference.question}
-              </Typography.Text>
-              <Button icon={<EditOutlined />} type="text" />
-            </div>
-            <Typography.Paragraph italic>{reference.answer}</Typography.Paragraph>
+            {Boolean(reference.qa_file_path) && (
+              <Space>
+                <FileTextOutlined />
+                <Typography.Text
+                  className="filePath"
+                  code
+                  ellipsis={{ tooltip: reference.qa_file_path }}
+                  strong
+                >
+                  {reference.qa_file_path}
+                </Typography.Text>
+              </Space>
+            )}
+            {Boolean(reference.score) && (
+              <Space className="relLine">
+                <FieldNumberOutlined />
+                <Tag color={getRelColor(reference.score)}>
+                  {I18N.Chat.xiangSiDu}
+                  {(reference.score * 100).toFixed(2)}%
+                </Tag>
+              </Space>
+            )}
+            {Boolean(reference.question) && (
+              <div>
+                <Typography.Paragraph
+                  className="q"
+                  editable={
+                    Boolean(reference.qa_file_path) && {
+                      editing: false,
+                      onStart: onEditRefClick.bind('', reference),
+                    }
+                  }
+                  ellipsis={{ rows: 4, expandable: true, tooltip: reference.question }}
+                  strong
+                >
+                  {reference.question}
+                </Typography.Paragraph>
+              </div>
+            )}
+            {Boolean(reference.answer) && (
+              <Typography.Paragraph
+                ellipsis={{ rows: 5, expandable: true, tooltip: reference.answer }}
+              >
+                {reference.answer}
+              </Typography.Paragraph>
+            )}
             <Divider className="divider" dashed />
           </>
         )}
@@ -94,36 +125,62 @@ const RefContent: FC<IRefContent> = props => {
             ) : (
               <Typography.Text>{reference.title}</Typography.Text>
             )}
+            <Divider className="divider" dashed />
           </>
         )}
         <Typography.Title level={5}>{I18N.Chat.yuanWen}</Typography.Title>
-        <Typography.Paragraph italic>{reference.content}</Typography.Paragraph>
-        {reference.file_name && (
+        {Boolean(reference.content) && (
+          <Typography.Paragraph
+            ellipsis={{ rows: 5, expandable: true, tooltip: reference.answer }}
+            italic
+          >
+            {reference.content}
+          </Typography.Paragraph>
+        )}
+        {Boolean(reference.file_name) && (
           <Space>
             <FileSearchOutlined />
-            <Typography.Text code ellipsis>
+            <Typography.Text className="filePath" code ellipsis={{ tooltip: reference.file_name }}>
               {reference.file_name}
-            </Typography.Text>{' '}
-            -{I18N.Chat.yeMa}
+            </Typography.Text>
+          </Space>
+        )}
+        {Boolean(reference.page_number) && (
+          <Space className="relLine">
+            {I18N.Chat.yeMa}
             {reference.page_number}
           </Space>
         )}
       </div>
     </Spin>
-  ) : (
-    <></>
   );
   return (
-    <Popover
-      content={content}
-      destroyTooltipOnHide
-      onOpenChange={props.onMouseLeaveCallback}
-      open={open}
-      placement="left"
-      title={null}
-    >
-      {children}
-    </Popover>
+    <>
+      {Boolean(editData?.visible) && <EditModal data={editData} setData={setEditData} />}
+      <Popover
+        content={
+          <ConfigProvider
+            theme={{
+              components: {
+                Descriptions: {
+                  titleMarginBottom: 0,
+                  itemPaddingBottom: 0,
+                },
+              },
+            }}
+          >
+            {content}
+          </ConfigProvider>
+        }
+        destroyTooltipOnHide
+        onOpenChange={props.onMouseLeaveCallback}
+        open={open}
+        placement="left"
+        title={null}
+      >
+        {children}
+      </Popover>
+    </>
   );
 };
 export default RefContent;

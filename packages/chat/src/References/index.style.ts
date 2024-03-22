@@ -51,6 +51,12 @@ export const usePopoverStyles = createStyles(({ token, css }) => {
         margin: 12px 0;
         font-size: 13px;
       }
+      .filePath {
+        width: 272px;
+      }
+      .fileName {
+        margin-bottom: 0 !important;
+      }
     `,
   };
 });
