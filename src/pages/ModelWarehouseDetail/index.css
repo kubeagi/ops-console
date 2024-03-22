@@ -5,3 +5,12 @@ body {
 .model-ware-detail .tenx-ui-materials-descriptions-header {
   margin-bottom: 4px;
 }
+
+.modal_not_footer .tenx-ui-materials-modal-body {
+  margin-bottom: 0;
+}
+
+.modal_not_footer .tenx-ui-materials-modal-body::after {
+  content: '';
+  height: 0;
+}
