@@ -89,6 +89,18 @@ class DataHandleList$$Page extends React.Component {
     console.log('will unmount');
   }
 
+  calcSpendTime(record) {
+    const times = (
+      ((record.end_datetime ? new Date(record.end_datetime) : new Date()).getTime() -
+        new Date(record.start_datetime).getTime()) /
+      60000
+    ).toFixed(2);
+    if (times > 60) {
+      return `${(times / 60).toFixed(2)} 小时`;
+    }
+    return `${times} 分钟`;
+  }
+
   getComponentRef(ref) {
     console.log(ref, 'ffffffffffff1');
     // this.logRef = ref;
@@ -331,399 +343,348 @@ class DataHandleList$$Page extends React.Component {
               __component_name="Alert"
               message="一站式数据处理方案，支持文本数据的拆分、数据异常清洗、数据过滤、数据去重以及数据去除隐私等处理配置，可大幅提升数据质量。"
               showIcon={true}
+              style={{ marginBottom: '16px' }}
               type="info"
             />
           </Col>
-          <Col __component_name="Col" span={24} style={{}}>
-            <Row __component_name="Row" wrap={true}>
-              <Col __component_name="Col" span={24}>
-                <Card
-                  __component_name="Card"
-                  actions={[]}
-                  bordered={false}
-                  hoverable={false}
-                  loading={false}
-                  size="default"
-                  style={{ paddingBottom: '16px', paddingTop: '4px' }}
-                  type="inner"
-                >
-                  <Row __component_name="Row" justify="space-between" wrap={false}>
-                    <Col __component_name="Col">
-                      <Space align="center" direction="horizontal" size={12}>
-                        <Button
-                          __component_name="Button"
-                          block={false}
-                          danger={false}
-                          disabled={false}
-                          ghost={false}
-                          href=""
-                          icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
-                          onClick={function () {
-                            return this.onLinkCreate.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          shape="default"
-                          target="_self"
-                          type="primary"
-                        >
-                          创建处理任务
-                        </Button>
-                        <Button
-                          __component_name="Button"
-                          block={false}
-                          danger={false}
-                          disabled={false}
-                          ghost={false}
-                          icon={
-                            <AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />
-                          }
-                          onClick={function () {
-                            return this.onRefresh.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          shape="default"
-                        >
-                          刷新
-                        </Button>
-                        <Input.Search
-                          __component_name="Input.Search"
-                          onChange={function () {
-                            return this.onhandleChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          onSearch={function () {
-                            return this.handleSearchValueChange.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          placeholder="请输入任务名称搜索"
-                          style={{ width: '240px' }}
-                          value={__$$eval(() => this.state.keyword)}
-                        />
-                      </Space>
-                    </Col>
-                  </Row>
-                  <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
-                    <Col __component_name="Col" span={24}>
-                      {!!__$$eval(() => this.state.delModalvisible) && (
-                        <Modal
-                          __component_name="Modal"
-                          centered={false}
-                          confirmLoading={false}
-                          destroyOnClose={true}
-                          forceRender={false}
-                          keyboard={true}
-                          mask={true}
-                          maskClosable={false}
-                          onCancel={function () {
-                            return this.onCloseDelModal.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          onOk={function () {
-                            return this.onCloseDelModal.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([])
-                            );
-                          }.bind(this)}
-                          open={true}
-                          title="删除任务"
-                        >
-                          <Alert
-                            __component_name="Alert"
-                            message="确认删除任务？"
-                            showIcon={true}
-                            type="warning"
-                          />
-                        </Modal>
-                      )}
-                      <Table
-                        __component_name="Table"
-                        columns={[
-                          {
-                            dataIndex: 'name',
-                            ellipsis: { showTitle: true },
-                            key: 'name',
-                            render: (text, record, index) =>
-                              (__$$context => (
-                                <UnifiedLink
-                                  __component_name="UnifiedLink"
-                                  target="_self"
-                                  to={__$$eval(() => '/data-handle/detail/' + record.id)}
-                                >
-                                  {__$$eval(() => text)}
-                                </UnifiedLink>
-                              ))(__$$createChildContext(__$$context, { text, record, index })),
-                            title: '任务名称',
-                          },
-                          {
-                            dataIndex: 'status',
-                            key: 'status',
-                            render: (text, record, index) =>
-                              (__$$context => [
-                                <Status
-                                  __component_name="Status"
-                                  id={__$$eval(() => record.status)}
-                                  types={[
-                                    { children: '处理中', id: 'processing', type: 'info' },
-                                    {
-                                      children: '处理完成',
-                                      id: 'process_complete',
-                                      type: 'success',
-                                    },
-                                    { children: '处理失败', id: 'process_fail', type: 'error' },
-                                  ]}
-                                  key="node_ocloo0nm9w4"
-                                />,
-                                <Tooltip
-                                  __component_name="Tooltip"
-                                  title={__$$eval(() => record.error_msg || '-')}
-                                  key="node_oclqyryfzi2"
-                                >
-                                  {!!__$$eval(() => record.status === 'process_fail') && (
-                                    <AntdIconInfoCircleOutlined
-                                      __component_name="AntdIconInfoCircleOutlined"
-                                      style={{ marginLeft: '20px' }}
-                                    />
-                                  )}
-                                </Tooltip>,
-                              ])(__$$createChildContext(__$$context, { text, record, index })),
-                            title: '状态',
-                          },
-                          {
-                            dataIndex: 'pre_data_set_name',
-                            key: 'pre_data_set_name',
-                            render: (text, record, index) =>
-                              (__$$context => [
-                                <UnifiedLink
-                                  __component_name="UnifiedLink"
-                                  inQianKun={false}
-                                  target="_self"
-                                  to={__$$eval(() => '/dataset/detail/' + record.pre_data_set_name)}
-                                  key="node_oclpc8ipq71"
-                                >
-                                  {__$$eval(() => record.pre_data_set_name)}
-                                </UnifiedLink>,
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '' }}
-                                  key="node_oclpb5hlmy7"
-                                >
-                                  {' '}
-                                  /{' '}
-                                </Typography.Text>,
-                                <UnifiedLink
-                                  __component_name="UnifiedLink"
-                                  target="_self"
-                                  to={__$$eval(
-                                    () =>
-                                      '/dataset/detail/' +
-                                      record.post_data_set_name +
-                                      '/version/' +
-                                      record.post_data_set_name +
-                                      '-' +
-                                      record.pre_data_set_version
-                                  )}
-                                  key="node_oclpc8ipq77"
-                                >
-                                  {__$$eval(() => record.pre_data_set_version)}
-                                </UnifiedLink>,
-                              ])(__$$createChildContext(__$$context, { text, record, index })),
-                            title: '处理前数据集',
-                          },
-                          {
-                            dataIndex: 'dataset_info.postDataSetName',
-                            key: 'postDataSetName',
-                            render: (text, record, index) =>
-                              (__$$context => [
-                                <UnifiedLink
-                                  __component_name="UnifiedLink"
-                                  inQianKun={false}
-                                  target="_self"
-                                  to={__$$eval(
-                                    () => '/dataset/detail/' + record.post_data_set_name
-                                  )}
-                                  key="node_oclpc8ipq78"
-                                >
-                                  {__$$eval(() => record.post_data_set_name)}
-                                </UnifiedLink>,
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '' }}
-                                  key="node_oclpb2s62x4"
-                                >
-                                  /
-                                </Typography.Text>,
-                                <UnifiedLink
-                                  __component_name="UnifiedLink"
-                                  target="_self"
-                                  to={__$$eval(
-                                    () =>
-                                      '/dataset/detail/' +
-                                      record.post_data_set_name +
-                                      '/version/' +
-                                      record.post_data_set_name +
-                                      '-' +
-                                      record.post_data_set_version
-                                  )}
-                                  key="node_oclpc8ipq79"
-                                >
-                                  {__$$eval(() => record.post_data_set_version)}
-                                </UnifiedLink>,
-                              ])(__$$createChildContext(__$$context, { text, record, index })),
-                            title: '处理后数据集',
-                          },
-                          {
-                            dataIndex: 'start_datetime',
-                            key: 'start_datetime',
-                            render: (text, record, index) =>
-                              (__$$context => (
-                                <Typography.Time
-                                  __component_name="Typography.Time"
-                                  format=""
-                                  relativeTime={false}
-                                  time={__$$eval(() => record.start_datetime)}
-                                />
-                              ))(__$$createChildContext(__$$context, { text, record, index })),
-                            title: '开始时间',
-                          },
-                          {
-                            dataIndex: 'op',
-                            key: 'op',
-                            render: (text, record, index) =>
-                              (__$$context => (
-                                <Space
-                                  __component_name="Space"
-                                  align="center"
-                                  direction="horizontal"
-                                >
-                                  {!!__$$eval(() => record.status === 'process_fail') && (
-                                    <Button
-                                      __component_name="Button"
-                                      block={false}
-                                      danger={false}
-                                      disabled={false}
-                                      ghost={false}
-                                      onClick={function () {
-                                        return this.onRetry.apply(
-                                          this,
-                                          Array.prototype.slice.call(arguments).concat([
-                                            {
-                                              record: record,
-                                            },
-                                          ])
-                                        );
-                                      }.bind(__$$context)}
-                                      shape="default"
-                                      size="small"
-                                    >
-                                      重试
-                                    </Button>
-                                  )}
-                                  <Button
-                                    __component_name="Button"
-                                    block={false}
-                                    danger={false}
-                                    disabled={false}
-                                    ghost={false}
-                                    onClick={function () {
-                                      return this.onOpenDelModal.apply(
-                                        this,
-                                        Array.prototype.slice.call(arguments).concat([
-                                          {
-                                            record: record,
-                                          },
-                                        ])
-                                      );
-                                    }.bind(__$$context)}
-                                    shape="default"
-                                    size="small"
-                                  >
-                                    删除
-                                  </Button>
-                                </Space>
-                              ))(__$$createChildContext(__$$context, { text, record, index })),
-                            title: '操作',
-                            width: 160,
-                          },
-                        ]}
-                        dataSource={__$$eval(() => this.state.dataHandleList)}
-                        loading={__$$eval(() => this.state.listLoading)}
-                        onChange={function () {
-                          return this.handleTableChange.apply(
-                            this,
-                            Array.prototype.slice.call(arguments).concat([])
-                          );
-                        }.bind(this)}
-                        pagination={{
-                          position: [],
-                          showQuickJumper: false,
-                          showSizeChanger: false,
-                          simple: false,
-                          size: 'default',
-                        }}
-                        rowKey=""
-                        scroll={{ scrollToFirstRowOnChange: true }}
-                        showHeader={true}
-                        size="middle"
-                        style={{ marginTop: '16px' }}
-                      />
-                    </Col>
-                  </Row>
-                  <Row __component_name="Row" wrap={true}>
-                    <Col __component_name="Col" span={24}>
-                      <Row __component_name="Row" justify="space-between" wrap={false}>
-                        <Col __component_name="Col" />
-                        <Col __component_name="Col">
-                          <Pagination
-                            __component_name="Pagination"
-                            current={__$$eval(() => this.state.currentPage)}
-                            onChange={function () {
-                              return this.onCurrentPageChange.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([])
-                              );
-                            }.bind(this)}
-                            onShowSizeChange={function () {
-                              return this.handlePaginationChange.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([])
-                              );
-                            }.bind(this)}
-                            pageSize={__$$eval(() => this.state.pageSize)}
-                            showTotal={function () {
-                              return this.showTotal.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([])
-                              );
-                            }.bind(this)}
-                            simple={false}
-                            style={{ marginTop: '12px', textAlign: 'right' }}
-                            total={__$$eval(() => this.state.totalCount)}
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </Card>
-              </Col>
-            </Row>
-          </Col>
         </Row>
+        <Card
+          __component_name="Card"
+          actions={[]}
+          bordered={false}
+          hoverable={false}
+          loading={false}
+          size="default"
+          style={{ paddingBottom: '16px', paddingTop: '4px' }}
+          type="inner"
+        >
+          <Row __component_name="Row" justify="space-between" wrap={false}>
+            <Col __component_name="Col">
+              <Space align="center" direction="horizontal" size={12}>
+                <Button
+                  __component_name="Button"
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  href=""
+                  icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
+                  onClick={function () {
+                    return this.onLinkCreate.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                  target="_self"
+                  type="primary"
+                >
+                  创建处理任务
+                </Button>
+                <Button
+                  __component_name="Button"
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  icon={<AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />}
+                  onClick={function () {
+                    return this.onRefresh.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                >
+                  刷新
+                </Button>
+                <Input.Search
+                  __component_name="Input.Search"
+                  onChange={function () {
+                    return this.onhandleChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  onSearch={function () {
+                    return this.handleSearchValueChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  placeholder="请输入任务名称搜索"
+                  style={{ width: '240px' }}
+                  value={__$$eval(() => this.state.keyword)}
+                />
+              </Space>
+            </Col>
+          </Row>
+          <Table
+            __component_name="Table"
+            columns={[
+              {
+                dataIndex: 'name',
+                ellipsis: { showTitle: true },
+                key: 'name',
+                render: (text, record, index) =>
+                  (__$$context => (
+                    <UnifiedLink
+                      __component_name="UnifiedLink"
+                      target="_self"
+                      to={__$$eval(() => '/data-handle/detail/' + record.id)}
+                    >
+                      {__$$eval(() => text)}
+                    </UnifiedLink>
+                  ))(__$$createChildContext(__$$context, { text, record, index })),
+                title: '任务名称',
+              },
+              {
+                dataIndex: 'status',
+                key: 'status',
+                render: (text, record, index) =>
+                  (__$$context => [
+                    <Status
+                      __component_name="Status"
+                      id={__$$eval(() => record.status)}
+                      types={[
+                        { children: '处理中', id: 'processing', type: 'info' },
+                        { children: '处理完成', id: 'process_complete', type: 'success' },
+                        { children: '处理失败', id: 'process_fail', type: 'error' },
+                      ]}
+                      key="node_ocloo0nm9w4"
+                    />,
+                    <Tooltip
+                      __component_name="Tooltip"
+                      title={__$$eval(() => record.error_msg || '-')}
+                      key="node_oclqyryfzi2"
+                    >
+                      {!!__$$eval(() => record.status === 'process_fail') && (
+                        <AntdIconInfoCircleOutlined
+                          __component_name="AntdIconInfoCircleOutlined"
+                          style={{ marginLeft: '20px' }}
+                        />
+                      )}
+                    </Tooltip>,
+                  ])(__$$createChildContext(__$$context, { text, record, index })),
+                title: '状态',
+              },
+              {
+                dataIndex: 'start_datetime',
+                key: 'start_datetime',
+                render: (text, record, index) =>
+                  (__$$context => (
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => __$$context.calcSpendTime(record))}
+                    </Typography.Text>
+                  ))(__$$createChildContext(__$$context, { text, record, index })),
+                title: '耗时',
+              },
+              {
+                dataIndex: 'pre_data_set_name',
+                key: 'pre_data_set_name',
+                render: (text, record, index) =>
+                  (__$$context => [
+                    <UnifiedLink
+                      __component_name="UnifiedLink"
+                      inQianKun={false}
+                      target="_self"
+                      to={__$$eval(() => '/dataset/detail/' + record.pre_data_set_name)}
+                      key="node_oclpc8ipq71"
+                    >
+                      {__$$eval(() => record.pre_data_set_name)}
+                    </UnifiedLink>,
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                      key="node_oclpb5hlmy7"
+                    >
+                      {' '}
+                      /{' '}
+                    </Typography.Text>,
+                    <UnifiedLink
+                      __component_name="UnifiedLink"
+                      target="_self"
+                      to={__$$eval(
+                        () =>
+                          '/dataset/detail/' +
+                          record.post_data_set_name +
+                          '/version/' +
+                          record.post_data_set_name +
+                          '-' +
+                          record.pre_data_set_version
+                      )}
+                      key="node_oclpc8ipq77"
+                    >
+                      {__$$eval(() => record.pre_data_set_version)}
+                    </UnifiedLink>,
+                  ])(__$$createChildContext(__$$context, { text, record, index })),
+                title: '处理前数据集',
+              },
+              {
+                dataIndex: 'dataset_info.postDataSetName',
+                key: 'postDataSetName',
+                render: (text, record, index) =>
+                  (__$$context => [
+                    <UnifiedLink
+                      __component_name="UnifiedLink"
+                      inQianKun={false}
+                      target="_self"
+                      to={__$$eval(() => '/dataset/detail/' + record.post_data_set_name)}
+                      key="node_oclpc8ipq78"
+                    >
+                      {__$$eval(() => record.post_data_set_name)}
+                    </UnifiedLink>,
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                      key="node_oclpb2s62x4"
+                    >
+                      /
+                    </Typography.Text>,
+                    <UnifiedLink
+                      __component_name="UnifiedLink"
+                      target="_self"
+                      to={__$$eval(
+                        () =>
+                          '/dataset/detail/' +
+                          record.post_data_set_name +
+                          '/version/' +
+                          record.post_data_set_name +
+                          '-' +
+                          record.post_data_set_version
+                      )}
+                      key="node_oclpc8ipq79"
+                    >
+                      {__$$eval(() => record.post_data_set_version)}
+                    </UnifiedLink>,
+                  ])(__$$createChildContext(__$$context, { text, record, index })),
+                title: '处理后数据集',
+              },
+              {
+                dataIndex: 'op',
+                key: 'op',
+                render: (text, record, index) =>
+                  (__$$context => (
+                    <Space __component_name="Space" align="center" direction="horizontal">
+                      {!!__$$eval(() => record.status === 'process_fail') && (
+                        <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
+                          onClick={function () {
+                            return this.onRetry.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([
+                                {
+                                  record: record,
+                                },
+                              ])
+                            );
+                          }.bind(__$$context)}
+                          shape="default"
+                          size="small"
+                        >
+                          重试
+                        </Button>
+                      )}
+                      <Button
+                        __component_name="Button"
+                        block={false}
+                        danger={false}
+                        disabled={false}
+                        ghost={false}
+                        onClick={function () {
+                          return this.onOpenDelModal.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([
+                              {
+                                record: record,
+                              },
+                            ])
+                          );
+                        }.bind(__$$context)}
+                        shape="default"
+                        size="small"
+                      >
+                        删除
+                      </Button>
+                    </Space>
+                  ))(__$$createChildContext(__$$context, { text, record, index })),
+                title: '操作',
+                width: 160,
+              },
+            ]}
+            dataSource={__$$eval(() => this.state.dataHandleList)}
+            loading={__$$eval(() => this.state.listLoading)}
+            onChange={function () {
+              return this.handleTableChange.apply(
+                this,
+                Array.prototype.slice.call(arguments).concat([])
+              );
+            }.bind(this)}
+            pagination={{
+              position: [],
+              showQuickJumper: false,
+              showSizeChanger: false,
+              simple: false,
+              size: 'default',
+            }}
+            rowKey=""
+            scroll={{ scrollToFirstRowOnChange: false }}
+            showHeader={true}
+            size="middle"
+            style={{ marginTop: '16px' }}
+          />
+          <Row __component_name="Row" wrap={true}>
+            <Col __component_name="Col" span={24}>
+              <Row __component_name="Row" justify="space-between" wrap={false}>
+                <Col __component_name="Col" />
+                <Col __component_name="Col">
+                  <Pagination
+                    __component_name="Pagination"
+                    current={__$$eval(() => this.state.currentPage)}
+                    onChange={function () {
+                      return this.onCurrentPageChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    onShowSizeChange={function () {
+                      return this.handlePaginationChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    pageSize={__$$eval(() => this.state.pageSize)}
+                    showTotal={function () {
+                      return this.showTotal.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    simple={false}
+                    style={{ marginTop: '12px', textAlign: 'right' }}
+                    total={__$$eval(() => this.state.totalCount)}
+                  />
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Card>
         <Modal
           __component_name="Modal"
           cancelButtonProps={{ disabled: false }}

@@ -71,8 +71,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.2.1
-        version: 1.2.1(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.2.2
+        version: 1.2.2(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/chat':
         specifier: workspace:*
         version: link:packages/chat
@@ -82,6 +82,9 @@ importers:
       '@yuntijs/request':
         specifier: ^1.0.0
         version: 1.0.0
+      '@yuntijs/ui-lowcode-materials':
+        specifier: ^1.0.0
+        version: 1.3.0(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd-style@3.6.1)(antd@5.13.2)(lodash@4.17.21)(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0)
       KubeAGIUpload:
         specifier: workspace:*
         version: link:packages/KubeAGIUpload
@@ -676,6 +679,15 @@ packages:
     resolution: {integrity: sha512-lQ+nU6JR54JMHERLU9R0PaDmPmLSwhUjZY/cKGgx8nDIq78tbxV2TjBIOnY2T0br64oyJ8SUkrqmDHOBV4o4PA==}
     dependencies:
       tslib: 2.6.2
+    dev: false
+
+  /@alilc/lowcode-plugin-base-monaco-editor@1.1.2(monaco-editor@0.47.0):
+    resolution: {integrity: sha512-ZEq08Zj4gLQgFzoU3T6xQITv6nyF/KlUJ1cVZ4RzdgYho4iQqUyoOUY0g+YIGc8Lre9yIVwnfLv2gSf2K61TCw==}
+    dependencies:
+      '@monaco-editor/loader': 1.3.0(monaco-editor@0.47.0)
+      classnames: 2.5.1
+    transitivePeerDependencies:
+      - monaco-editor
     dev: false
 
   /@alilc/lowcode-types@1.3.1:
@@ -5306,6 +5318,15 @@ packages:
   /@microsoft/tsdoc@0.14.2:
     resolution: {integrity: sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==}
 
+  /@monaco-editor/loader@1.3.0(monaco-editor@0.47.0):
+    resolution: {integrity: sha512-N3mGq1ktC3zh7WUx3NGO+PSDdNq9Vspk/41rEmRdrCqV9vNbBTRzAOplmUpNQsi+hmTs++ERMBobMERb8Kb+3g==}
+    peerDependencies:
+      monaco-editor: '>= 0.21.0 < 1'
+    dependencies:
+      monaco-editor: 0.47.0
+      state-local: 1.0.7
+    dev: false
+
   /@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1:
     resolution: {integrity: sha512-54/JRvkLIzzDWshCWfuhadfrfZVPiElY8Fcgmg1HroEly/EDSszzhBAsarCux+D/kOslTRquNzuyGSmUSTTHGg==}
     dependencies:
@@ -8764,8 +8785,8 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.2.1(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-lT0sw2+8rH2iR2hWnaTa+/EIJB2yXmlabilKjg3/lYcVEpT5e3t9NjX6MQCtrmtgH8E8NXQ1xYrAeW7IJ2nstQ==}
+  /@yuntijs/arcadia-bff-sdk@1.2.2(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-7rGcVJr5vqyZGE8W61Itlgq8gd3xgT2G2leG+Y0NpsIkQsWOaLQvAWzgmsJFLl/+mNXq1B2AZpUoaDsRzl0R5w==}
     peerDependencies:
       '@tarojs/taro': '>=3'
       antd: '>=5.4.0'
@@ -8926,6 +8947,59 @@ packages:
       abort-controller: 3.0.0
       downloadjs: 1.4.7
       qs: 6.11.2
+    dev: false
+
+  /@yuntijs/ui-lowcode-materials@1.3.0(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd-style@3.6.1)(antd@5.13.2)(lodash@4.17.21)(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-nJRA7p1flMAgRDdarvzG96TZqIEvzgLWm/+GPlMka4GfNSKpK0B2bnt+WtN/p3/jRCWTQ8SPIc0cdTOKlNL6Lw==}
+    peerDependencies:
+      lodash: ^4.17.21
+      moment: latest
+      react: 16.x || 17.x
+      react-dom: 16.x || 17.x
+    dependencies:
+      '@alilc/lowcode-types': 1.3.1
+      '@babel/runtime': 7.24.0
+      '@yuntijs/ui': 1.0.0-beta.8(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd-style@3.6.1)(antd@5.13.2)(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0)
+      lodash: 4.17.21
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - antd
+      - antd-style
+      - monaco-editor
+      - supports-color
+    dev: false
+
+  /@yuntijs/ui@1.0.0-beta.8(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd-style@3.6.1)(antd@5.13.2)(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-TrbYkOG4i0KWp+4PjZFBni91iAJJZ+RO9ldtHTHnOTBrDPapzHWG1Cw4YlSHPWIu/1CIub3DcEvZJCvwVDcH+Q==}
+    peerDependencies:
+      antd: '>=5'
+      antd-style: '>=3'
+      react: '>=18'
+      react-dom: '>=18'
+    dependencies:
+      '@alilc/lowcode-plugin-base-monaco-editor': 1.1.2(monaco-editor@0.47.0)
+      '@ant-design/icons': 5.3.1(react-dom@18.2.0)(react@18.2.0)
+      '@babel/runtime': 7.24.0
+      '@lobehub/ui': 1.128.4(@types/react-dom@18.2.18)(@types/react@18.2.48)(antd-style@3.6.1)(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
+      antd: 5.13.2(react-dom@18.2.0)(react@18.2.0)
+      antd-style: 3.6.1(@types/react@18.2.48)(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
+      leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
+      lodash-es: 4.17.21
+      lucide-react: 0.363.0(react@18.2.0)
+      query-string: 8.1.0
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      react-error-boundary: 4.0.12(react@18.2.0)
+      react-layout-kit: 1.7.4(react@18.2.0)
+      url-join: 5.0.0
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - monaco-editor
+      - supports-color
     dev: false
 
   /JSONStream@1.3.5:
@@ -12351,7 +12425,7 @@ packages:
     resolution: {integrity: sha1-+LETa0Bx+9jrFAr/hYsQGewpFfo=}
 
   /extract-files@9.0.0:
-    resolution: {integrity: sha1-indE8kN/gfXtMlDtnxVQ3pAv5Uo=}
+    resolution: {integrity: sha512-CvdFfHkC95B4bBBk36hcEmvdR2awOdhhVUYH6S/zrVj3477zven/fJMYg7121h4T1xHZC+tetUpubpAhxwI7hQ==}
     engines: {node: ^10.17.0 || ^12.0.0 || >= 13.7.0}
     dev: false
 
@@ -12789,7 +12863,7 @@ packages:
     dev: true
 
   /fs-extra@7.0.1:
-    resolution: {integrity: sha1-TxicRKoSO4lfcigE9V6iPq3DSOk=}
+    resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
     dependencies:
       graceful-fs: 4.2.11
@@ -15301,7 +15375,7 @@ packages:
     dev: true
 
   /lodash.isplainobject@4.0.6:
-    resolution: {integrity: sha1-fFJqUtibRcRcxpC4gWO+BJf1UMs=}
+    resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
     dev: true
 
   /lodash.isstring@4.0.1:
@@ -16552,6 +16626,10 @@ packages:
 
   /monaco-editor@0.19.3:
     resolution: {integrity: sha1-HJlLMYbABlDbzQNNU3DUa/VsBmM=}
+    dev: false
+
+  /monaco-editor@0.47.0:
+    resolution: {integrity: sha512-VabVvHvQ9QmMwXu4du008ZDuyLnHs9j7ThVFsiJoXSOQk18+LF89N4ADzPbFenm0W4V2bGHnFBztIRQTgBfxzw==}
     dev: false
 
   /mri@1.2.0:
@@ -22399,6 +22477,10 @@ packages:
   /stackframe@1.3.4:
     resolution: {integrity: sha512-oeVtt7eWQS+Na6F//S4kJ2K2VbRlS9D43mAlMyVpVWovy9o+jfgH8O9agzANzaiLjclA0oYzUXEM4PurhSUChw==}
 
+  /state-local@1.0.7:
+    resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==}
+    dev: false
+
   /stop-iteration-iterator@1.0.0:
     resolution: {integrity: sha512-iCGQj+0l0HOdZ2AEeBADlsRC+vsnDsZsbdSiH1yNSjcfKM7fdpCMfqAL/dwF5BLiw/XhRft/Wax6zQbhq2BcjQ==}
     engines: {node: '>= 0.4'}
@@ -23115,10 +23197,10 @@ packages:
       url-parse: 1.5.10
 
   /tr46@0.0.3:
-    resolution: {integrity: sha1-gYT9NH2snNwYWZLzpmIuFLnZq2o=}
+    resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
 
   /tr46@2.1.0:
-    resolution: {integrity: sha1-+oeqgcpdWUHajL8fm3SdyWmk4kA=}
+    resolution: {integrity: sha512-15Ih7phfcdP5YxqiB+iDtLoaTz4Nd35+IiAv0kQ5FNKHzXgdWqPoTIqEDDJmXceQt4JZk6lVPT8lnDlPpGDppw==}
     engines: {node: '>=8'}
     dependencies:
       punycode: 2.3.1
@@ -24084,14 +24166,14 @@ packages:
     dev: false
 
   /webidl-conversions@3.0.1:
-    resolution: {integrity: sha1-JFNCdeKnvGvnvIZhHMFq4KVlSHE=}
+    resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
 
   /webidl-conversions@5.0.0:
-    resolution: {integrity: sha1-rlnIoAsSFUOirMZcBDT1ew/BGv8=}
+    resolution: {integrity: sha512-VlZwKPCkYKxQgeSbH5EyngOmRp7Ww7I9rQLERETtf5ofd9pGeswWiOtogpEO850jziPRarreGxn5QIiTqpb2wA==}
     engines: {node: '>=8'}
 
   /webidl-conversions@6.1.0:
-    resolution: {integrity: sha1-kRG01+qArNQPUnDWZmIa+ni2lRQ=}
+    resolution: {integrity: sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==}
     engines: {node: '>=10.4'}
 
   /webpack-sources@3.2.3:
@@ -24150,7 +24232,7 @@ packages:
     resolution: {integrity: sha1-PUseAxLSB5h5+Cav8Y2+7KWWD78=}
 
   /whatwg-url@5.0.0:
-    resolution: {integrity: sha1-lmRU6HZUYuN2RNNib2dCzotwll0=}
+    resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
     dependencies:
       tr46: 0.0.3
       webidl-conversions: 3.0.1

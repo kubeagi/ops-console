@@ -127,28 +127,25 @@ class ModelService$$Page extends React.Component {
   async localMenuOnClick(e, item) {
     e.domEvent.stopPropagation();
     switch (e.key) {
-      case 'offline': {
+      case 'offline':
         this.setState({
           currentModel: item,
           offlineModal: true,
         });
         break;
-      }
-      case 'edit': {
+      case 'edit':
         this.history.push(
           `/model-service/editModelService?name=${item.name}&type=${
             item.providerType === 'worker' ? 'local' : 'external'
           }`
         );
         break;
-      }
-      case 'delete': {
+      case 'delete':
         this.setState({
           currentModel: item,
           delVisible: true,
         });
         break;
-      }
     }
   }
 
@@ -201,11 +198,15 @@ class ModelService$$Page extends React.Component {
         namespace,
         name: this.state.currentModel.name,
       };
-      await (currentModel.providerType === 'worker' ? this.props.appHelper.utils.bff?.deleteWorkers({
+      if (currentModel.providerType === 'worker') {
+        await this.props.appHelper.utils.bff?.deleteWorkers({
           input,
-        }) : this.props.appHelper.utils.bff?.deleteModelServices({
+        });
+      } else {
+        await this.props.appHelper.utils.bff?.deleteModelServices({
           input,
-        }));
+        });
+      }
       this.utils.notification.success({
         message: '删除成功',
       });
@@ -335,7 +336,10 @@ class ModelService$$Page extends React.Component {
                           ghost={false}
                           icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
                           onClick={function () {
-                            return Reflect.apply(this.onClickCreatModel, this, [...Array.prototype.slice.call(arguments)]);
+                            return this.onClickCreatModel.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
                           }.bind(this)}
                           shape="default"
                           type="primary"
@@ -350,7 +354,10 @@ class ModelService$$Page extends React.Component {
                           ghost={false}
                           icon={<TenxIconRefresh __component_name="TenxIconRefresh" />}
                           onClick={function () {
-                            return Reflect.apply(this.onRefresh, this, [...Array.prototype.slice.call(arguments)]);
+                            return this.onRefresh.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
                           }.bind(this)}
                           shape="default"
                         >
@@ -359,10 +366,16 @@ class ModelService$$Page extends React.Component {
                         <Input.Search
                           __component_name="Input.Search"
                           onChange={function () {
-                            return Reflect.apply(this.onChangeKeyword, this, [...Array.prototype.slice.call(arguments)]);
+                            return this.onChangeKeyword.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
                           }.bind(this)}
                           onSearch={function () {
-                            return Reflect.apply(this.onSearch, this, [...Array.prototype.slice.call(arguments)]);
+                            return this.onSearch.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
                           }.bind(this)}
                           placeholder={this.i18n('i18n-f591ezbf') /* 请输入模型服务名称搜索 */}
                           value={__$$eval(() => this.state.keyword)}
@@ -379,7 +392,10 @@ class ModelService$$Page extends React.Component {
                               allowClear={true}
                               disabled={false}
                               onChange={function () {
-                                return Reflect.apply(this.onChangeProviderType, this, [...Array.prototype.slice.call(arguments)]);
+                                return this.onChangeProviderType.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([])
+                                );
                               }.bind(this)}
                               options={[
                                 { label: '全部来源', value: '' },
@@ -397,7 +413,10 @@ class ModelService$$Page extends React.Component {
                               allowClear={true}
                               disabled={false}
                               onChange={function () {
-                                return Reflect.apply(this.onChangeModelTypes, this, [...Array.prototype.slice.call(arguments)]);
+                                return this.onChangeModelTypes.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([])
+                                );
                               }.bind(this)}
                               options={[
                                 { label: '全部类型', value: '' },
@@ -426,7 +445,10 @@ class ModelService$$Page extends React.Component {
                     loading={__$$eval(() => this.state.loading)}
                     pagination={{
                       onChange: function () {
-                        return Reflect.apply(this.paginationOnChange, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.paginationOnChange.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this),
                       pageSize: 12,
                       pagination: { pageSize: 5 },
@@ -434,7 +456,10 @@ class ModelService$$Page extends React.Component {
                       showQuickJumper: false,
                       showSizeChanger: false,
                       showTotal: function () {
-                        return Reflect.apply(this.showTotal, this, [...Array.prototype.slice.call(arguments)]);
+                        return this.showTotal.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
                       }.bind(this),
                       simple: false,
                       size: 'default',
@@ -450,12 +475,15 @@ class ModelService$$Page extends React.Component {
                             hoverable={true}
                             loading={false}
                             onClick={function () {
-                              return Reflect.apply(this.onClickToDetail, this, [...Array.prototype.slice.call(arguments), 
+                              return this.onClickToDetail.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([
                                   {
                                     id: item?.name,
                                     type: item?.providerType,
                                   },
-                                ]);
+                                ])
+                              );
                             }.bind(__$$context)}
                             size="default"
                             style={{}}
@@ -506,11 +534,14 @@ class ModelService$$Page extends React.Component {
                                           },
                                         ],
                                         onClick: function () {
-                                          return Reflect.apply(this.localMenuOnClick, this, [...Array.prototype.slice.call(arguments), 
+                                          return this.localMenuOnClick.apply(
+                                            this,
+                                            Array.prototype.slice.call(arguments).concat([
                                               {
                                                 ...item,
                                               },
-                                            ]);
+                                            ])
+                                          );
                                         }.bind(__$$context),
                                       }}
                                       placement="bottomLeft"
@@ -623,7 +654,13 @@ class ModelService$$Page extends React.Component {
                                           id={__$$eval(() => item?.status)}
                                           types={[
                                             { children: '运行中', id: 'Running', type: 'success' },
-                                            { children: '部署中', id: 'Pending', type: 'info' },
+                                            {
+                                              _unsafe_MixedSetter_tooltip_select: 'VariableSetter',
+                                              children: '部署中',
+                                              id: 'Pending',
+                                              tooltip: __$$eval(() => item.message || ''),
+                                              type: 'info',
+                                            },
                                             {
                                               _unsafe_MixedSetter_tooltip_select: 'VariableSetter',
                                               children: '异常',
@@ -731,10 +768,10 @@ class ModelService$$Page extends React.Component {
           mask={true}
           maskClosable={false}
           onCancel={function () {
-            return Reflect.apply(this.onDelCancel, this, [...Array.prototype.slice.call(arguments)]);
+            return this.onDelCancel.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           onOk={function () {
-            return Reflect.apply(this.onDelOk, this, [...Array.prototype.slice.call(arguments)]);
+            return this.onDelOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           open={__$$eval(() => this.state.delVisible)}
           style={{}}
@@ -761,10 +798,13 @@ class ModelService$$Page extends React.Component {
           mask={true}
           maskClosable={false}
           onCancel={function () {
-            return Reflect.apply(this.onOfflineCancel, this, [...Array.prototype.slice.call(arguments)]);
+            return this.onOfflineCancel.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
           }.bind(this)}
           onOk={function () {
-            return Reflect.apply(this.onOfflineOk, this, [...Array.prototype.slice.call(arguments)]);
+            return this.onOfflineOk.apply(this, Array.prototype.slice.call(arguments).concat([]));
           }.bind(this)}
           open={__$$eval(() => this.state.offlineModal)}
           style={{}}
@@ -809,15 +849,15 @@ const PageWrapper = (props = {}) => {
   };
   return (
     <DataProvider
-      render={dataProps => (
-        <ModelService$$Page {...props} {...dataProps} appHelper={appHelper} self={self} />
-      )}
+      self={self}
       sdkInitFunc={{
         enabled: false,
         params: undefined,
       }}
       sdkSwrFuncs={[]}
-      self={self}
+      render={dataProps => (
+        <ModelService$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
+      )}
     />
   );
 };
@@ -826,7 +866,7 @@ export default PageWrapper;
 function __$$eval(expr) {
   try {
     return expr();
-  } catch {}
+  } catch (error) {}
 }
 
 function __$$evalArray(expr) {

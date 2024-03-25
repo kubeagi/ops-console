@@ -701,9 +701,11 @@ class $$Page extends React.Component {
   onFinish() {
     const list = this.convertStep3Data();
     const files = this.state.selectedFileList.map(item => {
+      const curItem = this.state.dataSetFileList.find(file => file.path === item);
       const _item = item.split('/');
       return {
         name: _item[_item.length - 1],
+        size: curItem.size,
       };
     });
     const { pre_data_set_name, pre_data_set_version } = this.state.step2FormData;
