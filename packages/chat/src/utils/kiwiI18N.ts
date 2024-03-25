@@ -10,13 +10,27 @@ export enum LangEnum {
   'zh' = 'zh-CN',
 }
 
+// 解析cookie
+const parseCookies = () => {
+  const cookies: { [key: string]: string } = {};
+  document.cookie &&
+    document.cookie.split(';').forEach(cookie => {
+      const [name, value] = cookie.trim().split('=');
+      cookies[name] = value;
+    });
+  return cookies;
+};
+
 const LOCALE_KEY = 'intl_locale';
 const _locale =
   window.localStorage.getItem(LOCALE_KEY) ||
   (typeof navigator === 'object' && typeof navigator.language === 'string'
     ? navigator.language
     : 'zh-CN');
-const locale = _locale.startsWith('en') ? 'en-US' : 'zh-CN';
+const locale =
+  _locale.startsWith('en') || parseCookies()?.['NEXT_LOCALE']?.toLocaleLowerCase() === 'en'
+    ? 'en-US'
+    : 'zh-CN';
 
 const getLocale = () => locale;
 
