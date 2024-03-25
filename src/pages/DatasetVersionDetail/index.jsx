@@ -418,7 +418,7 @@ class DatasetVersionDetail$$Page extends React.Component {
         this.state.cvsData?.current
       }&size=10&bucket=${
         this.utils.getAuthData?.()?.project
-      }&bucketPath=${this.getBucketPath()}&fileName=${this.state.fileData?.path}`,
+      }&bucketPath=${this.getBucketPath()}&fileName=${encodeURIComponent(this.state.fileData?.path)}`,
       {
         headers: {
           Authorization: this.utils.getAuthorization(),
