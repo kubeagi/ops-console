@@ -1091,22 +1091,11 @@ class CreateModelService$$Page extends React.Component {
                       <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
                         <Col __component_name="Col" span={24}>
                           <Row __component_name="Row" gutter={[0, 0]} wrap={false}>
-                            <Col __component_name="Col" flex="" span={2}>
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '12px' }}
-                              >
-                                指定 GPU
-                              </Typography.Text>
-                            </Col>
                             <Col
                               __component_name="Col"
                               flex="auto"
-                              span={12}
-                              style={{ marginBottom: '-4px' }}
+                              span={14}
+                              style={{ marginBottom: '-4px', marginLeft: '-10px' }}
                             >
                               <FormilyInput
                                 __component_name="FormilyInput"
@@ -1118,11 +1107,17 @@ class CreateModelService$$Page extends React.Component {
                                   },
                                 }}
                                 decoratorProps={{
-                                  'x-decorator-props': { colon: false, labelEllipsis: true },
+                                  'x-decorator-props': {
+                                    colon: false,
+                                    labelAlign: 'left',
+                                    labelCol: 4,
+                                    labelEllipsis: true,
+                                    wrapperAlign: 'left',
+                                  },
                                 }}
                                 fieldProps={{
                                   'name': 'CUDA_VISIBLE_DEVICES',
-                                  'title': '',
+                                  'title': '指定 GPU',
                                   'x-validator': [
                                     {
                                       children: '未知',

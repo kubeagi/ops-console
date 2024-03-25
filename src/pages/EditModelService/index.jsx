@@ -743,295 +743,297 @@ class EditModelService$$Page extends React.Component {
                     </Col>
                   </Row>
                 )}
-                <Row __component_name="Row" justify="space-between" wrap={false}>
-                  <Col __component_name="Col" flex="" span={4} style={{ paddingLeft: '10px' }}>
-                    <Typography.Text
-                      __component_name="Typography.Text"
-                      disabled={false}
-                      ellipsis={true}
-                      strong={false}
-                      style={{ fontSize: '', paddingLeft: '8px', paddingTop: '10px' }}
-                    >
-                      {this.i18n('i18n-n55cj6ks') /* 服务规格 */}
-                    </Typography.Text>
-                  </Col>
-                  <Col __component_name="Col" span={20}>
-                    <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
-                      <Col __component_name="Col" span={24}>
-                        <Row __component_name="Row" gutter={[0, 0]} style={{}} wrap={true}>
-                          <Col __component_name="Col" span={14} style={{ marginLeft: '-10px' }}>
-                            <FormilySelect
-                              __component_name="FormilySelect"
-                              componentProps={{
-                                'x-component-props': {
-                                  _sdkSwrGetFunc: { label: '', params: [], value: '' },
-                                  allowClear: false,
-                                  disabled: false,
-                                  mode: 'multiple',
-                                  onChange: function () {
-                                    return this.onChangeNode.apply(
-                                      this,
-                                      Array.prototype.slice.call(arguments).concat([])
-                                    );
-                                  }.bind(this),
-                                  placeholder: '请选择节点',
-                                  showSearch: true,
-                                },
-                              }}
-                              decoratorProps={{
-                                'x-decorator-props': {
-                                  asterisk: false,
-                                  bordered: true,
-                                  colon: false,
-                                  fullness: false,
-                                  inset: false,
-                                  labelAlign: 'left',
-                                  labelCol: 4,
-                                  labelEllipsis: true,
-                                  labelWrap: false,
-                                  tooltipLayout: 'text',
-                                  wrapperAlign: 'left',
-                                  wrapperWrap: false,
-                                },
-                              }}
-                              fieldProps={{
-                                '_unsafe_MixedSetter_enum_select': 'ArraySetter',
-                                '_unsafe_MixedSetter_title_select': 'StringSetter',
-                                'enum': [],
-                                'name': 'nodes',
-                                'required': false,
-                                'title': '指定节点',
-                                'x-display':
-                                  "{{ !$form.values?.nodesNoAuth ? 'visible' : 'hidden' }}",
-                                'x-pattern': '',
-                                'x-validator': [],
-                              }}
-                              style={{}}
-                            />
-                          </Col>
-                        </Row>
-                        <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
-                          <Col __component_name="Col" span={24} style={{}}>
-                            <FormilyFormItem
-                              __component_name="FormilyFormItem"
-                              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
-                              fieldProps={{
-                                'name': '',
-                                'title': '',
-                                'type': 'object',
-                                'x-component': 'FormilyFormItem',
-                                'x-display':
-                                  "{{ $form.values?.nodesNoAuth ? 'visible' : 'hidden' }}",
-                                'x-validator': [],
-                              }}
-                            >
-                              <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
-                                <Col __component_name="Col" span={2} style={{}}>
-                                  <Typography.Title
-                                    __component_name="Typography.Title"
-                                    bold={false}
-                                    bordered={false}
-                                    ellipsis={true}
-                                    level={2}
-                                  >
-                                    指定节点
-                                  </Typography.Title>
-                                </Col>
-                                <Col __component_name="Col" span={13} style={{}}>
-                                  <Typography.Title
-                                    __component_name="Typography.Title"
-                                    bold={false}
-                                    bordered={false}
-                                    ellipsis={true}
-                                    level={2}
-                                    style={{}}
-                                  >
-                                    随机
-                                  </Typography.Title>
-                                  <Typography.Title
-                                    __component_name="Typography.Title"
-                                    bold={false}
-                                    bordered={false}
-                                    ellipsis={true}
-                                    level={2}
-                                    style={{ color: '#aaaaaa', display: 'block' }}
-                                  >
-                                    暂无权限，无法指定节点，请联系管理员获取节点查询权限。
-                                  </Typography.Title>
-                                </Col>
-                              </Row>
-                            </FormilyFormItem>
-                          </Col>
-                        </Row>
-                        <Row
-                          __component_name="Row"
-                          gutter={[0, 0]}
-                          style={{ marginBottom: '20px' }}
-                          wrap={true}
-                        >
-                          <Col __component_name="Col" span={24}>
-                            <Typography.Title
-                              __component_name="Typography.Title"
-                              bold={true}
-                              bordered={false}
-                              ellipsis={true}
-                              level={1}
-                            >
-                              {this.i18n('i18n-u0etzjrs') /* - */}
-                            </Typography.Title>
-                            <Typography.Title
-                              __component_name="Typography.Title"
-                              bold={false}
-                              bordered={false}
-                              ellipsis={true}
-                              level={2}
-                            >
-                              CPU
-                            </Typography.Title>
-                          </Col>
-                          <Col __component_name="Col" id="cpu" span={20}>
-                            <SliderInput
-                              __component_name="SliderInput"
-                              addonAfter="核"
-                              defaultValue={4}
-                              gutter={20}
-                              id="cpu"
-                              inputCol={__$$eval(() => ({
-                                span: 5,
-                              }))}
-                              inputProps={__$$eval(() => ({}))}
-                              max={64}
-                              min={1}
-                              onChange={function () {
-                                return this.onChangeCpu.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
-                              }.bind(this)}
-                              placeholder="CPU"
-                              sliderCol={__$$eval(() => ({
-                                span: 12,
-                              }))}
-                              sliderProps={__$$eval(() => ({}))}
-                              step={1}
-                              value={__$$eval(() => this.state.resourcesData?.cpu)}
-                            />
-                          </Col>
-                        </Row>
-                        <Row
-                          __component_name="Row"
-                          gutter={[0, 0]}
-                          style={{ marginBottom: '20px' }}
-                          wrap={true}
-                        >
-                          <Col __component_name="Col" span={24}>
-                            <Typography.Title
-                              __component_name="Typography.Title"
-                              bold={true}
-                              bordered={false}
-                              ellipsis={true}
-                              level={1}
-                            >
-                              {this.i18n('i18n-u0etzjrs') /* - */}
-                            </Typography.Title>
-                            <Typography.Title
-                              __component_name="Typography.Title"
-                              bold={false}
-                              bordered={false}
-                              ellipsis={true}
-                              level={2}
-                            >
-                              内存
-                            </Typography.Title>
-                          </Col>
-                          <Col __component_name="Col" span={20}>
-                            <SliderInput
-                              __component_name="SliderInput"
-                              addonAfter="GiB"
-                              defaultValue={16}
-                              gutter={20}
-                              id="memory"
-                              inputCol={__$$eval(() => ({
-                                span: 5,
-                              }))}
-                              inputProps={__$$eval(() => ({}))}
-                              max={256}
-                              min={1}
-                              onChange={function () {
-                                return this.onChangeMemory.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
-                              }.bind(this)}
-                              placeholder="内存"
-                              sliderCol={__$$eval(() => ({
-                                span: 12,
-                              }))}
-                              sliderProps={__$$eval(() => ({}))}
-                              step={1}
-                              value={__$$eval(() => this.state.resourcesData?.memory)}
-                            />
-                          </Col>
-                        </Row>
-                        <Row
-                          __component_name="Row"
-                          gutter={[0, 0]}
-                          style={{ marginBottom: '20px' }}
-                          wrap={true}
-                        >
-                          <Col __component_name="Col" span={24}>
-                            <Typography.Title
-                              __component_name="Typography.Title"
-                              bold={true}
-                              bordered={false}
-                              ellipsis={true}
-                              level={1}
-                            >
-                              {this.i18n('i18n-u0etzjrs') /* - */}
-                            </Typography.Title>
-                            <Typography.Title
-                              __component_name="Typography.Title"
-                              bold={false}
-                              bordered={false}
-                              ellipsis={true}
-                              level={2}
-                            >
-                              GPU{' '}
-                            </Typography.Title>
-                          </Col>
-                          <Col __component_name="Col" span={20}>
-                            <SliderInput
-                              __component_name="SliderInput"
-                              addonAfter="颗"
-                              defaultValue={1}
-                              gutter={16}
-                              id="nvidiaGPU"
-                              inputCol={__$$eval(() => ({
-                                span: 5,
-                              }))}
-                              inputProps={__$$eval(() => ({}))}
-                              max={16}
-                              min={1}
-                              onChange={function () {
-                                return this.onChangeNvidiaGPU.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([])
-                                );
-                              }.bind(this)}
-                              placeholder="GPU"
-                              sliderCol={__$$eval(() => ({
-                                span: 12,
-                              }))}
-                              sliderProps={__$$eval(() => ({}))}
-                              step={1}
-                              value={__$$eval(() => this.state.resourcesData?.nvidiaGPU)}
-                            />
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
+                {!!__$$eval(() => this.state.modelSource === 'worker') && (
+                  <Row __component_name="Row" justify="space-between" wrap={false}>
+                    <Col __component_name="Col" flex="" span={4} style={{ paddingLeft: '10px' }}>
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '', paddingLeft: '8px', paddingTop: '10px' }}
+                      >
+                        {this.i18n('i18n-n55cj6ks') /* 服务规格 */}
+                      </Typography.Text>
+                    </Col>
+                    <Col __component_name="Col" span={20}>
+                      <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                        <Col __component_name="Col" span={24}>
+                          <Row __component_name="Row" gutter={[0, 0]} style={{}} wrap={true}>
+                            <Col __component_name="Col" span={14} style={{ marginLeft: '-10px' }}>
+                              <FormilySelect
+                                __component_name="FormilySelect"
+                                componentProps={{
+                                  'x-component-props': {
+                                    _sdkSwrGetFunc: { label: '', params: [], value: '' },
+                                    allowClear: false,
+                                    disabled: false,
+                                    mode: 'multiple',
+                                    onChange: function () {
+                                      return this.onChangeNode.apply(
+                                        this,
+                                        Array.prototype.slice.call(arguments).concat([])
+                                      );
+                                    }.bind(this),
+                                    placeholder: '请选择节点',
+                                    showSearch: true,
+                                  },
+                                }}
+                                decoratorProps={{
+                                  'x-decorator-props': {
+                                    asterisk: false,
+                                    bordered: true,
+                                    colon: false,
+                                    fullness: false,
+                                    inset: false,
+                                    labelAlign: 'left',
+                                    labelCol: 4,
+                                    labelEllipsis: true,
+                                    labelWrap: false,
+                                    tooltipLayout: 'text',
+                                    wrapperAlign: 'left',
+                                    wrapperWrap: false,
+                                  },
+                                }}
+                                fieldProps={{
+                                  '_unsafe_MixedSetter_enum_select': 'ArraySetter',
+                                  '_unsafe_MixedSetter_title_select': 'StringSetter',
+                                  'enum': [],
+                                  'name': 'nodes',
+                                  'required': false,
+                                  'title': '指定节点',
+                                  'x-display':
+                                    "{{ !$form.values?.nodesNoAuth ? 'visible' : 'hidden' }}",
+                                  'x-pattern': '',
+                                  'x-validator': [],
+                                }}
+                                style={{}}
+                              />
+                            </Col>
+                          </Row>
+                          <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                            <Col __component_name="Col" span={24} style={{}}>
+                              <FormilyFormItem
+                                __component_name="FormilyFormItem"
+                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                                fieldProps={{
+                                  'name': '',
+                                  'title': '',
+                                  'type': 'object',
+                                  'x-component': 'FormilyFormItem',
+                                  'x-display':
+                                    "{{ $form.values?.nodesNoAuth ? 'visible' : 'hidden' }}",
+                                  'x-validator': [],
+                                }}
+                              >
+                                <Row __component_name="Row" gutter={[0, 0]} wrap={true}>
+                                  <Col __component_name="Col" span={2} style={{}}>
+                                    <Typography.Title
+                                      __component_name="Typography.Title"
+                                      bold={false}
+                                      bordered={false}
+                                      ellipsis={true}
+                                      level={2}
+                                    >
+                                      指定节点
+                                    </Typography.Title>
+                                  </Col>
+                                  <Col __component_name="Col" span={13} style={{}}>
+                                    <Typography.Title
+                                      __component_name="Typography.Title"
+                                      bold={false}
+                                      bordered={false}
+                                      ellipsis={true}
+                                      level={2}
+                                      style={{}}
+                                    >
+                                      随机
+                                    </Typography.Title>
+                                    <Typography.Title
+                                      __component_name="Typography.Title"
+                                      bold={false}
+                                      bordered={false}
+                                      ellipsis={true}
+                                      level={2}
+                                      style={{ color: '#aaaaaa', display: 'block' }}
+                                    >
+                                      暂无权限，无法指定节点，请联系管理员获取节点查询权限。
+                                    </Typography.Title>
+                                  </Col>
+                                </Row>
+                              </FormilyFormItem>
+                            </Col>
+                          </Row>
+                          <Row
+                            __component_name="Row"
+                            gutter={[0, 0]}
+                            style={{ marginBottom: '20px' }}
+                            wrap={true}
+                          >
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Title
+                                __component_name="Typography.Title"
+                                bold={true}
+                                bordered={false}
+                                ellipsis={true}
+                                level={1}
+                              >
+                                {this.i18n('i18n-u0etzjrs') /* - */}
+                              </Typography.Title>
+                              <Typography.Title
+                                __component_name="Typography.Title"
+                                bold={false}
+                                bordered={false}
+                                ellipsis={true}
+                                level={2}
+                              >
+                                CPU
+                              </Typography.Title>
+                            </Col>
+                            <Col __component_name="Col" id="cpu" span={20}>
+                              <SliderInput
+                                __component_name="SliderInput"
+                                addonAfter="核"
+                                defaultValue={4}
+                                gutter={20}
+                                id="cpu"
+                                inputCol={__$$eval(() => ({
+                                  span: 5,
+                                }))}
+                                inputProps={__$$eval(() => ({}))}
+                                max={64}
+                                min={1}
+                                onChange={function () {
+                                  return this.onChangeCpu.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                placeholder="CPU"
+                                sliderCol={__$$eval(() => ({
+                                  span: 12,
+                                }))}
+                                sliderProps={__$$eval(() => ({}))}
+                                step={1}
+                                value={__$$eval(() => this.state.resourcesData?.cpu)}
+                              />
+                            </Col>
+                          </Row>
+                          <Row
+                            __component_name="Row"
+                            gutter={[0, 0]}
+                            style={{ marginBottom: '20px' }}
+                            wrap={true}
+                          >
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Title
+                                __component_name="Typography.Title"
+                                bold={true}
+                                bordered={false}
+                                ellipsis={true}
+                                level={1}
+                              >
+                                {this.i18n('i18n-u0etzjrs') /* - */}
+                              </Typography.Title>
+                              <Typography.Title
+                                __component_name="Typography.Title"
+                                bold={false}
+                                bordered={false}
+                                ellipsis={true}
+                                level={2}
+                              >
+                                内存
+                              </Typography.Title>
+                            </Col>
+                            <Col __component_name="Col" span={20}>
+                              <SliderInput
+                                __component_name="SliderInput"
+                                addonAfter="GiB"
+                                defaultValue={16}
+                                gutter={20}
+                                id="memory"
+                                inputCol={__$$eval(() => ({
+                                  span: 5,
+                                }))}
+                                inputProps={__$$eval(() => ({}))}
+                                max={256}
+                                min={1}
+                                onChange={function () {
+                                  return this.onChangeMemory.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                placeholder="内存"
+                                sliderCol={__$$eval(() => ({
+                                  span: 12,
+                                }))}
+                                sliderProps={__$$eval(() => ({}))}
+                                step={1}
+                                value={__$$eval(() => this.state.resourcesData?.memory)}
+                              />
+                            </Col>
+                          </Row>
+                          <Row
+                            __component_name="Row"
+                            gutter={[0, 0]}
+                            style={{ marginBottom: '20px' }}
+                            wrap={true}
+                          >
+                            <Col __component_name="Col" span={24}>
+                              <Typography.Title
+                                __component_name="Typography.Title"
+                                bold={true}
+                                bordered={false}
+                                ellipsis={true}
+                                level={1}
+                              >
+                                {this.i18n('i18n-u0etzjrs') /* - */}
+                              </Typography.Title>
+                              <Typography.Title
+                                __component_name="Typography.Title"
+                                bold={false}
+                                bordered={false}
+                                ellipsis={true}
+                                level={2}
+                              >
+                                GPU{' '}
+                              </Typography.Title>
+                            </Col>
+                            <Col __component_name="Col" span={20}>
+                              <SliderInput
+                                __component_name="SliderInput"
+                                addonAfter="颗"
+                                defaultValue={1}
+                                gutter={16}
+                                id="nvidiaGPU"
+                                inputCol={__$$eval(() => ({
+                                  span: 5,
+                                }))}
+                                inputProps={__$$eval(() => ({}))}
+                                max={16}
+                                min={1}
+                                onChange={function () {
+                                  return this.onChangeNvidiaGPU.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
+                                placeholder="GPU"
+                                sliderCol={__$$eval(() => ({
+                                  span: 12,
+                                }))}
+                                sliderProps={__$$eval(() => ({}))}
+                                step={1}
+                                value={__$$eval(() => this.state.resourcesData?.nvidiaGPU)}
+                              />
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                )}
                 {!!__$$eval(() => this.state.modelSource === 'worker') && (
                   <Row
                     __component_name="Row"
@@ -1049,18 +1051,12 @@ class EditModelService$$Page extends React.Component {
                             style={{ paddingTop: '20px' }}
                             wrap={false}
                           >
-                            <Col __component_name="Col" flex="" span={2}>
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                指定 GPU
-                              </Typography.Text>
-                            </Col>
-                            <Col __component_name="Col" flex="auto" span={12}>
+                            <Col
+                              __component_name="Col"
+                              flex="auto"
+                              span={14}
+                              style={{ marginLeft: '-10px' }}
+                            >
                               <FormilyInput
                                 __component_name="FormilyInput"
                                 componentProps={{
@@ -1069,10 +1065,17 @@ class EditModelService$$Page extends React.Component {
                                       '请输入指定使用的 GPU 序号，多个用英文逗号隔开，如：0,3',
                                   },
                                 }}
-                                decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+                                decoratorProps={{
+                                  'x-decorator-props': {
+                                    labelAlign: 'left',
+                                    labelCol: 4,
+                                    labelEllipsis: true,
+                                    wrapperAlign: 'left',
+                                  },
+                                }}
                                 fieldProps={{
                                   'name': 'CUDA_VISIBLE_DEVICES',
-                                  'title': '',
+                                  'title': '指定 GPU',
                                   'x-validator': [
                                     {
                                       children: '未知',
