@@ -1,11 +1,6 @@
-import {
-  DeleteOutlined,
-  PlusCircleOutlined,
-  QuestionCircleOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { KubeagiKnowledge } from '@tenx-ui/icon';
-import { Empty, Flex, Form, Space, Tooltip, Typography } from 'antd';
+import { Empty, Flex, Form, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import I18N from '@/utils/kiwiI18N';
@@ -13,7 +8,6 @@ import I18N from '@/utils/kiwiI18N';
 import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
-import { SliderItem } from '../Modal';
 import stylesCommon from '../index.less';
 import { linkageReference } from '../linkage';
 import styles from './index.less';
@@ -189,58 +183,58 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
             },
           },
         },
-        {
-          key: 'string',
-          icon: <SettingOutlined />,
-          // children?: React.ReactElement
-          data: {},
-          modal: {
-            title: I18N.ModelApp.zhiShiKuGaoJi,
-            refresh: () => {},
-            type: 'edit',
-            data: {},
-            validateNames: ['scoreThreshold', 'numDocuments'],
-            children: (
-              <>
-                <SliderItem
-                  Config={{
-                    initialValue: 0.7,
-                    min: 0,
-                    max: 1,
-                    precision: 2,
-                  }}
-                  label={
-                    <Space size={3}>
-                      {I18N.ModelApp.zuiDiXiangSiDu}
-                      <Tooltip title={I18N.ModelApp.piPeiYongHuWen}>
-                        <QuestionCircleOutlined className={styles.tooltip} />
-                      </Tooltip>
-                    </Space>
-                  }
-                  name="scoreThreshold"
-                />
-                <SliderItem
-                  Config={{
-                    initialValue: 5,
-                    min: 1,
-                    max: 10,
-                    precision: 0,
-                  }}
-                  label={
-                    <Space size={3}>
-                      {I18N.ModelApp.yinYongShangXian}
-                      <Tooltip title={I18N.ModelApp.danCiSouSuoPi}>
-                        <QuestionCircleOutlined className={styles.tooltip} />
-                      </Tooltip>
-                    </Space>
-                  }
-                  name="numDocuments"
-                />
-              </>
-            ),
-            handleSave: (values: any) => {},
-          },
-        },
+        // {
+        //   key: 'string',
+        //   icon: <SettingOutlined />,
+        //   // children?: React.ReactElement
+        //   data: {},
+        //   modal: {
+        //     title: I18N.ModelApp.zhiShiKuGaoJi,
+        //     refresh: () => {},
+        //     type: 'edit',
+        //     data: {},
+        //     validateNames: ['scoreThreshold', 'numDocuments'],
+        //     children: (
+        //       <>
+        //         <SliderItem
+        //           Config={{
+        //             initialValue: 0.7,
+        //             min: 0,
+        //             max: 1,
+        //             precision: 2,
+        //           }}
+        //           label={
+        //             <Space size={3}>
+        //               {I18N.ModelApp.zuiDiXiangSiDu}
+        //               <Tooltip title={I18N.ModelApp.piPeiYongHuWen}>
+        //                 <QuestionCircleOutlined className={styles.tooltip} />
+        //               </Tooltip>
+        //             </Space>
+        //           }
+        //           name="scoreThreshold"
+        //         />
+        //         <SliderItem
+        //           Config={{
+        //             initialValue: 5,
+        //             min: 1,
+        //             max: 10,
+        //             precision: 0,
+        //           }}
+        //           label={
+        //             <Space size={3}>
+        //               {I18N.ModelApp.yinYongShangXian}
+        //               <Tooltip title={I18N.ModelApp.danCiSouSuoPi}>
+        //                 <QuestionCircleOutlined className={styles.tooltip} />
+        //               </Tooltip>
+        //             </Space>
+        //           }
+        //           name="numDocuments"
+        //         />
+        //       </>
+        //     ),
+        //     handleSave: (values: any) => {},
+        //   },
+        // },
       ]}
       isCollapse={true}
       title={I18N.Chat.zhiShiKu}

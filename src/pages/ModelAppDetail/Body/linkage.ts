@@ -6,5 +6,9 @@ export const linkageReference = (form, configs) => {
     showDocNullReturn: !!(
       configs?.Skill?.tools?.length > 0 || configs?.ConfigKnowledge?.knowledgebase
     ),
+    showSearchLimit:
+      configs?.ConfigKnowledge?.knowledgebase ||
+      configs?.Rerank?.enableRerank ||
+      configs?.MultiSearch?.enableMultiQuery,
   });
 };
