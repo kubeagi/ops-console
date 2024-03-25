@@ -1,7 +1,7 @@
 import { Button, Col, Page, Row, Space } from '@tenx-ui/materials';
 import { matchPath, useLocation } from '@umijs/max';
 import { Form } from 'antd';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 import I18N from '@/utils/kiwiI18N';
 
@@ -20,10 +20,27 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
   const location = useLocation();
   const match = matchPath({ path: '/model-app/detail/:id' }, location.pathname);
   const [form] = Form.useForm();
-  const { data, loading, mutate } = utils.bff.useGetApplication({
-    name: match?.params?.id,
-    namespace: utils.getAuthData().project,
-  });
+  const [data, setData] = useState<any>();
+  const [loading, setLoading] = useState<boolean>();
+
+  const mutate = useCallback(async () => {
+    if (!match?.params?.id || !utils.getAuthData().project) return;
+    try {
+      setLoading(true);
+      const res = await utils.bff.getApplication({
+        name: match?.params?.id,
+        namespace: utils.getAuthData().project,
+      });
+      setData(res);
+      setLoading(false);
+    } catch {
+      setLoading(false);
+    }
+  }, [match?.params?.id, utils.getAuthData().project]);
+
+  useEffect(() => {
+    mutate();
+  }, []);
 
   const [initConfigs, setInitConfigs] = useState<any>();
   const [configs, setConfigs] = useState<any>();
@@ -45,8 +62,6 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
       },
       ConfigKnowledge: {
         knowledgebase: Application?.knowledgebase || undefined,
-        scoreThreshold: Application?.scoreThreshold,
-        numDocuments: Application?.numDocuments,
       },
       ConfigPrompt: {
         userPrompt: Application?.userPrompt || undefined,
@@ -67,6 +82,28 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
       DocNullReturn: {
         docNullReturn: Application?.docNullReturn || undefined,
         showDocNullReturn: !!Application?.docNullReturn,
+      },
+      Rerank: {
+        enableRerank: Application?.enableRerank || false,
+        rerankModel: Application?.rerankModel || undefined,
+      },
+      MultiSearch: {
+        enableMultiQuery: Application?.enableMultiQuery || false,
+      },
+      SearchLimit: {
+        showSearchLimit:
+          Application?.knowledgebase || Application?.enableRerank || Application?.enableMultiQuery,
+        scoreThreshold: Application?.scoreThreshold,
+        numDocuments: Application?.numDocuments,
+      },
+      DialogeTimeout: {
+        chatTimeout: Application?.chatTimeout || 60,
+      },
+      DocDialoge: {
+        enableUploadFile: Application?.enableUploadFile || false,
+        chunkSize: Application?.chunkSize || 300,
+        chunkOverlap: Application?.chunkOverlap || 10,
+        batchSize: Application?.batchSize || 1,
       },
     };
     setConfigs(Config);

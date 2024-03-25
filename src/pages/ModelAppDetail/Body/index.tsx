@@ -9,14 +9,15 @@ import I18N from '@/utils/kiwiI18N';
 import utils from '../../../utils/__utils';
 import { useModalAppDetailContext } from '../index';
 import ConfigConversationStarter from './ConfigConversationStarter';
+import ConfigDialoge from './ConfigDialoge';
 import ConfigKnowledge from './ConfigKnowledge';
 import ConfigModelService from './ConfigModelService';
 import ConfigNext from './ConfigNext';
+import ConfigPlugins from './ConfigPlugins';
 import ConfigPrompt from './ConfigPrompt';
+import ConfigSearch from './ConfigSearch';
 import Container from './Container';
 import Dialogue from './Dialogue';
-import DocNullReturn from './DocNullReturn';
-import Plugins from './Plugins';
 import ViewReference from './ViewReference';
 import ViewResInfo from './ViewResInfo';
 import styles from './index.less';
@@ -55,11 +56,20 @@ const Body: React.FC<BodyProps> = props => {
                           name: data?.metadata?.name,
                           namespace: data?.metadata?.namespace,
                           ...values,
+                          rerankModel: values.rerankModel || '',
                           tools: values.tools?.map(name => ({ name })),
                           docNullReturn: values.showDocNullReturn ? values.docNullReturn : '',
                         };
+
                         delete input.metadata;
                         delete input.showDocNullReturn;
+
+                        if (!input.showSearchLimit) {
+                          delete input.scoreThreshold;
+                          delete input.numDocuments;
+                        }
+                        delete input.showSearchLimit;
+
                         await utils.bff.updateApplicationConfig({
                           input,
                         });
@@ -95,10 +105,16 @@ const Body: React.FC<BodyProps> = props => {
                 <div style={{ width: '60%' }}>
                   <ConfigModelService />
                   <Container title="技能" titleLevel={1}>
-                    <Plugins />
+                    <ConfigPlugins />
                   </Container>
                   <Container title="记忆" titleLevel={1}>
                     <ConfigKnowledge />
+                  </Container>
+                  <Container title="高级配置" titleLevel={1}>
+                    <>
+                      <ConfigSearch />
+                      <ConfigDialoge />
+                    </>
                   </Container>
                   {/* <ConfigAudio /> */}
                   <Divider
@@ -107,7 +123,6 @@ const Body: React.FC<BodyProps> = props => {
                     content={
                       <>
                         <ConfigConversationStarter />
-                        <DocNullReturn />
                         <ViewResInfo />
                         <ViewReference />
                         <ConfigNext />
