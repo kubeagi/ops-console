@@ -66,7 +66,7 @@
     "@tenx-ui/utils": "^2.3.1",
     "@umijs/max": "^4.0.42",
     "@yunti/lowcode-datasource-axios-handler": "^1.0.1",
-    "@yuntijs/arcadia-bff-sdk": "^1.2.0",
+    "@yuntijs/arcadia-bff-sdk": "^1.1.11",
     "@yuntijs/chat": "workspace:*",
     "@yuntijs/react-markdown-lowcode-materials": "1.0.1",
     "@yuntijs/request": "^1.0.0",
