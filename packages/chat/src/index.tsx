@@ -26,7 +26,7 @@ import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin, Tag, UploadFile, message, theme } from 'antd';
 import { throttle } from 'lodash';
 import { StopCircle } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 
 import ChatInputBottomAddons from './ChatInputBottomAddons';
 import PromptStarter from './PromptStarter';
@@ -93,6 +93,14 @@ let shouldUpdateConversationId: boolean = false;
 let ctrl: undefined | AbortController;
 const retry = new Retry(ctrl, 3);
 
+export const RootContext = createContext<{
+  appName: string;
+  appNamespace: string;
+}>({
+  appName: '',
+  appNamespace: '',
+});
+
 const Chat: React.FC<IChat> = props => {
   const { styles, cx } = useStyles();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -122,6 +130,9 @@ const Chat: React.FC<IChat> = props => {
         app_namespace: props.appNamespace,
         conversation_id: conversationId,
       },
+      headers: {
+        namespace: props.appNamespace,
+      },
     },
     initValue: [],
     resStr: 'messages',
@@ -141,6 +152,9 @@ const Chat: React.FC<IChat> = props => {
               app_namespace: props.appNamespace,
               conversation_id: cId,
               message_id: mId,
+            },
+            headers: {
+              namespace: props.appNamespace,
             },
           },
         })
@@ -279,6 +293,9 @@ const Chat: React.FC<IChat> = props => {
           options: {
             body: formData,
             timeout: 1000 * 60 * 10,
+            headers: {
+              namespace: props.appNamespace,
+            },
           },
         })
         .catch(_error => {
@@ -320,6 +337,7 @@ const Chat: React.FC<IChat> = props => {
         openWhenHidden: true,
         headers: {
           Authorization: `bearer ${getAuthData()?.token.id_token}`,
+          Namespace: props.appNamespace,
         },
         body: JSON.stringify(body),
         async onopen(response) {
@@ -470,121 +488,130 @@ const Chat: React.FC<IChat> = props => {
     });
   }, [ctrl, setConversation]);
   return (
-    <div className={cx(styles.chatComponent, 'chatComponent')}>
-      <GlobalStyles />
-      <div
-        className={cx(
-          'chatColumn',
-          props.debug && 'chatDebug',
-          props.isDark && 'chatDark',
-          props.gpts && 'gpts'
-        )}
-      >
-        <div className="chatList">
-          <ChatItemsList
-            data={conversation?.data}
-            loadingId={conversation.loadingMsgId}
-            renderActions={{
-              default: item => <CopyButton content={item.content} size="small" />,
-            }}
-            renderErrorMessages={{
-              error: {
-                Render: error => {
-                  if (typeof error?.error?.detail?.message === 'string') {
-                    return (
-                      <Highlighter copyButtonSize="small" language="json" type="pure">
-                        {formatJson(error?.error?.detail?.message)}
-                      </Highlighter>
-                    );
-                  }
-                  // @ts-ignore
-                  return <div>{error?.detail?.stack?.toString()}</div>;
+    <RootContext.Provider
+      value={{
+        appName: props.appName,
+        appNamespace: props.appNamespace,
+      }}
+    >
+      <div className={cx(styles.chatComponent, 'chatComponent')}>
+        <GlobalStyles />
+        <div
+          className={cx(
+            'chatColumn',
+            props.debug && 'chatDebug',
+            props.isDark && 'chatDark',
+            props.gpts && 'gpts'
+          )}
+        >
+          <div className="chatList">
+            <ChatItemsList
+              data={conversation?.data}
+              loadingId={conversation.loadingMsgId}
+              renderActions={{
+                default: item => <CopyButton content={item.content} size="small" />,
+              }}
+              renderErrorMessages={{
+                error: {
+                  Render: error => {
+                    if (typeof error?.error?.detail?.message === 'string') {
+                      return (
+                        <Highlighter copyButtonSize="small" language="json" type="pure">
+                          {formatJson(error?.error?.detail?.message)}
+                        </Highlighter>
+                      );
+                    }
+                    // @ts-ignore
+                    return <div>{error?.detail?.stack?.toString()}</div>;
+                  },
                 },
-              },
-            }}
-            renderMessages={{
-              default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
-            }}
-            renderMessagesExtra={{
-              default: chat => {
-                return (
-                  <>
-                    {!chat.content && conversation.loadingMsgId ? (
-                      <LoadingText delay={400} />
-                    ) : undefined}
-                    {Boolean(chat.extra.fileList?.length) && (
-                      <div>
-                        {chat.extra.fileList.map((file, index) => (
-                          <Tag key={index}>
-                            <FileOutlined /> {file.name}
-                          </Tag>
-                        ))}
-                      </div>
-                    )}
-                    {conversation.loadingMsgId !== chat.id &&
-                      Boolean(chat.extra?.index) &&
-                      chat.role === 'assistant' &&
-                      Boolean(appData?.showRespInfo) && (
-                        <div className="extraMsg">
-                          {Boolean(chat.extra?.latency) && (
-                            <Tag color="green">{(chat.extra?.latency / 1000).toFixed(2)}s</Tag>
-                          )}
-                          <Tag color="purple">
-                            {I18N.template(I18N.Chat.tiaoShangXiaWen, { val1: chat.extra?.index })}
-                          </Tag>
+              }}
+              renderMessages={{
+                default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
+              }}
+              renderMessagesExtra={{
+                default: chat => {
+                  return (
+                    <>
+                      {!chat.content && conversation.loadingMsgId ? (
+                        <LoadingText delay={400} />
+                      ) : undefined}
+                      {Boolean(chat.extra.fileList?.length) && (
+                        <div>
+                          {chat.extra.fileList.map((file, index) => (
+                            <Tag key={index}>
+                              <FileOutlined /> {file.name}
+                            </Tag>
+                          ))}
                         </div>
                       )}
-                    {Boolean(appData?.showRetrievalInfo) && (
-                      <RenderReferences chat={chat} debug={props.debug} />
-                    )}
-                  </>
-                );
-              },
-            }}
-            {...control}
-          />
-          <div className="safeArea" id={safeAreaId}></div>
-        </div>
-        {!conversationId && // 历史对话不展示引导
-          appData?.showNextGuide && // 根据智能体个性化配置展示引导
-          showNextGuide && ( // 智能体 debug 时, 问过后就不再展示引导
-            <PromptStarter
-              appName={props.appName}
-              appNamespace={props.appNamespace}
-              onPromptClick={onPromptClick}
+                      {conversation.loadingMsgId !== chat.id &&
+                        Boolean(chat.extra?.index) &&
+                        chat.role === 'assistant' &&
+                        Boolean(appData?.showRespInfo) && (
+                          <div className="extraMsg">
+                            {Boolean(chat.extra?.latency) && (
+                              <Tag color="green">{(chat.extra?.latency / 1000).toFixed(2)}s</Tag>
+                            )}
+                            <Tag color="purple">
+                              {I18N.template(I18N.Chat.tiaoShangXiaWen, {
+                                val1: chat.extra?.index,
+                              })}
+                            </Tag>
+                          </div>
+                        )}
+                      {Boolean(appData?.showRetrievalInfo) && (
+                        <RenderReferences chat={chat} debug={props.debug} />
+                      )}
+                    </>
+                  );
+                },
+              }}
+              {...control}
             />
-          )}
-        {Boolean(conversation.loadingMsgId) && (
-          <GradientButton
-            className="stop"
-            icon={<StopCircle size={12} />}
-            onClick={stop}
-            size="small"
-            type="dashed"
-          >
-            {I18N.Chat.tingZhi}
-          </GradientButton>
-        )}
-        <div className="inputArea">
-          <ChatInputArea
-            bottomAddons={
-              <ChatInputBottomAddons
-                appData={appData}
-                fileList={fileList}
-                input={input}
-                loading={Boolean(conversation.loadingMsgId)}
-                onFileListChange={onFileListChange}
-                onSend={onSend}
+            <div className="safeArea" id={safeAreaId}></div>
+          </div>
+          {!conversationId && // 历史对话不展示引导
+            appData?.showNextGuide && // 根据智能体个性化配置展示引导
+            showNextGuide && ( // 智能体 debug 时, 问过后就不再展示引导
+              <PromptStarter
+                appName={props.appName}
+                appNamespace={props.appNamespace}
+                onPromptClick={onPromptClick}
               />
-            }
-            onInput={setInput}
-            onSend={onSend.bind('', input)}
-            placeholder={I18N.Chat.qingShuRuWenTi}
-            value={input}
-          />
+            )}
+          {Boolean(conversation.loadingMsgId) && (
+            <GradientButton
+              className="stop"
+              icon={<StopCircle size={12} />}
+              onClick={stop}
+              size="small"
+              type="dashed"
+            >
+              {I18N.Chat.tingZhi}
+            </GradientButton>
+          )}
+          <div className="inputArea">
+            <ChatInputArea
+              bottomAddons={
+                <ChatInputBottomAddons
+                  appData={appData}
+                  fileList={fileList}
+                  input={input}
+                  loading={Boolean(conversation.loadingMsgId)}
+                  onFileListChange={onFileListChange}
+                  onSend={onSend}
+                />
+              }
+              onInput={setInput}
+              onSend={onSend.bind('', input)}
+              placeholder={I18N.Chat.qingShuRuWenTi}
+              value={input}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </RootContext.Provider>
   );
 };
 let refreshTimeout;

@@ -22,16 +22,18 @@ export interface SliderProps {
   };
   noSlider?: boolean;
   forceUpdate?: () => void;
+  sliderWidth?: string;
+  spaceStyle?: any;
 }
 export const SliderItem: React.FC<SliderProps> = props => {
   const { form } = useModalAppDetailContext();
-  const { label, name, Config, noSlider, forceUpdate } = props;
+  const { label, name, Config, noSlider, forceUpdate, spaceStyle } = props;
   const marginBottom = 0;
-  const sliderWidth = '260px';
+  const sliderWidth = props.sliderWidth || '260px';
   const min = Config?.minAlias ? form.getFieldValue(Config?.minAlias) : Config?.min;
   return (
     <Form.Item label={label} style={{ marginBottom: noSlider ? 20 : 0 }}>
-      <Space>
+      <Space style={spaceStyle || {}}>
         {!noSlider && (
           <Form.Item
             initialValue={Config.initialValue}

@@ -29,6 +29,7 @@ interface ContainerProps {
   isCollapse?: boolean;
   headerStyle?: any;
   isRowItem?: boolean;
+  borderBottom?: boolean;
 }
 
 const Container: React.FC<ContainerProps> = props => {
@@ -44,6 +45,7 @@ const Container: React.FC<ContainerProps> = props => {
     isCollapse,
     headerStyle,
     isRowItem = false,
+    borderBottom = false,
   } = props;
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<any>();
@@ -58,7 +60,7 @@ const Container: React.FC<ContainerProps> = props => {
 
   return (
     <div
-      className={`${styles.container} ${isCollapse && styles.isCollapseContainer} ${isRowItem && styles.RowItemContainer}`}
+      className={`${styles.container} ${isCollapse && styles.isCollapseContainer} ${isRowItem && styles.RowItemContainer} ${borderBottom && styles.borderBottomContainer}`}
       style={props.style}
     >
       <Modal

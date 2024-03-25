@@ -23,7 +23,6 @@ import {
   Switch,
   FormilyFormItem,
   Input,
-  Pagination,
   Table,
   FormilyInput,
   InnerHtmlContainer,
@@ -102,13 +101,13 @@ class $$Page extends React.Component {
         {
           _type: 'document_chunk',
           type: '文本分段',
-          before: `原始文件是：这是一段长文本，由于文本文字很长，需要做文本分段处理，分段配置设置为：分段长度 20 字符，分段重叠长度 10 字符。`,
+          before: `这是一段长文本，由于文本文字很长，需要做文本分段处理，分段配置设置为：分段长度 40 字符，分段重叠长度 10 字符。`,
           after: `
-        <p>这是一段长文本，由于文文本，由于文本文字很长，</p>
-        <p>本文字很长，需要做文本需要做文本分段处理，分</p>
-        <p>分段处理，分段配置设置段配置设置为：分段长度</p>
-        <p>为：分段长度 20 字符，分度 20 字符，分段重叠长</p>
-        <p>分段重叠长度 10 字符</p>
+        <p>这是一段长文本，由于文本文字很长，需要做文本</p>
+        <div style='border-bottom:1px solid #f0f0f0;margin-bottom:12px'></div>
+        <p>需要做文本分段处理，分段配置设置为：分段长度</p>
+        <div style='border-bottom:1px solid #f0f0f0;margin-bottom:12px'></div>
+        <p>为：分段长度 40 字符，分段重叠长度 10 字符。</p>
         `,
         },
         {
@@ -206,7 +205,7 @@ class $$Page extends React.Component {
       dataSetFileSearchParams: {
         keyword: '',
         currentPage: 1,
-        pageSize: 10,
+        pageSize: 999,
       },
       dataSetFileTotal: '0',
       embedderList: [],
@@ -220,7 +219,7 @@ class $$Page extends React.Component {
       },
       numberInputStep: 0.1,
       qaSplitHighConfig: {
-        removeDuplicateConfigChecked: 'checked',
+        removeDuplicateConfigChecked: [],
         removeDuplicateConfigSimilarity: 0.9,
         removeDuplicateConfigEmbedding: '',
         temperature: 40,
@@ -231,7 +230,7 @@ class $$Page extends React.Component {
       },
       selectedFileList: [],
       showLlmModel: false,
-      showQASplitDuplicateConfig: true,
+      showQASplitDuplicateConfig: false,
       step1FormData: {
         name: undefined,
         file_type: 'text',
@@ -245,8 +244,8 @@ class $$Page extends React.Component {
         },
         TextSegmentationChecked: true,
         TextSegmentationForm: {
-          chunk_size: 1024,
-          chunk_overlap: 100,
+          chunk_size: 500,
+          chunk_overlap: 50,
         },
         RemoveInvisibleCharactersChecked: true,
         SpaceHandleChecked: true,
@@ -884,18 +883,13 @@ class $$Page extends React.Component {
   }
 
   onPageChange(page, pageSize) {
-    this.setState(
-      {
-        dataSetFileSearchParams: {
-          ...this.state.dataSetFileSearchParams,
-          currentPage: page,
-          pageSize,
-        },
+    this.setState({
+      dataSetFileSearchParams: {
+        ...this.state.dataSetFileSearchParams,
+        currentPage: page,
+        pageSize,
       },
-      () => {
-        this.getDataSet();
-      }
-    );
+    });
   }
 
   onPrevious() {
@@ -928,20 +922,17 @@ class $$Page extends React.Component {
   }
 
   onSearch(value) {
-    this.setState(
-      {
-        dataSetFileSearchParams: {
-          ...this.state.dataSetFileSearchParams,
-          keyword: value,
-          currentPage: 1,
-        },
+    this.setState({
+      dataSetFileSearchParams: {
+        ...this.state.dataSetFileSearchParams,
+        keyword: value?.trim(),
+        currentPage: 1,
       },
-      () => {
-        const values = this.form('createDataHandleStep2')?.values;
-        const name = this.getVersionName(values?.pre_data_set_name, values?.pre_data_set_version);
-        this.getTableList(name);
-      }
-    );
+      selectedFileList: [],
+      dataSetFileTotal: this.state.dataSetFileList.filter(item =>
+        item?.path?.toLocaleLowerCase()?.includes(value?.trim()?.toLocaleLowerCase())
+      ).length,
+    });
   }
 
   onSelectFileChange(v) {
@@ -3424,8 +3415,8 @@ class $$Page extends React.Component {
                     </Divider>
                   </Col>
                   <Col __component_name="Col" span={24}>
-                    <Row __component_name="Row" wrap={true}>
-                      <Col __component_name="Col" span={10}>
+                    <Row __component_name="Row" style={{ marginBottom: '24px' }} wrap={true}>
+                      <Col __component_name="Col" span={6}>
                         <Card
                           __component_name="Card"
                           actions={[]}
@@ -3434,7 +3425,7 @@ class $$Page extends React.Component {
                           hoverable={false}
                           loading={false}
                           size="default"
-                          style={{ height: '200px', minWidth: '400px' }}
+                          style={{ height: '200px' }}
                           type="default"
                         >
                           <Row __component_name="Row" gutter={['', 0]} wrap={true}>
@@ -3732,7 +3723,7 @@ class $$Page extends React.Component {
                           </Typography.Paragraph>
                         </Card>
                       </Col>
-                      <Col __component_name="Col" span={10}>
+                      <Col __component_name="Col" span={6}>
                         <Card
                           __component_name="Card"
                           actions={[]}
@@ -3740,7 +3731,7 @@ class $$Page extends React.Component {
                           hoverable={true}
                           loading={false}
                           size="default"
-                          style={{ height: '200px', minWidth: '400px' }}
+                          style={{ height: '200px' }}
                           type="default"
                         >
                           <Row __component_name="Row" gutter={['', 0]} wrap={true}>
@@ -4104,48 +4095,13 @@ class $$Page extends React.Component {
                                 style={{ width: '400px' }}
                               />
                             </Col>
-                            <Col __component_name="Col">
-                              <Space __component_name="Space" align="center" direction="horizontal">
-                                <Row __component_name="Row" justify="space-between" wrap={false}>
-                                  <Col __component_name="Col">
-                                    <Pagination
-                                      __component_name="Pagination"
-                                      current={__$$eval(
-                                        () => this.state.dataSetFileSearchParams.currentPage
-                                      )}
-                                      onChange={function () {
-                                        return this.onPageChange.apply(
-                                          this,
-                                          Array.prototype.slice.call(arguments).concat([])
-                                        );
-                                      }.bind(this)}
-                                      onShowSizeChange={function () {
-                                        return this.onPageChange.apply(
-                                          this,
-                                          Array.prototype.slice.call(arguments).concat([])
-                                        );
-                                      }.bind(this)}
-                                      pageSize={10}
-                                      showTotal={function () {
-                                        return this.showTotal.apply(
-                                          this,
-                                          Array.prototype.slice.call(arguments).concat([])
-                                        );
-                                      }.bind(this)}
-                                      simple={false}
-                                      style={{ textAlign: 'right' }}
-                                      total={__$$eval(() => this.state.dataSetFileTotal)}
-                                    />
-                                  </Col>
-                                </Row>
-                              </Space>
-                            </Col>
                           </Row>
                         </Col>
                       </Row>
                       <Table
                         __component_name="Table"
                         bordered={false}
+                        className="dataset-table"
                         columns={[
                           { dataIndex: 'path', key: 'name', title: '文件名称' },
                           {
@@ -4168,10 +4124,41 @@ class $$Page extends React.Component {
                           { dataIndex: 'size', key: 'size', title: '文件大小', width: 100 },
                           { dataIndex: 'count', title: '数据量' },
                         ]}
-                        dataSource={__$$eval(() => this.state.dataSetFileList)}
+                        dataSource={__$$eval(() =>
+                          this.state.dataSetFileList.filter(item =>
+                            item?.path
+                              ?.toLocaleLowerCase()
+                              .includes(
+                                this.state.dataSetFileSearchParams.keyword.toLocaleLowerCase()
+                              )
+                          )
+                        )}
                         expandable={{ expandedRowRender: '' }}
                         loading={__$$eval(() => this.state.fileTableLoading)}
-                        pagination={false}
+                        pagination={{
+                          _unsafe_MixedSetter_position_select: 'ArraySetter',
+                          current: __$$eval(() => this.state.dataSetFileSearchParams.currentPage),
+                          onChange: function () {
+                            return this.onPageChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this),
+                          pageSize: 10,
+                          pagination: { pageSize: 10 },
+                          position: ['topRight'],
+                          showQuickJumper: false,
+                          showSizeChanger: false,
+                          showTotal: function () {
+                            return this.showTotal.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this),
+                          simple: false,
+                          size: 'default',
+                          total: __$$eval(() => this.state.dataSetFileTotal),
+                        }}
                         rowKey="path"
                         rowSelection={{
                           onChange: function () {

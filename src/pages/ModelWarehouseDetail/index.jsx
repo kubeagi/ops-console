@@ -9,14 +9,16 @@ import {
   Card,
   Row,
   Col,
+  Image,
   Descriptions,
-  Typography,
-  Tag,
   Status,
   Tooltip,
-  Space,
+  Typography,
+  Tag,
+  Dropdown,
   Tabs,
   Modal,
+  Space,
   Input,
   Table,
   Pagination,
@@ -24,7 +26,6 @@ import {
 } from '@tenx-ui/materials';
 
 import {
-  AntdIconCodeSandboxCircleFilled,
   AntdIconInfoCircleOutlined,
   AntdIconPlusOutlined,
   AntdIconReloadOutlined,
@@ -94,6 +95,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      baseInfoModalVisible: false,
       currentFile: '',
       data: {},
       deleteAppLoading: false,
@@ -101,13 +103,20 @@ class ModelWarehouseDetail$$Page extends React.Component {
       deleteFilesVisible: false,
       deleteLoading: false,
       deleteType: 'single',
+      descInfoList: [],
       fileSearchParams: {
         keyword: '',
         currentPage: 1,
         pageSize: 10,
       },
+      iconMap: {
+        modelscope: this.constants.ModelSourceImg_MODELSCOPE,
+        huggingface: this.constants.ModelSorceImg_HUGGINGFACE,
+        local: this.constants.ModelSorceImg_LOCAL,
+      },
       isLoadedReadme: false,
       loading: false,
+      modelSourceName: '',
       name: this.match.params.name,
       readmeData: '#### 暂无介绍',
       readmeLoading: false,
@@ -261,6 +270,12 @@ class ModelWarehouseDetail$$Page extends React.Component {
     });
   }
 
+  closeOpenBaseInfoModal() {
+    this.setState({
+      baseInfoModalVisible: false,
+    });
+  }
+
   closeUploadModal() {
     this.setState({
       uploadModalVisible: false,
@@ -327,6 +342,23 @@ class ModelWarehouseDetail$$Page extends React.Component {
         console.log(res);
         const { Model } = res;
         const { getModel } = Model || {};
+        if (this.history?.query.modelSource !== 'local') {
+          this.getOtherModelSummary(getModel);
+          // iic/speech_eres2net_sv_zh-cn_16k-common
+          let tempModelName;
+          if (getModel.modelScopeRepo) {
+            tempModelName = `modelscope.cn/${getModel.modelScopeRepo}`;
+          } else {
+            tempModelName = `huggingface.co/${getModel.huggingFaceRepo}`;
+          }
+          this.setState({
+            modelSourceName: tempModelName,
+          });
+        } else {
+          this.setState({
+            modelSourceName: '本地模型',
+          });
+        }
         this.setState({
           loading: false,
           data: getModel,
@@ -377,6 +409,40 @@ class ModelWarehouseDetail$$Page extends React.Component {
         this.setState({
           readmeLoading: false,
           data: {},
+        });
+      });
+  }
+
+  getOtherModelSummary(data) {
+    this.setState({
+      readmeLoading: true,
+    });
+    const modelSource = data.modelSource;
+    const modelid = modelSource === 'huggingface' ? data.huggingFaceRepo : data.modelScopeRepo;
+    this.utils.axios
+      .get(
+        `/kubeagi-apis/forward/${modelSource}/summary?modelid=${modelid}&revision=${data.revision}`,
+        {
+          headers: {
+            REPOTOKEN: data.token,
+            namespace: this.utils.getAuthData()?.project,
+            Authorization: this.utils.getAuthorization(),
+          },
+        }
+      )
+      .then(res => {
+        const data = res.data;
+        this.setState({
+          readmeData: data.summary || '#### 暂无介绍',
+          isLoadedReadme: true,
+          readmeLoading: false,
+        });
+      })
+      .catch(err => {
+        this.setState({
+          readmeData: '#### 暂无介绍',
+          isLoadedReadme: true,
+          readmeLoading: false,
         });
       });
   }
@@ -560,8 +626,41 @@ class ModelWarehouseDetail$$Page extends React.Component {
       });
   }
 
+  onDeploy() {
+    this.history.push('/model-service/createModelService?name=' + this.state.data.name);
+  }
+
   onEdit(item) {
     this.history.push(`/model-warehouse/edit/${this.match.params.name}`);
+  }
+
+  onMenuClick({ key, domEvent }) {
+    domEvent.stopPropagation();
+    switch (key) {
+      case 'edit':
+        {
+          this.onEdit();
+        }
+        break;
+      case 'del':
+        {
+          this.onOpenDeleteAppModal();
+        }
+        break;
+      case 'baseinfo':
+        {
+          this.onOpenBaseInfoModal();
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  onOpenBaseInfoModal() {
+    this.setState({
+      baseInfoModalVisible: true,
+    });
   }
 
   onOpenDeleteAppModal() {
@@ -644,7 +743,9 @@ class ModelWarehouseDetail$$Page extends React.Component {
     this._dataSourceEngine.reloadDataSource();
 
     this.getData();
-    this.getFileData();
+    if (this.history?.query.modelSource === 'local') {
+      this.getFileData();
+    }
     console.log('did mount');
   }
 
@@ -684,9 +785,14 @@ class ModelWarehouseDetail$$Page extends React.Component {
                 span={1}
                 style={{ height: '56px', width: '56px' }}
               >
-                <AntdIconCodeSandboxCircleFilled
-                  __component_name="AntdIconCodeSandboxCircleFilled"
-                  style={{ color: '#4a90e2', fontSize: 56, lineHeight: '0px' }}
+                <Image
+                  __component_name="Image"
+                  fallback=""
+                  height={56}
+                  preview={false}
+                  src={__$$eval(() => this.state.iconMap[this.history?.query.modelSource])}
+                  style={{ borderRadius: '56px' }}
+                  width={56}
                 />
               </Col>
               <Col
@@ -702,171 +808,292 @@ class ModelWarehouseDetail$$Page extends React.Component {
                   style={{ paddingLeft: '20px' }}
                   wrap={true}
                 />
-                <Descriptions
-                  __component_name="Descriptions"
-                  bordered={false}
-                  borderedBottom={false}
-                  borderedBottomDashed={false}
-                  colon={true}
-                  column={5}
-                  items={[
-                    {
-                      children: (
-                        <Typography.Text
-                          __component_name="Typography.Text"
-                          disabled={false}
-                          ellipsis={true}
-                          strong={false}
-                          style={{ fontSize: '' }}
-                        >
-                          {__$$eval(() => this.state.data?.id)}
-                        </Typography.Text>
-                      ),
-                      key: 'wgs8wwlzyja',
-                      label: 'ID',
-                      span: 2,
-                    },
-                    {
-                      children: __$$evalArray(() => this.state.data?.types?.split(',')).map(
-                        (item, index) =>
-                          (__$$context => (
-                            <Tag __component_name="Tag" closable={false} color="success">
-                              {__$$eval(() => __$$context.state.typesMap[item] || item)}
-                            </Tag>
-                          ))(__$$createChildContext(__$$context, { item, index }))
-                      ),
-                      key: 'b6yd5zk0mh',
-                      label: '模型类型',
-                      span: 1,
-                    },
-                    {
-                      children: (
-                        <Typography.Time
-                          __component_name="Typography.Time"
-                          format=""
-                          relativeTime={false}
-                          time={__$$eval(() => this.state.data?.creationTimestamp)}
-                        />
-                      ),
-                      key: 'rvtflfoq0zo',
-                      label: '创建时间',
-                      span: 1,
-                    },
-                    {
-                      children: (
-                        <Typography.Text
-                          __component_name="Typography.Text"
-                          disabled={false}
-                          ellipsis={true}
-                          strong={false}
-                          style={{ fontSize: '' }}
-                        >
-                          {__$$eval(() => this.state.data?.creator || '-')}
-                        </Typography.Text>
-                      ),
-                      key: '204yyaezthg',
-                      label: '创建者',
-                      span: 1,
-                    },
-                    {
-                      children: (
-                        <Typography.Text
-                          __component_name="Typography.Text"
-                          disabled={false}
-                          ellipsis={false}
-                          strong={false}
-                          style={{ fontSize: '' }}
-                        >
-                          {__$$eval(() => this.state.data?.description || '-')}
-                        </Typography.Text>
-                      ),
-                      key: 'mn1yxmujfac',
-                      label: '描述',
-                      span: 4,
-                    },
-                  ]}
-                  layout="horizontal"
-                  size="default"
-                  style={{}}
-                  title={
-                    <Row __component_name="Row" style={{ marginBottom: '0px' }} wrap={true}>
-                      <Col __component_name="Col" span={24} style={{ marginBottom: '0px' }}>
-                        <Typography.Title
-                          __component_name="Typography.Title"
-                          bold={true}
-                          bordered={false}
-                          ellipsis={true}
-                          level={1}
-                          style={{ marginRight: '8px', paddingRight: '8px' }}
-                        >
-                          {__$$eval(() => this.utils.getFullName(this.state.data) || '-')}
-                        </Typography.Title>
-                        <Row __component_name="Row" wrap={true}>
-                          <Col __component_name="Col" span={24} style={{ marginTop: '8px' }}>
-                            <Status
-                              __component_name="Status"
-                              id={__$$eval(() => this.state.data.status)}
-                              style={{ fontSize: '12px', marginLeft: '8px' }}
-                              types={[
-                                { children: '异常', id: 'False', type: 'error' },
-                                { children: '正常', id: 'True', type: 'success' },
-                              ]}
-                            />
-                            <Tooltip
-                              __component_name="Tooltip"
-                              title={__$$eval(() => this.state.data.message)}
-                            >
-                              {!!__$$eval(() => this.state.data.status === 'False') && (
-                                <AntdIconInfoCircleOutlined
-                                  __component_name="AntdIconInfoCircleOutlined"
-                                  style={{ marginLeft: '20px' }}
-                                />
-                              )}
-                            </Tooltip>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                  }
-                />
+                {!!__$$eval(() => this.history?.query.modelSource === 'local') && (
+                  <Descriptions
+                    __component_name="Descriptions"
+                    bordered={false}
+                    borderedBottom={false}
+                    borderedBottomDashed={false}
+                    colon={true}
+                    column={8}
+                    items={[
+                      {
+                        children: [
+                          <Status
+                            __component_name="Status"
+                            id={__$$eval(() => this.state.data.status)}
+                            types={[
+                              { children: '异常', id: 'False', type: 'error' },
+                              { children: '正常', id: 'True', type: 'success' },
+                            ]}
+                            key="node_oclu0miditz"
+                          />,
+                          <Tooltip
+                            __component_name="Tooltip"
+                            title={__$$eval(() => this.state.data.message)}
+                            key="node_oclu0midit10"
+                          >
+                            {!!__$$eval(() => this.state.data.status === 'False') && (
+                              <AntdIconInfoCircleOutlined
+                                __component_name="AntdIconInfoCircleOutlined"
+                                style={{ marginLeft: '20px' }}
+                              />
+                            )}
+                          </Tooltip>,
+                        ],
+                        key: '918t94n9pza',
+                        label: '状态',
+                        span: 1,
+                      },
+                      {
+                        children: (
+                          <Typography.Text
+                            __component_name="Typography.Text"
+                            copyable={false}
+                            disabled={false}
+                            ellipsis={true}
+                            strong={false}
+                            style={{ fontSize: '', maxWidth: '100%', width: '100%' }}
+                          >
+                            {__$$eval(() => this.state.modelSourceName || '-')}
+                          </Typography.Text>
+                        ),
+                        key: 'qts1prkau6',
+                        label: '模型地址',
+                        span: 1,
+                      },
+                      {
+                        children: __$$evalArray(() => this.state.data?.types?.split(',')).map(
+                          (item, index) =>
+                            (__$$context => (
+                              <Tag __component_name="Tag" closable={false} color="success">
+                                {__$$eval(() => item)}
+                              </Tag>
+                            ))(__$$createChildContext(__$$context, { item, index }))
+                        ),
+                        key: '7cmmj6aoyzm',
+                        label: '模型类型',
+                        span: 1,
+                      },
+                    ]}
+                    layout="horizontal"
+                    size="default"
+                    style={{}}
+                    title={
+                      <Row
+                        __component_name="Row"
+                        gutter={[null, 0]}
+                        style={{ marginBottom: '0px' }}
+                        wrap={true}
+                      >
+                        <Col __component_name="Col" span={24} style={{ marginBottom: '0px' }}>
+                          <Typography.Title
+                            __component_name="Typography.Title"
+                            bold={true}
+                            bordered={false}
+                            ellipsis={true}
+                            level={1}
+                            style={{ marginRight: '8px', paddingRight: '8px' }}
+                          >
+                            {__$$eval(() => this.utils.getFullName(this.state.data) || '-')}
+                          </Typography.Title>
+                        </Col>
+                      </Row>
+                    }
+                  />
+                )}
+                {!!__$$eval(() => this.history?.query.modelSource !== 'local') && (
+                  <Descriptions
+                    __component_name="Descriptions"
+                    bordered={false}
+                    borderedBottom={false}
+                    borderedBottomDashed={false}
+                    colon={true}
+                    column={6}
+                    items={[
+                      {
+                        children: [
+                          <Status
+                            __component_name="Status"
+                            id={__$$eval(() => this.state.data.status)}
+                            types={[
+                              { children: '异常', id: 'False', type: 'error' },
+                              { children: '正常', id: 'True', type: 'success' },
+                            ]}
+                            key="node_oclu0miditn"
+                          />,
+                          <Tooltip
+                            __component_name="Tooltip"
+                            title={__$$eval(() => this.state.data.message)}
+                            key="node_oclu0miditw"
+                          >
+                            {!!__$$eval(() => this.state.data.status === 'False') && (
+                              <AntdIconInfoCircleOutlined
+                                __component_name="AntdIconInfoCircleOutlined"
+                                style={{ marginLeft: '20px' }}
+                              />
+                            )}
+                          </Tooltip>,
+                        ],
+                        key: 'vf42cdbq3y',
+                        label: '状态',
+                        span: 1,
+                      },
+                      {
+                        children: (
+                          <Typography.Text
+                            __component_name="Typography.Text"
+                            copyable={__$$eval(() => this.state.modelSourceName !== '本地模型')}
+                            disabled={false}
+                            ellipsis={true}
+                            strong={false}
+                            style={{ fontSize: '', maxWidth: '100%', width: '100%' }}
+                          >
+                            {__$$eval(() => this.state.modelSourceName || '-')}
+                          </Typography.Text>
+                        ),
+                        key: 'qts1prkau6',
+                        label: '模型地址',
+                        span: 1,
+                      },
+                      {
+                        children: (
+                          <Typography.Text
+                            __component_name="Typography.Text"
+                            disabled={false}
+                            ellipsis={true}
+                            strong={false}
+                            style={{ fontSize: '' }}
+                          >
+                            {__$$eval(() => this.state.data.revision || '-')}
+                          </Typography.Text>
+                        ),
+                        key: '3y6x8ue0rz',
+                        label: '分支',
+                        span: 1,
+                      },
+                      {
+                        children: __$$evalArray(() => this.state.data?.types?.split(',')).map(
+                          (item, index) =>
+                            (__$$context => (
+                              <Tag __component_name="Tag" closable={false} color="success">
+                                {__$$eval(() => item)}
+                              </Tag>
+                            ))(__$$createChildContext(__$$context, { item, index }))
+                        ),
+                        key: '7cmmj6aoyzm',
+                        label: '模型类型',
+                        span: 1,
+                      },
+                    ]}
+                    layout="horizontal"
+                    size="default"
+                    style={{}}
+                    title={
+                      <Row
+                        __component_name="Row"
+                        gutter={[null, 0]}
+                        style={{ marginBottom: '0px' }}
+                        wrap={true}
+                      >
+                        <Col __component_name="Col" span={24} style={{ marginBottom: '0px' }}>
+                          <Typography.Title
+                            __component_name="Typography.Title"
+                            bold={true}
+                            bordered={false}
+                            ellipsis={true}
+                            level={1}
+                            style={{ marginRight: '8px', paddingRight: '8px' }}
+                          >
+                            {__$$eval(() => this.utils.getFullName(this.state.data) || '-')}
+                          </Typography.Title>
+                        </Col>
+                      </Row>
+                    }
+                  />
+                )}
               </Col>
               <Col __component_name="Col" flex="110px" style={{ height: '56px', width: '56px' }}>
-                <Space __component_name="Space" align="center" direction="horizontal">
-                  <Button
-                    __component_name="Button"
-                    block={false}
+                {!!__$$eval(() => this.state.data.status === 'True') && (
+                  <Dropdown.Button
+                    __component_name="Dropdown.Button"
                     danger={false}
+                    destroyPopupOnHide={true}
                     disabled={false}
-                    ghost={false}
+                    menu={{
+                      items: [
+                        { key: 'baseinfo', label: '基础信息' },
+                        { key: 'edit', label: '编辑' },
+                        { key: 'del', label: '删除' },
+                      ],
+                      onClick: function () {
+                        return this.onMenuClick.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
+                    }}
+                    onClick={function () {
+                      return this.onDeploy.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    placement="bottomCenter"
+                    trigger={['hover']}
+                    type="default"
+                  >
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      部署
+                    </Typography.Text>
+                  </Dropdown.Button>
+                )}
+                {!!__$$eval(() => this.state.data.status === 'False') && (
+                  <Dropdown.Button
+                    __component_name="Dropdown.Button"
+                    danger={false}
+                    destroyPopupOnHide={true}
+                    disabled={false}
+                    menu={{
+                      items: [
+                        { key: 'baseinfo', label: '基础信息' },
+                        { key: 'del', label: '删除' },
+                        { disabled: true, key: 'deploy', label: '部署' },
+                      ],
+                      onClick: function () {
+                        return this.onMenuClick.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this),
+                    }}
                     onClick={function () {
                       return this.onEdit.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    shape="default"
-                    size="small"
+                    placement="bottomCenter"
+                    trigger={['hover']}
+                    type="default"
                   >
-                    编辑
-                  </Button>
-                  <Button
-                    __component_name="Button"
-                    block={false}
-                    danger={false}
-                    disabled={false}
-                    ghost={false}
-                    onClick={function () {
-                      return this.onOpenDeleteAppModal.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    shape="default"
-                    size="small"
-                  >
-                    删除
-                  </Button>
-                </Space>
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      编辑
+                    </Typography.Text>
+                  </Dropdown.Button>
+                )}
               </Col>
             </Row>
           </Card>
@@ -1112,6 +1339,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                     </Col>
                   </Row>
                 ),
+                hidden: __$$eval(() => this.history?.query?.modelSource !== 'local'),
                 key: 'file',
                 label: '模型文件',
               },
@@ -1256,7 +1484,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(() => this.state.deleteAppModalVisible)}
-          title="弹框标题"
+          title="删除模型"
         >
           <Alert
             __component_name="Alert"
@@ -1264,6 +1492,268 @@ class ModelWarehouseDetail$$Page extends React.Component {
             showIcon={true}
             type="warning"
           />
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          cancelButtonProps={{ disabled: false }}
+          centered={false}
+          className="modal_not_footer"
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={null}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          okButtonProps={{ disabled: true }}
+          onCancel={function () {
+            return this.closeOpenBaseInfoModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(() => this.state.baseInfoModalVisible)}
+          title="基本信息"
+          width="680px"
+        >
+          {!!__$$eval(() => this.history?.query.modelSource === 'local') && (
+            <Descriptions
+              __component_name="Descriptions"
+              bordered={false}
+              borderedBottom={false}
+              borderedBottomDashed={false}
+              colon={true}
+              column={2}
+              items={[
+                {
+                  children: (
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => this.state.data?.name || '-')}
+                    </Typography.Text>
+                  ),
+                  key: 'rih7p2dysbo',
+                  label: '模型名称',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => this.state.data?.id || '-')}
+                    </Typography.Text>
+                  ),
+                  key: '0kkdql8bwqcm',
+                  label: 'ID',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Time
+                      __component_name="Typography.Time"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      relativeTime={false}
+                      time={__$$eval(() => this.state.data?.updateTimestamp || '-')}
+                    />
+                  ),
+                  key: '7sl4fga857j',
+                  label: '更新时间',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Time
+                      __component_name="Typography.Time"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      relativeTime={false}
+                      time={__$$eval(() => this.state.data?.creationTimestamp || '-')}
+                    />
+                  ),
+                  key: 's40dyqz93',
+                  label: '创建时间',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => this.state.data?.creator || '-')}
+                    </Typography.Text>
+                  ),
+                  key: 'vx2ug1ccct',
+                  label: '创建者',
+                  span: 2,
+                },
+                {
+                  children: (
+                    <Typography.Paragraph
+                      code={false}
+                      delete={false}
+                      disabled={false}
+                      editable={false}
+                      ellipsis={false}
+                      mark={false}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                      underline={false}
+                    >
+                      {__$$eval(() => this.state.data?.description || '-')}
+                    </Typography.Paragraph>
+                  ),
+                  key: 'sw0a4avmxhl',
+                  label: '描述',
+                  span: 2,
+                },
+              ]}
+              labelStyle={{ width: 80 }}
+              layout="horizontal"
+              size="default"
+              style={{}}
+              title=""
+            />
+          )}
+          {!!__$$eval(() => this.history?.query.modelSource !== 'local') && (
+            <Descriptions
+              __component_name="Descriptions"
+              bordered={false}
+              borderedBottom={false}
+              borderedBottomDashed={false}
+              colon={true}
+              column={2}
+              items={[
+                {
+                  children: (
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => this.state.data?.name || '-')}
+                    </Typography.Text>
+                  ),
+                  key: 'rih7p2dysbo',
+                  label: '模型名称',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => this.state.data?.id || '-')}
+                    </Typography.Text>
+                  ),
+                  key: '0kkdql8bwqcm',
+                  label: 'ID',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => this.state.data?.token || '-')}
+                    </Typography.Text>
+                  ),
+                  key: 'm029qv9anc',
+                  label: 'Token',
+                  span: __$$eval(() => (this.history?.query?.modelSource !== 'local' ? 1 : 0)),
+                },
+                {
+                  children: (
+                    <Typography.Time
+                      __component_name="Typography.Time"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      relativeTime={false}
+                      time={__$$eval(() => this.state.data?.updateTimestamp || '-')}
+                    />
+                  ),
+                  key: '7sl4fga857j',
+                  label: '更新时间',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Time
+                      __component_name="Typography.Time"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      relativeTime={false}
+                      time={__$$eval(() => this.state.data?.creationTimestamp || '-')}
+                    />
+                  ),
+                  key: 's40dyqz93',
+                  label: '创建时间',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(() => this.state.data?.creator || '-')}
+                    </Typography.Text>
+                  ),
+                  key: 'vx2ug1ccct',
+                  label: '创建者',
+                  span: 1,
+                },
+                {
+                  children: (
+                    <Typography.Paragraph
+                      code={false}
+                      delete={false}
+                      disabled={false}
+                      editable={false}
+                      ellipsis={false}
+                      mark={false}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                      underline={false}
+                    >
+                      {__$$eval(() => this.state.data?.description || '-')}
+                    </Typography.Paragraph>
+                  ),
+                  key: 'sw0a4avmxhl',
+                  label: '描述',
+                  span: 2,
+                },
+              ]}
+              labelStyle={{ textAlign: 'right', width: 80 }}
+              layout="horizontal"
+              size="small"
+              style={{ textAlign: 'left' }}
+              title=""
+            />
+          )}
         </Modal>
       </Page>
     );

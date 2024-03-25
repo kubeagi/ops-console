@@ -52,7 +52,8 @@ const addAuthHeaders = <T extends addAuthHeadersOptions>(options: T, url: string
     }
   } */
   if (project) {
-    authHeaders.project = project;
+    // authHeaders.project = project;
+    authHeaders.namespace = project;
   }
   options.headers = mergeHeaders(authHeaders, options.headers);
   return options;

@@ -5,18 +5,19 @@ import React from 'react';
 import {
   Page,
   Modal,
-  Table,
-  Button,
   Row,
   Col,
+  Typography,
+  Select,
+  Input,
+  Table,
+  Button,
   Card,
   Image,
-  Typography,
   Status,
   Tooltip,
   Space,
   Tabs,
-  Input,
   Descriptions,
   UnifiedLink,
   Flex,
@@ -73,11 +74,17 @@ class KnowledgeDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      addFileModalSearchText: undefined,
       addFilesModalConfirmBtnLoading: false,
       addFilesModalOpen: false,
+      dataset: undefined,
+      datasetList: [],
+      datasetVersion: undefined,
+      datasetVersionList: [],
       deleteModalOpen: false,
       editModalOpen: false,
       modalFilesList: [],
+      modalFilesListLoading: false,
       modalFilesSelectedKeys: [],
     };
   }
@@ -90,8 +97,8 @@ class KnowledgeDetail$$Page extends React.Component {
     // console.log('will unmount');
   }
 
-  countFileGroupDetail() {
-    const detail = this.getFileGroupDetail();
+  countFileGroupDetails() {
+    const detail = this.getFileGroupDetails();
     let processing = 0;
     let succeeded = 0;
     let failed = 0;
@@ -112,17 +119,76 @@ class KnowledgeDetail$$Page extends React.Component {
     };
   }
 
-  getFileGroupDetail() {
-    // 第一版本只支持一个数据集
-    const fileGroupDetail = this.getKnowledge()?.fileGroupDetails?.[0] || {};
-    return (fileGroupDetail.filedetails || []).map(detail => ({
-      ...detail,
-      source: fileGroupDetail.source?.name,
-    }));
+  getCurrentDatasetAndVersion() {
+    const knowledge = this.getKnowledge();
+    const fileGroupDetail = knowledge?.fileGroupDetails?.[0] || {};
+    const name = fileGroupDetail.source?.name;
+    return {
+      dataset: this.state.dataset || name.slice(0, name.lastIndexOf('-')),
+      version: this.state.datasetVersion || name,
+    };
+  }
+
+  async getDatasetList() {
+    const knowledge = this.getKnowledge();
+    const res = await this.utils.bff.listDatasets({
+      input: {
+        namespace: knowledge?.namespace,
+        page: 1,
+        pageSize: 1000,
+      },
+      versionsInput: {
+        namespace: knowledge?.namespace,
+        page: 1,
+        pageSize: 1000,
+      },
+      filesInput: {
+        keyword: '',
+        pageSize: 1,
+        page: 1,
+      },
+    });
+    const datasetList = (res.Dataset?.listDatasets?.nodes || []).map(item => {
+      const versions = item.versions.nodes.map(i => ({
+        label: i.version,
+        value: i.name,
+        files: i.files.nodes,
+      }));
+      return {
+        label: this.utils.getFullName(item),
+        value: item.name,
+        contentType: item.contentType,
+        versions: versions,
+      };
+    });
+    const dataset = this.getCurrentDatasetAndVersion().dataset;
+    this.setState({
+      datasetList,
+      datasetVersionList: datasetList.find(d => d.value === dataset)?.versions,
+    });
+  }
+
+  getDefaultModalFilesSelectedKeys(datasetVersion) {
+    const fileGroupDetail = this.getOneFileGroupDetail(datasetVersion);
+    return fileGroupDetail.map(({ path }) => path);
+  }
+
+  getFileGroupDetails() {
+    const fileGroupDetails = this.getKnowledge()?.fileGroupDetails || [];
+    const filesDetails = [];
+    fileGroupDetails.forEach(fgd => {
+      (fgd?.filedetails || []).forEach(detail => {
+        filesDetails.push({
+          ...detail,
+          source: fgd.source?.name,
+        });
+      });
+    });
+    return filesDetails;
   }
 
   getFileModalCheckboxProps(record) {
-    const fileGroupDetail = this.getFileGroupDetail();
+    const fileGroupDetail = this.getOneFileGroupDetail(this.getCurrentDatasetAndVersion().version);
     return {
       name: record.path,
       disabled: fileGroupDetail.some(detail => detail.path === record.path),
@@ -131,6 +197,29 @@ class KnowledgeDetail$$Page extends React.Component {
 
   getKnowledge() {
     return this.props.useGetKnowledgeBase?.data?.KnowledgeBase?.getKnowledgeBase;
+  }
+
+  getModalFilesList() {
+    const { modalFilesList, addFileModalSearchText } = this.state;
+    if (!addFileModalSearchText) {
+      return modalFilesList;
+    }
+    return modalFilesList.filter(file =>
+      file.path.toLowerCase().includes(addFileModalSearchText.toLowerCase())
+    );
+  }
+
+  getOneFileGroupDetail(name) {
+    // 默认取第一个数据集
+    const fileGroupDetails = this.getKnowledge()?.fileGroupDetails || [];
+    let fileGroupDetail = fileGroupDetails[0];
+    if (name) {
+      fileGroupDetail = fileGroupDetails.find(fgd => fgd.source?.name === name);
+    }
+    return (fileGroupDetail?.filedetails || []).map(detail => ({
+      ...detail,
+      source: fileGroupDetail.source?.name,
+    }));
   }
 
   getStatusType(status) {
@@ -150,21 +239,39 @@ class KnowledgeDetail$$Page extends React.Component {
     if (timeCost < 1000) {
       return `${timeCost} ms`;
     }
-    return `${(timeCost / 1000).toFixed(2)} s`;
+    if (timeCost < 1000 * 60) {
+      return `${(timeCost / 1000).toFixed(2)} s`;
+    }
+    return `${(timeCost / 1000 / 60).toFixed(2)} min`;
   }
 
-  async getVersionedDataset() {
+  async getVersionedDataset(name) {
     const knowledge = this.getKnowledge();
     const fileGroupDetail = knowledge?.fileGroupDetails?.[0] || {};
+    name = name || fileGroupDetail.source?.name;
+    if (!name) {
+      return;
+    }
+    this.setState({
+      modalFilesListLoading: true,
+      modalFilesList: [],
+    });
     const res = await this.utils.bff.getVersionedDataset({
       namespace: knowledge?.namespace,
-      name: fileGroupDetail.source?.name,
+      name,
       fileInput: {
         pageSize: 999,
       },
     });
     this.setState({
+      modalFilesListLoading: false,
       modalFilesList: res?.VersionedDataset?.getVersionedDataset?.files?.nodes || [],
+    });
+  }
+
+  onAddFileModalSearchTextSubmit(value) {
+    this.setState({
+      addFileModalSearchText: value,
     });
   }
 
@@ -177,10 +284,23 @@ class KnowledgeDetail$$Page extends React.Component {
   async onAddFilesModalOk() {
     const { modalFilesSelectedKeys } = this.state;
     const knowledge = this.getKnowledge();
-    const fileGroups = {
-      source: knowledge.fileGroupDetails?.[0]?.source,
-      path: modalFilesSelectedKeys,
-    };
+    const fileGroups = (knowledge.fileGroupDetails || []).map(fgd => ({
+      source: fgd.source,
+      path: fgd.filedetails.map(detail => detail.path),
+    }));
+    const version = this.getCurrentDatasetAndVersion().version;
+    const targetFileGroupIndex = fileGroups.findIndex(fg => fg.source?.name === version);
+    if (targetFileGroupIndex > -1) {
+      fileGroups[targetFileGroupIndex].path = modalFilesSelectedKeys;
+    } else {
+      fileGroups.push({
+        source: {
+          kind: 'VersionedDataset',
+          name: version,
+        },
+        path: modalFilesSelectedKeys,
+      });
+    }
     const input = {
       name: knowledge.name,
       namespace: knowledge.namespace,
@@ -213,6 +333,28 @@ class KnowledgeDetail$$Page extends React.Component {
     this.history.push('/knowledge');
   }
 
+  onDatasetChange(v) {
+    const datasetObj = this.state.datasetList.find(item => item.value === v);
+    const datasetVersionList = datasetObj?.versions || [];
+    const datasetVersion = datasetVersionList[0]?.value;
+    // console.log('datasetObj', datasetObj)
+    // console.log('datasetVersion', datasetVersion)
+    if (datasetVersion) {
+      this.getVersionedDataset(datasetVersion);
+    }
+    this.setState({
+      dataset: v,
+      datasetVersionList,
+      datasetVersion,
+      // 切换数据集后，清除之前选择的文件，重置为默认
+      modalFilesSelectedKeys: this.getDefaultModalFilesSelectedKeys(datasetVersion),
+    });
+  }
+
+  onDatasetVersionChange(v) {
+    this.getVersionedDataset(v);
+  }
+
   onDeleteModalCancel() {
     this.setState({
       deleteModalOpen: false,
@@ -240,19 +382,20 @@ class KnowledgeDetail$$Page extends React.Component {
   }
 
   onFileModalSelectionChange(selectedRowKeys, selectedRows) {
-    // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    this.fileModalSelectedRowKeys = selectedRowKeys;
     this.setState({
       modalFilesSelectedKeys: selectedRowKeys,
     });
   }
 
   openAddFilesModal() {
-    const fileGroupDetail = this.getFileGroupDetail();
-    this.getVersionedDataset();
+    const version = this.getCurrentDatasetAndVersion().version;
     this.setState({
       addFilesModalOpen: true,
-      modalFilesSelectedKeys: fileGroupDetail.map(({ path }) => path),
+      modalFilesSelectedKeys: this.getDefaultModalFilesSelectedKeys(version),
     });
+    this.getDatasetList();
+    this.getVersionedDataset(version);
   }
 
   openDeleteModal() {
@@ -303,37 +446,124 @@ class KnowledgeDetail$$Page extends React.Component {
           title="新增文件"
           width="800px"
         >
-          <Table
-            __component_name="Table"
-            columns={[
-              { dataIndex: 'path', key: 'name', title: '名称' },
-              { dataIndex: 'fileType', key: 'age', title: '类型' },
-              { dataIndex: 'count', title: '数据量' },
-              { dataIndex: 'size', title: '大小' },
-            ]}
-            dataSource={__$$eval(() => this.state.modalFilesList)}
-            pagination={{ pageSize: 10 }}
-            rowKey="path"
-            rowSelection={{
-              getCheckboxProps: function () {
-                return this.getFileModalCheckboxProps.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this),
-              onChange: function () {
-                return this.onFileModalSelectionChange.apply(
-                  this,
-                  Array.prototype.slice.call(arguments).concat([])
-                );
-              }.bind(this),
-              selectedRowKeys: __$$eval(() => this.state.modalFilesSelectedKeys),
-              type: 'checkbox',
-            }}
-            scroll={{ scrollToFirstRowOnChange: true }}
-            showHeader={true}
-            size="middle"
-          />
+          <Row
+            __component_name="Row"
+            justify="space-between"
+            style={{ marginBottom: '16px' }}
+            wrap={false}
+          >
+            <Col __component_name="Col" span={4}>
+              <Typography.Text
+                __component_name="Typography.Text"
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '', paddingLeft: '10px', paddingTop: '6px' }}
+              >
+                数据集
+              </Typography.Text>
+            </Col>
+            <Col
+              __component_name="Col"
+              span={10}
+              style={{ paddingLeft: '10px', paddingRight: '0px' }}
+            >
+              <Select
+                __component_name="Select"
+                _sdkSwrGetFunc={{}}
+                allowClear={false}
+                disabled={false}
+                onChange={function () {
+                  return this.onDatasetChange.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                options={__$$eval(() => this.state.datasetList)}
+                placeholder="请选择数据集"
+                showSearch={true}
+                style={{ width: '100%' }}
+                value={__$$eval(() => this.getCurrentDatasetAndVersion().dataset)}
+              />
+            </Col>
+            <Col __component_name="Col" span={10}>
+              <Select
+                __component_name="Select"
+                _sdkSwrGetFunc={{}}
+                allowClear={false}
+                disabled={false}
+                onChange={function () {
+                  return this.onDatasetVersionChange.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                options={__$$eval(() => this.state.datasetVersionList)}
+                placeholder="请选择版本"
+                showSearch={true}
+                style={{ width: '100%' }}
+                value={__$$eval(() => this.getCurrentDatasetAndVersion().version)}
+              />
+            </Col>
+          </Row>
+          <Row __component_name="Row" justify="space-between" wrap={false}>
+            <Col __component_name="Col" span={4}>
+              <Typography.Text
+                __component_name="Typography.Text"
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ paddingLeft: '10px', paddingTop: '6px' }}
+              >
+                选择文件
+              </Typography.Text>
+            </Col>
+            <Col __component_name="Col" span={20}>
+              <Input.Search
+                __component_name="Input.Search"
+                onSearch={function () {
+                  return this.onAddFileModalSearchTextSubmit.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                placeholder="请输入文件名称搜索"
+                style={{ marginBottom: '8px', width: '50%' }}
+              />
+              <Table
+                __component_name="Table"
+                columns={[
+                  { dataIndex: 'path', ellipsis: { showTitle: true }, key: 'name', title: '名称' },
+                  { dataIndex: 'fileType', key: 'age', title: '类型', width: 100 },
+                  { dataIndex: 'count', title: '数据量', width: 100 },
+                  { dataIndex: 'size', title: '大小', width: 150 },
+                ]}
+                dataSource={__$$eval(() => this.getModalFilesList())}
+                loading={__$$eval(() => this.state.modalFilesListLoading)}
+                pagination={{ pageSize: 10 }}
+                rowKey="path"
+                rowSelection={{
+                  getCheckboxProps: function () {
+                    return this.getFileModalCheckboxProps.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                  onChange: function () {
+                    return this.onFileModalSelectionChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                  selectedRowKeys: __$$eval(() => this.state.modalFilesSelectedKeys),
+                  type: 'checkbox',
+                }}
+                scroll={{ scrollToFirstRowOnChange: true }}
+                showHeader={true}
+                size="middle"
+              />
+            </Col>
+          </Row>
         </Modal>
         {!!__$$eval(() => this.state.deleteModalOpen) && (
           <LccComponentChj61
@@ -615,7 +845,7 @@ class KnowledgeDetail$$Page extends React.Component {
                                   style={{ fontSize: '', paddingRight: '12px' }}
                                 >
                                   {__$$eval(
-                                    () => `共有文件：${this.countFileGroupDetail().total} 个`
+                                    () => `共有文件：${this.countFileGroupDetails().total} 个`
                                   )}
                                 </Typography.Text>
                                 <Typography.Text
@@ -627,7 +857,7 @@ class KnowledgeDetail$$Page extends React.Component {
                                 >
                                   {__$$eval(
                                     () =>
-                                      `文件向量化中：${this.countFileGroupDetail().processing} 个`
+                                      `文件向量化中：${this.countFileGroupDetails().processing} 个`
                                   )}
                                 </Typography.Text>
                                 <Typography.Text
@@ -639,7 +869,7 @@ class KnowledgeDetail$$Page extends React.Component {
                                 >
                                   {__$$eval(
                                     () =>
-                                      `文件向量化成功：${this.countFileGroupDetail().succeeded} 个`
+                                      `文件向量化成功：${this.countFileGroupDetails().succeeded} 个`
                                   )}
                                 </Typography.Text>
                                 <Typography.Text
@@ -650,7 +880,8 @@ class KnowledgeDetail$$Page extends React.Component {
                                   style={{ fontSize: '', paddingRight: '12px' }}
                                 >
                                   {__$$eval(
-                                    () => `文件向量化失败：${this.countFileGroupDetail().failed} 个`
+                                    () =>
+                                      `文件向量化失败：${this.countFileGroupDetails().failed} 个`
                                   )}
                                 </Typography.Text>
                               </Space>
@@ -762,7 +993,7 @@ class KnowledgeDetail$$Page extends React.Component {
                                     title: '操作',
                                   },
                                 ]}
-                                dataSource={__$$eval(() => this.getFileGroupDetail())}
+                                dataSource={__$$eval(() => this.getFileGroupDetails())}
                                 loading={__$$eval(() => this.props.useGetKnowledgeBase?.loading)}
                                 pagination={{
                                   current: 1,
@@ -773,7 +1004,7 @@ class KnowledgeDetail$$Page extends React.Component {
                                   showSizeChanger: false,
                                   simple: false,
                                   size: 'default',
-                                  total: __$$eval(() => this.getFileGroupDetail().length),
+                                  total: __$$eval(() => this.getFileGroupDetails().length),
                                 }}
                                 rowKey="path"
                                 scroll={{ scrollToFirstRowOnChange: true }}

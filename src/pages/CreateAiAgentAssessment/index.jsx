@@ -20,7 +20,6 @@ import {
   FormilyFormItem,
   FormilySwitch,
   Input,
-  Pagination,
   Table,
   Divider,
 } from '@tenx-ui/materials';
@@ -75,7 +74,7 @@ class CreateAiAgentAssessment$$Page extends React.Component {
       dataSetFileSearchParams: {
         keyword: '',
         currentPage: 1,
-        pageSize: 10,
+        pageSize: 999,
       },
       dataSetFileTotal: '0',
       fileSelectCheckErrorFlag: false,
@@ -303,7 +302,7 @@ class CreateAiAgentAssessment$$Page extends React.Component {
       namespace: this.utils.getAuthData().project,
       fileInput: {
         keyword: this.state.dataSetFileSearchParams.keyword,
-        pageSize: 10,
+        pageSize: this.state.dataSetFileSearchParams.pageSize,
         page: this.state.dataSetFileSearchParams.currentPage,
       },
     });
@@ -339,10 +338,15 @@ class CreateAiAgentAssessment$$Page extends React.Component {
       selectedFileList: [],
       dataSetFileTotal: '0',
     });
-    this.form('create_form').setValues({
-      data_set_version: undefined,
+    const obj = this.state.dataSetDataList.find(item => item.value === v);
+    const genOptionList = obj.versions;
+    this.form('create_form').setFieldState('data_set_version', {
+      dataSource: genOptionList,
     });
-    this.setDataSetVersionsSource(v);
+    this.form('create_form').setValues({
+      data_set_version: genOptionList[0]?.value,
+    });
+    this.onDataSetVersionChange(genOptionList[0]?.value);
   }
 
   onDataSetVersionChange(v) {
@@ -423,34 +427,27 @@ class CreateAiAgentAssessment$$Page extends React.Component {
   }
 
   onPageChange(page, pageSize) {
-    this.setState(
-      {
-        dataSetFileSearchParams: {
-          ...this.state.dataSetFileSearchParams,
-          currentPage: page,
-          pageSize,
-        },
+    this.setState({
+      dataSetFileSearchParams: {
+        ...this.state.dataSetFileSearchParams,
+        currentPage: page,
+        pageSize,
       },
-      () => {
-        this.getDataSet();
-      }
-    );
+    });
   }
 
   onSearch(value) {
-    this.setState(
-      {
-        dataSetFileSearchParams: {
-          keyword: value,
-          currentPage: 1,
-        },
+    this.setState({
+      dataSetFileSearchParams: {
+        ...this.state.dataSetFileSearchParams,
+        keyword: value?.trim(),
+        currentPage: 1,
       },
-      () => {
-        const values = this.form('create_form')?.values;
-        const name = this.getVersionName(values?.data_set_name, values?.data_set_version);
-        this.getTableList(name);
-      }
-    );
+      selectedFileList: [],
+      dataSetFileTotal: this.state.dataSetFileList.filter(item =>
+        item?.path?.toLocaleLowerCase()?.includes(value?.trim()?.toLocaleLowerCase())
+      ).length,
+    });
   }
 
   onSelectFileChange(v) {
@@ -486,14 +483,6 @@ class CreateAiAgentAssessment$$Page extends React.Component {
         factuality: 100 - val,
       });
     }
-  }
-
-  setDataSetVersionsSource(v) {
-    const obj = this.state.dataSetDataList.find(item => item.value === v);
-    const genOptionList = obj.versions;
-    this.form('create_form').setFieldState('data_set_version', {
-      dataSource: genOptionList,
-    });
   }
 
   showTotal(total, range) {
@@ -2355,50 +2344,14 @@ class CreateAiAgentAssessment$$Page extends React.Component {
                           style={{ width: '400px' }}
                         />
                       </Col>
-                      <Col __component_name="Col">
-                        <Space __component_name="Space" align="center" direction="horizontal">
-                          <Row __component_name="Row" justify="space-between" wrap={false}>
-                            <Col __component_name="Col">
-                              <Pagination
-                                __component_name="Pagination"
-                                current={__$$eval(
-                                  () => this.state.dataSetFileSearchParams.currentPage
-                                )}
-                                onChange={function () {
-                                  return this.onPageChange.apply(
-                                    this,
-                                    Array.prototype.slice.call(arguments).concat([])
-                                  );
-                                }.bind(this)}
-                                onShowSizeChange={function () {
-                                  return this.onPageChange.apply(
-                                    this,
-                                    Array.prototype.slice.call(arguments).concat([])
-                                  );
-                                }.bind(this)}
-                                pageSize={__$$eval(
-                                  () => this.state.dataSetFileSearchParams.pageSize
-                                )}
-                                showTotal={function () {
-                                  return this.showTotal.apply(
-                                    this,
-                                    Array.prototype.slice.call(arguments).concat([])
-                                  );
-                                }.bind(this)}
-                                simple={false}
-                                style={{ textAlign: 'right' }}
-                                total={__$$eval(() => this.state.dataSetFileTotal)}
-                              />
-                            </Col>
-                          </Row>
-                        </Space>
-                      </Col>
+                      <Col __component_name="Col" />
                     </Row>
                   </Col>
                 </Row>
                 <Table
                   __component_name="Table"
                   bordered={false}
+                  className="dataset-table"
                   columns={[
                     { dataIndex: 'path', key: 'name', title: '文件名称' },
                     {
@@ -2421,10 +2374,38 @@ class CreateAiAgentAssessment$$Page extends React.Component {
                     { dataIndex: 'size', key: 'size', title: '文件大小', width: 100 },
                     { dataIndex: 'count', title: '数据量' },
                   ]}
-                  dataSource={__$$eval(() => this.state.dataSetFileList)}
+                  dataSource={__$$eval(() =>
+                    this.state.dataSetFileList.filter(item =>
+                      item?.path
+                        ?.toLocaleLowerCase()
+                        ?.includes(this.state.dataSetFileSearchParams.keyword?.toLocaleLowerCase())
+                    )
+                  )}
                   expandable={{ expandedRowRender: '' }}
                   loading={__$$eval(() => this.state.fileTableLoading)}
-                  pagination={false}
+                  pagination={{
+                    current: __$$eval(() => this.state.dataSetFileSearchParams.currentPage),
+                    onChange: function () {
+                      return this.onPageChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                    pageSize: 10,
+                    pagination: { pageSize: 10 },
+                    position: ['topRight'],
+                    showQuickJumper: false,
+                    showSizeChanger: false,
+                    showTotal: function () {
+                      return this.showTotal.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                    simple: false,
+                    size: 'default',
+                    total: __$$eval(() => this.state.dataSetFileTotal),
+                  }}
                   rowKey="path"
                   rowSelection={{
                     onChange: function () {
