@@ -70,6 +70,7 @@
     "@yuntijs/chat": "workspace:*",
     "@yuntijs/react-markdown-lowcode-materials": "1.0.1",
     "@yuntijs/request": "^1.0.0",
+    "@yuntijs/ui-lowcode-materials": "^1.0.0",
     "KubeAGIUpload": "workspace:*",
     "antd": "^5.12.2",
     "app-card": "workspace:*",
