@@ -1,6 +1,19 @@
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { default as Logs } from '@tenx-ui/logs';
-import { Alert, Button, Col, Modal, Page, Row, Space, Typography } from '@tenx-ui/materials';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Descriptions,
+  Dropdown,
+  Modal,
+  Page,
+  Row,
+  Space,
+  Typography,
+} from '@tenx-ui/materials';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { matchPath, useLocation } from '@umijs/max';
 import type { TabsProps } from 'antd';
 import { Avatar, Divider, List, Spin, Tabs, Tooltip, notification } from 'antd';
@@ -12,8 +25,8 @@ import I18N from '@/utils/kiwiI18N';
 import Status from '../../components/Status';
 import utils from '../../utils/__utils';
 import DataHandle from './DataHandle';
+import FileStatus from './FileStatus';
 import styles from './index.less';
-import Info from './info';
 
 const DataHandleDetail = props => {
   const statuesMap = {
@@ -35,12 +48,122 @@ const DataHandleDetail = props => {
   const [loading, setLoading] = useState(false);
   const [deleteVisible, setDelevisible] = useState(false);
   const [logVisible, setLogvisible] = useState(false);
+  const [baseInfoVisible, setBaseInfovisible] = useState(false);
   const location = useLocation();
   const logRef = useRef();
+  const [baseInfoItems, setbaseInfoItems] = useState([]);
+  const history = getUnifiedHistory();
+
+  const Link = path => {
+    history.push(path);
+  };
+
+  const calcSpendTime = record => {
+    const times = (
+      ((record.end_time ? new Date(record.end_time) : new Date()).getTime() -
+        new Date(record.start_time).getTime()) /
+      60_000
+    ).toFixed(2);
+    if (times > 60) {
+      return `${(times / 60).toFixed(2)} 小时`;
+    }
+    return `${times} 分钟`;
+  };
 
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    const _baseInfoDescItems = [
+      {
+        label: 'ID',
+        children: detailData.id,
+      },
+      {
+        label: I18N.DataHandle.wenJianLeiXing,
+        children:
+          detailData.file_type === 'text' ? I18N.DataHandle.puTongWenBen : I18N.DataHandle.qAWenBen,
+      },
+      {
+        label: I18N.DataHandle.chuLiQianShuJu,
+        children: (
+          <>
+            <a onClick={() => Link('/dataset/detail/' + detailData.pre_dataset_name)}>
+              {detailData.pre_dataset_name}
+            </a>
+            ---
+            <a
+              onClick={() =>
+                Link(
+                  '/dataset/detail/' +
+                    detailData.pre_dataset_name +
+                    '/version/' +
+                    detailData.pre_dataset_name +
+                    '-' +
+                    detailData.pre_dataset_version
+                )
+              }
+            >
+              {detailData.pre_dataset_version}
+            </a>
+          </>
+        ),
+      },
+      {
+        label: I18N.DataHandle.chuLiHouShuJu,
+        children: (
+          <>
+            <a onClick={() => Link('/dataset/detail/' + detailData.post_dataset_name)}>
+              {detailData.post_dataset_name}
+            </a>
+            ---
+            <a
+              onClick={() =>
+                Link(
+                  '/dataset/detail/' +
+                    detailData.post_dataset_name +
+                    '/version/' +
+                    detailData.post_dataset_name +
+                    '-' +
+                    detailData.post_dataset_version
+                )
+              }
+            >
+              {detailData.post_dataset_version}
+            </a>
+          </>
+        ),
+      },
+      {
+        label: I18N.DataHandle.kaiShiShiJian,
+        children: (
+          <Typography.Time
+            __component_name="Typography.Time"
+            format="YYYY-MM-DD HH:mm:ss"
+            relativeTime={false}
+            time={detailData.start_time}
+          />
+        ),
+      },
+      {
+        label: I18N.DataHandle.wanChengShiJian,
+        children: (
+          <Typography.Time
+            __component_name="Typography.Time"
+            format="YYYY-MM-DD HH:mm:ss"
+            relativeTime={false}
+            time={detailData.end_time || new Date()}
+          />
+        ),
+      },
+      {
+        label: I18N.DataHandle.chuangJianRen,
+        children: detailData.creator,
+      },
+    ];
+    setbaseInfoItems(_baseInfoDescItems);
+  }, [detailData]);
 
   const getData = () => {
     setLoading(true);
@@ -73,15 +196,11 @@ const DataHandleDetail = props => {
       });
   };
 
-  const formatTime = (time = '') => {
-    return time.split('.')[0];
-  };
-
   const items: TabsProps['items'] = [
     {
-      key: 'info',
-      label: I18N.DataHandle.xiangXiXinXi,
-      children: <Info data={detailData} />,
+      key: 'file',
+      label: I18N.DataHandle.wenJianChuLiZhuangTai,
+      children: <FileStatus calcSpendTime={calcSpendTime} data={detailData} getData={getData} />,
     },
     {
       key: 'data-handle',
@@ -135,19 +254,46 @@ const DataHandleDetail = props => {
       </Row>
 
       <Spin spinning={loading}>
-        <div className={styles.info}>
+        <Card bodyStyle={{ padding: '0 16px' }}>
           <List
             dataSource={[detailData]}
             itemLayout="horizontal"
             renderItem={(item, index) => (
               <List.Item
                 actions={[
-                  <Button key={index} onClick={onShowLog} size="small">
+                  <Dropdown.Button
+                    destroyPopupOnHide={true}
+                    key={index}
+                    menu={{
+                      items: [
+                        {
+                          key: 'baseinfo',
+                          label: I18N.DataHandle.jiChuXinXi,
+                        },
+                        {
+                          key: 'delete',
+                          label: I18N.DataHandle.shanChu,
+                        },
+                      ],
+                      onClick: ({ key }) => {
+                        switch (key) {
+                          case 'baseinfo': {
+                            setBaseInfovisible(true);
+                            break;
+                          }
+                          case 'delete': {
+                            onDel();
+
+                            break;
+                          }
+                          // No default
+                        }
+                      },
+                    }}
+                    onClick={onShowLog}
+                  >
                     {I18N.DataHandle.chaKanRiZhi}
-                  </Button>,
-                  <Button key={index} onClick={onDel} size="small">
-                    {I18N.DataHandle.shanChu}
-                  </Button>,
+                  </Dropdown.Button>,
                 ]}
               >
                 <List.Item.Meta
@@ -175,8 +321,8 @@ const DataHandleDetail = props => {
                         type="vertical"
                       />
                       <span>
-                        {I18N.DataHandle.gengXinShiJian}
-                        {item.end_time ? formatTime(item.end_time) : formatTime(item.start_time)}
+                        {I18N.DataHandle.haoShi}
+                        {calcSpendTime(item)}
                       </span>
                     </>
                   }
@@ -185,10 +331,10 @@ const DataHandleDetail = props => {
               </List.Item>
             )}
           />
-        </div>
-        <div className={styles.tabs}>
+        </Card>
+        <Card bodyStyle={{ paddingTop: 0 }} className={styles.tabs}>
           <Tabs items={items} />
-        </div>
+        </Card>
         <Modal
           destroyOnClose
           onCancel={() => setDelevisible(false)}
@@ -237,6 +383,23 @@ const DataHandleDetail = props => {
                   }
                 }}
               />
+            </div>
+          </Modal>
+        )}
+        {baseInfoVisible && (
+          <Modal
+            __component_name="Modal"
+            footer={null}
+            onCancel={() => {
+              setBaseInfovisible(false);
+            }}
+            open={baseInfoVisible}
+            title={I18N.DataHandle.jiChuXinXi}
+            width="700px"
+            wrapClassName={styles.descInfoModal}
+          >
+            <div>
+              <Descriptions column={2} items={baseInfoItems} labelStyle={{ width: 100 }} />
             </div>
           </Modal>
         )}
