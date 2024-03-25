@@ -82,10 +82,10 @@ class ModelAppList$$Page extends React.Component {
 
     this.state = {
       cateList: [
-        '游戏动漫',
         '通用对话',
         '工作学习',
         '内容创作',
+        '游戏动漫',
         'AI绘画',
         '影音生成',
         '角色扮演',
@@ -419,7 +419,7 @@ class ModelAppList$$Page extends React.Component {
         setTimeout(() => {
           pageThis.form('create_form').setValues({
             imageUrl: imageUrl,
-            category: '游戏动漫',
+            category: '通用对话',
             icon: {
               fileList: [
                 {
