@@ -289,6 +289,14 @@ class ModelServiceDetail$$Page extends React.Component {
     return '-';
   }
 
+  handleNodeData() {
+    const value = this.state.detail.matchExpressions;
+    if (value) {
+      return value?.reduce((acc, obj) => acc.concat(obj.values), [])?.join(',') || '-';
+    }
+    return '随机';
+  }
+
   handleOnOrOffModalCancelClick() {
     this.setState({
       onAndOffModalVisible: false,
@@ -940,10 +948,10 @@ class ModelServiceDetail$$Page extends React.Component {
                         <Typography.Text
                           __component_name="Typography.Text"
                           disabled={false}
-                          ellipsis={false}
+                          ellipsis={true}
                           strong={false}
                           style={{ fontSize: '' }}
-                          key="node_oclt2bpkaw1"
+                          key="node_oclu6hmjz71"
                         >
                           -
                         </Typography.Text>
@@ -954,7 +962,7 @@ class ModelServiceDetail$$Page extends React.Component {
                           justify="flex-start"
                           style={{ width: '100%' }}
                           wrap="wrap"
-                          key="node_oclt2bnfrq1"
+                          key="node_oclu6hlm1m3"
                         >
                           {__$$evalArray(() => this.handleModelInfos()).map((item, index) =>
                             (__$$context => (
@@ -1021,7 +1029,7 @@ class ModelServiceDetail$$Page extends React.Component {
                         </Flex>
                       ),
                     ],
-                    key: 'gl4qwni097',
+                    key: 'zg1pe5ua3je',
                     label: '模型信息',
                     span: 1,
                   },
@@ -1173,7 +1181,7 @@ class ModelServiceDetail$$Page extends React.Component {
                       <Typography.Text
                         __component_name="Typography.Text"
                         disabled={false}
-                        ellipsis={false}
+                        ellipsis={true}
                         strong={false}
                         style={{ fontSize: '' }}
                       >
@@ -1215,6 +1223,23 @@ class ModelServiceDetail$$Page extends React.Component {
                     ),
                     key: 'p5ek0awahr',
                     label: this.i18n('i18n-txt5kh4m') /* 描述 */,
+                    span: 1,
+                  },
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={false}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        {__$$eval(() => this.handleNodeData())}
+                      </Typography.Text>
+                    ),
+                    key: '1gud1h9jqfi',
+                    label: '指定节点',
                     span: 1,
                   },
                   {
@@ -1327,7 +1352,7 @@ class ModelServiceDetail$$Page extends React.Component {
                           ellipsis={false}
                           strong={false}
                           style={{ fontSize: '' }}
-                          key="node_oclt2bj9n71k"
+                          key="node_oclu6hkt9n1"
                         >
                           -
                         </Typography.Text>
@@ -1405,7 +1430,7 @@ class ModelServiceDetail$$Page extends React.Component {
                         </Flex>
                       ),
                     ],
-                    key: 'ayhgg13s7ep',
+                    key: 'fo8nzboy43',
                     label: '模型信息',
                     span: 1,
                   },
