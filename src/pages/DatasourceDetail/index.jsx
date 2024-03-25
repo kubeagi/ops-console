@@ -261,6 +261,7 @@ class DatasourceDetail$$Page extends React.Component {
           web: 'onLine',
           oss: 'objectStorage',
           unknown: 'onLine',
+          postgresql: 'postgresql',
         }[data?.type] || 'web',
     };
   }

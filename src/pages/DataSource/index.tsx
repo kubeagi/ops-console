@@ -215,87 +215,87 @@ class DataSource$$Page extends React.Component {
     );
   }
 
-  onSubmit(event) {
+  async onSubmit(v) {
     const { modalType } = this.state;
     const isCreate = modalType === 'add';
     const form = this?.editThis?.form();
-    form.submit(async v => {
-      this.setState({
-        modalLoading: true,
-      });
-      let params = {
+    // form.submit(async v => {
+    this.setState({
+      modalLoading: true,
+    });
+    let params = {
+      input: {
+        name: v?.name,
+        displayName: v?.displayName,
+        namespace: this.utils.getAuthData()?.project,
+        description: v?.description,
+        ossinput: {
+          bucket: v?.bucket,
+          object: v?.object,
+        },
+        endpointinput: {
+          url: v?.serverAddress,
+          insecure: v?.insecure === 'https' ? false : true,
+          auth: {
+            rootUser: v?.username,
+            rootPassword: v?.password,
+          },
+        },
+        webinput: {
+          recommendIntervalTime: v?.recommendIntervalTime || 1000,
+        },
+      },
+    };
+    if (this?.editThis?.getType() === 'onLine') {
+      params = {
         input: {
           name: v?.name,
           displayName: v?.displayName,
           namespace: this.utils.getAuthData()?.project,
           description: v?.description,
-          ossinput: {
-            bucket: v?.bucket,
-            object: v?.object,
-          },
           endpointinput: {
             url: v?.serverAddress,
-            insecure: v?.insecure === 'https' ? false : true,
-            auth: {
-              rootUser: v?.username,
-              rootPassword: v?.password,
-            },
           },
           webinput: {
-            recommendIntervalTime: v?.recommendIntervalTime || 1000,
+            recommendIntervalTime: +v?.recommendIntervalTime || 1000,
           },
         },
       };
-      if (this?.editThis?.getType() === 'onLine') {
-        params = {
-          input: {
-            name: v?.name,
-            displayName: v?.displayName,
-            namespace: this.utils.getAuthData()?.project,
-            description: v?.description,
-            endpointinput: {
-              url: v?.serverAddress,
-            },
-            webinput: {
-              recommendIntervalTime: +v?.recommendIntervalTime || 1000,
-            },
-          },
-        };
-      }
-      const api = {
-        create: {
-          name: 'createDatasource',
-          params,
-          successMessage: 'i18n-ia3gjpq5',
-          faildMessage: 'i18n-p20wuevb',
-        },
-        update: {
-          name: 'updateDatasource',
-          params,
-          successMessage: 'i18n-tz6dwud2',
-          faildMessage: 'i18n-sah3nlrl',
-        },
-      }[isCreate ? 'create' : 'update'];
-      try {
-        const res = await this.props.appHelper.utils.bff[api.name](api.params);
-        this.utils.notification.success({
-          message: this.i18n(api.successMessage),
-        });
-        this.handleRefresh();
-        this.closeModal();
-        this.setState({
-          modalLoading: false,
-        });
-      } catch (error) {
-        this.utils.notification.warnings({
-          message: this.i18n(api.faildMessage),
-          errors: error?.response?.errors,
-        });
-        this.setState({
-          modalLoading: false,
-        });
-      }
-    });
+    }
+    const api = {
+      create: {
+        name: 'createDatasource',
+        params,
+        successMessage: 'i18n-ia3gjpq5',
+        faildMessage: 'i18n-p20wuevb',
+      },
+      update: {
+        name: 'updateDatasource',
+        params,
+        successMessage: 'i18n-tz6dwud2',
+        faildMessage: 'i18n-sah3nlrl',
+      },
+    }[isCreate ? 'create' : 'update'];
+    try {
+      const res = await this.props.appHelper.utils.bff[api.name](api.params);
+      this.utils.notification.success({
+        message: this.i18n(api.successMessage),
+      });
+      this.handleRefresh();
+      this.closeModal();
+      this.setState({
+        modalLoading: false,
+      });
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n(api.faildMessage),
+        errors: error?.response?.errors,
+      });
+      this.setState({
+        modalLoading: false,
+      });
+    }
+    // })
   }
 
   openModal(e, { record = {}, modalType = 'add' }) {
@@ -567,6 +567,7 @@ class DataSource$$Page extends React.Component {
                                 web: 'onLine',
                                 oss: 'objectStorage',
                                 unknown: 'onLine',
+                                postgresql: 'postgresql',
                               }[item.type] || 'web',
                           })
                         ) || []

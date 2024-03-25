@@ -174,10 +174,10 @@ const Edit: React.FC<EditProps> = props => {
           >
             <Select placeholder={I18N.ModelApp.qingXuanZeZhiNeng}>
               {[
-                I18N.ModelApp.youXiDongMan,
                 I18N.ModelApp.tongYongDuiHua,
                 I18N.ModelApp.gongZuoXueXi,
                 I18N.ModelApp.neiRongChuangZuo,
+                I18N.ModelApp.youXiDongMan,
                 I18N.ModelApp.aIHuiHua,
                 I18N.ModelApp.yingYinShengCheng,
                 I18N.ModelApp.jueSeBanYan,
