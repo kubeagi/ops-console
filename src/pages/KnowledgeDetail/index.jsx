@@ -90,6 +90,7 @@ class KnowledgeDetail$$Page extends React.Component {
       modalFilesList: [],
       modalFilesListLoading: false,
       modalFilesSelectedKeys: [],
+      searchText: undefined,
     };
   }
 
@@ -180,12 +181,15 @@ class KnowledgeDetail$$Page extends React.Component {
   getFileGroupDetails() {
     const fileGroupDetails = this.getKnowledge()?.fileGroupDetails || [];
     const filesDetails = [];
+    const { searchText } = this.state;
     fileGroupDetails.forEach(fgd => {
       (fgd?.filedetails || []).forEach(detail => {
-        filesDetails.push({
-          ...detail,
-          source: fgd.source?.name,
-        });
+        if (!searchText || detail.path.toLowerCase().includes(searchText.toLowerCase())) {
+          filesDetails.push({
+            ...detail,
+            source: fgd.source?.name,
+          });
+        }
       });
     });
     return filesDetails;
@@ -462,6 +466,12 @@ class KnowledgeDetail$$Page extends React.Component {
     } finally {
       //
     }
+  }
+
+  onSearchTextSubmit(value) {
+    this.setState({
+      searchText: value,
+    });
   }
 
   openAddFilesModal() {
@@ -913,6 +923,12 @@ class KnowledgeDetail$$Page extends React.Component {
                               </Button>
                               <Input.Search
                                 __component_name="Input.Search"
+                                onSearch={function () {
+                                  return this.onSearchTextSubmit.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([])
+                                  );
+                                }.bind(this)}
                                 placeholder="请输入文件名称搜索"
                                 style={{ height: '32px', marginRight: '12px', width: '240px' }}
                               />
@@ -1101,13 +1117,12 @@ class KnowledgeDetail$$Page extends React.Component {
                                 dataSource={__$$eval(() => this.getFileGroupDetails())}
                                 loading={__$$eval(() => this.props.useGetKnowledgeBase?.loading)}
                                 pagination={{
-                                  current: 1,
                                   pageSize: 20,
                                   pagination: { pageSize: 10 },
                                   position: ['bottomRight'],
                                   showQuickJumper: false,
                                   showSizeChanger: false,
-                                  simple: false,
+                                  simple: true,
                                   size: 'default',
                                   total: __$$eval(() => this.getFileGroupDetails().length),
                                 }}
