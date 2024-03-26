@@ -1,6 +1,8 @@
-import { KubeagiNextLead } from '@tenx-ui/icon';
 import { Form, InputNumber, Switch } from 'antd';
 import React from 'react';
+
+import DialogeTimeout from '@/assets/img/modelAppConfig/dialogeTimeout.svg';
+import DocDialoge from '@/assets/img/modelAppConfig/docDialoge.svg';
 
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
@@ -66,7 +68,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
           ]}
           configKey="DialogeTimeout"
           headerStyle={{ paddingBottom: 8 }}
-          icon={<KubeagiNextLead />}
+          icon={<img src={DialogeTimeout} width={14} />}
           isRowItem={true}
           style={{ paddingTop: 8 }}
           title={'对话超时'}
@@ -94,7 +96,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
             },
           ]}
           configKey="DocDialoge"
-          icon={<KubeagiNextLead className={styles.greenIcon} />}
+          icon={<img src={DocDialoge} width={14} />}
           isRowItem={!form?.getFieldValue('enableUploadFile')}
           renderChildren={form => {
             return (
