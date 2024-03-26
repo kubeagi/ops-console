@@ -23,6 +23,8 @@ import {
   Flex,
 } from '@tenx-ui/materials';
 
+import LccComponentSbva0 from 'confirm';
+
 import LccComponentChj61 from 'kubeagi-knowledge-delete-modal';
 
 import LccComponentXnggv from 'kubeagi-knowledge-edit-modal';
@@ -83,6 +85,8 @@ class KnowledgeDetail$$Page extends React.Component {
       datasetVersionList: [],
       deleteModalOpen: false,
       editModalOpen: false,
+      fileDelBtnsLoading: {},
+      fileDelconfirm: {},
       modalFilesList: [],
       modalFilesListLoading: false,
       modalFilesSelectedKeys: [],
@@ -321,7 +325,7 @@ class KnowledgeDetail$$Page extends React.Component {
         addFilesModalOpen: false,
       });
     } catch (err) {
-      //
+      console.warn('updateKnowledgeBase failed', err);
     } finally {
       this.setState({
         addFilesModalConfirmBtnLoading: false,
@@ -381,11 +385,83 @@ class KnowledgeDetail$$Page extends React.Component {
     });
   }
 
+  async onFileDelBtnClick(event, extParams) {
+    const { path, source } = extParams.record;
+    this.setState({
+      fileDelconfirm: {
+        id: new Date().getTime(),
+        title: '删除知识库文件',
+        content: `确定删除知识库文件：${source}/${path} ？`,
+        onOk: async () => {
+          const knowledge = this.getKnowledge();
+          const fileGroups = (knowledge.fileGroupDetails || []).map(fgd => ({
+            source: fgd.source,
+            path: fgd.filedetails
+              .filter(detail => detail.path !== path || fgd.source.name !== source)
+              .map(detail => detail.path),
+          }));
+          const input = {
+            name: knowledge.name,
+            namespace: knowledge.namespace,
+            fileGroups,
+          };
+          // console.log('input', input)
+          // console.log('knowledge', knowledge)
+          // console.log('path', path)
+          // console.log('source', source)
+          try {
+            await this.utils.bff.updateKnowledgeBase({
+              input,
+            });
+            this.utils.message.success(`文件 '${path}' 删除成功`);
+            this.refreshData();
+          } catch (err) {
+            console.warn('updateKnowledgeBase failed', err);
+            this.utils.message.warning(`文件 '${path}' 删除失败`);
+          } finally {
+            //
+          }
+        },
+      },
+    });
+  }
+
   onFileModalSelectionChange(selectedRowKeys, selectedRows) {
     this.fileModalSelectedRowKeys = selectedRowKeys;
     this.setState({
       modalFilesSelectedKeys: selectedRowKeys,
     });
+  }
+
+  async onFileProcessRetyClick() {
+    const key = 'onFileProcessRetyClick';
+    const knowledge = this.getKnowledge();
+    const input = {
+      name: knowledge.name,
+      namespace: knowledge.namespace,
+      annotations: {
+        ...knowledge.annotations,
+        'arcadia.kubeagi.k8s.com.cn/update-source-file-time': Date.now().toString(),
+      },
+    };
+    try {
+      await this.utils.bff.updateKnowledgeBase({
+        input,
+      });
+      this.utils.message.success({
+        content: '文件重新处理中',
+        key,
+      });
+      this.refreshData();
+    } catch (err) {
+      console.warn('updateKnowledgeBase failed', err);
+      this.utils.message.warning({
+        content: '文件处理重试请求失败',
+        key,
+      });
+    } finally {
+      //
+    }
   }
 
   openAddFilesModal() {
@@ -421,6 +497,10 @@ class KnowledgeDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        <LccComponentSbva0
+          __component_name="LccComponentSbva0"
+          data={__$$eval(() => this.state.fileDelconfirm)}
+        />
         <Modal
           __component_name="Modal"
           centered={false}
@@ -872,18 +952,43 @@ class KnowledgeDetail$$Page extends React.Component {
                                       `文件向量化成功：${this.countFileGroupDetails().succeeded} 个`
                                   )}
                                 </Typography.Text>
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '', paddingRight: '12px' }}
+                                <Space
+                                  __component_name="Space"
+                                  align="center"
+                                  direction="horizontal"
+                                  size={4}
                                 >
-                                  {__$$eval(
-                                    () =>
-                                      `文件向量化失败：${this.countFileGroupDetails().failed} 个`
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '' }}
+                                  >
+                                    {__$$eval(
+                                      () =>
+                                        `文件向量化失败：${this.countFileGroupDetails().failed} 个`
+                                    )}
+                                  </Typography.Text>
+                                  {!!__$$eval(() => this.countFileGroupDetails().failed > 0) && (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      onClick={function () {
+                                        return this.onFileProcessRetyClick.apply(
+                                          this,
+                                          Array.prototype.slice.call(arguments).concat([])
+                                        );
+                                      }.bind(this)}
+                                      strong={false}
+                                      style={{ cursor: 'pointer', fontSize: '' }}
+                                      type="colorPrimary"
+                                    >
+                                      重试
+                                    </Typography.Text>
                                   )}
-                                </Typography.Text>
+                                </Space>
                               </Space>
                             </Col>
                             <Col __component_name="Col" span={24}>
@@ -959,7 +1064,7 @@ class KnowledgeDetail$$Page extends React.Component {
                                   },
                                   {
                                     dataIndex: 'operator',
-                                    render: (text, record, index) =>
+                                    render: /* 插槽容器*/ (text, record, index) =>
                                       (__$$context => (
                                         <Space
                                           __component_name="Space"
@@ -969,19 +1074,19 @@ class KnowledgeDetail$$Page extends React.Component {
                                           <Button
                                             __component_name="Button"
                                             block={false}
-                                            danger={false}
+                                            danger={true}
                                             disabled={false}
                                             ghost={false}
-                                            shape="default"
-                                          >
-                                            日志
-                                          </Button>
-                                          <Button
-                                            __component_name="Button"
-                                            block={false}
-                                            danger={true}
-                                            disabled={true}
-                                            ghost={false}
+                                            onClick={function () {
+                                              return this.onFileDelBtnClick.apply(
+                                                this,
+                                                Array.prototype.slice.call(arguments).concat([
+                                                  {
+                                                    record: record,
+                                                  },
+                                                ])
+                                              );
+                                            }.bind(__$$context)}
                                             shape="default"
                                           >
                                             删除
