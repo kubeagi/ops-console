@@ -1,8 +1,10 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { KubeagiNextLead } from '@tenx-ui/icon';
 import { Form, Select, Space, Switch, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
 
+import MultiSearchIcon from '@/assets/img/modelAppConfig/multiSearch.svg';
+import RerankIcon from '@/assets/img/modelAppConfig/rerank.svg';
+import SearchLimit from '@/assets/img/modelAppConfig/searchLimit.svg';
 import I18N from '@/utils/kiwiI18N';
 
 import utils from '../../../../utils/__utils';
@@ -18,19 +20,20 @@ interface ConfigNextProps {}
 const ConfigNext: React.FC<ConfigNextProps> = props => {
   const { configs, setConfigs, form } = useModalAppDetailContext();
 
-  const { data: llms } = utils.bff.useListLlMs({
-    input: {
-      pageSize: 9999,
-      page: 1,
-      namespace: utils.getAuthData().project,
-      labelSelector: 'arcadia.kubeagi.k8s.com.cn/reranking=true',
-    },
-  });
-
+  const { data: llms } =
+    utils.bff?.useListModelServices({
+      input: {
+        pageSize: 9999,
+        page: 1,
+        namespace: utils.getAuthData().project,
+      },
+    }) || {};
   const llmList = useMemo(() => {
     return (
-      llms?.LLM?.listLLMs?.nodes?.filter(
-        (item: any) => item.status === 'True' || item.status === 'Running'
+      llms?.ModelService?.listModelServices?.nodes?.filter(
+        (item: any) =>
+          (item.status === 'True' || item.status === 'Running') &&
+          item.types?.split(',')?.some(type => type === 'reranking')
       ) || []
     );
   }, [llms]);
@@ -64,7 +67,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
         borderBottom={form?.getFieldValue('enableRerank')}
         changeConfig
         configKey="Rerank"
-        icon={<KubeagiNextLead />}
+        icon={<img src={RerankIcon} width={16} />}
         isRowItem={!form?.getFieldValue('enableRerank')}
         renderChildren={form => {
           return (
@@ -85,6 +88,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
                 style={{ marginBottom: 8 }}
               >
                 <Select
+                  allowClear
                   onChange={v => {
                     setConfigs({
                       ...configs,
@@ -135,7 +139,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
           },
         ]}
         configKey="MultiSearch"
-        icon={<KubeagiNextLead className={styles.greenIcon} />}
+        icon={<img src={MultiSearchIcon} width={14} />}
         isRowItem={true}
         // style={{ padding: 0 }}
         title={'多查询'}
@@ -166,7 +170,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
           ]}
           borderBottom={form?.getFieldValue('showSearchLimit')}
           configKey="SearchLimit"
-          icon={<KubeagiNextLead className={styles.orangeIcon} />}
+          icon={<img src={SearchLimit} width={14} />}
           isRowItem={!form?.getFieldValue('showSearchLimit')}
           renderChildren={form => {
             return (
