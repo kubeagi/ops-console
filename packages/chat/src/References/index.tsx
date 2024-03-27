@@ -27,6 +27,7 @@ export type Reference = {
   score: number;
   title?: string;
   url?: string;
+  rerank_score: number;
 };
 type IRenderReferences = {
   chat: ChatMessage;

@@ -120,7 +120,7 @@ const Chat: React.FC<IChat> = props => {
     name: props.appName,
     namespace: props.appNamespace,
   });
-  const appData = application?.data?.Application?.getApplication;
+  const app = application?.data?.Application?.getApplication;
   const [messages, messagesLoading] = useGetCommonData<TMessage[]>({
     url: '/chat/messages',
     method: 'post',
@@ -142,7 +142,7 @@ const Chat: React.FC<IChat> = props => {
   });
   const fetchLastReference = useCallback(
     async (cId, mId) => {
-      if (!mId || !cId || !appData?.showRetrievalInfo) return;
+      if (!mId || !cId || !app?.showRetrievalInfo) return;
       const res = await request
         .post({
           url: `/chat/messages/${mId}/references`,
@@ -181,11 +181,10 @@ const Chat: React.FC<IChat> = props => {
       });
       scrollToBottom();
     },
-    [setConversation, appData?.showRetrievalInfo, props.appName, props.appNamespace]
+    [setConversation, app?.showRetrievalInfo, props.appName, props.appNamespace]
   );
   useEffect(() => {
     if (conversation.data?.length) return;
-    const app = application?.data?.Application?.getApplication;
     if (!app?.metadata.name) return;
     const defaultPrologue = I18N.template(I18N.Chat.ninHaoWoShiA, {
       val1: `${app?.metadata.displayName || app?.metadata.name}${app?.metadata.description ? `\n\n${app?.metadata.description}` : ''}`,
@@ -195,7 +194,8 @@ const Chat: React.FC<IChat> = props => {
         app?.prologue || defaultPrologue,
         conversationId || Date.now().toString(),
         null,
-        false
+        false,
+        app?.metadata
       ),
     ];
     // 存在会话id, 展示历史聊天内容
@@ -218,7 +218,8 @@ const Chat: React.FC<IChat> = props => {
             cur.answer,
             cur.id + '_answer',
             { references: cur.references, latency: cur.latency },
-            false
+            false,
+            app?.metadata
           ),
         ],
         cvList
@@ -230,7 +231,7 @@ const Chat: React.FC<IChat> = props => {
         data: cvList,
       })
     );
-  }, [conversation, application, conversationId, messages, messagesLoading]);
+  }, [conversation, app, conversationId, messages, messagesLoading]);
   useEffect(() => {
     scrollToBottom();
   }, [conversation]);
@@ -454,7 +455,7 @@ const Chat: React.FC<IChat> = props => {
                 : null,
               true
             ),
-            getCvsMeta('', assistantMsgId, {}, false),
+            getCvsMeta('', assistantMsgId, {}, false, app?.metadata),
           ],
         });
       });
@@ -462,7 +463,7 @@ const Chat: React.FC<IChat> = props => {
       setInput('');
       setShowNextGuide(false);
     },
-    [setInput, setConversation, fetchConversation, setShowNextGuide, fileList]
+    [setInput, setConversation, fetchConversation, setShowNextGuide, fileList, app]
   );
   const onPromptClick = useCallback(
     value => {
@@ -548,7 +549,7 @@ const Chat: React.FC<IChat> = props => {
                       {conversation.loadingMsgId !== chat.id &&
                         Boolean(chat.extra?.index) &&
                         chat.role === 'assistant' &&
-                        Boolean(appData?.showRespInfo) && (
+                        Boolean(app?.showRespInfo) && (
                           <div className="extraMsg">
                             {Boolean(chat.extra?.latency) && (
                               <Tag color="green">{(chat.extra?.latency / 1000).toFixed(2)}s</Tag>
@@ -560,7 +561,7 @@ const Chat: React.FC<IChat> = props => {
                             </Tag>
                           </div>
                         )}
-                      {Boolean(appData?.showRetrievalInfo) && (
+                      {Boolean(app?.showRetrievalInfo) && (
                         <RenderReferences chat={chat} debug={props.debug} />
                       )}
                     </>
@@ -572,7 +573,7 @@ const Chat: React.FC<IChat> = props => {
             <div className="safeArea" id={safeAreaId}></div>
           </div>
           {!conversationId && // 历史对话不展示引导
-            appData?.showNextGuide && // 根据智能体个性化配置展示引导
+            app?.showNextGuide && // 根据智能体个性化配置展示引导
             showNextGuide && ( // 智能体 debug 时, 问过后就不再展示引导
               <PromptStarter
                 appName={props.appName}
@@ -595,7 +596,7 @@ const Chat: React.FC<IChat> = props => {
             <ChatInputArea
               bottomAddons={
                 <ChatInputBottomAddons
-                  appData={appData}
+                  appData={app}
                   fileList={fileList}
                   input={input}
                   loading={Boolean(conversation.loadingMsgId)}

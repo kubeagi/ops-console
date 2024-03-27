@@ -88,6 +88,15 @@ const RefContent: FC<IRefContent> = props => {
                 </Tag>
               </Space>
             )}
+            {Boolean(reference.rerank_score) && (
+              <Space className="relLine">
+                <FieldNumberOutlined />
+                <Tag color={getRelColor(reference.rerank_score)}>
+                  Rerank:
+                  {(reference.rerank_score * 100).toFixed(2)}%
+                </Tag>
+              </Space>
+            )}
             {Boolean(reference.question) && (
               <div>
                 <Typography.Paragraph
