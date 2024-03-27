@@ -92,13 +92,6 @@ class $$Page extends React.Component {
     this.state = {
       afterTreatmentData: [
         {
-          _type: 'qa_split',
-          type: 'QA拆分',
-          before:
-            ' 为了保证知识库问答质量，需要对文档做 QA 拆分，QA 拆分时需要选择对应的模型服务。',
-          after: `Q：为什么要做 QA 拆分？<br />A：为了保证知识库问答质量。<br />Q：QA 拆分需要注意什么？<br /> A：QA 拆分时需要选择对应的模型服务。`,
-        },
-        {
           _type: 'document_chunk',
           type: '文本分段',
           before: `这是一段长文本，由于文本文字很长，需要做文本分段处理，分段配置设置为：分段长度 40 字符，分段重叠长度 10 字符。`,
@@ -109,6 +102,13 @@ class $$Page extends React.Component {
         <div style='border-bottom:1px solid #f0f0f0;margin-bottom:12px'></div>
         <p>为：分段长度 40 字符，分段重叠长度 10 字符。</p>
         `,
+        },
+        {
+          _type: 'qa_split',
+          type: 'QA拆分',
+          before:
+            ' 为了保证知识库问答质量，需要对文档做 QA 拆分，QA 拆分时需要选择对应的模型服务。',
+          after: `Q：为什么要做 QA 拆分？<br />A：为了保证知识库问答质量。<br />Q：QA 拆分需要注意什么？<br /> A：QA 拆分时需要选择对应的模型服务。`,
         },
         {
           _type: 'remove_invisible_characters',
@@ -181,8 +181,8 @@ class $$Page extends React.Component {
       cacheqaSplitHighConfig: {},
       configEnableMap: {},
       configMap: {
-        qa_split: 'QAsplitChecked',
         document_chunk: 'TextSegmentationChecked',
+        qa_split: 'QAsplitChecked',
         remove_invisible_characters: 'RemoveInvisibleCharactersChecked',
         space_standardization: 'SpaceHandleChecked',
         remove_garbled_text: 'RemoveGarbledCodeChecked',
@@ -237,15 +237,15 @@ class $$Page extends React.Component {
       },
       step2FormData: {},
       step3Data: {
-        QAsplitChecked: true,
-        QAsplitForm: {
-          type: undefined,
-          model: undefined,
-        },
         TextSegmentationChecked: true,
         TextSegmentationForm: {
           chunk_size: 500,
           chunk_overlap: 50,
+        },
+        QAsplitChecked: true,
+        QAsplitForm: {
+          type: undefined,
+          model: undefined,
         },
         RemoveInvisibleCharactersChecked: true,
         SpaceHandleChecked: true,
