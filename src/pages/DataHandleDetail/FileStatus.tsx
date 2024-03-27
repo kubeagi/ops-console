@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Status from '@/components/Status';
 import I18N from '@/utils/kiwiI18N';
 
+import utils from '../../utils/__utils';
 import styles from './FileStatus.less';
 
 interface Iprops {
@@ -62,13 +63,6 @@ const FileStatus: React.FC<Iprops> = props => {
 
             <div>
               <Status {...statuesMap[item.status]} />
-              {item.status === 'fail' ? (
-                <a className={styles.retry} onClick={props.getData}>
-                  {I18N.DataHandle.chongShi}
-                </a>
-              ) : (
-                ''
-              )}
             </div>
             <div>
               <span className={styles.time}>
@@ -83,22 +77,54 @@ const FileStatus: React.FC<Iprops> = props => {
     setFileStatusCount(statusCount);
     // setItems(_items);
   }, [file_details]);
+
+  const onRetry = () => {
+    const record = props.data;
+    utils.bff
+      .dataProcessRetry({
+        input: {
+          id: record.id,
+          creator: utils.getAuthData()?.user?.name,
+        },
+      })
+      .then(res => {
+        utils.notification.success({
+          message: res.dataProcess.dataProcessRetry.message,
+        });
+        props.getData();
+      })
+      .catch(error => {
+        utils.notification.warn({
+          message: '重试失败',
+        });
+      });
+  };
+
   return (
     <div>
       <Button className={styles.reloadBtn} onClick={props.getData}>
         {I18N.DataHandle.shuaXin}
       </Button>
-      <div
-        dangerouslySetInnerHTML={{
-          __html: I18N.template(I18N.DataHandle.fileStatusCount, {
-            total: fileTotal,
-            success: fileStatusCount.success,
-            not_start: fileStatusCount.not_start,
-            doing: fileStatusCount.doing,
-            fail: fileStatusCount.fail,
-          }),
-        }}
-      ></div>
+      <div style={{ display: 'flex' }}>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: I18N.template(I18N.DataHandle.fileStatusCount, {
+              total: fileTotal,
+              success: fileStatusCount.success,
+              not_start: fileStatusCount.not_start,
+              doing: fileStatusCount.doing,
+              fail: fileStatusCount.fail,
+            }),
+          }}
+        ></div>
+        {props.data.status === 'process_fail' ? (
+          <a className={styles.retry} onClick={onRetry}>
+            {I18N.DataHandle.chongShi}
+          </a>
+        ) : (
+          ''
+        )}
+      </div>
       <List
         dataSource={file_details}
         itemLayout="horizontal"
@@ -118,13 +144,6 @@ const FileStatus: React.FC<Iprops> = props => {
                   <span className={styles.title}>{item.file_name}</span>
                   <Divider type="vertical" />
                   <Status {...statuesMap[item.status]} />
-                  {item.status === 'fail' ? (
-                    <a className={styles.retry} onClick={props.getData}>
-                      {I18N.DataHandle.chongShi}
-                    </a>
-                  ) : (
-                    ''
-                  )}
                   <Divider type="vertical" />
                   <span className={styles.time}>
                     <ClockCircleOutlined />

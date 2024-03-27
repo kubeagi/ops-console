@@ -86,56 +86,6 @@ const DataHandleDetail = props => {
           detailData.file_type === 'text' ? I18N.DataHandle.puTongWenBen : I18N.DataHandle.qAWenBen,
       },
       {
-        label: I18N.DataHandle.chuLiQianShuJu,
-        children: (
-          <>
-            <a onClick={() => Link('/dataset/detail/' + detailData.pre_dataset_name)}>
-              {detailData.pre_dataset_name}
-            </a>
-            ---
-            <a
-              onClick={() =>
-                Link(
-                  '/dataset/detail/' +
-                    detailData.pre_dataset_name +
-                    '/version/' +
-                    detailData.pre_dataset_name +
-                    '-' +
-                    detailData.pre_dataset_version
-                )
-              }
-            >
-              {detailData.pre_dataset_version}
-            </a>
-          </>
-        ),
-      },
-      {
-        label: I18N.DataHandle.chuLiHouShuJu,
-        children: (
-          <>
-            <a onClick={() => Link('/dataset/detail/' + detailData.post_dataset_name)}>
-              {detailData.post_dataset_name}
-            </a>
-            ---
-            <a
-              onClick={() =>
-                Link(
-                  '/dataset/detail/' +
-                    detailData.post_dataset_name +
-                    '/version/' +
-                    detailData.post_dataset_name +
-                    '-' +
-                    detailData.post_dataset_version
-                )
-              }
-            >
-              {detailData.post_dataset_version}
-            </a>
-          </>
-        ),
-      },
-      {
         label: I18N.DataHandle.kaiShiShiJian,
         children: (
           <Typography.Time
@@ -324,6 +274,62 @@ const DataHandleDetail = props => {
                         {I18N.DataHandle.haoShi}
                         {calcSpendTime(item)}
                       </span>
+                      <Divider
+                        style={{
+                          borderInlineStart: '1px solid rgba(5, 5, 5, 0.15)',
+                          marginInline: 16,
+                        }}
+                        type="vertical"
+                      />
+                      <span>{I18N.DataHandle.chuLiQianShuJu}</span>
+                      <>
+                        <a onClick={() => Link('/dataset/detail/' + detailData.pre_dataset_name)}>
+                          {detailData.pre_dataset_name}
+                        </a>
+                        ---
+                        <a
+                          onClick={() =>
+                            Link(
+                              '/dataset/detail/' +
+                                detailData.pre_dataset_name +
+                                '/version/' +
+                                detailData.pre_dataset_name +
+                                '-' +
+                                detailData.pre_dataset_version
+                            )
+                          }
+                        >
+                          {detailData.pre_dataset_version}
+                        </a>
+                      </>
+                      <Divider
+                        style={{
+                          borderInlineStart: '1px solid rgba(5, 5, 5, 0.15)',
+                          marginInline: 16,
+                        }}
+                        type="vertical"
+                      />
+                      <span>{I18N.DataHandle.chuLiHouShuJu}</span>
+                      <>
+                        <a onClick={() => Link('/dataset/detail/' + detailData.pre_dataset_name)}>
+                          {detailData.pre_dataset_name}
+                        </a>
+                        ---
+                        <a
+                          onClick={() =>
+                            Link(
+                              '/dataset/detail/' +
+                                detailData.pre_dataset_name +
+                                '/version/' +
+                                detailData.pre_dataset_name +
+                                '-' +
+                                detailData.pre_dataset_version
+                            )
+                          }
+                        >
+                          {detailData.pre_dataset_version}
+                        </a>
+                      </>
                     </>
                   }
                   title={<h4>{item.name || I18N.DataHandle.zheShiYiGeMing}</h4>}
