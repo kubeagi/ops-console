@@ -71,8 +71,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.2.2
-        version: 1.2.2(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.2.4
+        version: 1.2.4(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/chat':
         specifier: workspace:*
         version: link:packages/chat
@@ -8785,28 +8785,6 @@ packages:
       - debug
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.2.2(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-7rGcVJr5vqyZGE8W61Itlgq8gd3xgT2G2leG+Y0NpsIkQsWOaLQvAWzgmsJFLl/+mNXq1B2AZpUoaDsRzl0R5w==}
-    peerDependencies:
-      '@tarojs/taro': '>=3'
-      antd: '>=5.4.0'
-      headers-polyfill: '>=4'
-      react: '>=16.9.0'
-      swr: '>=2.0.0'
-    dependencies:
-      '@tarojs/taro': 3.6.25(@tarojs/helper@3.6.25)(@tarojs/runtime@3.6.25)(@types/react@18.2.48)(postcss@8.4.33)
-      antd: 5.13.2(react-dom@18.2.0)(react@18.2.0)
-      graphql: 16.8.1
-      graphql-request: 5.2.0(graphql@16.8.1)
-      graphql-tag: 2.12.6(graphql@16.8.1)
-      headers-polyfill: 4.0.3
-      query-string: 8.1.0
-      react: 18.2.0
-      swr: 2.2.4(react@18.2.0)
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
   /@yuntijs/arcadia-bff-sdk@1.2.3(@tarojs/taro@3.6.25)(antd@5.15.0)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
     resolution: {integrity: sha512-VtvvCimDuaZssz+ycaMFtTyE0kPRHo2g9i96Ik3JVRbrCuc3Xwj0sYjmDAkyitZtNwXtI5PRFkz7+5G6jLo7RA==}
     peerDependencies:
@@ -8818,6 +8796,28 @@ packages:
     dependencies:
       '@tarojs/taro': 3.6.25(@tarojs/helper@3.6.25)(@tarojs/runtime@3.6.25)(@types/react@18.2.48)(postcss@8.4.33)
       antd: 5.15.0(react-dom@18.2.0)(react@18.2.0)
+      graphql: 16.8.1
+      graphql-request: 5.2.0(graphql@16.8.1)
+      graphql-tag: 2.12.6(graphql@16.8.1)
+      headers-polyfill: 4.0.3
+      query-string: 8.1.0
+      react: 18.2.0
+      swr: 2.2.4(react@18.2.0)
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
+  /@yuntijs/arcadia-bff-sdk@1.2.4(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-++mrGqMBIqb93TTkYYyL6WJOZmBqIOKc2D4dXKFmKHlMJXxyuQX4Nv4gRXi3r4xXPxiA95hcyX7q8Fd1Fog9xw==}
+    peerDependencies:
+      '@tarojs/taro': '>=3'
+      antd: '>=5.4.0'
+      headers-polyfill: '>=4'
+      react: '>=16.9.0'
+      swr: '>=2.0.0'
+    dependencies:
+      '@tarojs/taro': 3.6.25(@tarojs/helper@3.6.25)(@tarojs/runtime@3.6.25)(@types/react@18.2.48)(postcss@8.4.33)
+      antd: 5.13.2(react-dom@18.2.0)(react@18.2.0)
       graphql: 16.8.1
       graphql-request: 5.2.0(graphql@16.8.1)
       graphql-tag: 2.12.6(graphql@16.8.1)

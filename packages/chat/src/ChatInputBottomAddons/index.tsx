@@ -38,16 +38,18 @@ const ChatInputBottomAddons: React.FC<IChatInputBottomAddons> = props => {
   const { styles, cx } = useStyles();
   return (
     <Flex align="center" className={cx(styles.sendAction, 'sendAction')} gap="large" justify="end">
-      <Upload
-        beforeUpload={() => false}
-        className="upload-list-inline"
-        fileList={fileList}
-        listType="picture"
-        multiple
-        onChange={handleChange}
-      >
-        <Button icon={<PaperClipOutlined style={{ fontSize: 17 }} />} type="text"></Button>
-      </Upload>
+      {Boolean(appData?.enableUploadFile) && (
+        <Upload
+          beforeUpload={() => false}
+          className="upload-list-inline"
+          fileList={fileList}
+          listType="picture"
+          multiple
+          onChange={handleChange}
+        >
+          <Button icon={<PaperClipOutlined style={{ fontSize: 17 }} />} type="text"></Button>
+        </Upload>
+      )}
       <span className="keyBindings">
         <CornerDownLeft size={12} />
         <span>{I18N.Chat.faSong2}</span>

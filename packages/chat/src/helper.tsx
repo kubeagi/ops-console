@@ -28,7 +28,8 @@ export const getCvsMeta = (
       [key: string]: any;
     }[];
   } = {},
-  isUser?: boolean
+  isUser?: boolean,
+  assistantMeta?: any
 ): ChatMessage => {
   const Icon = isUser ? ChatUser : ChatAssistant;
   return {
@@ -38,12 +39,15 @@ export const getCvsMeta = (
     updateAt: 1_686_437_950_084,
     id,
     meta: {
-      avatar: (
-        <div className="customAvatar">
-          <Icon height={32} width={32} />
-        </div>
-      ),
-      title: isUser ? 'You' : 'Assistant',
+      avatar:
+        isUser || (!isUser && !assistantMeta.icon) ? (
+          <div className="customAvatar">
+            <Icon height={32} width={32} />
+          </div>
+        ) : (
+          <img alt={assistantMeta.displayName || assistantMeta.name} src={assistantMeta.icon} />
+        ),
+      title: isUser ? 'You' : assistantMeta.displayName || assistantMeta.name || 'Assistant',
     },
     role: isUser ? 'user' : 'assistant',
   };
