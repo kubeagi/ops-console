@@ -132,6 +132,14 @@ class DatasetVersionList$$Component extends React.Component {
     if (event.key === 'delete') {
       return this.delVersion(params);
     }
+    if (event.key === 'dataProcess') {
+      return this.history.push(
+        `/data-handle/create?dataset=${params.dataset.name}&datasetVersion=${params.version.name}`
+      );
+    }
+    if (event.key === 'import') {
+      return this.props.onImportDataClick(params);
+    }
     if (event.key === 'release') {
       return this.release(params);
     }
