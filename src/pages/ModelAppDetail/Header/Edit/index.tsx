@@ -153,7 +153,7 @@ const Edit: React.FC<EditProps> = props => {
               showUploadList={false}
             >
               {imageUrl ? (
-                <img alt="avatar" src={imageUrl} style={{ width: '100%' }} />
+                <img alt="avatar" src={imageUrl} style={{ width: '100%', height: '100%' }} />
               ) : (
                 <div>
                   <PlusOutlined />

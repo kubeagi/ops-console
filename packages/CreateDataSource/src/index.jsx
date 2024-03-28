@@ -104,7 +104,7 @@ class CreateDataSource$$Component extends React.Component {
       {
         [valueKey]: 'objectStorage',
         [labelKey]: pageThis.i18n('i18n-8cjf8cxq'),
-        forms: ['serverAddress', 'username', 'password', 'bucket', 'object'],
+        forms: ['serverAddress', 'username', 'password', 'bucket', 'object', 'insecure'],
         icon: 'data:image/png;base64,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',
       },
       // {
@@ -126,8 +126,9 @@ class CreateDataSource$$Component extends React.Component {
       {
         [valueKey]: 'postgresql',
         [labelKey]: 'postgresql',
-        forms: ['serverAddress', 'username', 'password'],
+        forms: ['serverAddress', 'username', 'password', 'database'],
         icon: 'data:image/image/png;base64,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',
+        disabledChecked: true,
       },
     ];
   }
@@ -143,6 +144,10 @@ class CreateDataSource$$Component extends React.Component {
   getTypeForms() {
     return this.getDataSourceTypes(this, 'label')?.find(item => item.value === this.getType())
       ?.forms;
+  }
+
+  getTypeInfos() {
+    return this.getDataSourceTypes(this, 'label')?.find(item => item.value === this.getType());
   }
 
   handelCancel() {
@@ -171,6 +176,9 @@ class CreateDataSource$$Component extends React.Component {
           },
           webinput: {
             recommendIntervalTime: v?.recommendIntervalTime || 1000,
+          },
+          pginput: {
+            database: v?.database,
           },
         },
       };
@@ -644,7 +652,40 @@ class CreateDataSource$$Component extends React.Component {
                 'name': 'serverAddress',
                 'required': true,
                 'title': this.i18n('i18n-wg1t5zxg') /* 服务地址 */,
-                'x-validator': [],
+                'x-validator': [{ children: '未知', id: 'disabled', type: 'disabled' }],
+              }}
+            />
+          )}
+          {!!__$$eval(() => this.getTypeForms()?.includes('database')) && (
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{
+                'x-component-props': {
+                  onChange: function () {
+                    return this.handleResetChecked.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                  placeholder: '请输入数据库',
+                },
+              }}
+              decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
+              fieldProps={{
+                'name': 'database',
+                'required': true,
+                'title': '数据库',
+                'x-validator': [
+                  {
+                    children: '未知',
+                    id: 'disabled',
+                    message: '最多支持100字符',
+                    pattern: '^.{0,100}$',
+                    required: false,
+                    triggerType: 'onInput',
+                    type: 'disabled',
+                  },
+                ],
               }}
             />
           )}
@@ -787,7 +828,7 @@ class CreateDataSource$$Component extends React.Component {
               }}
             />
           )}
-          {!!__$$eval(() => this.getType() !== 'onLine') && (
+          {!!__$$eval(() => this.getTypeForms()?.includes('insecure')) && (
             <FormilyRadio
               __component_name="FormilyRadio"
               componentProps={{
@@ -818,7 +859,10 @@ class CreateDataSource$$Component extends React.Component {
             />
           )}
           {!!__$$eval(
-            () => !this.getTypeForms()?.includes('upload') && this.getType() !== 'onLine'
+            () =>
+              !this.getTypeForms()?.includes('upload') &&
+              this.getType() !== 'onLine' &&
+              !this.getTypeInfos()?.disabledChecked
           ) && (
             <Row __component_name="Row" wrap={true}>
               <Col __component_name="Col" flex="120px" span={4} style={{}} />
@@ -943,6 +987,7 @@ class CreateDataSource$$Component extends React.Component {
                       !this.state.checked &&
                       !this.getTypeForms()?.includes('upload') &&
                       this.getType() !== 'onLine' &&
+                      !this.getTypeInfos()?.disabledChecked &&
                       '请先测试连接并通过'
                   )}
                 >
@@ -954,7 +999,8 @@ class CreateDataSource$$Component extends React.Component {
                       () =>
                         !this.state.checked &&
                         !this.getTypeForms()?.includes('upload') &&
-                        this.getType() !== 'onLine'
+                        this.getType() !== 'onLine' &&
+                        !this.getTypeInfos()?.disabledChecked
                     )}
                     ghost={false}
                     onClick={function () {

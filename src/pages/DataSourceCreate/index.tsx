@@ -102,6 +102,26 @@ class DataSourceCreate$$Page extends React.Component {
         },
       };
     }
+    if (this.state?.createThis?.getType() === 'postgresql') {
+      params = {
+        input: {
+          name: v?.name,
+          displayName: v?.displayName,
+          namespace: this.utils.getAuthData()?.project,
+          description: v?.description,
+          endpointinput: {
+            url: v?.serverAddress,
+            auth: {
+              rootUser: v?.username,
+              rootPassword: v?.password,
+            },
+          },
+          pginput: {
+            database: v?.database,
+          },
+        },
+      };
+    }
     const api = {
       create: {
         name: 'createDatasource',
