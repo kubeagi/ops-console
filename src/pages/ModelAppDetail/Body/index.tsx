@@ -1,5 +1,4 @@
-import { CaretDownOutlined, CaretRightOutlined } from '@ant-design/icons';
-import { Card, Divider, Typography, notification } from '@tenx-ui/materials';
+import { Card, Typography, notification } from '@tenx-ui/materials';
 import { Button, Col, Flex, Form, Row, Tooltip } from 'antd';
 import { isEqual } from 'lodash';
 import React, { useState } from 'react';
@@ -8,18 +7,14 @@ import I18N from '@/utils/kiwiI18N';
 
 import utils from '../../../utils/__utils';
 import { useModalAppDetailContext } from '../index';
-import ConfigConversationStarter from './ConfigConversationStarter';
 import ConfigDialoge from './ConfigDialoge';
 import ConfigKnowledge from './ConfigKnowledge';
 import ConfigModelService from './ConfigModelService';
-import ConfigNext from './ConfigNext';
 import ConfigPlugins from './ConfigPlugins';
 import ConfigPrompt from './ConfigPrompt';
 import ConfigSearch from './ConfigSearch';
 import Container from './Container';
 import Dialogue from './Dialogue';
-import ViewReference from './ViewReference';
-import ViewResInfo from './ViewResInfo';
 import styles from './index.less';
 
 interface BodyProps {}
@@ -57,7 +52,13 @@ const Body: React.FC<BodyProps> = props => {
                           namespace: data?.metadata?.namespace,
                           ...values,
                           rerankModel: values.rerankModel || '',
-                          tools: values.tools?.map(name => ({ name })),
+                          tools:
+                            values.tools
+                              ?.filter(item => item.used)
+                              ?.map(item => {
+                                delete item.used;
+                                return item;
+                              }) || [],
                           docNullReturn: values.showDocNullReturn ? values.docNullReturn : '',
                         };
 
@@ -117,7 +118,7 @@ const Body: React.FC<BodyProps> = props => {
                     </>
                   </Container>
                   {/* <ConfigAudio /> */}
-                  <Divider
+                  {/* <Divider
                     __component_name="Divider"
                     closeIcon={<CaretDownOutlined />}
                     content={
@@ -137,7 +138,7 @@ const Body: React.FC<BodyProps> = props => {
                     orientationMargin={0}
                   >
                     {I18N.ModelApp.geXingHuaPeiZhi}
-                  </Divider>
+                  </Divider> */}
                 </div>
               </Flex>
             </Form>

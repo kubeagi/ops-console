@@ -14,10 +14,11 @@ const ConversationStarter: React.FC<ConversationStarterProps> = props => {
 
   return (
     <Container
+      borderBottom
       changeConfig
       configKey="ConfigConversationStarter"
       icon={<KubeagiDialogue />}
-      style={{ padding: 0 }}
+      style={{ paddingTop: 8 }}
       title={I18N.ModelApp.duiHuaKaiChangBai}
     >
       <Form.Item

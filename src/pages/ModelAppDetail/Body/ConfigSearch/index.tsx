@@ -192,6 +192,15 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
                       </Space>
                     }
                     name="scoreThreshold"
+                    onChange={v => {
+                      setConfigs({
+                        ...configs,
+                        SearchLimit: {
+                          ...configs?.SearchLimit,
+                          scoreThreshold: v,
+                        },
+                      });
+                    }}
                     sliderWidth="100px"
                     spaceStyle={{ float: 'right' }}
                   />
@@ -211,6 +220,15 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
                       </Space>
                     }
                     name="numDocuments"
+                    onChange={v => {
+                      setConfigs({
+                        ...configs,
+                        SearchLimit: {
+                          ...configs?.SearchLimit,
+                          numDocuments: v,
+                        },
+                      });
+                    }}
                     sliderWidth="100px"
                     spaceStyle={{ float: 'right' }}
                   />
