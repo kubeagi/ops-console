@@ -330,7 +330,9 @@ class KnowledgeCreate$$Page extends React.Component {
               name: version,
               namespace: this.utils.getAuthData().project,
             },
-            path: selectFiles,
+            files: selectFiles.map(path => ({
+              path,
+            })),
           },
         ];
         try {

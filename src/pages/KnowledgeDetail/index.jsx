@@ -294,19 +294,25 @@ class KnowledgeDetail$$Page extends React.Component {
     const knowledge = this.getKnowledge();
     const fileGroups = (knowledge.fileGroupDetails || []).map(fgd => ({
       source: fgd.source,
-      path: fgd.filedetails.map(detail => detail.path),
+      files: fgd.filedetails.map(detail => ({
+        path: detail.path,
+      })),
     }));
     const version = this.getCurrentDatasetAndVersion().version;
     const targetFileGroupIndex = fileGroups.findIndex(fg => fg.source?.name === version);
     if (targetFileGroupIndex > -1) {
-      fileGroups[targetFileGroupIndex].path = modalFilesSelectedKeys;
+      fileGroups[targetFileGroupIndex].files = modalFilesSelectedKeys.map(path => ({
+        path,
+      }));
     } else {
       fileGroups.push({
         source: {
           kind: 'VersionedDataset',
           name: version,
         },
-        path: modalFilesSelectedKeys,
+        files: modalFilesSelectedKeys.map(path => ({
+          path,
+        })),
       });
     }
     const input = {
@@ -400,9 +406,11 @@ class KnowledgeDetail$$Page extends React.Component {
           const knowledge = this.getKnowledge();
           const fileGroups = (knowledge.fileGroupDetails || []).map(fgd => ({
             source: fgd.source,
-            path: fgd.filedetails
+            files: fgd.filedetails
               .filter(detail => detail.path !== path || fgd.source.name !== source)
-              .map(detail => detail.path),
+              .map(detail => ({
+                path: detail.path,
+              })),
           }));
           const input = {
             name: knowledge.name,
