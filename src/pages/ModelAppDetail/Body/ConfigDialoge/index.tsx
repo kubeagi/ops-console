@@ -5,7 +5,11 @@ import DialogeTimeout from '@/assets/img/modelAppConfig/dialogeTimeout.svg';
 import DocDialoge from '@/assets/img/modelAppConfig/docDialoge.svg';
 
 import { useModalAppDetailContext } from '../../index';
+import ConfigConversationStarter from '../ConfigConversationStarter';
+import ConfigNext from '../ConfigNext';
 import Container from '../Container';
+import ViewReference from '../ViewReference';
+import ViewResInfo from '../ViewResInfo';
 import styles from '../index.less';
 
 const InputNumberWidth = 120;
@@ -18,13 +22,14 @@ const FormItemProps = {
   },
   labelAlign: 'left',
 } as any;
-interface ConfigNextProps {}
+interface ConfigDialogeProps {}
 
-const ConfigNext: React.FC<ConfigNextProps> = props => {
+const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
   const { configs, setConfigs, form } = useModalAppDetailContext();
   return (
-    <Container isCollapse={true} title={'对话配置'} titleLevel={2}>
+    <Container isCollapse={true} style={{ marginBottom: 8 }} title={'对话配置'} titleLevel={2}>
       <>
+        <ConfigConversationStarter />
         <Container
           actions={[
             {
@@ -248,9 +253,12 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
           style={{ padding: 0 }}
           title={'文档对话'}
         ></Container>
+        <ViewResInfo />
+        <ViewReference />
+        <ConfigNext />
       </>
     </Container>
   );
 };
 
-export default ConfigNext;
+export default ConfigDialoge;

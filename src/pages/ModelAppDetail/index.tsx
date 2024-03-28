@@ -7,6 +7,7 @@ import I18N from '@/utils/kiwiI18N';
 
 import utils from '../../utils/__utils';
 import Body from './Body';
+import { PLUGINS_MAP } from './Body/ConfigPlugins';
 import Header from './Header';
 
 export const ModalAppDetailContext = createContext(null);
@@ -77,7 +78,14 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
         showRetrievalInfo: Application?.showRetrievalInfo,
       },
       Skill: {
-        tools: Application?.tools?.map(item => item.name),
+        tools: PLUGINS_MAP.map(item => {
+          const tool = Application?.tools?.find(tool => tool.name === item.id);
+          return {
+            name: item.id,
+            ...tool,
+            used: !!tool,
+          };
+        }),
       },
       DocNullReturn: {
         docNullReturn: Application?.docNullReturn || undefined,
