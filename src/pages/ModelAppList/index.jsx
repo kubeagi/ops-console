@@ -81,20 +81,6 @@ class ModelAppList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      cateList: [
-        '通用对话',
-        '工作学习',
-        '内容创作',
-        '游戏动漫',
-        'AI绘画',
-        '影音生成',
-        '角色扮演',
-        '生活趣味',
-        '其他',
-      ].map(item => ({
-        label: item,
-        value: item,
-      })),
       createBtnLoading: false,
       createModalVisible: false,
       currentRecord: null,
@@ -188,6 +174,14 @@ class ModelAppList$$Page extends React.Component {
           loading: false,
         });
       });
+  }
+
+  getGPTsCate() {
+    return this.props.useListGptCategory?.data?.GPT?.listGPTCategory.map(item => ({
+      label: item.name,
+      value: item.id,
+      ...item,
+    }));
   }
 
   handleEditImageChange({ fileList: newFileList }) {
@@ -417,9 +411,12 @@ class ModelAppList$$Page extends React.Component {
         const imageUrl =
           'data:image/image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABwCAYAAADG4PRLAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAFchJREFUeNrsXQt8FNW5/2Z2s0l83ASCaBBIQFColQQVFX9Wotf2p7U14bZa7bU0tj56sUrwUV+3TSheLW2VRLm2veJlrWLvra0mLSL4U++i1CL8KolUrTwkQR4VK2x45ME+zj3f7M5mHufMnHnsZhP4ZHdmJ+vZmfOf8/2/1zkjEUJgqMljz0E1EKgEINX0YzW9gtLUZ6hQroYo/1Ki3ad76cvtoq9Ouh+l23Z80f3Ou2+Q24daX0hDAcDHn4MaulFe9GxnQRolFazMxrDPAG7gCNFvB/4/soa+R+h+5J7vBCLHAHQhS35DRxRAHT21Orqt1QNE9AAYgdOBxwfO3AZht0Ggjb630v3W+24MRI8BaA0cAlaPoJkBImbAuMCZwXMCHHMUp/YpmCR8/03B1mMA6kdbQxq4CnNHE3sV6RA4LXg84My/oxv5yKFheqj5gVuC0aMSQA1w+Coxd64Az+lAccRzXLDMI5qY2tDcMN30eDPdNv/we4MDZM4BFAXONAKyy3PctnXt6Ua6ru1u+kEB8kf/VhAdtgBS8BC0JgSObYj4z3OpfUc8JwycSRUTCiS9vsa5Bc3DCkAKXLXCGQBVrlVa7nnOBJ7deWt+pwM5venWgvYhDyAFD0dcI7sDcsRzblQxX1064dAFC75f0DQkAaTAYWQEze0q7zw3oAZduwXeeY4PnLUq7kB/duFtoc4hAyAFD12CZq2RYslzfrgFNjwnoi6FVDEDOIG20VptePD2UDjvAaTgIXDz/OY5P9wCQnzlOSFVbLiGFgpiQ14CmHYPwrS5Wq669Bj+ylOeY4467jUAaaNv9Q81FEbzBsA0eBHaVNWg8pwfboE7nrMFLmOupf510Leah+d7B9EzgAgebSKidxHyMvwl1DbP4BFRxfy2Cev80NWo+YlHED0B+PhzqZGnWJqibkGWeU4g/JVtntOqS7t+UEBcdId7EF0DqIJHcOQNTponb3nOoSruoGdc89M7i6I5AxDBw4QnKJyXF2keL+EvN26BrboU41CiARFqfnaXcxBlN6jTEw7Ttyr1FJQLSJ8cUbfqSepGBtHdvcx9TedmOkHTtrZzSKYTiK4No7rUtk3SB3TnbPwd4LfNP2+SblsPvrkfNOANHK9KhxqzPwIfW45+HpmX52keX9SlTzxnOD9ixcktP7+7qCFrAD62nGCEZVku0jyDHP7ym+eYwHFshhse+UFR2HcAKXiVBCu4SDoVlIPwV77znD3fa3xbe+DUtrvpW/Wj9xQLxU6DDnivVYlt5jLNk5Pwl2d/jgmQUNu6c8o0gH2MfV3t2whseZY0EUwJOeS5cadIMGk8wOiRknJsyw4CWzqT0H0of9wCzzyn+d65ZwZg4lgJRpRI0NsH8N7WBPx1SxJ6+wkXOAtVvKD53uImzwA2P0uwiHaj0/DXFRdJcOYkydRe/xGA195OwqbNxBeey2H4i9t2cSHALdeEoPwk8/XuP0Bg2Ysx2L03yVKXdqp4est9xe3eVCh1GZzy3OUc8FAKQwBf/oIMff1J2NxJfAl/nTxKgtITJDiFbvFY5amS8RoU2b4rqWz3fEogepAoW6/q0go8lBH/JMHca0PwSLgf9nUTp6o4bKdKLUdg8zOkgf51sZPwF6rNa6+QbO8LVKNP/E/CFc8hYGdUSlA5RoKKMRJ4ke27CGzfmYT3tyVTgDp0Cy67MABfnGk/Djb8NQG/WXlE0PXScej8x+4/rtkxgIufIRgq60Sr00ma59LzJTjnc2KdunxFErr2ECGeKz1RgvOmSTCFAldyojfQeBKl6g6BXLsxAfu7iUjnwvw5hdzRZ5Q7FvW6cTmwUKry8QeOizpToQRw9JU4DX+pBougbatvmwEcjrBZ58qeR5qIlFJ1d+H0gPL6iI7KV/+cgI8+Tlr6c6LgeXA5sKpBreYTC6U9+mvF52twE/7qO+IQPk74a3y5BHOuCiivXIBnlIljZbj56gK4+ZoCmDhOZoW/FOnrdxiG5IXWNKksRhiw4dYHe0odxEJJPW2whDnSeLHF9IEdu8UjO9GD+ovBbQk1Rq65fPCAYwF5CwVyTm2BYpAYO3fbx0mhdtCAIcAGTntjsPuYasLUKLQH8JGnk6VE82XjqGMBpyV4dA/6BUdhRbm+Q86fhnd9QDFQ8k3OnCQrfHfR2cFMPxQVSgqoIrJ+U0KvbQzAEWD18YDapt9vmPvjw6UiIzBT8m68I3jAaf2kXgreq+vE7sqv1sgw7XRZcS1w1H3pwtR+vkoRdRlqLw1C/exQxj0YM9oewF3UB3z5zRgvE8EeKESf4UhHaBpsrdCfh5MYg6twHf5K/15FOcBXagJUJdp3TDdVpSUnwrCUNRvi8MKrMZFMhCGnSljHu37ReHwlF0AKHs7Pe9FbmkdvtZ5cJkFRKHUcgUJew5E33GQDVZHLXzoCk8bLmX7YtZdAby9xBpxN2I7uzP5l0/GtPDei3u80z9//QXSGEIaWknRbe8nwAXHTlhR4eL1bupJcl8MqE0EMX7KI0NRDKtit58CfLVOMl1qw4Tl2xt2QubbS7/T1yT+SwobOUJDJdNSNGS1bZdw5rpeJ5ywqDzLGT+3NjYdKWUZMHWEFhlnlDOC+nOGUMoBv1wbz2lhxbtxIcNu/huBUBFFrXXL7QeP7cYAzJs0z7aY+15lUKP1CHVMt+pjmKaRW3DeotekneBjHRLW8/wAoEX90rNXzUH001RHHN+zsMSelUj4jqSWp/M0HKabt3vj1ECxa2gc9fURYXToqdh44XpcOdA8YMYv+O0Hc8pxomqe+LujZOd9DOfWDbUkl1JUJc3ksZ0AQJ9HX5ycHhNwCK9m6Iwktz/R55Tnb81668AQpAyAFr4Z+4/+sI/DeZvPMmhGAmhnu7nYcVe98kIC3NiZh34Gk86y45U2m/TpRRuXF5wbhvLMCymh1IyvfiCkvYjgHttVpAZy15XrJUwtPiATTn2qyWc6AeTo34GFc9a2NCfgTfWFW2031l8NyBvism8CL1G9btTauAFkzwzmQX764ADo+TMDOvyfF1aU4cOofaugrIqe/UMOqY2QaKNywj8ZyNVhRdZcGHIP3wUdJWLI8Bq+to+D1EaYxxbx7xWKLJvCMbSOPrXozBoue6lfcBKfyratCeiOFdd4s8MRDazUZKxSXr+K5BbxGiTZiwABOba96iqyMQCfy0hsJePaPcUVdEou2CctKE+gAFbhMIa5F2xiEXvr8EXjhVWd+z9iTZbigKmhd7Gxz3jYuxyyFAx96Mq7UvHia5M8p20Orc/6cAiUSI8p1z66IUwMl4S/PiVqANqp4ckUAbro6pFicIoJq/4Hm3pRV6o7n7M57OnqflVx/Tuu8W6hLXnn6zGkBYfBQnvz9EWpZJmxK6Tnq0s7nMpS+E2YpvbUq3tyZgJZfiycAEehLLyiw8udE1SXvvCtl+udqzzwHbBVUPVVcdf7ulTjs2Utc8RxxyXN6vhdTxR9/koRn/iCuTmem1agdz9lkInjzLaplfLNtVOMWWE0K0XLodApeqWDtCtahvPN+wprnwCPPATidcMLt3D93xODdD8UMm7JSCWZWB3Wq2EpbOAytVaMRUyo0mwfAcjYPGIyf6VMCwrz3/Csxi1lNqc+oik8bKysZ8vLRMpfoWcCJqOIxJ0sweXwAJlGeKy6S2CMaBsJfT7f1p1wbAbmQAihiFRt5TiC0VhokqZVuueEvNykkLA4y1WZyBH28vj7r6i/kkoY5IV32+82/JKDt9ZholTM30nEqtRav/0qhstUaHyvXxOD19XGuEdHTS+D1dXG4claB7TWeXhmAkaUyfBZNikVoBCNLiB2edQU34865A6xcDtxOnSDutK99J27LReecGTCVLnzhnABTXTpxOTDqcvv1evBU4+NrXwrBJecFLbnotXUx4eucPjUgxHNCLscAyBWyF55jTX5EmXqaLMx9OIfAjuew+pklSvTfA89dcXGBpUuAo0v9O0sVH6ajsONvYlxYPTXIVMXMtsEaOG1/y154jqXTUSYIqs9txppLXmkdN41DPLkc6NfZuQFjT5EtuejDzrjQtZ5B1ahu1IGNVWwBnHawyLzwF19d8oHD/cpTxdXn7k+JUPiLJ25dDrX9kSUCNxpnRKvtfrwnKXy9Z1TKdm6ByeVg9bF+BDrkOe2L1eiEseK+37YdCUdugWjn2rkc6udM+YOFZKIoBpWm/v7ftovHSc+YGBTJuHMD8eYqQZJWoUaeA3ueM5vDKdVQ7iTuKeBzgQV+O/cSN1XOmetFf85KMPKyY0+SH0VxGOAeRX1CZvTHhufM+wM3pwzcyIQ1z/FWZ+AZHDwVyPWLNG3v/sQ8UjDI3NNLXGci8Hvr2uOwroPNYZgB+e2qI8LhLyGnfoRssrhFeM4InHYEB/2e5D9hrDgHWs5a1Rgc725OwOq1cZhxVkDhLcx6K7WWghl3K5/r6dZ+ZaRdQJ3t06lRsy9KqGGSUMDr6SVibQvKlAkBQyUDEejjzFkz/dqg74vZOKwj6ekn/Fmrmo57eW1MqW52m3G3Kmd4i47EtzbGHZVhqG0c5zRrb8hE2Pc3sVy7TfZ7MRsnUj5a8hT+UtWJp9iiBReJZDnGlUsO8XPGc8TGrUMrtMspz1l2rgM5a3LANs3jJeMuFFsk3tI806cGnQHogucsLO4uJKxOa19DvHOdTHZEmfF5GYpDku8Zd9Oo81DOYBX+Oq5IgovOLgA3YrbszcDxo2DpqBkhnXL6EWx8dWnXARpLimUtWgkWC113ZYH3NA9YxxZBMLboVBV/92tFSubCC3BGI8U6CpYBTj2NKI7Adiues0vzaOtK3KhRrMW87spUmYKnjLtNlTOxyYo7UcVKES8Fb/rngh5HH0NdErvoj66NdkwntdvWigB/kj+49Im0gjWYOKtnFbU03+5I+D2bx67KWdjlwO+gyqy7LARlpbJr8KzcAvY+4fVDe1DhQHdrXDI7ABO0RYXOLwz9u2/SkTj7MgKbPkxAx+ZUXaUyNTnLVc5WLsco6nyPK5fhbGqsnE1HnFOVaQzLmW44Rr6VBRznJutUKrPvb+4ndisoiPpcc68LwWnj/J06psYsMSGKhbdGXa0cjxLO2miEGf0pK5GhbIRk+gOWQCBoSuxyQsDX6/jgozgsfOKw/ZLOHOCMl/S7llIpmP4CPnZ0lh9VzjhiThvn63XD5ApZtx2q8uk+kbkcRGD2rrJZk0onpY5HPKygoFNrW3ck4JjwEtgJC3dGX1HA7eOBvo5kAKSfIm5XUDBarlu7kseQ4gG4Nc6I/hCTdckDzpCJGADwJ3cURoR9LouyPdxFFYqrMhwTvXTtTsDefUlN9Iew3AKmumS5HC88PkIzAlMmdpuQzwX2Vc7r3z2mRo2yZn1MP+pAgJL4EZo2tV1Zw5KtflU5v73pGIBGiWw44lhd8kJr6dWT9QCml/n1pcoZl9aIbIgfQy0tK9/oh0M9SXtKYmTcOfFbxioVdxVFSeqh956rnPE/nKEqWrk8nAWd9+dX9VlTkk1ojejDbG2t/zkialahqb+H9XeE+zQPliT8/pXYUQ9g+MVeOvqIG57jxUfD2vZNS23d+dM+DK1V+BVau/6qEFwwLXhUgreG8t6S5T3MoJBdxp3j5He1PTGyUvsbsjnYSsK+zebBcM/qGOz85OhzKzp3JWDZC722PGdVSs9IIYWNv2MGEKCZ4PPQfZpY2dObhMVP9x1VICJ4TUsOwaFeIpxxJ9x0UkbH4XN4m20BXHxPcVQBUYDnhLLiaSJ/NNynrNww3GXDphg0Ing9RJznCAc4vcvR/MdfjDStm81c9Lzh4V58vFwnpNfMdvL4GLs0zz+fXwBXXx4aluChwbIi0s/mOUtu0/YVMxOhLHwuDCDKvId7m2hLjaILCDhZzKasRIL62YXKvLnhEuNc8lwP7P0syQUOwP5RQLo1QvUGz4IVvxzZxPptLoC3P9RjeOyAD1lxQ00kztj56iWhIQskAve/1Md7b0vcHjjQz3/U9w8nhaQZfRTAqCMAUW77jx5c4nexiLr04nLgFK4vzgwpkyC9ZLxz5ZivfzcGK9b0Q+fOBINOiKtSCQBuNfx8Cp7zB3+o8v0He7Bmpop3kjzV4KbKWXlYEAURay2nTAy4rjvxWz7dn1RGGRoob2+K8f05bzzH2u946VcjLR+9I+Jh19M2N2Zx0TbdiH7n/bjywkOjKIDjy7EmJaAAetIIKeugIliYOX+Pqkd0B7bTUYafTefqkuds1KXOaoXU6ryWIvT4uVsX9jTRn230umibH6oYz3f8mAAcT1VtcRGuwT3An1jLotazsHtPBWjgDLsoSOiv4USWzp1x25tM7xZY94NT4AxtL1j5q7ImXwBEmfvjw4oqJR5Da35UlnmZzcP+Hdvqr2zznH5lSIAOCp7QAyDFn+CJq8QSaM88T8lCXdoVP3lRxV5n8+hHiTAXZZPnwPAod7Q660RxcfQQ5O8tOIw6eRlrjpsTnnOjiu2fnEYcrGlj4XPliOe052Boe/bL/1XWmhUAUW5pOtxMf2WeF54zfceFurTzuVxUOfvKcyLqktFGCwUve48hV+XmxkN4h9R6nVjpjefA7ypnIVXsI88Z22t7+cmyOqdYuLXJ8QEhHdmaWGm3OgOv5EBgNo9wOYPVrCYwzczitK07TjKjjpFxx76sdwOEqxGIctOPDuGDQiIZJz8Pec5BlbPf4S87ntOeaweuWb5qaVk0pwCi3PjDQ5i1iNATqMoGzwlzUR7znE0/eALPM4Ao3/13BJFkQPTbLcg6z2XfLeC1jWqzZrUH8HwBEOU7DxzEzAXOr6iyUkGO/Tlbc93ZbJ4spHksgeP3Ax15PoDnG4AoN9yvgIjPnK8V9bnyhed8DH/Z8L0ibfiI29VLR0X96HffAMyYp/cdxHKMeUdd+EuobdJCgWvws799BxDl2/cerKddgDmsEr/CX4TkN8/ZcF53etS1+t3XWQEQZc69ByrTNfxVQ4HnHKZ5RHhO/YCWZt3qp0Z1ZqOfswagKt+650AT/YnGoRD+8sxzhmuk/xZQ4Jqy2b9ZBxDl+h8cwGdThOkVVWWT5wYh/MV+PF86svLKU6Pas923OQFQlW/e3d1AL65Jm5JyrC7zl+fwAxZEN9FR15yrPs0pgCjX3dWNz6lAS6yBlVvM4zQPzy1QgUPru5mOumgu+zPnAKpy7Z0pINMPty/J8zQPj+cGDbhBB1CVb8yPlqZBxGh8RS54zkP4S93vov9TeDCByxsAtXJ1QxTzYfUknWsc1PAXGziMooSz4c8NCwBV+fq8KKaqEEz6IrWDlOZRtzhrmQJGWv0Kfw17AI3yL7ftx2f81mAAmPborCyHv3AFJMyuRFYtLYvke98MCQCNUnfrfiy5q8RHFFIUqgk+gQ2Uh3hVCKpLymG4yJ+yVmp7utquc9WTZe1DrS/+X4ABAAkHccuewz7YAAAAAElFTkSuQmCC';
         setTimeout(() => {
+          pageThis.form('create_form').setFieldState('category', {
+            dataSource: this.getGPTsCate(),
+          });
           pageThis.form('create_form').setValues({
             imageUrl: imageUrl,
-            category: '通用对话',
+            category: this.getGPTsCate()[0].id,
             icon: {
               fileList: [
                 {
@@ -543,6 +540,14 @@ class ModelAppList$$Page extends React.Component {
       () => {
         const pageThis = this;
         setTimeout(() => {
+          const cateList = this.getGPTsCate();
+          pageThis.form('edit_form').setFieldState('category', {
+            dataSource: cateList,
+          });
+          // 兼容老数据
+          const cateName =
+            this.state.currentRecord.annotations['arcadia.kubeagi.k8s.com.cn/app-category'];
+          const curCate = cateList.find(item => item.name === cateName || item.value === cateName);
           pageThis.form('edit_form')?.setValues({
             name: this.state.currentRecord.name,
             displayName: this.state.currentRecord.displayName,
@@ -554,8 +559,7 @@ class ModelAppList$$Page extends React.Component {
                 },
               ],
             },
-            category:
-              this.state.currentRecord.annotations['arcadia.kubeagi.k8s.com.cn/app-category'],
+            category: curCate.value,
             description: this.state.currentRecord.description,
           });
         }, 500);
@@ -768,8 +772,8 @@ class ModelAppList$$Page extends React.Component {
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
-                'enum': __$$eval(() => this.state.cateList),
+                '_unsafe_MixedSetter_enum_select': 'ArraySetter',
+                'enum': [],
                 'name': 'category',
                 'title': '智能体分类',
                 'x-validator': [],
@@ -1339,8 +1343,8 @@ class ModelAppList$$Page extends React.Component {
               }}
               decoratorProps={{ 'x-decorator-props': { labelEllipsis: true } }}
               fieldProps={{
-                '_unsafe_MixedSetter_enum_select': 'ExpressionSetter',
-                'enum': __$$eval(() => this.state.cateList),
+                '_unsafe_MixedSetter_enum_select': 'ArraySetter',
+                'enum': [],
                 'name': 'category',
                 'title': '智能体分类',
                 'x-validator': [],
@@ -1418,7 +1422,13 @@ const PageWrapper = (props = {}) => {
         enabled: undefined,
         params: undefined,
       }}
-      sdkSwrFuncs={[]}
+      sdkSwrFuncs={[
+        {
+          func: 'useListGptCategory',
+          params: undefined,
+          enableLocationSearch: undefined,
+        },
+      ]}
       render={dataProps => (
         <ModelAppList$$Page {...props} {...dataProps} self={self} appHelper={appHelper} />
       )}
