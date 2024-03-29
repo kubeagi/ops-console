@@ -71,8 +71,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.2.5
-        version: 1.2.5(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.2.8
+        version: 1.2.8(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/chat':
         specifier: workspace:*
         version: link:packages/chat
@@ -6426,7 +6426,7 @@ packages:
     dev: true
 
   /@semantic-release/error@3.0.0:
-    resolution: {integrity: sha512-5hiM4Un+tpl4cKw3lV4UgzJj+SmfNIDCLLw0TepzQxz9ZGV5ixnqkzIVF+3tp0ZHgcMKE+VNGHJjEeyFG2dcSw==}
+    resolution: {integrity: sha1-MKO5e7tYRNaV6yL506pA9qkncMI=}
     engines: {node: '>=14.17'}
     dev: true
 
@@ -7230,7 +7230,7 @@ packages:
     dev: true
 
   /@tootallnate/once@1.1.2:
-    resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
+    resolution: {integrity: sha1-zLkURTYBeaBOf+av94wA/8Hur4I=}
     engines: {node: '>= 6'}
 
   /@tootallnate/once@2.0.0:
@@ -8810,8 +8810,8 @@ packages:
       - encoding
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.2.5(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-NCeDredtuPrzqrkVNPdsyWqXvuAs6sfweIDllHD+NFaxa1B0ckBLJyzk+xRU2JWVJc1iNtqhqQGHn9/q8PObeQ==}
+  /@yuntijs/arcadia-bff-sdk@1.2.8(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-agwe2RwAhvz0z7nOzyCqoZ8/0a7M2Vb+CNkbwOc/0OxIYI5BBKGpfWjcSyLfMJOjA2BZ3rGqJIMztrM8dL++pg==}
     peerDependencies:
       '@tarojs/taro': '>=3'
       antd: '>=5.4.0'
@@ -9074,7 +9074,7 @@ packages:
     dev: true
 
   /agent-base@6.0.2:
-    resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
+    resolution: {integrity: sha1-Sf/1hXfP7j83F2/qtMIuAPhtf3c=}
     engines: {node: '>= 6.0.0'}
     dependencies:
       debug: 4.3.4
@@ -9098,7 +9098,7 @@ packages:
     dev: false
 
   /aggregate-error@3.1.0:
-    resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
+    resolution: {integrity: sha1-kmcP9Q9TWb23o+DUDQ7DDFc3aHo=}
     engines: {node: '>=8'}
     dependencies:
       clean-stack: 2.2.0
@@ -10371,7 +10371,7 @@ packages:
     dev: true
 
   /clean-stack@2.2.0:
-    resolution: {integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==}
+    resolution: {integrity: sha1-7oRy27Ep5yezHooQpCfe6d/kAIs=}
     engines: {node: '>=6'}
     dev: true
 
@@ -13559,7 +13559,7 @@ packages:
     resolution: {integrity: sha1-+nFolEq5pRnTN8sL7HKE3D5yPYc=}
 
   /http-proxy-agent@4.0.1:
-    resolution: {integrity: sha512-k0zdNgqWTGA6aeIRVpvfVob4fL52dTfaehylg0Y4UvSySvOq/Y+BOyPrgpUrA7HylqvU8vIZGsRuXmspskV0Tg==}
+    resolution: {integrity: sha1-ioyO9/WTLM+VPClsqCkblap0qjo=}
     engines: {node: '>= 6'}
     dependencies:
       '@tootallnate/once': 1.1.2
@@ -18127,7 +18127,7 @@ packages:
       side-channel: 1.0.4
 
   /query-string@6.14.1:
-    resolution: {integrity: sha512-XDxAeVmpfu1/6IjyT/gXHOl+S0vQ9owggJ30hhWKdHAsNPOcasn5o9BW0eejZqL2e4vMjhAxoW3jVHcD6mbcYw==}
+    resolution: {integrity: sha1-esLcpG2n8wlEm6D4ax/SglWwyGo=}
     engines: {node: '>=6'}
     dependencies:
       decode-uri-component: 0.2.2

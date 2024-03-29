@@ -28,6 +28,7 @@ interface KnowledgeProps {
   hasEmpty?: boolean;
 }
 export const Knowledge: React.FC<KnowledgeProps> = props => {
+  const { disabled } = useModalAppDetailContext();
   const { items, canDelete, canSelect, multi, callback, hasEmpty = false } = props;
   const [checkedIds, setCheckedIds] = useState([]);
   useEffect(() => {
@@ -102,8 +103,9 @@ export const Knowledge: React.FC<KnowledgeProps> = props => {
               </div>
               {canDelete && (
                 <DeleteOutlined
-                  className={styles.delete}
+                  className={`${styles.delete} ${disabled && styles.disabled}`}
                   onClick={() => {
+                    if (disabled) return;
                     setCheckedIds && setCheckedIds(checkedIds?.filter(id => item?.id !== id));
                     props.setCheckedIds &&
                       props.setCheckedIds(checkedIds?.filter(id => item?.id !== id));

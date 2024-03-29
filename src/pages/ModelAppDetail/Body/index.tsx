@@ -27,10 +27,12 @@ const Body: React.FC<BodyProps> = props => {
     initConfigs,
     loading: cardLoading,
     form,
+    disabled,
   } = useModalAppDetailContext();
   const [loading, setLoading] = useState(false);
   const [saveIng, setSaveIng] = useState(false);
-
+  const disabledMsg =
+    '当前智能体为发布状态，不可进行编排。如需变更智能体配置，请先将智能体撤销发布，再进行修改。';
   return (
     <Card bordered={false} className={styles.card} loading={cardLoading} type="inner">
       <Row className={styles.content}>
@@ -40,7 +42,7 @@ const Body: React.FC<BodyProps> = props => {
             extra={
               <Tooltip title={isEqual(initConfigs, configs) && I18N.ModelApp.qingXianXiuGaiZhi}>
                 <Button
-                  disabled={isEqual(initConfigs, configs)}
+                  disabled={isEqual(initConfigs, configs) || disabled}
                   loading={loading}
                   onClick={async () => {
                     form.validateFields().then(async values => {
@@ -96,7 +98,21 @@ const Body: React.FC<BodyProps> = props => {
               </Tooltip>
             }
             headStyle={{ background: 'transparent', padding: '0 20px' }}
-            title={<Typography.Title level={1}>{I18N.ModelApp.zhiNengTiPeiZhi}</Typography.Title>}
+            title={
+              <div style={disabled ? { paddingTop: 16 } : {}}>
+                <Typography.Title level={1}>{I18N.ModelApp.zhiNengTiPeiZhi}</Typography.Title>
+                {disabled && (
+                  <p>
+                    <Typography.Text
+                      ellipsis={{ tooltip: { title: disabledMsg } }}
+                      type="colorTextDescription"
+                    >
+                      {disabledMsg}
+                    </Typography.Text>
+                  </p>
+                )}
+              </div>
+            }
           >
             <Form form={form}>
               <Flex gap={24}>

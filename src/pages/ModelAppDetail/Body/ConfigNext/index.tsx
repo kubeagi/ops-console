@@ -11,7 +11,7 @@ import styles from '../index.less';
 interface ConfigNextProps {}
 
 const ConfigNext: React.FC<ConfigNextProps> = props => {
-  const { configs, setConfigs } = useModalAppDetailContext();
+  const { configs, setConfigs, disabled } = useModalAppDetailContext();
   return (
     <Container
       actions={[
@@ -20,6 +20,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
           children: (
             <Form.Item name="showNextGuide" style={{ marginBottom: 0 }}>
               <Switch
+                disabled={disabled}
                 onChange={v => {
                   setConfigs({
                     ...configs,

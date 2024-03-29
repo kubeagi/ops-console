@@ -10,7 +10,7 @@ import Container from '../Container';
 interface ViewResInfoProps {}
 
 const ViewResInfo: React.FC<ViewResInfoProps> = props => {
-  const { configs, setConfigs } = useModalAppDetailContext();
+  const { configs, setConfigs, disabled } = useModalAppDetailContext();
   return (
     <Container
       actions={[
@@ -19,6 +19,7 @@ const ViewResInfo: React.FC<ViewResInfoProps> = props => {
           children: (
             <Form.Item name="showRespInfo" style={{ marginBottom: 0 }}>
               <Switch
+                disabled={disabled}
                 onChange={v => {
                   setConfigs({
                     ...configs,

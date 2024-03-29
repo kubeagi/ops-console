@@ -10,7 +10,7 @@ import Container from '../Container';
 interface ConversationStarterProps {}
 
 const ConversationStarter: React.FC<ConversationStarterProps> = props => {
-  const { configs, setConfigs } = useModalAppDetailContext();
+  const { configs, setConfigs, disabled } = useModalAppDetailContext();
 
   return (
     <Container
@@ -27,6 +27,7 @@ const ConversationStarter: React.FC<ConversationStarterProps> = props => {
         style={{ marginBottom: 8 }}
       >
         <Input.TextArea
+          disabled={disabled}
           onChange={e => {
             setConfigs({
               ...configs,

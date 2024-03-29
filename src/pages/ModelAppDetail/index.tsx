@@ -131,6 +131,7 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
         setConfigs,
         initConfigs,
         form,
+        disabled: data?.Application?.getApplication?.metadata?.isPublic,
       }}
     >
       <Page>

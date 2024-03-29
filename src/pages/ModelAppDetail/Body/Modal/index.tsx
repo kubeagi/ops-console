@@ -25,10 +25,11 @@ export interface SliderProps {
   sliderWidth?: string;
   spaceStyle?: any;
   onChange?: (v) => void;
+  disabled?: boolean;
 }
 export const SliderItem: React.FC<SliderProps> = props => {
   const { form } = useModalAppDetailContext();
-  const { label, name, Config, noSlider, forceUpdate, spaceStyle, onChange } = props;
+  const { label, name, Config, noSlider, forceUpdate, spaceStyle, onChange, disabled } = props;
   const marginBottom = 0;
   const sliderWidth = props.sliderWidth || '260px';
   const min = Config?.minAlias ? form.getFieldValue(Config?.minAlias) : Config?.min;
@@ -43,6 +44,7 @@ export const SliderItem: React.FC<SliderProps> = props => {
             style={{ marginBottom }}
           >
             <Slider
+              disabled={disabled}
               marks={{
                 [Config.min]: Config.minMark || [Config.min],
                 [Config.max]: Config.maxMark || [Config.max],
@@ -66,6 +68,7 @@ export const SliderItem: React.FC<SliderProps> = props => {
           style={{ marginBottom }}
         >
           <InputNumber
+            disabled={disabled}
             max={Config.max}
             min={min}
             onChange={v => {

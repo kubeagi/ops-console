@@ -70,6 +70,8 @@ const Edit: React.FC<EditProps> = props => {
                 icon: imageUrl,
                 name: data?.name,
                 namespace: data?.namespace,
+                isRecomended: data?.metadata?.isRecomended,
+                isPublic: data?.metadata?.isPublic,
               },
             });
             setOpen(false);

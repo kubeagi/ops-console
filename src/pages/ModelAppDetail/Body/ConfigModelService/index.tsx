@@ -37,7 +37,7 @@ const SESSION_ROUND_DEFAULT = {
   precision: 0,
 };
 const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
-  const { configs, setConfigs } = useModalAppDetailContext();
+  const { configs, setConfigs, disabled } = useModalAppDetailContext();
 
   const { data: llms } = utils.bff.useListLlMs({
     input: {
@@ -152,6 +152,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
               style={{ marginBottom: noModelSelect ? 0 : 20 }}
             >
               <Select
+                disabled={disabled}
                 onChange={v => {
                   forceUpdate();
                   const llm = llmList?.find(item => item.name === v);
@@ -192,6 +193,7 @@ const ConfigModelService: React.FC<ConfigModelServiceProps> = props => {
               style={noModelSelect ? { display: 'none', marginBottom: 0 } : { marginBottom: 0 }}
             >
               <Select
+                disabled={disabled}
                 onChange={v => {
                   setConfigs({
                     ...configs,
