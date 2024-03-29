@@ -704,8 +704,10 @@ class ModelService$$Page extends React.Component {
                                         {__$$evalArray(() =>
                                           item.types.split(',').map(item => {
                                             if (item === 'llm') return 'LLM';
-                                            if (item === 'embedding') return 'Embedding';
-                                            return;
+                                            return (
+                                              item?.slice(0, 1)?.toLocaleUpperCase() +
+                                              item?.slice(1)
+                                            );
                                           })
                                         ).map((item, index) =>
                                           (__$$context => (
