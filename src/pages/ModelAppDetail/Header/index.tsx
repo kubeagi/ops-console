@@ -1,4 +1,4 @@
-import { StarFilled, StarOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, StarFilled, StarOutlined, UserOutlined } from '@ant-design/icons';
 import { AntdIconInfoCircleOutlined } from '@tenx-ui/icon-materials';
 import {
   Col,
@@ -71,8 +71,8 @@ const Header: React.FC<HeaderProps> = props => {
   };
 
   const recommendedDom = () => {
-    const isRecomended = data?.metadata?.isRecomended;
-    const handleRecomend = async () => {
+    const isRecommended = data?.metadata?.isRecommended;
+    const handleRecommend = async () => {
       try {
         await utils.bff.updateApplication({
           input: {
@@ -83,29 +83,29 @@ const Header: React.FC<HeaderProps> = props => {
             icon: data?.metadata?.icon,
             isPublic: data?.metadata?.isPublic,
             category: data?.metadata?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category'],
-            isRecomended: !isRecomended,
+            isRecommended: !isRecommended,
           },
         });
         refresh && refresh();
         notification.success({
-          message: isRecomended ? '取消推荐成功' : '推荐成功',
+          message: isRecommended ? '取消推荐成功' : '推荐成功',
         });
       } catch (error) {
         notification.warnings({
-          message: isRecomended ? '取消推荐失败' : '推荐失败',
+          message: isRecommended ? '取消推荐失败' : '推荐失败',
           errors: error?.response?.errors,
         });
       }
     };
     return (
       <span className={styles.recommended}>
-        {isRecomended ? (
+        {isRecommended ? (
           <Tooltip title="取消推荐">
-            <StarFilled className={styles.recommendedIcon} onClick={handleRecomend} />
+            <StarFilled className={styles.recommendedIcon} onClick={handleRecommend} />
           </Tooltip>
         ) : (
           <Tooltip title="推荐">
-            <StarOutlined className={styles.noRecommendedIcon} onClick={handleRecomend} />
+            <StarOutlined className={styles.noRecommendedIcon} onClick={handleRecommend} />
           </Tooltip>
         )}
       </span>
@@ -163,7 +163,6 @@ const Header: React.FC<HeaderProps> = props => {
                   </Typography.Title>
                 </Col>
                 <Col span={24}>
-                  <Typography.Text>状态：</Typography.Text>
                   <Typography.Text>
                     <Status
                       __component_name="Status"
@@ -192,17 +191,17 @@ const Header: React.FC<HeaderProps> = props => {
                   </Typography.Text>
 
                   <Divider dashed={false} mode="default" type="vertical" />
-                  <Typography.Text ellipsis={true} strong={false}>
-                    {I18N.ModelApp.chuangJianZhe}
-                  </Typography.Text>
+                  <Tooltip title="创建者">
+                    <UserOutlined className={styles.icon} />
+                  </Tooltip>
                   <Typography.Text ellipsis={true} strong={false}>
                     {data?.metadata?.creator || '-'}
                   </Typography.Text>
 
                   <Divider dashed={false} mode="default" type="vertical" />
-                  <Typography.Text disabled={false} ellipsis={true} strong={false}>
-                    更新时间：
-                  </Typography.Text>
+                  <Tooltip title="更新时间">
+                    <ClockCircleOutlined className={styles.icon} />
+                  </Tooltip>
                   <Typography.Time
                     format=""
                     relativeTime={false}
@@ -232,6 +231,7 @@ const Header: React.FC<HeaderProps> = props => {
                   {
                     key: 'edit',
                     label: I18N.ModelApp.bianJi,
+                    disabled: data?.metadata?.isPublic,
                   },
                   {
                     key: 'metadata',
