@@ -92,6 +92,7 @@ export interface RowData {
     description?: string;
     icon?: string;
     category: string[];
+    isRecommended?: boolean;
   };
 }
 interface PublishProps {
@@ -126,7 +127,7 @@ const Publish: React.FC<PublishProps> = props => {
                 icon: data?.metadata?.icon,
                 isPublic: !data?.metadata?.isPublic,
                 category: data?.metadata?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category'],
-                isRecomended: data?.metadata?.isRecomended,
+                isRecommended: data?.metadata?.isRecommended,
               },
             });
             setOpen(false);

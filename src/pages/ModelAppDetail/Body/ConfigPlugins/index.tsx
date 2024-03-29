@@ -17,6 +17,17 @@ const apiKeyComponent = ({ names, updateValue }) => (
     label="API Key"
     labelCol={{ span: 4 }}
     name={[...(names || []), 'apiKey']}
+    required
+    rules={[
+      {
+        validator: (_, value, callback) => {
+          if (!value) {
+            return callback('请输入API Key');
+          }
+          return callback();
+        },
+      },
+    ]}
     style={{ marginBottom: 0 }}
     wrapperCol={{ span: 10 }}
   >
@@ -39,6 +50,7 @@ export const PLUGINS_MAP = [
     color: '#A16BF1',
     description: '从 Bing 搜索信息和网页',
     formComponent: apiKeyComponent,
+    validatorFields: ['apiKey'],
   },
   {
     id: 'Weather Query API',
@@ -48,6 +60,7 @@ export const PLUGINS_MAP = [
     description:
       '此插件用于查询当前和未来的天气状况。若用户输入城市名称或地区名称，该插件将回复该地区的天气情况',
     formComponent: apiKeyComponent,
+    validatorFields: ['apiKey'],
   },
   {
     id: 'Web Scraper',
@@ -74,8 +87,8 @@ const PanelSelect = props => {
     'linear-gradient( 137deg, #FEAD4C 0%, #F07C18 100%)',
     'linear-gradient( 137deg, #0ACAAE 0%, #04BE97 100%)',
   ];
-  const { tools, items, setTools, forceUpdate } = props;
-  const [activeKey, setActiveKey] = useState(items.map(item => item.id));
+  const { tools, items, setTools, forceUpdate, form } = props;
+  const [activeKey, setActiveKey] = useState([]);
   return (
     <div>
       {items.map((item, i) => {
@@ -154,12 +167,20 @@ const PanelSelect = props => {
                         ) : (
                           <Button
                             onClick={() => {
-                              setTools(
-                                tools.map(tool => ({
-                                  ...tool,
-                                  used: tool.name === item.id ? true : tool.used,
-                                }))
-                              );
+                              const validatorFields = item.validatorFields || [];
+                              form
+                                .validateFields(
+                                  validatorFields.map(key => ['tools', i, 'params', key]),
+                                  { force: true }
+                                )
+                                .then(() => {
+                                  setTools(
+                                    tools.map(tool => ({
+                                      ...tool,
+                                      used: tool.name === item.id ? true : tool.used,
+                                    }))
+                                  );
+                                });
                             }}
                             type="primary"
                           >

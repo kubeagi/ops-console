@@ -4,7 +4,6 @@ import React from 'react';
 
 import I18N from '@/utils/kiwiI18N';
 
-import utils from '../../../../utils/__utils';
 import styles from '../index.less';
 
 export interface RowData {
@@ -42,15 +41,10 @@ const Publish: React.FC<PublishProps> = props => {
           {
             key: 'name',
             span: 1,
-            label: '智能体名称',
+            label: '智能体分类',
             children: (
-              <Typography.Text
-                disabled={false}
-                ellipsis={{ tooltip: utils.getFullName(data) || '-' }}
-                strong={false}
-                style={{ maxWidth: 200 }}
-              >
-                {utils.getFullName(data)}
+              <Typography.Text disabled={false} strong={false} style={{ maxWidth: 200 }}>
+                {data?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category']}
               </Typography.Text>
             ),
           },

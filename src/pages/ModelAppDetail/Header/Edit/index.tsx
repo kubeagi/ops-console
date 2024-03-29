@@ -70,7 +70,7 @@ const Edit: React.FC<EditProps> = props => {
                 icon: imageUrl,
                 name: data?.name,
                 namespace: data?.namespace,
-                isRecomended: data?.metadata?.isRecomended,
+                isRecommended: data?.metadata?.isRecommended,
                 isPublic: data?.metadata?.isPublic,
               },
             });
