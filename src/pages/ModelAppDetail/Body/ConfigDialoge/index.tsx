@@ -25,7 +25,7 @@ const FormItemProps = {
 interface ConfigDialogeProps {}
 
 const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
-  const { configs, setConfigs, form } = useModalAppDetailContext();
+  const { configs, setConfigs, form, disabled } = useModalAppDetailContext();
   return (
     <Container isCollapse={true} style={{ marginBottom: 8 }} title={'对话配置'} titleLevel={2}>
       <>
@@ -38,6 +38,7 @@ const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
                 <Form.Item initialValue={60} name="chatTimeout" style={{ marginBottom: 0 }}>
                   <InputNumber
                     addonAfter={'s'}
+                    disabled={disabled}
                     min={1}
                     onBlur={e => {
                       if (!e.target.value) {
@@ -85,6 +86,7 @@ const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
               children: (
                 <Form.Item name="enableUploadFile" style={{ marginBottom: 0 }}>
                   <Switch
+                    disabled={disabled}
                     onChange={v => {
                       setConfigs({
                         ...configs,
@@ -123,6 +125,7 @@ const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
                   >
                     <InputNumber
                       addonAfter="字符"
+                      disabled={disabled}
                       min={1}
                       onBlur={e => {
                         if (!e.target.value) {
@@ -173,6 +176,7 @@ const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
                   >
                     <InputNumber
                       addonAfter="字符"
+                      disabled={disabled}
                       min={1}
                       onBlur={e => {
                         if (!e.target.value) {
@@ -217,6 +221,7 @@ const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
                     ]}
                   >
                     <InputNumber
+                      disabled={disabled}
                       min={1}
                       onBlur={e => {
                         if (!e.target.value) {

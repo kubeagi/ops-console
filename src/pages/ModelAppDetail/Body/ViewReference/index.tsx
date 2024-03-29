@@ -11,7 +11,7 @@ import styles from '../index.less';
 interface ViewReferenceProps {}
 
 const ViewReference: React.FC<ViewReferenceProps> = props => {
-  const { configs, setConfigs } = useModalAppDetailContext();
+  const { configs, setConfigs, disabled } = useModalAppDetailContext();
   return (
     <Container
       actions={[
@@ -20,6 +20,7 @@ const ViewReference: React.FC<ViewReferenceProps> = props => {
           children: (
             <Form.Item name="showRetrievalInfo" style={{ marginBottom: 0 }}>
               <Switch
+                disabled={disabled}
                 onChange={v => {
                   setConfigs({
                     ...configs,

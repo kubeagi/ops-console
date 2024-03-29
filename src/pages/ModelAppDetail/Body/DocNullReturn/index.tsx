@@ -10,7 +10,7 @@ import Container from '../Container';
 interface DocNullReturnProps {}
 
 const DocNullReturn: React.FC<DocNullReturnProps> = props => {
-  const { configs, setConfigs, form } = useModalAppDetailContext();
+  const { configs, setConfigs, form, disabled } = useModalAppDetailContext();
   return (
     <Container
       actions={[
@@ -19,6 +19,7 @@ const DocNullReturn: React.FC<DocNullReturnProps> = props => {
           children: (
             <Form.Item name="showDocNullReturn" style={{ marginBottom: 0 }}>
               <Switch
+                disabled={disabled}
                 onChange={v => {
                   setConfigs({
                     ...configs,
@@ -57,6 +58,7 @@ const DocNullReturn: React.FC<DocNullReturnProps> = props => {
               style={{ marginBottom: 8 }}
             >
               <Input.TextArea
+                disabled={disabled}
                 onChange={e => {
                   setConfigs({
                     ...configs,

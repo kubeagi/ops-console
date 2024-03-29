@@ -51,7 +51,7 @@ const Container: React.FC<ContainerProps> = props => {
   const [modalType, setModalType] = useState<any>();
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
   const [actionData, setActionData] = useState<Action>();
-  const { initConfigs, configs, setConfigs, form } = useModalAppDetailContext();
+  const { initConfigs, configs, setConfigs, form, disabled } = useModalAppDetailContext();
   const [collapse, setCollapse] = useState<boolean>(true);
   useEffect(() => {
     form.setFieldsValue(initConfigs?.[configKey] || {});
@@ -98,9 +98,9 @@ const Container: React.FC<ContainerProps> = props => {
               <>
                 {actionIcon && (
                   <span
-                    className={styles.icon}
+                    className={`${styles.icon} ${disabled && styles.disabledIcon}`}
                     onClick={() => {
-                      if (!isModal) return;
+                      if (!isModal || disabled) return;
                       setModalOpen(true);
                       setModalType(key);
                       setActionData(action);

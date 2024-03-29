@@ -1,3 +1,4 @@
+import { StarFilled, StarOutlined } from '@ant-design/icons';
 import { AntdIconInfoCircleOutlined } from '@tenx-ui/icon-materials';
 import {
   Col,
@@ -9,6 +10,7 @@ import {
   Status,
   Tooltip,
   Typography,
+  notification,
 } from '@tenx-ui/materials';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Card } from 'antd';
@@ -16,19 +18,40 @@ import React, { useState } from 'react';
 
 import I18N from '@/utils/kiwiI18N';
 
+import utils from '../../../utils/__utils';
 import { useModalAppDetailContext } from '../index';
 import Delete from './Delete';
 import Edit from './Edit';
+import MetaData from './MetaData';
 import Publish from './Publish';
 import styles from './index.less';
+
+const getChatLinkLocale = () => {
+  const LOCALE_KEY = 'intl_locale';
+  let locale = window.localStorage.getItem(LOCALE_KEY);
+  if (!locale) {
+    locale =
+      typeof navigator === 'object' && typeof navigator.language === 'string'
+        ? navigator.language
+        : 'zh-CN';
+  }
+  locale = locale.startsWith('en') ? 'en-US' : 'zh-CN';
+  return {
+    'en-US': 'en',
+    'zh-CN': 'zh',
+  }[locale];
+};
 
 interface HeaderProps {}
 
 const Header: React.FC<HeaderProps> = props => {
   const { refresh, data, loading } = useModalAppDetailContext();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [modalType, setModalType] = useState<'publish' | 'edit' | 'delete'>();
+  const [modalType, setModalType] = useState<'publish' | 'edit' | 'delete' | 'metadata'>();
   const history = getUnifiedHistory();
+
+  const { data: gptData } = utils.bff.useGetGptStore();
+  const gptUrl = gptData?.GPT?.getGPTStore?.url || '';
 
   const handlePublish = () => {
     setModalOpen(true);
@@ -41,6 +64,52 @@ const Header: React.FC<HeaderProps> = props => {
   const handleDelete = () => {
     setModalOpen(true);
     setModalType('delete');
+  };
+  const handleMetadata = () => {
+    setModalOpen(true);
+    setModalType('metadata');
+  };
+
+  const recommendedDom = () => {
+    const isRecomended = data?.metadata?.isRecomended;
+    const handleRecomend = async () => {
+      try {
+        await utils.bff.updateApplication({
+          input: {
+            name: data?.metadata?.name,
+            namespace: data?.metadata?.namespace,
+            displayName: data?.metadata?.displayName,
+            description: data?.metadata?.description,
+            icon: data?.metadata?.icon,
+            isPublic: data?.metadata?.isPublic,
+            category: data?.metadata?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category'],
+            isRecomended: !isRecomended,
+          },
+        });
+        refresh && refresh();
+        notification.success({
+          message: isRecomended ? '取消推荐成功' : '推荐成功',
+        });
+      } catch (error) {
+        notification.warnings({
+          message: isRecomended ? '取消推荐失败' : '推荐失败',
+          errors: error?.response?.errors,
+        });
+      }
+    };
+    return (
+      <span className={styles.recommended}>
+        {isRecomended ? (
+          <Tooltip title="取消推荐">
+            <StarFilled className={styles.recommendedIcon} onClick={handleRecomend} />
+          </Tooltip>
+        ) : (
+          <Tooltip title="推荐">
+            <StarOutlined className={styles.noRecommendedIcon} onClick={handleRecomend} />
+          </Tooltip>
+        )}
+      </span>
+    );
   };
   return (
     <Card bordered={false} className={styles.header} loading={loading}>
@@ -65,6 +134,13 @@ const Header: React.FC<HeaderProps> = props => {
         setOpen={setModalOpen}
         type={modalType}
       />
+      <MetaData
+        data={data?.metadata}
+        open={modalOpen && modalType === 'metadata'}
+        refresh={refresh}
+        setOpen={setModalOpen}
+        type={modalType}
+      />
       <Row wrap={false}>
         <Col flex="auto">
           <Row wrap={false}>
@@ -82,7 +158,8 @@ const Header: React.FC<HeaderProps> = props => {
               <Row gutter={['', 8]} wrap={true}>
                 <Col span={24}>
                   <Typography.Title bold={true} ellipsis={true} level={1}>
-                    {data?.metadata?.displayName}
+                    {utils.getFullName(data?.metadata)}
+                    {recommendedDom()}
                   </Typography.Title>
                 </Col>
                 <Col span={24}>
@@ -113,90 +190,58 @@ const Header: React.FC<HeaderProps> = props => {
                       )}
                     </Tooltip>
                   </Typography.Text>
-                  <Divider dashed={false} mode="default" type="vertical" />
 
-                  <Typography.Text ellipsis={true}>{I18N.ModelApp.mingCheng}</Typography.Text>
-                  <Typography.Text
-                    ellipsis={{ tooltip: data?.metadata?.name }}
-                    style={{ maxWidth: 200 }}
-                  >
-                    {data?.metadata?.name}
-                  </Typography.Text>
                   <Divider dashed={false} mode="default" type="vertical" />
-                  <Typography.Text disabled={false} ellipsis={true} strong={false}>
-                    ID:
-                  </Typography.Text>
-                  <Typography.Text disabled={false} ellipsis={true} strong={false}>
-                    {data?.metadata?.id}
-                  </Typography.Text>
-                  <Divider dashed={false} mode="default" type="vertical" />
-                  <Typography.Text disabled={false} ellipsis={true} strong={false}>
-                    {I18N.DataHandle.gengXinShiJian}
-                  </Typography.Text>
-                  <Typography.Time
-                    format=""
-                    relativeTime={false}
-                    time={data?.metadata?.updateTimestamp}
-                  />
-                  <Divider mode="default" type="vertical" />
-                  <Typography.Text ellipsis={true} strong={false}>
-                    {I18N.ModelApp.chuangJianShiJian}
-                  </Typography.Text>
-                  <Typography.Time
-                    format=""
-                    relativeTime={false}
-                    time={data?.metadata?.creationTimestamp}
-                  />
-                </Col>
-                <Col span={24}>
-                  {/* <Divider mode="default" type="vertical" /> */}
                   <Typography.Text ellipsis={true} strong={false}>
                     {I18N.ModelApp.chuangJianZhe}
                   </Typography.Text>
                   <Typography.Text ellipsis={true} strong={false}>
                     {data?.metadata?.creator || '-'}
                   </Typography.Text>
-                  <Divider mode="default" type="vertical" />
-                  <Typography.Text ellipsis={true} strong={false}>
-                    {I18N.ModelApp.miaoShu2}
+
+                  <Divider dashed={false} mode="default" type="vertical" />
+                  <Typography.Text disabled={false} ellipsis={true} strong={false}>
+                    更新时间：
                   </Typography.Text>
-                  <Typography.Text
-                    ellipsis={{ tooltip: data?.metadata?.description || '-' }}
-                    strong={false}
-                    style={{ maxWidth: 200 }}
-                  >
-                    {data?.metadata?.description || '-'}
-                  </Typography.Text>
+                  <Typography.Time
+                    format=""
+                    relativeTime={false}
+                    time={data?.metadata?.updateTimestamp}
+                  />
                 </Col>
               </Row>
             </Col>
           </Row>
         </Col>
-        <Col flex="100px" style={{ display: 'flex' }}>
+        <Col flex={data?.metadata?.isPublic ? '130px' : '140px'} style={{ display: 'flex' }}>
           <Space align="center" direction="horizontal">
             <Dropdown.Button
               destroyPopupOnHide={true}
               menu={{
                 items: [
+                  data?.metadata?.isPublic
+                    ? {
+                        key: 'dialog',
+                        label: I18N.ModelApp.duiHua,
+                      }
+                    : null,
                   {
                     key: 'assessment',
                     label: I18N.ModelApp.zhiNengTiPingGu,
-                  },
-                  {
-                    key: 'publish',
-                    label: data?.metadata?.isPublic
-                      ? I18N.ModelApp.cheXiaoFaBu
-                      : I18N.ModelApp.faBuZhiNengTi,
                   },
                   {
                     key: 'edit',
                     label: I18N.ModelApp.bianJi,
                   },
                   {
+                    key: 'metadata',
+                    label: '基本信息',
+                  },
+                  {
                     key: 'delete',
                     label: I18N.DataHandle.shanChu,
                   },
-                ],
+                ].filter(Boolean),
                 onClick: ({ key }) => {
                   switch (key) {
                     case 'edit': {
@@ -221,17 +266,30 @@ const Header: React.FC<HeaderProps> = props => {
                       handlePublish();
                       break;
                     }
+
+                    case 'metadata': {
+                      handleMetadata();
+                      break;
+                    }
+
+                    case 'dialog': {
+                      window.open(
+                        `${gptUrl}/${getChatLinkLocale()}/chat/new?appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
+                      );
+                      break;
+                    }
                     // No default
                   }
                 },
               }}
               onClick={() => {
-                history.push(
-                  `/chat?appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
-                );
+                handlePublish();
+              }}
+              overlayStyle={{
+                width: data?.metadata?.isPublic ? '110px' : '120px',
               }}
             >
-              {I18N.ModelApp.duiHua}
+              {data?.metadata?.isPublic ? I18N.ModelApp.cheXiaoFaBu : I18N.ModelApp.faBuZhiNengTi}
             </Dropdown.Button>
           </Space>
         </Col>

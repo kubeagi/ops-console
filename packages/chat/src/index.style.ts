@@ -27,9 +27,6 @@ export const GlobalStyles = createGlobalStyle`
   }
   .tenx-icon-svg {
     user-select: none;
-    user-select: none;
-    user-select: none;
-    user-select: none;
 
     overflow: hidden;
     flex-shrink: 0;
@@ -119,6 +116,9 @@ const useStyles = createStyles(({ token, css }) => {
       }
       .chatDebug {
         height: calc(100vh - 278px);
+      }
+      .chatDebugisPublic {
+        height: calc(100vh - 255px);
       }
       .gpts {
         height: calc(100vh);

@@ -18,7 +18,7 @@ import { linkageReference } from '../linkage';
 interface ConfigNextProps {}
 
 const ConfigNext: React.FC<ConfigNextProps> = props => {
-  const { configs, setConfigs, form } = useModalAppDetailContext();
+  const { configs, setConfigs, form, disabled } = useModalAppDetailContext();
 
   const { data: llms } =
     utils.bff?.useListModelServices({
@@ -47,6 +47,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
             children: (
               <Form.Item name="enableRerank" style={{ marginBottom: 0 }}>
                 <Switch
+                  disabled={disabled}
                   onChange={v => {
                     const newConfigs = {
                       ...configs,
@@ -89,6 +90,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
               >
                 <Select
                   allowClear
+                  disabled={disabled}
                   onChange={v => {
                     setConfigs({
                       ...configs,
@@ -121,6 +123,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
             children: (
               <Form.Item name="enableMultiQuery" style={{ marginBottom: 0 }}>
                 <Switch
+                  disabled={disabled}
                   onChange={v => {
                     const newConfigs = {
                       ...configs,
@@ -152,6 +155,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
               children: (
                 <Form.Item name="showSearchLimit" style={{ marginBottom: 0 }}>
                   <Switch
+                    disabled={disabled}
                     onChange={v => {
                       setConfigs({
                         ...configs,
@@ -183,6 +187,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
                       max: 1,
                       precision: 2,
                     }}
+                    disabled={disabled}
                     label={
                       <Space size={3}>
                         相似度阀值
@@ -211,6 +216,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
                       max: 10,
                       precision: 0,
                     }}
+                    disabled={disabled}
                     label={
                       <Space size={3}>
                         引用数量

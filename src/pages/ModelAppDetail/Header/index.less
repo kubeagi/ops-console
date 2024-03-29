@@ -1,3 +1,5 @@
+@import '@/assets/style/index.less';
+
 .header {
   :global {
     .tenx-ui-materials-card-body {
@@ -6,7 +8,27 @@
     }
     .tenx-ui-materials-divider {
       margin: 0 12px;
-      color: rgba(0,0,0,0.15);
+      color: rgba(0, 0, 0, 0.15);
     }
+  }
+}
+.metadataModal {
+  :global {
+    .tenx-ui-materials-modal-body::after {
+      background: transparent;
+    }
+    .tenx-ui-materials-modal-body {
+      margin-bottom: 0 !important;
+    }
+  }
+}
+.recommended {
+  cursor: pointer;
+  margin-left: 12px;
+  .recommendedIcon {
+    color: @warning-color;
+  }
+  .noRecommendedIcon {
+    color: @font-color-3;
   }
 }

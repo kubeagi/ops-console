@@ -133,7 +133,7 @@ const PROMPTS_MAP: Prompt[] = [
 interface ConfigPromptProps {}
 
 const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
-  const { configs, setConfigs } = useModalAppDetailContext();
+  const { configs, setConfigs, disabled } = useModalAppDetailContext();
   const [detailOpen, setDetailOpen] = useState(false);
 
   return (
@@ -255,6 +255,7 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
         <Form.Item name="userPrompt" style={{ marginBottom: 0 }}>
           <Input.TextArea
             className={styles.PromptTextArea}
+            disabled={disabled}
             onChange={e => {
               setConfigs({
                 ...configs,

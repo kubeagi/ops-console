@@ -501,6 +501,7 @@ const Chat: React.FC<IChat> = props => {
           className={cx(
             'chatColumn',
             props.debug && 'chatDebug',
+            props.debug && app?.metadata?.isPublic && 'chatDebugisPublic',
             props.isDark && 'chatDark',
             props.gpts && 'gpts'
           )}

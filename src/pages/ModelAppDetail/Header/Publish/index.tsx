@@ -126,6 +126,7 @@ const Publish: React.FC<PublishProps> = props => {
                 icon: data?.metadata?.icon,
                 isPublic: !data?.metadata?.isPublic,
                 category: data?.metadata?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category'],
+                isRecomended: data?.metadata?.isRecomended,
               },
             });
             setOpen(false);
