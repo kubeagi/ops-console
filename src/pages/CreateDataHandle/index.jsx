@@ -512,7 +512,7 @@ class $$Page extends React.Component {
         if (this.state.step3Data?.QAsplitForm?.type) {
           const cur = _list.find(i => i.value === this.state.step3Data.QAsplitForm.type);
           if (cur.provider !== 'worker') {
-            this.form('qa_split').setFieldState('model', {
+            this.form('qa_split')?.setFieldState('model', {
               dataSource: cur.models,
             });
           }
@@ -520,7 +520,7 @@ class $$Page extends React.Component {
         this.setState({
           llmList: _list,
         });
-        this.form('qa_split').setFieldState('type', {
+        this.form('qa_split')?.setFieldState('type', {
           dataSource: _list,
         });
       })
@@ -772,10 +772,10 @@ class $$Page extends React.Component {
             showLlmModel: true,
           },
           () => {
-            this.form('qa_split').setFieldState('model', {
+            this.form('qa_split')?.setFieldState('model', {
               dataSource: cur.models,
             });
-            this.form('qa_split').setValues({
+            this.form('qa_split')?.setValues({
               model: cur.models[0]?.value,
             });
           }
@@ -1071,6 +1071,20 @@ class $$Page extends React.Component {
         });
       }
     });
+    const dataset = this.history.query.dataset;
+    const datasetVersion = this.history.query.datasetVersion;
+    this.setState({
+      step2FormData: {
+        ...this.state.step2FormData,
+        pre_data_set_name: dataset,
+        pre_data_set_version: datasetVersion,
+        post_data_set_name: dataset,
+        post_data_set_version: datasetVersion,
+      },
+    });
+    if (dataset && datasetVersion) {
+      this.getTableList(`${dataset}-${datasetVersion}`);
+    }
   }
 
   render() {
@@ -1566,7 +1580,12 @@ class $$Page extends React.Component {
         <Row __component_name="Row" style={{ marginBottom: '16px' }} wrap={true}>
           <Col __component_name="Col" span={24}>
             <Space __component_name="Space" align="center" direction="horizontal">
-              <Button.Back __component_name="Button.Back" title="" type="primary" />
+              <Button.Back
+                __component_name="Button.Back"
+                path="/data-handle"
+                title=""
+                type="primary"
+              />
             </Space>
             <Typography.Title
               __component_name="Typography.Title"

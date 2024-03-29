@@ -1023,8 +1023,20 @@ class ModelWarehouseDetail$$Page extends React.Component {
                     menu={{
                       items: [
                         { key: 'baseinfo', label: '基础信息' },
-                        { key: 'edit', label: '编辑' },
-                        { key: 'del', label: '删除' },
+                        {
+                          disabled: __$$eval(
+                            () => this.utils.getAuthData()?.project !== this.state.data.namespace
+                          ),
+                          key: 'edit',
+                          label: '编辑',
+                        },
+                        {
+                          disabled: __$$eval(
+                            () => this.utils.getAuthData()?.project !== this.state.data.namespace
+                          ),
+                          key: 'del',
+                          label: '删除',
+                        },
                       ],
                       onClick: function () {
                         return this.onMenuClick.apply(
@@ -1062,8 +1074,20 @@ class ModelWarehouseDetail$$Page extends React.Component {
                     disabled={false}
                     menu={{
                       items: [
-                        { key: 'baseinfo', label: '基础信息' },
-                        { key: 'del', label: '删除' },
+                        {
+                          disabled: __$$eval(
+                            () => this.utils.getAuthData()?.project !== this.state.data.namespace
+                          ),
+                          key: 'edit',
+                          label: '编辑',
+                        },
+                        {
+                          disabled: __$$eval(
+                            () => this.utils.getAuthData()?.project !== this.state.data.namespace
+                          ),
+                          key: 'del',
+                          label: '删除',
+                        },
                         { disabled: true, key: 'deploy', label: '部署' },
                       ],
                       onClick: function () {
@@ -1074,7 +1098,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                       }.bind(this),
                     }}
                     onClick={function () {
-                      return this.onEdit.apply(
+                      return this.onOpenBaseInfoModal.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
@@ -1090,7 +1114,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
                       strong={false}
                       style={{ fontSize: '' }}
                     >
-                      编辑
+                      基础信息
                     </Typography.Text>
                   </Dropdown.Button>
                 )}
