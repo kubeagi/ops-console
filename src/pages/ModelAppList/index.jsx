@@ -559,7 +559,7 @@ class ModelAppList$$Page extends React.Component {
                 },
               ],
             },
-            category: curCate.value,
+            category: curCate?.value,
             description: this.state.currentRecord.description,
           });
         }, 500);
