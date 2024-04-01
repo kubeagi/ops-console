@@ -1140,7 +1140,7 @@ class ModelWarehouseDetail$$Page extends React.Component {
               {
                 children: (
                   <Spin __component_name="Spin" spinning={__$$eval(() => this.state.readmeLoading)}>
-                    <ReactMarkdownLowcode __component_name="ReactMarkdownLowcode">
+                    <ReactMarkdownLowcode __component_name="ReactMarkdownLowcode" skipHtml={true}>
                       {__$$eval(() => this.state.readmeData)}
                     </ReactMarkdownLowcode>
                   </Spin>
