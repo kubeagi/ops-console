@@ -203,9 +203,14 @@ class CreateModelService$$Page extends React.Component {
       this.form()?.setFieldState('nodes', {
         dataSource: _listNodes,
       });
-      this.setState({
-        listNodes: nodes,
-      });
+      this.setState(
+        {
+          listNodes: nodes,
+        },
+        () => {
+          this.onChangeNode(['随机']);
+        }
+      );
     } catch (error) {
       // console.log(error, '===> err')
       this.setState({
