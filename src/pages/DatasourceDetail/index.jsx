@@ -662,9 +662,15 @@ class DatasourceDetail$$Page extends React.Component {
                                 <Typography.Text
                                   __component_name="Typography.Text"
                                   disabled={false}
-                                  ellipsis={true}
+                                  ellipsis={{
+                                    expandable: false,
+                                    tooltip: {
+                                      _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                      title: __$$eval(() => this.getData()?.endpoint?.url || '-'),
+                                    },
+                                  }}
                                   strong={false}
-                                  style={{ fontSize: '' }}
+                                  style={{ maxWidth: '300px' }}
                                 >
                                   {__$$eval(() => this.getData()?.endpoint?.url || '-')}
                                 </Typography.Text>
@@ -694,9 +700,14 @@ class DatasourceDetail$$Page extends React.Component {
                                 <Typography.Text
                                   __component_name="Typography.Text"
                                   disabled={false}
-                                  ellipsis={true}
+                                  ellipsis={{
+                                    tooltip: {
+                                      _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                      title: __$$eval(() => this.getData()?.description || '-'),
+                                    },
+                                  }}
                                   strong={false}
-                                  style={{ fontSize: '' }}
+                                  style={{ maxWidth: '300px' }}
                                 >
                                   {__$$eval(() => this.getData()?.description || '-')}
                                 </Typography.Text>
@@ -803,9 +814,14 @@ class DatasourceDetail$$Page extends React.Component {
                                 <Typography.Text
                                   __component_name="Typography.Text"
                                   disabled={false}
-                                  ellipsis={true}
+                                  ellipsis={{
+                                    tooltip: {
+                                      _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                      title: __$$eval(() => this.getData()?.endpoint?.url || '-'),
+                                    },
+                                  }}
                                   strong={false}
-                                  style={{ fontSize: '' }}
+                                  style={{ maxWidth: '300px' }}
                                 >
                                   {__$$eval(() => this.getData()?.endpoint?.url || '-')}
                                 </Typography.Text>
@@ -835,9 +851,14 @@ class DatasourceDetail$$Page extends React.Component {
                                 <Typography.Text
                                   __component_name="Typography.Text"
                                   disabled={false}
-                                  ellipsis={true}
+                                  ellipsis={{
+                                    tooltip: {
+                                      _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                      title: __$$eval(() => this.getData()?.description || '-'),
+                                    },
+                                  }}
                                   strong={false}
-                                  style={{ fontSize: '' }}
+                                  style={{ maxWidth: '300px' }}
                                 >
                                   {__$$eval(() => this.getData()?.description || '-')}
                                 </Typography.Text>
@@ -910,9 +931,14 @@ class DatasourceDetail$$Page extends React.Component {
                                 <Typography.Text
                                   __component_name="Typography.Text"
                                   disabled={false}
-                                  ellipsis={true}
+                                  ellipsis={{
+                                    tooltip: {
+                                      _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                      title: __$$eval(() => this.getData()?.endpoint?.url || '-'),
+                                    },
+                                  }}
                                   strong={false}
-                                  style={{ fontSize: '' }}
+                                  style={{ maxWidth: '300px' }}
                                 >
                                   {__$$eval(() => this.getData()?.endpoint?.url || '-')}
                                 </Typography.Text>
@@ -926,9 +952,14 @@ class DatasourceDetail$$Page extends React.Component {
                                 <Typography.Text
                                   __component_name="Typography.Text"
                                   disabled={false}
-                                  ellipsis={true}
+                                  ellipsis={{
+                                    tooltip: {
+                                      _unsafe_MixedSetter_title_select: 'VariableSetter',
+                                      title: __$$eval(() => this.getData()?.description || '-'),
+                                    },
+                                  }}
                                   strong={false}
-                                  style={{ fontSize: '' }}
+                                  style={{ fontSize: '', maxWidth: '300px' }}
                                 >
                                   {__$$eval(() => this.getData()?.description || '-')}
                                 </Typography.Text>
