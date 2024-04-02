@@ -35,6 +35,8 @@ const Edit: React.FC<EditProps> = props => {
   const { open, setOpen, refresh, type, data } = props;
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
   const [imageUrl, setImageUrl] = useState<string>();
+  const { data: gptCategoryData } = utils.bff.useListGptCategory();
+  const categories = gptCategoryData?.GPT?.listGPTCategory || [];
 
   const title = type === 'add' ? I18N.ModelApp.xinJian : I18N.ModelApp.bianJi;
   const handelBlur = () => {
@@ -175,18 +177,10 @@ const Edit: React.FC<EditProps> = props => {
             ]}
           >
             <Select placeholder={I18N.ModelApp.qingXuanZeZhiNeng}>
-              {[
-                I18N.ModelApp.tongYongDuiHua,
-                I18N.ModelApp.gongZuoXueXi,
-                I18N.ModelApp.neiRongChuangZuo,
-                I18N.ModelApp.youXiDongMan,
-                I18N.ModelApp.aIHuiHua,
-                I18N.ModelApp.yingYinShengCheng,
-                I18N.ModelApp.jueSeBanYan,
-                I18N.ModelApp.shengHuoQuWei,
-                I18N.ModelApp.qiTa,
-              ].map(item => (
-                <Select.Option key={item}>{item}</Select.Option>
+              {categories.map(item => (
+                <Select.Option key={item.id} value={item.id}>
+                  {item.name}
+                </Select.Option>
               ))}
             </Select>
           </Form.Item>
