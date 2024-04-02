@@ -122,7 +122,7 @@ class DatasetVersionDetail$$Page extends React.Component {
     ) {
       this.setState({
         versionDetail:
-          this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset,
+        this.props.useGetVersionedDataset.data?.VersionedDataset?.getVersionedDataset,
       });
     }
   }
@@ -147,16 +147,16 @@ class DatasetVersionDetail$$Page extends React.Component {
       ];
       const body = isEdit
         ? {
-            updateLines: [
-              {
-                lineNumber: this.state.addCsvOriginData?.lineNumber,
-                values: line,
-              },
-            ],
-          }
+          updateLines: [
+            {
+              lineNumber: this.state.addCsvOriginData?.lineNumber,
+              values: line,
+            },
+          ],
+        }
         : {
-            newLines: [line],
-          };
+          newLines: [line],
+        };
       const errorMsg = isEdit ? '编辑数据失败' : '新增数据失败';
       const res = await this.updateCsv(body, errorMsg);
       if (res.status === 200) {
@@ -418,7 +418,7 @@ class DatasetVersionDetail$$Page extends React.Component {
         this.state.cvsData?.current
       }&size=10&bucket=${
         this.utils.getAuthData?.()?.project
-      }&bucketPath=${this.getBucketPath()}&fileName=${encodeURIComponent(this.state.fileData?.path)}`,
+      }&bucketPath=${this.getBucketPath()}&fileName=${this.state.fileData?.path}`,
       {
         headers: {
           Authorization: this.utils.getAuthorization(),
@@ -491,6 +491,19 @@ class DatasetVersionDetail$$Page extends React.Component {
     this.setState({
       addFileLocal: v.target.value === 'local',
     });
+  }
+
+  onCsvPageChange(page, pageSize) {
+    // 页码或 pageSize 改变的回调
+    this.setState(
+      {
+        cvsData: {
+          ...this.state.cvsData,
+          current: page,
+        },
+      },
+      this.getFile.bind(this)
+    );
   }
 
   onDatasourceChange(v) {
@@ -579,9 +592,9 @@ class DatasetVersionDetail$$Page extends React.Component {
     ) {
       this.fileUploadSuccessList = [];
       this.state.upload.uploadThis?.state?.fileList?.length >= 2 &&
-        this.utils.notification.success({
-          message: '所有文件上传完成',
-        });
+      this.utils.notification.success({
+        message: '所有文件上传完成',
+      });
       this.clearFileBuffer();
       this.setState({
         addFileLoading: false,
@@ -618,9 +631,9 @@ class DatasetVersionDetail$$Page extends React.Component {
       )
       .catch(e => {
         errorMsg &&
-          this.utils.notification.warn({
-            message: errorMsg,
-          });
+        this.utils.notification.warn({
+          message: errorMsg,
+        });
       });
     return res;
   }
@@ -1172,7 +1185,7 @@ class DatasetVersionDetail$$Page extends React.Component {
             pagination={{
               current: __$$eval(() => this.state.cvsData?.current || 1),
               onChange: function () {
-                return this.onFilePageChange.apply(
+                return this.onCsvPageChange.apply(
                   this,
                   Array.prototype.slice.call(arguments).concat([])
                 );
