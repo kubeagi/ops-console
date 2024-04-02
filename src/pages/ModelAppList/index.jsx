@@ -21,8 +21,9 @@ import {
   Space,
   Button,
   Input,
+  Select,
+  Radio,
   List,
-  Dropdown,
   Divider,
   Descriptions,
   Status,
@@ -34,7 +35,6 @@ import {
   AntdIconCloudUploadOutlined,
   AntdIconPlusOutlined,
   AntdIconReloadOutlined,
-  AntdIconSettingOutlined,
   AntdIconInfoCircleOutlined,
 } from '@tenx-ui/icon-materials';
 
@@ -81,6 +81,7 @@ class ModelAppList$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      category: '',
       createBtnLoading: false,
       createModalVisible: false,
       currentRecord: null,
@@ -99,6 +100,7 @@ class ModelAppList$$Page extends React.Component {
         pageSize: 12,
         total: 0,
       },
+      status: '',
     };
   }
 
@@ -145,9 +147,25 @@ class ModelAppList$$Page extends React.Component {
     });
     const project = this.utils.getAuthData()?.project;
     const { currentPage, pageSize } = this.state.pages;
+    const { status, category } = this.state;
+    const statusParams =
+      status !== ''
+        ? status === 'true'
+          ? `arcadia.kubeagi.k8s.com.cn/app-is-public=true`
+          : '!arcadia.kubeagi.k8s.com.cn/app-is-public'
+        : '';
+    const categoryParams =
+      category === ''
+        ? `arcadia.kubeagi.k8s.com.cn/app-is-recommended=true`
+        : `arcadia.kubeagi.k8s.com.cn/app-category=${category}`;
+    let labelSelector = categoryParams;
+    if (statusParams) {
+      labelSelector = `${labelSelector},${statusParams}`;
+    }
     const params = {
       namespace: project,
       keyword: this.state.keyword,
+      labelSelector,
       page: currentPage,
       pageSize,
     };
@@ -182,6 +200,16 @@ class ModelAppList$$Page extends React.Component {
       value: item.id,
       ...item,
     }));
+  }
+
+  getSelectCateList() {
+    return [
+      {
+        value: '',
+        label: '推荐',
+      },
+      ...this.getGPTsCate(),
+    ];
   }
 
   handleEditImageChange({ fileList: newFileList }) {
@@ -221,6 +249,18 @@ class ModelAppList$$Page extends React.Component {
     this.setState({
       imageUrl: file.url || file.preview,
     });
+  }
+
+  onCateChange(e) {
+    const value = e.target.value;
+    this.setState(
+      {
+        category: value,
+      },
+      () => {
+        this.getData();
+      }
+    );
   }
 
   onChange(page, pageSize) {
@@ -449,6 +489,17 @@ class ModelAppList$$Page extends React.Component {
           ...this.state.pages,
           currentPage: 1,
         },
+      },
+      () => {
+        this.getData();
+      }
+    );
+  }
+
+  onStatusChange(status) {
+    this.setState(
+      {
+        status: status || '',
       },
       () => {
         this.getData();
@@ -885,6 +936,56 @@ class ModelAppList$$Page extends React.Component {
                         />
                       </Space>
                     </Col>
+                    <Col __component_name="Col">
+                      <Space align="center" direction="horizontal" size={12}>
+                        <Select
+                          __component_name="Select"
+                          _sdkSwrGetFunc={{ params: [] }}
+                          allowClear={true}
+                          disabled={false}
+                          onChange={function () {
+                            return this.onStatusChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          options={[
+                            { label: '已发布', value: 'true' },
+                            { label: '未发布', value: 'false' },
+                          ]}
+                          placeholder="请选择发布状态"
+                          showSearch={true}
+                          style={{ width: 200 }}
+                        />
+                      </Space>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col __component_name="Col" span={24}>
+                  <Row __component_name="Row" wrap={true}>
+                    <Col __component_name="Col" span={24} style={{}}>
+                      <Radio.Group
+                        __component_name="Radio.Group"
+                        _sdkSwrGetFunc={{
+                          _unsafe_MixedSetter_params_select: 'ArraySetter',
+                          params: [],
+                        }}
+                        buttonSpace={true}
+                        buttonStyle="tag"
+                        disabled={false}
+                        onChange={function () {
+                          return this.onCateChange.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
+                        }.bind(this)}
+                        options={__$$eval(() => this.getSelectCateList())}
+                        optionType="button"
+                        size="middle"
+                        style={{ marginBottom: '12px' }}
+                        value={__$$eval(() => this.state.category)}
+                      />
+                    </Col>
                   </Row>
                 </Col>
                 <Col __component_name="Col" span={24}>
@@ -975,48 +1076,7 @@ class ModelAppList$$Page extends React.Component {
                                           {__$$eval(() => item.description || '-')}
                                         </Typography.Paragraph>
                                       </Col>
-                                      <Col __component_name="Col" style={{ zIndex: 3 }}>
-                                        <Dropdown
-                                          __component_name="Dropdown"
-                                          destroyPopupOnHide={true}
-                                          disabled={false}
-                                          menu={{
-                                            items: [
-                                              { key: 'edit', label: '编辑' },
-                                              { key: 'delete', label: '删除' },
-                                            ],
-                                            onClick: function () {
-                                              return this.onMenuClick.apply(
-                                                this,
-                                                Array.prototype.slice.call(arguments).concat([
-                                                  {
-                                                    item: item,
-                                                  },
-                                                ])
-                                              );
-                                            }.bind(__$$context),
-                                          }}
-                                          overlayStyle={{}}
-                                          placement="bottomLeft"
-                                          style={{}}
-                                          trigger={['hover']}
-                                        >
-                                          <Button
-                                            __component_name="Button"
-                                            block={false}
-                                            children=""
-                                            danger={false}
-                                            disabled={false}
-                                            ghost={false}
-                                            icon={
-                                              <AntdIconSettingOutlined __component_name="AntdIconSettingOutlined" />
-                                            }
-                                            shape="default"
-                                            size="small"
-                                            style={{ borderColor: 'rgba(34,25,77,0)' }}
-                                          />
-                                        </Dropdown>
-                                      </Col>
+                                      <Col __component_name="Col" style={{ zIndex: 3 }} />
                                     </Row>
                                   </Col>
                                 </Row>
@@ -1041,7 +1101,7 @@ class ModelAppList$$Page extends React.Component {
                                   borderedBottom={false}
                                   borderedBottomDashed={true}
                                   colon={false}
-                                  column={1}
+                                  column={2}
                                   contentStyle={{ padding: '12px 0 0 0' }}
                                   id=""
                                   items={[
@@ -1094,6 +1154,22 @@ class ModelAppList$$Page extends React.Component {
                                     },
                                     {
                                       children: (
+                                        <Typography.Text
+                                          __component_name="Typography.Text"
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                        >
+                                          {__$$eval(() => item.creator || '-')}
+                                        </Typography.Text>
+                                      ),
+                                      key: 'nf53ke06xg',
+                                      label: '创建者',
+                                      span: 1,
+                                    },
+                                    {
+                                      children: (
                                         <Typography.Time
                                           __component_name="Typography.Time"
                                           format="YYYY-MM-DD HH:mm:ss"
@@ -1103,7 +1179,7 @@ class ModelAppList$$Page extends React.Component {
                                       ),
                                       key: '9xu6y1xb06v',
                                       label: '更新时间',
-                                      span: 1,
+                                      span: 2,
                                     },
                                   ]}
                                   labelStyle={{ padding: '12px 0 0 0', width: '60px' }}
@@ -1119,32 +1195,6 @@ class ModelAppList$$Page extends React.Component {
                                     {null}
                                   </Descriptions.Item>
                                 </Descriptions>
-                              </Col>
-                              <Col __component_name="Col" span={24} style={{ marginTop: '16px' }}>
-                                <Button
-                                  __component_name="Button"
-                                  block={true}
-                                  danger={false}
-                                  disabled={false}
-                                  ghost={true}
-                                  hoverColor="primary"
-                                  href={__$$eval(
-                                    () =>
-                                      `/chat?appNamespace=${item.namespace}&appName=${item.name}`
-                                  )}
-                                  onClick={function () {
-                                    return this.onDeployment.apply(
-                                      this,
-                                      Array.prototype.slice.call(arguments).concat([])
-                                    );
-                                  }.bind(__$$context)}
-                                  shape="default"
-                                  size="small"
-                                  style={{}}
-                                  type="primary"
-                                >
-                                  对话
-                                </Button>
                               </Col>
                             </Row>
                           </Card>
