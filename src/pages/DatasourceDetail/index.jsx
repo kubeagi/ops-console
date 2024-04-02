@@ -766,111 +766,113 @@ class DatasourceDetail$$Page extends React.Component {
                           </Descriptions.Item>
                         </Descriptions>
                       ),
-                      <Descriptions
-                        __component_name="Descriptions"
-                        bordered={false}
-                        borderedBottom={false}
-                        borderedBottomDashed={false}
-                        colon={false}
-                        column={2}
-                        id=""
-                        items={[
-                          {
-                            children: (
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(
-                                  () =>
-                                    this.utils
-                                      .getDataSourceTypes(this)
-                                      ?.find(item => item.value === this.getData().type)
-                                      ?.children || '-'
-                                )}
-                              </Typography.Text>
-                            ),
-                            key: 'znsxqm9jvg',
-                            label: '数据来源',
-                            span: 1,
-                          },
-                          {
-                            children: (
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(() => this.getData()?.endpoint?.url || '-')}
-                              </Typography.Text>
-                            ),
-                            key: 'ylkewexl94s',
-                            label: '服务地址',
-                            span: 1,
-                          },
-                          {
-                            children: (
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(() => this.getData()?.pg?.database || '-')}
-                              </Typography.Text>
-                            ),
-                            key: 'znsxqm9jvg',
-                            label: '数据库',
-                            span: 1,
-                          },
-                          {
-                            children: (
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(() => this.getData()?.description || '-')}
-                              </Typography.Text>
-                            ),
-                            key: 'bmtu55oldgu',
-                            label: '描述',
-                            span: 1,
-                          },
-                        ]}
-                        labelStyle={{ width: 100 }}
-                        layout="horizontal"
-                        size="default"
-                        title=""
-                        key="node_oclub1rxli5"
-                      >
-                        <Descriptions.Item key="7u6hhq5r76c" label="ID" span={1}>
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="7yk3a5jlohw" label="数据来源" span={1}>
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="06xockdofixg" label="文件数" span={1}>
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="itgwws5yosa" label="创建时间" span={1}>
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="g5rygvbd6v" label="创建者" span={1}>
-                          {null}
-                        </Descriptions.Item>
-                        <Descriptions.Item key="bmtu55oldgu" label="描述" span={1}>
-                          {null}
-                        </Descriptions.Item>
-                      </Descriptions>,
+                      !!__$$eval(() => this.getData().type === 'postgresql') && (
+                        <Descriptions
+                          __component_name="Descriptions"
+                          bordered={false}
+                          borderedBottom={false}
+                          borderedBottomDashed={false}
+                          colon={false}
+                          column={2}
+                          id=""
+                          items={[
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      this.utils
+                                        .getDataSourceTypes(this)
+                                        ?.find(item => item.value === this.getData().type)
+                                        ?.children || '-'
+                                  )}
+                                </Typography.Text>
+                              ),
+                              key: 'znsxqm9jvg',
+                              label: '数据来源',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.endpoint?.url || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'ylkewexl94s',
+                              label: '服务地址',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.pg?.database || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'znsxqm9jvg',
+                              label: '数据库',
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() => this.getData()?.description || '-')}
+                                </Typography.Text>
+                              ),
+                              key: 'bmtu55oldgu',
+                              label: '描述',
+                              span: 1,
+                            },
+                          ]}
+                          labelStyle={{ width: 100 }}
+                          layout="horizontal"
+                          size="default"
+                          title=""
+                          key="node_oclub1rxli5"
+                        >
+                          <Descriptions.Item key="7u6hhq5r76c" label="ID" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="7yk3a5jlohw" label="数据来源" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="06xockdofixg" label="文件数" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="itgwws5yosa" label="创建时间" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="g5rygvbd6v" label="创建者" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                          <Descriptions.Item key="bmtu55oldgu" label="描述" span={1}>
+                            {null}
+                          </Descriptions.Item>
+                        </Descriptions>
+                      ),
                       !!__$$eval(() => this.getData().type === 'onLine') && (
                         <Descriptions
                           __component_name="Descriptions"
