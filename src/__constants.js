@@ -149,7 +149,7 @@ export const DESCRIPTION_LENGTH_REG = constants.DESCRIPTION_LENGTH_REG;
 constants.FILES_API_ORIGIN = function applyThis() {
   return process.env.NODE_ENV === 'production'
   ? window.location.origin
-  : 'https://portal.172.22.96.136.nip.io';
+  : 'https://portal.172.22.96.167.nip.io';
 }.apply(constants);
 export const FILES_API_ORIGIN = constants.FILES_API_ORIGIN;
 

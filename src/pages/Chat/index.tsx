@@ -63,6 +63,7 @@ const Chat: React.FC<IChat> = props => {
           appName={appName as string}
           appNamespace={appNamespace as string}
           conversationId={selectedConversationId}
+          gpts
           isDark={qiankun?.theme?.isDark}
           onNewChat={onNewChat}
           refresh={refresh}

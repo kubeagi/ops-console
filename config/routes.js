@@ -116,8 +116,8 @@ const routes = [
         path: '/model-app/detail/:name',
         component: '@/pages/ModelAppDetail',
       },
-      {
-        name: '对话管理',
+      process.env.NODE_ENV === 'production' ?  undefined : {
+        name: 'GPTS chat debug (dev only)',
         path: '/chat',
         component: '@/pages/Chat',
       },
@@ -135,7 +135,7 @@ const routes = [
       },
     ],
   },
-];
+].filter(Boolean);
 
 const filterNameInProduction = routes => routes.map(route => ({
   ...route,
