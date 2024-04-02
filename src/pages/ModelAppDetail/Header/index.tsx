@@ -16,6 +16,7 @@ import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 import { Card } from 'antd';
 import React, { useState } from 'react';
 
+import { IS_PROD } from '@/__constants';
 import I18N from '@/utils/kiwiI18N';
 
 import utils from '../../../utils/__utils';
@@ -241,6 +242,13 @@ const Header: React.FC<HeaderProps> = props => {
                     key: 'delete',
                     label: I18N.DataHandle.shanChu,
                   },
+                  // 用于 gpts 那边的对话调试
+                  IS_PROD
+                    ? null
+                    : {
+                        key: 'GTPS',
+                        label: 'GPTS chat debug (dev only)',
+                      },
                 ].filter(Boolean),
                 onClick: ({ key }) => {
                   switch (key) {
@@ -276,6 +284,13 @@ const Header: React.FC<HeaderProps> = props => {
                       window.open(
                         `${gptUrl}/${getChatLinkLocale()}/chat/new?appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
                       );
+                      break;
+                    }
+                    case 'GTPS': {
+                      !IS_PROD &&
+                        history.push(
+                          `/chat?appNamespace=${data?.metadata?.namespace}&appName=${data?.metadata?.name}`
+                        );
                       break;
                     }
                     // No default
