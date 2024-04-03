@@ -133,7 +133,7 @@ const routes = [
         path: '/ai-agent-assessment/report',
         component: '@/pages/AiAgentAssessmentReport',
       },
-    ],
+    ].filter(Boolean),
   },
 ].filter(Boolean);
 
