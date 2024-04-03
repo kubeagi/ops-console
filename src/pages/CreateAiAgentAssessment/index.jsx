@@ -108,6 +108,8 @@ class CreateAiAgentAssessment$$Page extends React.Component {
           checked: true,
           value: 0.5,
         },
+        semantic: 50,
+        factuality: 50,
       },
       hasKnowledgebase: true,
       llmList: [],
