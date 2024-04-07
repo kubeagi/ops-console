@@ -60,3 +60,8 @@ export const formatJson = (json: string, space: number = 2): string => {
     return json;
   }
 };
+
+export const getUrl = (url: string, gpts: boolean | undefined) => {
+  const gptsPrefix = gpts ? '/gpts' : '';
+  return `${gptsPrefix}${url}`;
+};

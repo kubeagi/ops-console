@@ -10,7 +10,10 @@
  */
 import { Col, Row, Tag } from 'antd';
 import * as React from 'react';
+import { useContext } from 'react';
 
+import { getUrl } from '../helper';
+import { RootContext } from '../index';
 import useGetCommonData from '../utils/hooks/useGetCommonData';
 import useStyles from './index.style';
 
@@ -22,8 +25,10 @@ interface IPromptStarter {
 
 const PromptStarter: React.FC<IPromptStarter> = props => {
   const { styles, cx } = useStyles();
+  const { gpts } = useContext(RootContext);
+
   const [promptStarter] = useGetCommonData<string[]>({
-    url: '/chat/prompt-starter',
+    url: getUrl('/chat/prompt-starter', gpts),
     method: 'post',
     options: {
       body: {
