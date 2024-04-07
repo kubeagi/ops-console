@@ -38,4 +38,9 @@ export default {
   wenJianMing: '文件名称',
   bianJiShuJuShiBai: '编辑数据失败',
   bianJiShuJuChengGong: '编辑数据成功',
+  VectorStoreIsNotReady: '向量数据库没有就绪',
+  EmbedderIsNotReady: 'embedder 服务没有就绪',
+  KnowledgeBaseNotReady: '知识库未就绪',
+  LLMNotReady: '模型服务没有就绪',
+  ConfigError: '应用配置错误',
 };
