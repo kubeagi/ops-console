@@ -32,7 +32,7 @@ import PromptStarter from './PromptStarter';
 import RenderReferences, { Reference } from './References';
 import LoadingText from './components/LoadingText';
 import { GetApplication, GetGpts } from './components/getApplication';
-import { formatJson, getCvsMeta } from './helper';
+import { formatJson, getCvsMeta, getUrl } from './helper';
 import useStyles, { GlobalStyles, useChatContainerStyles } from './index.style';
 import Retry from './retry';
 import { getAuthData } from './utils/auth-utils';
@@ -96,9 +96,11 @@ const retry = new Retry(ctrl, 3);
 export const RootContext = createContext<{
   appName: string;
   appNamespace: string;
+  gpts: boolean;
 }>({
   appName: '',
   appNamespace: '',
+  gpts: true,
 });
 
 const Chat: React.FC<IChat> = props => {
@@ -117,18 +119,13 @@ const Chat: React.FC<IChat> = props => {
   const gptsPrefix = useMemo(() => {
     return props.gpts ? '/gpts' : '';
   }, [props.gpts]);
-  const getUrl = useCallback(
-    (url: string) => {
-      return `${gptsPrefix}${url}`;
-    },
-    [gptsPrefix]
-  );
+
   const conversationId = useMemo(() => {
     return props.conversationId || conversation.id;
   }, [props.conversationId, conversation.id]);
 
   const [messages, messagesLoading] = useGetCommonData<TMessage[]>({
-    url: getUrl('/chat/messages'),
+    url: getUrl('/chat/messages', props.gpts),
     method: 'post',
     options: {
       body: {
@@ -151,7 +148,7 @@ const Chat: React.FC<IChat> = props => {
       if (!mId || !cId || !app?.showRetrievalInfo) return;
       const res = await request
         .post({
-          url: getUrl(`/chat/messages/${mId}/references`),
+          url: getUrl(`/chat/messages/${mId}/references`, props.gpts),
           options: {
             body: {
               app_name: props.appName,
@@ -296,7 +293,7 @@ const Chat: React.FC<IChat> = props => {
       }
       const res = await request
         .post({
-          url: getUrl(`/chat/conversations/file`),
+          url: getUrl(`/chat/conversations/file`, props.gpts),
           options: {
             body: formData,
             timeout: 1000 * 60 * 10,
@@ -499,6 +496,7 @@ const Chat: React.FC<IChat> = props => {
       value={{
         appName: props.appName,
         appNamespace: props.appNamespace,
+        gpts: Boolean(props.gpts),
       }}
     >
       <GetAppData setApp={setApp} />
