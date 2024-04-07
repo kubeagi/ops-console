@@ -4,6 +4,7 @@ import React from 'react';
 
 import I18N from '@/utils/kiwiI18N';
 
+import utils from '../../../../utils/__utils';
 import styles from '../index.less';
 
 export interface RowData {
@@ -22,6 +23,8 @@ const Publish: React.FC<PublishProps> = props => {
   const title = I18N.DataHandle.shanChu;
   const history = getUnifiedHistory();
 
+  const { data: gptCategoryData } = utils.bff.useListGptCategory();
+  const categories = gptCategoryData?.GPT?.listGPTCategory || [];
   return (
     <Modal
       className={styles.metadataModal}
@@ -44,7 +47,12 @@ const Publish: React.FC<PublishProps> = props => {
             label: '智能体分类',
             children: (
               <Typography.Text disabled={false} strong={false} style={{ maxWidth: 200 }}>
-                {data?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category']}
+                {
+                  categories?.find(
+                    item =>
+                      item.id === data?.annotations?.['arcadia.kubeagi.k8s.com.cn/app-category']
+                  )?.name
+                }
               </Typography.Text>
             ),
           },

@@ -9,6 +9,7 @@ import I18N from '@/utils/kiwiI18N';
 import { useModalAppDetailContext } from '../../index';
 import { Knowledge } from '../ConfigKnowledge';
 import Container from '../Container';
+import { useStylish } from '../commonStylish';
 import stylesCommon from '../index.less';
 import { linkageReference } from '../linkage';
 
@@ -89,6 +90,7 @@ const PanelSelect = props => {
   ];
   const { tools, items, setTools, forceUpdate, form } = props;
   const [activeKey, setActiveKey] = useState([]);
+
   return (
     <div>
       {items.map((item, i) => {
@@ -206,13 +208,14 @@ const PanelSelect = props => {
 };
 const Plugins: React.FC<PluginsProps> = props => {
   const { configs, setConfigs, form } = useModalAppDetailContext();
+  const stylish = useStylish();
   return (
     <Container
       actions={[
         {
           key: 'add',
           icon: (
-            <a className={stylesCommon.link}>
+            <a className={stylish.link}>
               <PlusCircleOutlined style={{ marginRight: 5 }} />
               {I18N.ModelApp.tianJia}
             </a>
@@ -243,7 +246,7 @@ const Plugins: React.FC<PluginsProps> = props => {
                         },
                       };
                       setConfigs(newConfigs);
-                      linkageReference(form, newConfigs);
+                      linkageReference(form, newConfigs, setConfigs);
                     }}
                     tools={form.getFieldValue('tools') || []}
                   />
@@ -251,7 +254,7 @@ const Plugins: React.FC<PluginsProps> = props => {
               );
             },
             handleSave: (values: any, configs) => {
-              linkageReference(form, configs);
+              linkageReference(form, configs, setConfigs);
             },
           },
           data: {},
@@ -287,7 +290,7 @@ const Plugins: React.FC<PluginsProps> = props => {
             },
           };
           setConfigs(newConfigs);
-          linkageReference(form, newConfigs);
+          linkageReference(form, newConfigs, setConfigs);
         }}
       />
     </Container>

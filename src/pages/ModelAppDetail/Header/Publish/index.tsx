@@ -7,6 +7,7 @@ import React, { useReducer } from 'react';
 import I18N from '@/utils/kiwiI18N';
 
 import utils from '../../../../utils/__utils';
+import { useStylish } from '../../Body/commonStylish';
 import styles from './index.less';
 
 const PLATS_MAPS = [
@@ -47,6 +48,7 @@ interface PlatPanelProps {
 
 const PlatPanel: React.FC<PlatPanelProps> = props => {
   const { value, dataSource, defaultValue, form, forceUpdate } = props;
+  const stylish = useStylish();
 
   return dataSource?.map((data: DataSource) => {
     const { id, name, description, Icon } = data;
@@ -54,7 +56,7 @@ const PlatPanel: React.FC<PlatPanelProps> = props => {
     const disabled = defaultValue?.includes(id);
     return (
       <Flex
-        className={`${styles.Panel} ${checked && styles.PanelChecked} ${disabled && styles.PanelDisabled}`}
+        className={`${styles.Panel} ${checked && stylish.ItemSelectedPrimary} ${disabled && styles.PanelDisabled}`}
         key={id}
         onClick={() => {
           if (disabled) return;

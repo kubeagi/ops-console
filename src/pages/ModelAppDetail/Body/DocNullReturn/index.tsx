@@ -38,7 +38,7 @@ const DocNullReturn: React.FC<DocNullReturnProps> = props => {
       changeConfig
       configKey="DocNullReturn"
       icon={<img src={docNullReturnIcon} width={14} />}
-      isRowItem={!form?.getFieldValue('showDocNullReturn')}
+      isRowItem={!configs?.DocNullReturn?.showDocNullReturn}
       renderChildren={form => {
         return (
           form.getFieldValue('showDocNullReturn') && (

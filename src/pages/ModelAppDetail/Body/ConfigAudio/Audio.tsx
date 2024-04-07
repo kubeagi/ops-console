@@ -6,6 +6,7 @@ import React from 'react';
 
 import I18N from '@/utils/kiwiI18N';
 
+import { useStylish } from '../commonStylish';
 import styles from './index.less';
 
 // import { OPENAI_BASE_URL } from '@lobehub/tts/core/const/api';
@@ -16,6 +17,7 @@ interface AudioProps {
   voice: OpenaiVoice;
 }
 const Audio: React.FC<AudioProps> = props => {
+  const stylish = useStylish();
   const { voice } = props;
   const { setText, isGlobalLoading, audio, start, stop } = useOpenAITTS(defaultText, {
     api: {
@@ -31,7 +33,7 @@ const Audio: React.FC<AudioProps> = props => {
   });
   return (
     <Space
-      className={styles.Audio}
+      className={stylish.Audio}
       onClick={e => {
         e.stopPropagation();
       }}

@@ -5,6 +5,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 
 import { useModalAppDetailContext } from '../../index';
 import Modal, { SettingProps } from '../Modal';
+import { useStylish } from '../commonStylish';
 import styles from './index.less';
 
 interface Action {
@@ -33,6 +34,7 @@ interface ContainerProps {
 }
 
 const Container: React.FC<ContainerProps> = props => {
+  const stylish = useStylish();
   const {
     children,
     icon,
@@ -83,7 +85,7 @@ const Container: React.FC<ContainerProps> = props => {
               )}
             </span>
           )}
-          {icon && <span className={styles.titleIcon}>{icon}</span>}
+          {icon && <span className={`${styles.titleIcon} ${stylish.linkColor}`}>{icon}</span>}
           <Typography.Title
             className={[1, 2].includes(titleLevel) && styles.bold}
             level={titleLevel || 3}
@@ -98,7 +100,7 @@ const Container: React.FC<ContainerProps> = props => {
               <>
                 {actionIcon && (
                   <span
-                    className={`${styles.icon} ${disabled && styles.disabledIcon}`}
+                    className={`${styles.icon} ${stylish.hover} ${disabled && styles.disabledIcon}`}
                     onClick={() => {
                       if (!isModal || disabled) return;
                       setModalOpen(true);
