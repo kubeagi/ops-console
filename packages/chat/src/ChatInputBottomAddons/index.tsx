@@ -27,6 +27,14 @@ interface IChatInputBottomAddons {
   loading: boolean;
 }
 
+const _notReadyReasonCode = {
+  VectorStoreIsNotReady: I18N.Chat.VectorStoreIsNotReady,
+  EmbedderIsNotReady: I18N.Chat.EmbedderIsNotReady,
+  KnowledgeBaseNotReady: I18N.Chat.KnowledgeBaseNotReady,
+  LLMNotReady: I18N.Chat.LLMNotReady,
+  ConfigError: I18N.Chat.ConfigError,
+};
+
 const ChatInputBottomAddons: React.FC<IChatInputBottomAddons> = props => {
   const { appData, onSend, onFileListChange, input, fileList, loading } = props;
   const handleChange: UploadProps['onChange'] = useCallback(
@@ -57,8 +65,16 @@ const ChatInputBottomAddons: React.FC<IChatInputBottomAddons> = props => {
         <CornerDownLeft size={12} />
         <span>{I18N.Chat.huanXing}</span>
       </span>
-      <Tooltip title={appData?.llm ? '' : I18N.Chat.zanWeiGuanLianMo}>
-        <Button disabled={!appData?.llm || loading} onClick={onSend.bind('', input)} type="primary">
+      <Tooltip
+        title={
+          appData?.notReadyReasonCode ? _notReadyReasonCode[appData.notReadyReasonCode] ?? '' : ''
+        }
+      >
+        <Button
+          disabled={appData?.notReadyReasonCode || loading}
+          onClick={onSend.bind('', input)}
+          type="primary"
+        >
           {I18N.Chat.faSong}
         </Button>
       </Tooltip>

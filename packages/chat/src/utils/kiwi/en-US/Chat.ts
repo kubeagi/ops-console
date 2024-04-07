@@ -42,4 +42,9 @@ export default {
   wenJianMing: 'File Name',
   bianJiShuJuShiBai: 'Failed to edit data',
   bianJiShuJuChengGong: 'Successfully edited data',
+  VectorStoreIsNotReady: 'Vector database is not ready',
+  EmbedderIsNotReady: 'Embedder service is not ready',
+  KnowledgeBaseNotReady: 'Knowledge base is not ready',
+  LLMNotReady: 'Model service is not ready',
+  ConfigError: 'Application configuration error',
 };

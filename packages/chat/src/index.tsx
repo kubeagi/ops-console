@@ -22,7 +22,6 @@ import {
   useCreateStore,
 } from '@lobehub/ui';
 // @ts-ignore
-import { sdk } from '@yuntijs/arcadia-bff-sdk';
 import { Spin, Tag, UploadFile, message, theme } from 'antd';
 import { throttle } from 'lodash';
 import { StopCircle } from 'lucide-react';
@@ -32,6 +31,7 @@ import ChatInputBottomAddons from './ChatInputBottomAddons';
 import PromptStarter from './PromptStarter';
 import RenderReferences, { Reference } from './References';
 import LoadingText from './components/LoadingText';
+import { GetApplication, GetGpts } from './components/getApplication';
 import { formatJson, getCvsMeta } from './helper';
 import useStyles, { GlobalStyles, useChatContainerStyles } from './index.style';
 import Retry from './retry';
@@ -103,6 +103,7 @@ export const RootContext = createContext<{
 
 const Chat: React.FC<IChat> = props => {
   const { styles, cx } = useStyles();
+  const [app, setApp] = useState({});
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [showNextGuide, setShowNextGuide] = useState(true);
   const [conversation, setConversation] = useState<{
@@ -113,16 +114,21 @@ const Chat: React.FC<IChat> = props => {
     id: props.conversationId,
     data: [],
   });
+  const gptsPrefix = useMemo(() => {
+    return props.gpts ? '/gpts' : '';
+  }, [props.gpts]);
+  const getUrl = useCallback(
+    (url: string) => {
+      return `${gptsPrefix}${url}`;
+    },
+    [gptsPrefix]
+  );
   const conversationId = useMemo(() => {
     return props.conversationId || conversation.id;
   }, [props.conversationId, conversation.id]);
-  const application = sdk.useGetApplication({
-    name: props.appName,
-    namespace: props.appNamespace,
-  });
-  const app = application?.data?.Application?.getApplication;
+
   const [messages, messagesLoading] = useGetCommonData<TMessage[]>({
-    url: '/chat/messages',
+    url: getUrl('/chat/messages'),
     method: 'post',
     options: {
       body: {
@@ -145,7 +151,7 @@ const Chat: React.FC<IChat> = props => {
       if (!mId || !cId || !app?.showRetrievalInfo) return;
       const res = await request
         .post({
-          url: `/chat/messages/${mId}/references`,
+          url: getUrl(`/chat/messages/${mId}/references`),
           options: {
             body: {
               app_name: props.appName,
@@ -185,7 +191,7 @@ const Chat: React.FC<IChat> = props => {
   );
   useEffect(() => {
     if (conversation.data?.length) return;
-    if (!app?.metadata.name) return;
+    if (!app?.metadata?.name) return;
     const defaultPrologue = I18N.template(I18N.Chat.ninHaoWoShiA, {
       val1: `${app?.metadata.displayName || app?.metadata.name}${app?.metadata.description ? `\n\n${app?.metadata.description}` : ''}`,
     });
@@ -290,7 +296,7 @@ const Chat: React.FC<IChat> = props => {
       }
       const res = await request
         .post({
-          url: `/chat/conversations/file`,
+          url: getUrl(`/chat/conversations/file`),
           options: {
             body: formData,
             timeout: 1000 * 60 * 10,
@@ -332,7 +338,7 @@ const Chat: React.FC<IChat> = props => {
         body.conversation_id = fileRes?.conversation_id;
       }
       ctrl = new AbortController();
-      await fetchEventSource(`${window.location.origin}/kubeagi-apis/chat`, {
+      await fetchEventSource(`${window.location.origin}/kubeagi-apis${gptsPrefix}/chat`, {
         method: 'POST',
         signal: ctrl.signal,
         openWhenHidden: true,
@@ -421,7 +427,6 @@ const Chat: React.FC<IChat> = props => {
   );
 
   useEffect(() => {
-    application.mutate();
     scrollToBottomTimeout = setTimeout(scrollToBottom, 100);
     return () => {
       ctrl?.abort();
@@ -488,6 +493,7 @@ const Chat: React.FC<IChat> = props => {
       };
     });
   }, [ctrl, setConversation]);
+  const GetAppData = props.gpts ? GetGpts : GetApplication;
   return (
     <RootContext.Provider
       value={{
@@ -495,6 +501,7 @@ const Chat: React.FC<IChat> = props => {
         appNamespace: props.appNamespace,
       }}
     >
+      <GetAppData setApp={setApp} />
       <div className={cx(styles.chatComponent, 'chatComponent')}>
         <GlobalStyles />
         <div
