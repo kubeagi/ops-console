@@ -19,7 +19,7 @@ const Dialogue: React.FC<DialogueProps> = props => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<any>('reference');
   const [modalData, setModalData] = useState<any>();
-  const { data, loading } = useModalAppDetailContext();
+  const { data, loading, name, namespace } = useModalAppDetailContext();
   return (
     <Spin spinning={loading}>
       {/* <div
@@ -30,8 +30,8 @@ const Dialogue: React.FC<DialogueProps> = props => {
         对话引用弹窗
       </div> */}
       <ChatComponent
-        appName={data?.metadata?.name}
-        appNamespace={data?.metadata?.namespace}
+        appName={name}
+        appNamespace={namespace}
         debug={true}
         isDark={qiankun?.theme?.isDark}
         refresh={props.saveIng}
