@@ -124,6 +124,8 @@ const ModelAppDetailDetail: React.FC<ModelAppDetailDetailProps> = () => {
   return (
     <ModalAppDetailContext.Provider
       value={{
+        name: match?.params?.id,
+        namespace: utils.getAuthData().project,
         data: data?.Application?.getApplication,
         refresh,
         loading,
