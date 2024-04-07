@@ -8,6 +8,7 @@ import I18N from '@/utils/kiwiI18N';
 
 import Container from '../Container';
 import { SliderItem } from '../Modal';
+import { useStylish } from '../commonStylish';
 import Audio from './Audio';
 import styles from './index.less';
 
@@ -22,6 +23,7 @@ interface AudioStyleProps {
   setCheckedId: (ids: string) => void;
 }
 const AudioStyle: React.FC<AudioStyleProps> = props => {
+  const stylish = useStylish();
   const { items } = props;
   const [checkedId, setCheckedId] = useState('');
   useEffect(() => {
@@ -33,8 +35,8 @@ const AudioStyle: React.FC<AudioStyleProps> = props => {
         return (
           <Flex
             align="center"
-            className={`${styles.AudioItem} ${styles.AudioItemCanSelect} ${
-              item.id === checkedId && styles.AudioItemSelected
+            className={`${styles.AudioItem} ${stylish.ItemCanSelectPrimary} ${
+              item.id === checkedId && stylish.ItemSelectedPrimary
             }`}
             justify="space-between"
             key={item.id}

@@ -26,6 +26,7 @@ interface ConfigDialogeProps {}
 
 const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
   const { configs, setConfigs, form, disabled } = useModalAppDetailContext();
+  const enableUploadFile = configs?.DocDialoge?.enableUploadFile;
   return (
     <Container isCollapse={true} style={{ marginBottom: 8 }} title={'对话配置'} titleLevel={2}>
       <>
@@ -102,9 +103,10 @@ const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
               data: {},
             },
           ]}
+          borderBottom={enableUploadFile}
           configKey="DocDialoge"
           icon={<img src={DocDialoge} width={14} />}
-          isRowItem={!form?.getFieldValue('enableUploadFile')}
+          isRowItem={!enableUploadFile}
           renderChildren={form => {
             return (
               form.getFieldValue('enableUploadFile') && (
@@ -207,7 +209,7 @@ const ConfigDialoge: React.FC<ConfigDialogeProps> = props => {
                     />
                   </Form.Item>
                   <Form.Item
-                    style={{ marginBottom: 0 }}
+                    style={{ marginBottom: enableUploadFile ? 16 : 0 }}
                     {...FormItemProps}
                     initialValue={1}
                     label="批处理"

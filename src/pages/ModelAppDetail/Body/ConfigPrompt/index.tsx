@@ -8,6 +8,7 @@ import I18N from '@/utils/kiwiI18N';
 import { useModalAppDetailContext } from '../../index';
 import { Knowledge } from '../ConfigKnowledge';
 import Container from '../Container';
+import { useStylish } from '../commonStylish';
 import styles from '../index.less';
 
 interface DetailModalProps {
@@ -135,6 +136,7 @@ interface ConfigPromptProps {}
 const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
   const { configs, setConfigs, disabled } = useModalAppDetailContext();
   const [detailOpen, setDetailOpen] = useState(false);
+  const stylish = useStylish();
 
   return (
     <>
@@ -145,7 +147,7 @@ const ConfigPrompt: React.FC<ConfigPromptProps> = props => {
           {
             key: 'string',
             icon: (
-              <a className={styles.link}>
+              <a className={stylish.link}>
                 <KubeagiPrompt style={{ marginRight: 5 }} />
                 {I18N.ModelApp.pROMP3}
               </a>

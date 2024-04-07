@@ -8,7 +8,7 @@ import I18N from '@/utils/kiwiI18N';
 import utils from '../../../../utils/__utils';
 import { useModalAppDetailContext } from '../../index';
 import Container from '../Container';
-import stylesCommon from '../index.less';
+import { useStylish } from '../commonStylish';
 import { linkageReference } from '../linkage';
 import styles from './index.less';
 
@@ -28,6 +28,7 @@ interface KnowledgeProps {
   hasEmpty?: boolean;
 }
 export const Knowledge: React.FC<KnowledgeProps> = props => {
+  const stylish = useStylish();
   const { disabled } = useModalAppDetailContext();
   const { items, canDelete, canSelect, multi, callback, hasEmpty = false } = props;
   const [checkedIds, setCheckedIds] = useState([]);
@@ -52,8 +53,8 @@ export const Knowledge: React.FC<KnowledgeProps> = props => {
           return (
             <Flex
               align="center"
-              className={`${styles.KnowledgeItem} ${canSelect && styles.KnowledgeItemCanSelect} ${
-                checkedIds.includes(item?.id) && styles.KnowledgeItemSelected
+              className={`${styles.KnowledgeItem} ${canSelect && stylish.ItemCanSelectPrimary} ${
+                checkedIds.includes(item?.id) && stylish.ItemSelectedPrimary
               }`}
               justify="space-between"
               key={item?.id}
@@ -78,12 +79,12 @@ export const Knowledge: React.FC<KnowledgeProps> = props => {
               }}
             >
               <div style={{ width: canDelete ? `calc(100% - 20px)` : '100%' }}>
-                <span className={styles.icon}>
+                <span className={`${styles.icon} ${stylish.link}`}>
                   {typeof item?.icon === 'string' ? (
                     <img className={styles.img} src={item?.icon} width={canDelete ? 14 : 24} />
                   ) : (
                     <span
-                      className={styles?.icon}
+                      className={`${styles.icon} ${stylish.link}`}
                       style={item?.color ? { color: item?.color } : {}}
                     >
                       {item?.icon}
@@ -103,7 +104,7 @@ export const Knowledge: React.FC<KnowledgeProps> = props => {
               </div>
               {canDelete && (
                 <DeleteOutlined
-                  className={`${styles.delete} ${disabled && styles.disabled}`}
+                  className={`${styles.delete} ${disabled && styles.disabled} ${stylish.hover}`}
                   onClick={() => {
                     if (disabled) return;
                     setCheckedIds && setCheckedIds(checkedIds?.filter(id => item?.id !== id));
@@ -122,6 +123,7 @@ export const Knowledge: React.FC<KnowledgeProps> = props => {
 interface ConfigKnowledgeProps {}
 
 const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
+  const stylish = useStylish();
   const { configs, setConfigs, form } = useModalAppDetailContext();
   const knowledgesRes = utils.bff.useListKnowledgeBases({
     input: {
@@ -142,7 +144,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
         {
           key: 'string',
           icon: (
-            <a className={stylesCommon.link}>
+            <a className={stylish.link}>
               <PlusCircleOutlined style={{ marginRight: 5 }} />
               {I18N.ModelApp.tianJia}
             </a>
@@ -181,7 +183,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
               );
             },
             handleSave: (values: any, configs) => {
-              linkageReference(form, configs);
+              linkageReference(form, configs, setConfigs);
             },
           },
         },
@@ -269,7 +271,7 @@ const ConfigKnowledge: React.FC<ConfigKnowledgeProps> = props => {
             },
           };
           setConfigs(newConfigs);
-          linkageReference(form, newConfigs);
+          linkageReference(form, newConfigs, setConfigs);
         }}
       />
     </Container>

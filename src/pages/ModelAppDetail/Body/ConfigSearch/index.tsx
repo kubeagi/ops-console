@@ -38,6 +38,8 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
     );
   }, [llms]);
 
+  const enableRerank = configs?.Rerank?.enableRerank;
+
   return (
     <Container isCollapse={true} title="查询配置" titleLevel={2}>
       <Container
@@ -56,7 +58,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
                         enableRerank: v,
                       },
                     };
-                    linkageReference(form, newConfigs);
+                    linkageReference(form, newConfigs, setConfigs);
                     setConfigs(newConfigs);
                   }}
                 />
@@ -65,11 +67,11 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
             data: {},
           },
         ]}
-        borderBottom={form?.getFieldValue('enableRerank')}
+        borderBottom={enableRerank}
         changeConfig
         configKey="Rerank"
         icon={<img src={RerankIcon} width={16} />}
-        isRowItem={!form?.getFieldValue('enableRerank')}
+        isRowItem={!enableRerank}
         renderChildren={form => {
           return (
             form.getFieldValue('enableRerank') && (
@@ -132,7 +134,7 @@ const ConfigNext: React.FC<ConfigNextProps> = props => {
                         enableMultiQuery: v,
                       },
                     };
-                    linkageReference(form, newConfigs);
+                    linkageReference(form, newConfigs, setConfigs);
                     setConfigs(newConfigs);
                   }}
                 />
