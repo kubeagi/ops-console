@@ -1,3 +1,36 @@
 body {
   font-size: 12px;
 }
+
+.dataset-collapse-header > div > .tenx-ui-materials-collapse-header {
+  padding: 12px;
+}
+
+.dataset-collapse-header {
+  background-color: unset !important;
+}
+
+.dataset-collapse-header .tenx-ui-materials-collapse-content-box {
+  padding: 0 !important;
+}
+
+.dataset-collapse-header .tenx-ui-materials-table-thead {
+  background-color: var(--menu-item-color);
+}
+
+.dataset-collapse-header th:first-child,
+.dataset-collapse-header td:first-child {
+  padding-left: 16px !important;
+}
+
+.dataset-collapse-header td:last-child div {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+.dataset-collapse-header th:last-child {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 100px !important;
+}

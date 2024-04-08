@@ -1,3 +1,5 @@
+@import '@/assets/style/index.less';
+
 body {
   font-size: 12px;
 }
@@ -7,5 +9,10 @@ body {
 }
 
 .custom-table .tenx-ui-materials-table-thead {
-  background-color: var(--menu-item-color);
+  background-color: var(--background-color-body);
+}
+
+.dataset-version-header .tenx-ui-materials-card-body {
+  padding-top: 16px;
+  padding-bottom: 16px;
 }

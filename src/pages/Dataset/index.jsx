@@ -1220,6 +1220,7 @@ class Dataset$$Page extends React.Component {
                         __component_name="Collapse"
                         accordion={true}
                         bordered={true}
+                        className="dataset-collapse-header"
                         destroyInactivePanel={true}
                         expandIconPosition="right"
                         ghost={false}
@@ -1244,18 +1245,23 @@ class Dataset$$Page extends React.Component {
                             label: (
                               <Row
                                 __component_name="Row"
-                                style={{ display: 'flex', justifyContent: 'space-between' }}
+                                align="middle"
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  marginTop: '0px',
+                                }}
                                 wrap={true}
                               >
                                 <Col
                                   __component_name="Col"
-                                  span={11}
+                                  span={7}
                                   style={{ alignItems: 'center', display: 'flex' }}
                                 >
                                   <Image
                                     __component_name="Image"
                                     fallback=""
-                                    height={32}
+                                    height={28}
                                     preview={false}
                                     src={__$$eval(
                                       () =>
@@ -1263,23 +1269,26 @@ class Dataset$$Page extends React.Component {
                                           item.contentType
                                           ]
                                     )}
-                                    width={32}
+                                    width={28}
                                   />
-                                  <Typography.Title
-                                    __component_name="Typography.Title"
-                                    bold={false}
-                                    bordered={false}
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
                                     ellipsis={true}
-                                    level={1}
-                                    style={{ paddingLeft: '8px' }}
+                                    strong={false}
+                                    style={{
+                                      fontSize: '14px',
+                                      fontWeight: 500,
+                                      paddingLeft: '8px',
+                                    }}
                                   >
                                     {__$$eval(() => __$$context.utils.getFullName(item))}
-                                  </Typography.Title>
+                                  </Typography.Text>
                                 </Col>
                                 <Col
                                   __component_name="Col"
                                   flex="200px"
-                                  span={4}
+                                  span={3}
                                   style={{
                                     alignItems: 'center',
                                     display: 'flex',
@@ -1322,8 +1331,8 @@ class Dataset$$Page extends React.Component {
                                 </Col>
                                 <Col
                                   __component_name="Col"
-                                  flex="150px"
-                                  span={4}
+                                  flex=""
+                                  span={8}
                                   style={{
                                     alignItems: 'center',
                                     display: 'flex',
@@ -1371,6 +1380,7 @@ class Dataset$$Page extends React.Component {
                                       );
                                     }.bind(__$$context)}
                                     shape="default"
+                                    size="small"
                                     type="text"
                                   >
                                     {this.i18n('i18n-wgpt60zj') /* 新增版本 */}
@@ -1402,6 +1412,7 @@ class Dataset$$Page extends React.Component {
                                       );
                                     }.bind(__$$context)}
                                     shape="default"
+                                    size="small"
                                     type="text"
                                   >
                                     {this.i18n('i18n-z0idrepg') /* - */}
