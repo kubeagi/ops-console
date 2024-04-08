@@ -1252,6 +1252,7 @@ class DatasetVersionDetail$$Page extends React.Component {
           __component_name="Card"
           actions={[]}
           bordered={false}
+          className="dataset-version-header"
           hoverable={false}
           loading={false}
           size="default"
@@ -1259,20 +1260,24 @@ class DatasetVersionDetail$$Page extends React.Component {
           type="default"
         >
           <Row __component_name="Row">
-            <Col __component_name="Col" flex="470px">
+            <Col __component_name="Col" flex="470px" span={19}>
               <Row __component_name="Row" wrap={true}>
-                <Col __component_name="Col" span={4}>
+                <Col __component_name="Col">
                   <Image
                     __component_name="Image"
                     fallback=""
-                    height={64}
+                    height={56}
                     preview={false}
                     src={__$$eval(() => this.constants.DATASET_DATA.versionImg)}
-                    width={64}
+                    width={56}
                   />
                 </Col>
-                <Col __component_name="Col" span={6}>
-                  <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={20}>
+                  <Row
+                    __component_name="Row"
+                    style={{ display: 'flex', height: '56px' }}
+                    wrap={true}
+                  >
                     <Col __component_name="Col" span={24}>
                       <Typography.Title
                         __component_name="Typography.Title"
@@ -1284,7 +1289,7 @@ class DatasetVersionDetail$$Page extends React.Component {
                         {__$$eval(() => this.data().data?.version || '-')}
                       </Typography.Title>
                     </Col>
-                    <Col __component_name="Col" flex="" span={24}>
+                    <Col __component_name="Col" span={24} style={{ marginTop: '-13px' }}>
                       <Space
                         __component_name="Space"
                         align="center"
@@ -1339,6 +1344,7 @@ class DatasetVersionDetail$$Page extends React.Component {
             <Col
               __component_name="Col"
               flex="auto"
+              span={5}
               style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}
             >
               <Space __component_name="Space" align="center" direction="horizontal">
