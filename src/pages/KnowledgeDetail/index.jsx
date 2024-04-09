@@ -20,6 +20,8 @@ import {
   Tooltip,
   Dropdown,
   Space,
+  Badge,
+  Tag,
 } from '@tenx-ui/materials';
 
 import LccComponentSbva0 from 'confirm';
@@ -31,6 +33,7 @@ import LccComponentXnggv from 'kubeagi-knowledge-edit-modal';
 import {
   AntdIconInfoCircleOutlined,
   AntdIconPlusOutlined,
+  TenxIconHandPress,
   AntdIconReloadOutlined,
 } from '@tenx-ui/icon-materials';
 
@@ -79,6 +82,7 @@ class KnowledgeDetail$$Page extends React.Component {
       addFilesModalConfirmBtnLoading: false,
       addFilesModalOpen: false,
       baseInfoModalOpen: false,
+      confirm: {},
       dataset: undefined,
       datasetList: [],
       datasetVersion: undefined,
@@ -86,10 +90,10 @@ class KnowledgeDetail$$Page extends React.Component {
       deleteModalOpen: false,
       editModalOpen: false,
       fileDelBtnsLoading: {},
-      fileDelconfirm: {},
       modalFilesList: [],
       modalFilesListLoading: false,
       modalFilesSelectedKeys: [],
+      modalFilesSelectedRows: [],
       searchText: undefined,
     };
   }
@@ -113,6 +117,7 @@ class KnowledgeDetail$$Page extends React.Component {
     let processing = 0;
     let succeeded = 0;
     let failed = 0;
+    let pendingUpdate = 0;
     detail.forEach(d => {
       if (d.phase === 'Processing') {
         processing++;
@@ -121,12 +126,16 @@ class KnowledgeDetail$$Page extends React.Component {
       } else if (d.phase === 'Failed') {
         failed++;
       }
+      if (d.latestVersion !== d.version) {
+        pendingUpdate++;
+      }
     });
     return {
       total: detail.length,
       processing,
       succeeded,
       failed,
+      pendingUpdate,
     };
   }
 
@@ -296,28 +305,42 @@ class KnowledgeDetail$$Page extends React.Component {
   }
 
   async onAddFilesModalOk() {
-    const { modalFilesSelectedKeys } = this.state;
+    const { modalFilesSelectedKeys, modalFilesSelectedRows } = this.state;
     const knowledge = this.getKnowledge();
     const fileGroups = (knowledge.fileGroupDetails || []).map(fgd => ({
       source: fgd.source,
       files: fgd.filedetails.map(detail => ({
         path: detail.path,
+        version: detail.version,
       })),
     }));
     const version = this.getCurrentDatasetAndVersion().version;
     const targetFileGroupIndex = fileGroups.findIndex(fg => fg.source?.name === version);
     if (targetFileGroupIndex > -1) {
-      fileGroups[targetFileGroupIndex].files = modalFilesSelectedKeys.map(path => ({
-        path,
-      }));
+      // 修改已有 dataset
+      const currentFiles = fileGroups[targetFileGroupIndex].files;
+      fileGroups[targetFileGroupIndex].files = modalFilesSelectedKeys.map(path => {
+        const oldFile = currentFiles.find(f => f.path === path);
+        let version = oldFile?.version;
+        if (!version) {
+          // 没有的话说明是新增的，需要获取最新版本
+          version = modalFilesSelectedRows.find(f => f.path === path)?.latestVersion;
+        }
+        return {
+          path,
+          version,
+        };
+      });
     } else {
+      // 新增 dataset
       fileGroups.push({
         source: {
           kind: 'VersionedDataset',
           name: version,
         },
-        files: modalFilesSelectedKeys.map(path => ({
-          path,
+        files: modalFilesSelectedRows.map(row => ({
+          path: row.path,
+          version: row.latestVersion,
         })),
       });
     }
@@ -416,7 +439,7 @@ class KnowledgeDetail$$Page extends React.Component {
   async onFileDelBtnClick(event, extParams) {
     const { path, source } = extParams.record;
     this.setState({
-      fileDelconfirm: {
+      confirm: {
         id: new Date().getTime(),
         title: '删除知识库文件',
         content: `确定删除知识库文件：${source}/${path} ？`,
@@ -428,6 +451,7 @@ class KnowledgeDetail$$Page extends React.Component {
               .filter(detail => detail.path !== path || fgd.source.name !== source)
               .map(detail => ({
                 path: detail.path,
+                version: detail.version,
               })),
           }));
           const input = {
@@ -460,6 +484,7 @@ class KnowledgeDetail$$Page extends React.Component {
     this.fileModalSelectedRowKeys = selectedRowKeys;
     this.setState({
       modalFilesSelectedKeys: selectedRowKeys,
+      modalFilesSelectedRows: selectedRows,
     });
   }
 
@@ -492,6 +517,65 @@ class KnowledgeDetail$$Page extends React.Component {
     } finally {
       //
     }
+  }
+
+  async onFileUpdateBtnClick(event, extParams) {
+    const { path, source } = extParams?.record || {};
+    const pendingUpdateCount = this.countFileGroupDetails().pendingUpdate;
+    this.setState({
+      confirm: {
+        id: new Date().getTime(),
+        title: '更新知识库文件',
+        content: source
+          ? `确定更新知识库文件：${source}/${path} ？`
+          : `确定更新所有知识库文件（共 ${pendingUpdateCount} 个需要更新）？`,
+        onOk: async () => {
+          const knowledge = this.getKnowledge();
+          const fileGroups = (knowledge.fileGroupDetails || []).map(fgd => ({
+            source: fgd.source,
+            files: fgd.filedetails.map(detail => {
+              // 更新全部文件
+              if (!source) {
+                return {
+                  path: detail.path,
+                  version: detail.latestVersion,
+                };
+              }
+              // 更新单个文件
+              if (detail.path === path && fgd.source.name === source) {
+                return {
+                  path: detail.path,
+                  version: detail.latestVersion,
+                };
+              }
+              return {
+                path: detail.path,
+                version: detail.version,
+              };
+            }),
+          }));
+          const input = {
+            name: knowledge.name,
+            namespace: knowledge.namespace,
+            fileGroups,
+          };
+          try {
+            await this.utils.bff.updateKnowledgeBase({
+              input,
+            });
+            this.utils.message.success(
+              source ? `文件 '${path}' 更新成功` : `${pendingUpdateCount} 个文件更新成功`
+            );
+            this.refreshData();
+          } catch (err) {
+            console.warn('updateKnowledgeBase failed', err);
+            this.utils.message.warning(`文件更新失败`);
+          } finally {
+            //
+          }
+        },
+      },
+    });
   }
 
   onSearchTextSubmit(value) {
@@ -555,7 +639,7 @@ class KnowledgeDetail$$Page extends React.Component {
               Array.prototype.slice.call(arguments).concat([])
             );
           }.bind(this)}
-          open={__$$eval(() => this.state.baseInfoModalOpen)}
+          open={false}
           title="基础信息"
           width="700px"
         >
@@ -719,7 +803,7 @@ class KnowledgeDetail$$Page extends React.Component {
         </Modal>
         <LccComponentSbva0
           __component_name="LccComponentSbva0"
-          data={__$$eval(() => this.state.fileDelconfirm)}
+          data={__$$eval(() => this.state.confirm)}
         />
         <Modal
           __component_name="Modal"
@@ -1093,114 +1177,143 @@ class KnowledgeDetail$$Page extends React.Component {
               size="default"
               type="default"
             >
-              <Row __component_name="Row" wrap={true}>
-                <Col
-                  __component_name="Col"
-                  span={24}
-                  style={{
-                    alignItem: 'center',
-                    alignItems: 'center',
-                    dispalay: 'flex',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'nowrap',
-                    height: '32px',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <Button
-                    __component_name="Button"
-                    block={false}
-                    danger={false}
-                    disabled={false}
-                    ghost={false}
-                    icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
-                    onClick={function () {
-                      return this.openAddFilesModal.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    shape="default"
-                    style={{ height: '32px', marginRight: '12px' }}
-                    type="primary"
-                  >
-                    新增文件
-                  </Button>
-                  <Button
-                    __component_name="Button"
-                    block={false}
-                    danger={false}
-                    disabled={false}
-                    ghost={false}
-                    icon={<AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />}
-                    onClick={function () {
-                      return this.refreshData.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    shape="default"
-                    style={{ height: '32px', marginRight: '12px' }}
-                  >
-                    刷新
-                  </Button>
-                  <Input.Search
-                    __component_name="Input.Search"
-                    onSearch={function () {
-                      return this.onSearchTextSubmit.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    placeholder="请输入文件名称搜索"
-                    style={{ height: '32px', marginRight: '12px', width: '240px' }}
-                  />
+              <Row __component_name="Row" gutter={[null, 16]} wrap={true}>
+                <Col __component_name="Col" className="knowledge-detail-btns-row" span={24}>
                   <Space __component_name="Space" align="center" direction="horizontal">
-                    <Typography.Text
-                      __component_name="Typography.Text"
+                    <Button
+                      __component_name="Button"
+                      block={false}
+                      danger={false}
                       disabled={false}
-                      ellipsis={true}
-                      strong={false}
-                      style={{ fontSize: '', paddingRight: '12px' }}
+                      ghost={false}
+                      icon={<AntdIconPlusOutlined __component_name="AntdIconPlusOutlined" />}
+                      onClick={function () {
+                        return this.openAddFilesModal.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
+                      shape="default"
+                      style={{}}
+                      type="primary"
                     >
-                      {__$$eval(() => `共有文件：${this.countFileGroupDetails().total} 个`)}
-                    </Typography.Text>
-                    <Typography.Text
-                      __component_name="Typography.Text"
+                      新增文件
+                    </Button>
+                    {!!__$$eval(() => this.countFileGroupDetails().pendingUpdate > 0) && (
+                      <Badge
+                        __component_name="Badge"
+                        color=""
+                        count=""
+                        offset={[]}
+                        overflowCount={0}
+                        shape="dot"
+                        showZero={false}
+                      >
+                        <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={false}
+                          ghost={false}
+                          icon={<TenxIconHandPress __component_name="TenxIconHandPress" />}
+                          onClick={function () {
+                            return this.onFileUpdateBtnClick.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this)}
+                          shape="default"
+                          style={{}}
+                        >
+                          一键更新
+                        </Button>
+                      </Badge>
+                    )}
+                    <Button
+                      __component_name="Button"
+                      block={false}
+                      danger={false}
                       disabled={false}
-                      ellipsis={true}
-                      strong={false}
-                      style={{ fontSize: '', paddingRight: '12px' }}
+                      ghost={false}
+                      icon={<AntdIconReloadOutlined __component_name="AntdIconReloadOutlined" />}
+                      onClick={function () {
+                        return this.refreshData.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
+                      shape="default"
+                      style={{}}
                     >
-                      {__$$eval(
-                        () => `文件向量化中：${this.countFileGroupDetails().processing} 个`
-                      )}
-                    </Typography.Text>
-                    <Typography.Text
-                      __component_name="Typography.Text"
-                      disabled={false}
-                      ellipsis={true}
-                      strong={false}
-                      style={{ fontSize: '', paddingRight: '12px' }}
-                    >
-                      {__$$eval(
-                        () => `文件向量化成功：${this.countFileGroupDetails().succeeded} 个`
-                      )}
-                    </Typography.Text>
-                    <Space __component_name="Space" align="center" direction="horizontal" size={4}>
+                      刷新
+                    </Button>
+                    <Input.Search
+                      __component_name="Input.Search"
+                      onSearch={function () {
+                        return this.onSearchTextSubmit.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
+                      placeholder="请输入文件名称搜索"
+                      style={{ height: '32px', marginRight: '12px', width: '240px' }}
+                    />
+                    <Space __component_name="Space" align="center" direction="horizontal">
                       <Typography.Text
                         __component_name="Typography.Text"
                         disabled={false}
                         ellipsis={true}
                         strong={false}
-                        style={{ fontSize: '' }}
+                        style={{ fontSize: '', paddingRight: '12px' }}
+                      >
+                        {__$$eval(() => `共有文件：${this.countFileGroupDetails().total} 个`)}
+                      </Typography.Text>
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '', paddingRight: '12px' }}
                       >
                         {__$$eval(
-                          () => `文件向量化失败：${this.countFileGroupDetails().failed} 个`
+                          () => `文件向量化中：${this.countFileGroupDetails().processing} 个`
                         )}
                       </Typography.Text>
-                      {!!__$$eval(() => this.getKnowledge()?.status === 'False') && (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '', paddingRight: '12px' }}
+                      >
+                        {__$$eval(
+                          () => `文件向量化成功：${this.countFileGroupDetails().succeeded} 个`
+                        )}
+                      </Typography.Text>
+                      <Space
+                        __component_name="Space"
+                        align="center"
+                        direction="horizontal"
+                        size={4}
+                      >
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={true}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                        >
+                          {__$$eval(
+                            () => `文件向量化失败：${this.countFileGroupDetails().failed} 个`
+                          )}
+                        </Typography.Text>
+                      </Space>
+                    </Space>
+                    {!!__$$eval(() => this.getKnowledge()?.status === 'False') && (
+                      <Tooltip
+                        __component_name="Tooltip"
+                        title="点击‘ 重试’ 对处理失败的文件进行重新处理"
+                      >
                         <Typography.Text
                           __component_name="Typography.Text"
                           disabled={false}
@@ -1212,20 +1325,43 @@ class KnowledgeDetail$$Page extends React.Component {
                             );
                           }.bind(this)}
                           strong={false}
-                          style={{ cursor: 'pointer', fontSize: '' }}
+                          style={{ cursor: 'pointer', display: 'flex' }}
                           type="colorPrimary"
                         >
                           重试
                         </Typography.Text>
-                      )}
-                    </Space>
+                      </Tooltip>
+                    )}
                   </Space>
                 </Col>
                 <Col __component_name="Col" span={24}>
                   <Table
                     __component_name="Table"
                     columns={[
-                      { dataIndex: 'path', key: 'path', title: '文件名称' },
+                      {
+                        dataIndex: 'path',
+                        key: 'path',
+                        render: (text, record, index) =>
+                          (__$$context => (
+                            <Space __component_name="Space" align="center" direction="horizontal">
+                              <Typography.Text
+                                __component_name="Typography.Text"
+                                disabled={false}
+                                ellipsis={true}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                              >
+                                {__$$eval(() => text)}
+                              </Typography.Text>
+                              {!!__$$eval(() => record.latestVersion !== record.version) && (
+                                <Tag __component_name="Tag" closable={false} color="success">
+                                  new
+                                </Tag>
+                              )}
+                            </Space>
+                          ))(__$$createChildContext(__$$context, { text, record, index })),
+                        title: '文件名称',
+                      },
                       {
                         dataIndex: 'phase',
                         key: 'age',
@@ -1283,6 +1419,26 @@ class KnowledgeDetail$$Page extends React.Component {
                         render: /* 插槽容器*/ (text, record, index) =>
                           (__$$context => (
                             <Space __component_name="Space" align="center" direction="horizontal">
+                              <Button
+                                __component_name="Button"
+                                block={false}
+                                danger={false}
+                                disabled={__$$eval(() => record.latestVersion === record.version)}
+                                ghost={false}
+                                onClick={function () {
+                                  return this.onFileUpdateBtnClick.apply(
+                                    this,
+                                    Array.prototype.slice.call(arguments).concat([
+                                      {
+                                        record: record,
+                                      },
+                                    ])
+                                  );
+                                }.bind(__$$context)}
+                                shape="default"
+                              >
+                                更新
+                              </Button>
                               <Button
                                 __component_name="Button"
                                 block={false}

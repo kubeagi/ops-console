@@ -143,14 +143,14 @@ class KnowledgeCreate$$Page extends React.Component {
     } catch (error) {}
   }
 
-  getCheckBox(rows) {
+  getCheckBox(keys, rows) {
     try {
       const { version } = this.state;
       this.setState({
-        selectFiles: rows,
-        nextFileList: rows.map(item => {
+        selectFiles: keys,
+        nextFileList: keys.map(key => {
           return {
-            ...this.state.dataSetFileList.find(_item => _item.path === item),
+            ...this.state.dataSetFileList.find(_item => _item.path === key),
             version,
           };
         }),
@@ -330,8 +330,9 @@ class KnowledgeCreate$$Page extends React.Component {
               name: version,
               namespace: this.utils.getAuthData().project,
             },
-            files: selectFiles.map(path => ({
-              path,
+            files: selectFiles.map(file => ({
+              path: file.path,
+              version: file.latestVersion,
             })),
           },
         ];
@@ -752,7 +753,7 @@ class KnowledgeCreate$$Page extends React.Component {
                         {
                           dataIndex: 'fileType',
                           key: '',
-                          render: (text, record, index) =>
+                          render: /* 插槽容器*/ (text, record, index) =>
                             (__$$context => (
                               <Typography.Text
                                 __component_name="Typography.Text"
@@ -761,7 +762,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 strong={false}
                                 style={{ fontSize: '' }}
                               >
-                                {__$$eval(() => text || '-')}
+                                {__$$eval(() => __$$context.fileTyle || '-')}
                               </Typography.Text>
                             ))(__$$createChildContext(__$$context, { text, record, index })),
                           title: '类型',
@@ -859,7 +860,7 @@ class KnowledgeCreate$$Page extends React.Component {
                                 strong={false}
                                 style={{ fontSize: '' }}
                               >
-                                {__$$eval(() => `类型：${__$$context.getType() || '-'}`)}
+                                {__$$eval(() => `类型：${item.fileType || '-'}`)}
                               </Typography.Text>
                             </Col>
                             <Col __component_name="Col" span={4}>
