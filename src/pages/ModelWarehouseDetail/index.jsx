@@ -180,26 +180,6 @@ class ModelWarehouseDetail$$Page extends React.Component {
           }.bind(_this),
           type: 'axios',
         },
-        {
-          id: 'download',
-          isInit: function () {
-            return false;
-          }.bind(_this),
-          options: function () {
-            return {
-              headers: {
-                Authorization: this.props.Authorization || this.state.Authorization,
-                namespace: this.utils.getAuthData()?.project,
-              },
-              isCors: true,
-              method: 'GET',
-              params: {},
-              timeout: 5000,
-              uri: `${this.getUrlPrex()}/model/files/download`,
-            };
-          }.bind(_this),
-          type: 'axios',
-        },
       ],
     };
   }
@@ -284,32 +264,37 @@ class ModelWarehouseDetail$$Page extends React.Component {
   }
 
   downloadReadme({ size, ...fileData }) {
-    const pageThis = this;
-    return new Promise((resolve, reject) => {
-      pageThis
-        .getDataSourceMap()
-        .download.load({
+    this.setState({
+      readmeLoading: true,
+    });
+    this.utils.axios
+      .get(`${this.getUrlPrex()}/model/files/download`, {
+        params: {
           fileName: fileData.name,
           bucket: fileData.namespace,
           bucketPath: fileData.bucketPath,
           from: 0,
           end: size,
-        })
-        .then(function (response) {
-          pageThis.setState({
-            readmeData: response || '#### 暂无介绍',
-            isLoadedReadme: true,
-            readmeLoading: false,
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-          reject(error);
-          pageThis.setState({
-            readmeLoading: false,
-          });
+        },
+        headers: {
+          namespace: fileData.namespace,
+          Authorization: this.utils.getAuthorization(),
+        },
+      })
+      .then(res => {
+        const data = res.data;
+        this.setState({
+          readmeData: data || '#### 暂无介绍',
+          isLoadedReadme: true,
+          readmeLoading: false,
         });
-    });
+      })
+      .catch(err => {
+        this.setState({
+          readmeData: '#### 暂无介绍',
+          readmeLoading: false,
+        });
+      });
   }
 
   getBucket() {
@@ -448,31 +433,34 @@ class ModelWarehouseDetail$$Page extends React.Component {
   }
 
   getReadmeSize(fileData) {
-    const pageThis = this;
-    return new Promise((resolve, reject) => {
-      pageThis
-        .getDataSourceMap()
-        .get_file_size.load({
+    this.setState({
+      readmeLoading: true,
+    });
+    this.utils.axios
+      .get(`${this.getUrlPrex()}/model/files/stat`, {
+        params: {
           fileName: fileData.name,
           bucket: fileData.namespace,
           bucketPath: fileData.bucketPath,
-        })
-        .then(function (response) {
-          console.log(response);
-          const size = response.size;
-          pageThis.downloadReadme({
-            ...fileData,
-            size,
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-          reject(error);
-          pageThis.setState({
-            readmeLoading: false,
-          });
+        },
+        headers: {
+          namespace: fileData.namespace,
+          Authorization: this.utils.getAuthorization(),
+        },
+      })
+      .then(res => {
+        const data = res.data;
+        const size = data.size;
+        this.downloadReadme({
+          ...fileData,
+          size,
         });
-    });
+      })
+      .catch(err => {
+        this.setState({
+          readmeLoading: false,
+        });
+      });
   }
 
   getUrlPrex() {
