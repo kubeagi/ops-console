@@ -147,7 +147,7 @@ class KnowledgeCreate$$Page extends React.Component {
     try {
       const { version } = this.state;
       this.setState({
-        selectFiles: keys,
+        selectFiles: rows,
         nextFileList: keys.map(key => {
           return {
             ...this.state.dataSetFileList.find(_item => _item.path === key),
