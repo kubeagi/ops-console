@@ -479,7 +479,7 @@ const Chat: React.FC<IChat> = props => {
       setFileList(fileList);
       onSend(input || '总结一下', fileList);
     },
-    [setFileList, input, fileList]
+    [setFileList, input, fileList, onSend]
   );
   const stop = useCallback(() => {
     ctrl?.abort();

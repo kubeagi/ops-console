@@ -40,14 +40,14 @@ export const getCvsMeta = (
     id,
     meta: {
       avatar:
-        isUser || (!isUser && !assistantMeta.icon) ? (
+        isUser || (!isUser && !assistantMeta?.icon) ? (
           <div className="customAvatar">
             <Icon height={32} width={32} />
           </div>
         ) : (
-          <img alt={assistantMeta.displayName || assistantMeta.name} src={assistantMeta.icon} />
+          <img alt={assistantMeta?.displayName || assistantMeta?.name} src={assistantMeta?.icon} />
         ),
-      title: isUser ? 'You' : assistantMeta.displayName || assistantMeta.name || 'Assistant',
+      title: isUser ? 'You' : assistantMeta?.displayName || assistantMeta?.name || 'Assistant',
     },
     role: isUser ? 'user' : 'assistant',
   };
