@@ -754,7 +754,7 @@ class KnowledgeDetail$$Page extends React.Component {
                     delete={false}
                     disabled={false}
                     editable={false}
-                    ellipsis={{ rows: 2 }}
+                    ellipsis={true}
                     mark={false}
                     strong={false}
                     style={{ fontSize: '' }}

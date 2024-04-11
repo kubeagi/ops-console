@@ -71,8 +71,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@yuntijs/arcadia-bff-sdk':
-        specifier: ^1.2.16
-        version: 1.2.16(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4)
+        specifier: ^1.2.17
+        version: 1.2.17(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4)
       '@yuntijs/chat':
         specifier: workspace:*
         version: link:packages/chat
@@ -5187,7 +5187,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.365.0(react@18.2.0)
+      lucide-react: 0.367.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.1(react@18.2.0)
       query-string: 8.1.0
@@ -5251,7 +5251,7 @@ packages:
       immer: 10.0.3
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.365.0(react@18.2.0)
+      lucide-react: 0.367.0(react@18.2.0)
       polished: 4.2.2
       prism-react-renderer: 2.3.1(react@18.2.0)
       query-string: 8.1.0
@@ -6725,7 +6725,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-darwin-x64@1.3.96:
@@ -6734,7 +6733,6 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-linux-arm-gnueabihf@1.3.96:
@@ -6743,7 +6741,6 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-linux-arm64-gnu@1.3.96:
@@ -6753,7 +6750,6 @@ packages:
     os: [linux]
     libc: [glibc]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-linux-arm64-musl@1.3.96:
@@ -6763,7 +6759,6 @@ packages:
     os: [linux]
     libc: [musl]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-linux-x64-gnu@1.3.96:
@@ -6773,7 +6768,6 @@ packages:
     os: [linux]
     libc: [glibc]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-linux-x64-musl@1.3.96:
@@ -6783,7 +6777,6 @@ packages:
     os: [linux]
     libc: [musl]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-win32-arm64-msvc@1.3.96:
@@ -6792,7 +6785,6 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-win32-ia32-msvc@1.3.96:
@@ -6801,7 +6793,6 @@ packages:
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core-win32-x64-msvc@1.3.96:
@@ -6810,7 +6801,6 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@swc/core@1.3.96:
@@ -6836,11 +6826,9 @@ packages:
       '@swc/core-win32-arm64-msvc': 1.3.96
       '@swc/core-win32-ia32-msvc': 1.3.96
       '@swc/core-win32-x64-msvc': 1.3.96
-    dev: false
 
   /@swc/counter@0.1.3:
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
-    dev: false
 
   /@swc/register@0.1.10(@swc/core@1.3.96):
     resolution: {integrity: sha512-6STwH/q4dc3pitXLVkV7sP0Hiy+zBsU2wOF1aXpXR95pnH3RYHKIsDC+gvesfyB7jxNT9OOZgcqOp9RPxVTx9A==}
@@ -6859,7 +6847,6 @@ packages:
     resolution: {integrity: sha512-/JLo/l2JsT/LRd80C3HfbmVpxOAJ11FO2RCEslFrgzLltoP9j8XIbsyDcfCt2WWyX+CM96rBoNM+IToAkFOugg==}
     dependencies:
       '@swc/counter': 0.1.3
-    dev: false
 
   /@tanstack/match-sorter-utils@8.11.7:
     resolution: {integrity: sha512-4PUKgaaFpiB7MK406N5VAiLu2VUhDumojGWhEC8kNQ767RGU2vsJDI7Xp4D8lMBzijqswRWz3U8ioa2zUKnFeQ==}
@@ -8563,7 +8550,7 @@ packages:
       react-refresh: 0.14.0
       schema-utils: 3.3.0
       source-map: 0.7.4
-      webpack: 5.90.0
+      webpack: 5.90.0(@swc/core@1.3.96)
 
   /@umijs/renderer-react@4.1.1(react-dom@18.1.0)(react@18.1.0):
     resolution: {integrity: sha512-h6mXzTeadXGjUUDfBOjNjIFPkiyt1N0oIEK+eS2PH3SaZGCUa8HNm+yWJmUxxDqbo/+1rvnN8z1oEGDRHfHwXA==}
@@ -8826,8 +8813,8 @@ packages:
       - encoding
     dev: false
 
-  /@yuntijs/arcadia-bff-sdk@1.2.16(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
-    resolution: {integrity: sha512-GN9YBcRvEZZAMlisb4B3xKxn/g+ld7U+wjgeLv9KGBn4H9GZ98Dqdo1kTCVLN8bm60sl7Dn34zU803pxtSU4AQ==}
+  /@yuntijs/arcadia-bff-sdk@1.2.17(@tarojs/taro@3.6.25)(antd@5.13.2)(headers-polyfill@4.0.3)(react@18.2.0)(swr@2.2.4):
+    resolution: {integrity: sha512-yNq+AhZeCRl6EQBck5mwG+8TxGOBJoXYk02oaeR8+2xaj9yIf9LT0LL9awVFL7LCAiHyPxzJap1br+DtgFqhgA==}
     peerDependencies:
       '@tarojs/taro': '>=3'
       antd: '>=5.4.0'
@@ -9007,7 +8994,7 @@ packages:
       antd-style: 3.6.1(@types/react@18.2.48)(antd@5.13.2)(react-dom@18.2.0)(react@18.2.0)
       leva: 0.9.35(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
       lodash-es: 4.17.21
-      lucide-react: 0.365.0(react@18.2.0)
+      lucide-react: 0.367.0(react@18.2.0)
       query-string: 8.1.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -10938,7 +10925,7 @@ packages:
       postcss-modules-values: 4.0.0(postcss@8.4.33)
       postcss-value-parser: 4.2.0
       semver: 7.5.4
-      webpack: 5.90.0
+      webpack: 5.90.0(@swc/core@1.3.96)
 
   /css-prefers-color-scheme@6.0.3(postcss@8.4.33):
     resolution: {integrity: sha512-4BqMbZksRkJQx2zAjrokiGMd07RqOa2IxIrrN10lyBe9xhn9DEvjUK79J6jkeiv9D9hQFXKb6g1jwU62jziJZA==}
@@ -12788,7 +12775,7 @@ packages:
       semver: 7.5.4
       tapable: 2.2.1
       typescript: 5.0.4
-      webpack: 5.90.0
+      webpack: 5.90.0(@swc/core@1.3.96)
 
   /fork-ts-checker-webpack-plugin@8.0.0(typescript@5.3.3)(webpack@5.90.0):
     resolution: {integrity: sha512-mX3qW3idpueT2klaQXBzrIM/pHw+T0B/V9KHEvNrqijTq9NFnMZU6oreVxDYcf33P8a5cW+67PjodNHthGnNVg==}
@@ -12810,7 +12797,7 @@ packages:
       semver: 7.5.4
       tapable: 2.2.1
       typescript: 5.3.3
-      webpack: 5.90.0
+      webpack: 5.90.0(@swc/core@1.3.96)
     dev: false
 
   /form-data-encoder@1.7.2:
@@ -13551,7 +13538,7 @@ packages:
       lodash: 4.17.21
       pretty-error: 4.0.0
       tapable: 2.2.1
-      webpack: 5.90.0
+      webpack: 5.90.0(@swc/core@1.3.96)
     dev: false
 
   /html2canvas@1.4.1:
@@ -15524,8 +15511,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /lucide-react@0.365.0(react@18.2.0):
-    resolution: {integrity: sha512-sJYpPyyzGHI4B3pys+XSFnE4qtSWc68rFnDLxbNNKjkLST5XSx9DNn5+1Z3eFgFiw39PphNRiVBSVb+AL3oKwA==}
+  /lucide-react@0.367.0(react@18.2.0):
+    resolution: {integrity: sha512-3FWiBaJiqMrx5a1sjH3CVdPqWnw/Z/PTVeeTDmOeILSs+8Ah+VhCd4FQMeHo6Z0WxHcm9piIOtilQwvceiCCKQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -23054,7 +23041,7 @@ packages:
       ansi-escapes: 4.3.2
       supports-hyperlinks: 2.3.0
 
-  /terser-webpack-plugin@5.3.10(webpack@5.90.0):
+  /terser-webpack-plugin@5.3.10(@swc/core@1.3.96)(webpack@5.90.0):
     resolution: {integrity: sha512-BKFPWlPDndPs+NGGCr1U59t0XScL5317Y0UReNrHaw9/FwhPENlq6bfgs+4yPfyP51vqC1bQ4rp1EfXW5ZSH9w==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -23071,11 +23058,12 @@ packages:
         optional: true
     dependencies:
       '@jridgewell/trace-mapping': 0.3.22
+      '@swc/core': 1.3.96
       jest-worker: 27.5.1
       schema-utils: 3.3.0
       serialize-javascript: 6.0.2
       terser: 5.27.0
-      webpack: 5.90.0
+      webpack: 5.90.0(@swc/core@1.3.96)
 
   /terser@5.27.0:
     resolution: {integrity: sha512-bi1HRwVRskAjheeYl291n3JC4GgO/Ty4z1nVs5AAsmonJulGxpSektecnNedrwK9C7vpvVtcX3cw00VSLt7U2A==}
@@ -24197,7 +24185,7 @@ packages:
     resolution: {integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==}
     engines: {node: '>=10.13.0'}
 
-  /webpack@5.90.0:
+  /webpack@5.90.0(@swc/core@1.3.96):
     resolution: {integrity: sha512-bdmyXRCXeeNIePv6R6tGPyy20aUobw4Zy8r0LUS2EWO+U+Ke/gYDgsCh7bl5rB6jPpr4r0SZa6dPxBxLooDT3w==}
     engines: {node: '>=10.13.0'}
     hasBin: true
@@ -24228,7 +24216,7 @@ packages:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(webpack@5.90.0)
+      terser-webpack-plugin: 5.3.10(@swc/core@1.3.96)(webpack@5.90.0)
       watchpack: 2.4.0
       webpack-sources: 3.2.3
     transitivePeerDependencies:
