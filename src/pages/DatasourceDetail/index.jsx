@@ -4,6 +4,7 @@ import React from 'react';
 
 import {
   Page,
+  Drawer,
   Row,
   Col,
   Space,
@@ -27,6 +28,8 @@ import {
   FormilyTextArea,
   Alert,
 } from '@tenx-ui/materials';
+
+import LccComponentRu83f from 'CreateDataSource';
 
 import {
   AntdIconPlusOutlined,
@@ -341,6 +344,108 @@ class DatasourceDetail$$Page extends React.Component {
     );
   }
 
+  async onSubmit(v) {
+    const isCreate = false;
+    const form = this?.editThis?.form();
+    // form.submit(async v => {
+    this.setState({
+      loading: true,
+    });
+    let params = {
+      input: {
+        name: v?.name,
+        displayName: v?.displayName,
+        namespace: this.utils.getAuthData()?.project,
+        description: v?.description,
+        ossinput: {
+          bucket: v?.bucket,
+          object: v?.object,
+        },
+        endpointinput: {
+          url: v?.serverAddress,
+          insecure: v?.insecure === 'https' ? false : true,
+          auth: {
+            rootUser: v?.username,
+            rootPassword: v?.password,
+          },
+        },
+        webinput: {
+          recommendIntervalTime: v?.recommendIntervalTime || 1000,
+        },
+      },
+    };
+    if (this?.editThis?.getType() === 'onLine') {
+      params = {
+        input: {
+          name: v?.name,
+          displayName: v?.displayName,
+          namespace: this.utils.getAuthData()?.project,
+          description: v?.description,
+          endpointinput: {
+            url: v?.serverAddress,
+          },
+          webinput: {
+            recommendIntervalTime: +v?.recommendIntervalTime || 1000,
+          },
+        },
+      };
+    }
+    if (this?.editThis?.getType() === 'postgresql') {
+      params = {
+        input: {
+          name: v?.name,
+          displayName: v?.displayName,
+          namespace: this.utils.getAuthData()?.project,
+          description: v?.description,
+          endpointinput: {
+            url: v?.serverAddress,
+            auth: {
+              rootUser: v?.username,
+              rootPassword: v?.password,
+            },
+          },
+          pginput: {
+            database: v?.database,
+          },
+        },
+      };
+    }
+    const api = {
+      create: {
+        name: 'createDatasource',
+        params,
+        successMessage: 'i18n-ia3gjpq5',
+        faildMessage: 'i18n-p20wuevb',
+      },
+      update: {
+        name: 'updateDatasource',
+        params,
+        successMessage: 'i18n-tz6dwud2',
+        faildMessage: 'i18n-sah3nlrl',
+      },
+    }[isCreate ? 'create' : 'update'];
+    try {
+      const res = await this.props.appHelper.utils.bff[api.name](api.params);
+      this.utils.notification.success({
+        message: this.i18n(api.successMessage),
+      });
+      this.refresh();
+      this.setState({
+        loading: false,
+        editVisible: false,
+      });
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n(api.faildMessage),
+        errors: error?.response?.errors,
+      });
+      this.setState({
+        loading: false,
+      });
+    }
+    // })
+  }
+
   refresh() {
     this.props.useGetDatasource?.mutate();
   }
@@ -366,6 +471,22 @@ class DatasourceDetail$$Page extends React.Component {
         message: '文件：' + event.file.name + '内容过大',
       });
     }
+  }
+
+  setEditThis(editThis) {
+    this.editThis = editThis;
+    const record = this.getData();
+    this?.editThis?.initEditForm({
+      ...record,
+      bucket: record?.oss?.bucket,
+      object: record?.oss?.object,
+      serverAddress: record?.endpoint?.url,
+      password: record?.endpoint?.auth?.password,
+      username: record?.endpoint?.auth?.username,
+      insecure: record?.endpoint?.insecure ? 'http' : 'https',
+      recommendIntervalTime: record?.web?.recommendIntervalTime || 1000,
+      database: record?.pg?.database,
+    });
   }
 
   sizeTostr(size) {
@@ -408,6 +529,38 @@ class DatasourceDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page style={{ backgroundColor: '#f0f0f0' }}>
+        <Drawer
+          __component_name="Drawer"
+          className="edit-data-source-drawer"
+          destroyOnClose={true}
+          footer={null}
+          mask={true}
+          maskClosable={false}
+          onClose={function () {
+            return this.cancelEdit.apply(this, Array.prototype.slice.call(arguments).concat([]));
+          }.bind(this)}
+          open={__$$eval(() => this.state.editVisible)}
+          placement="right"
+          title={this.i18n('i18n-8vmpttzl') /* 编辑数据源 */}
+          width="600"
+        >
+          <LccComponentRu83f
+            __component_name="LccComponentRu83f"
+            bff={__$$eval(() => this.props.appHelper.utils.bff)}
+            colWidth="430px"
+            data={__$$eval(() => this.getData())}
+            handelCancel={function () {
+              return this.cancelEdit.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            handleSave={function () {
+              return this.onSubmit.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+            project={__$$eval(() => this.utils.getAuthData()?.project)}
+            setThis={function () {
+              return this.setEditThis.apply(this, Array.prototype.slice.call(arguments).concat([]));
+            }.bind(this)}
+          />
+        </Drawer>
         <Row __component_name="Row" wrap={true}>
           <Col __component_name="Col" span={24}>
             <Space __component_name="Space" align="center" direction="horizontal">
@@ -1601,7 +1754,7 @@ class DatasourceDetail$$Page extends React.Component {
               Array.prototype.slice.call(arguments).concat([])
             );
           }.bind(this)}
-          open={__$$eval(() => this.state.editVisible)}
+          open={false}
           title="编辑"
         >
           <FormilyForm
